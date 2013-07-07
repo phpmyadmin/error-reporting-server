@@ -17,3 +17,15 @@ CREATE TABLE reports (
     created DATETIME DEFAULT NULL,
     modified DATETIME DEFAULT NULL
 );
+
+DROP TABLE IF EXISTS developers;
+CREATE TABLE developers (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    github_id INT UNSIGNED,
+    name VARCHAR(50),
+    email VARCHAR(70),
+    gravatar_id VARCHAR(100),
+    access_token VARCHAR(100),
+    created DATETIME DEFAULT NULL,
+    modified DATETIME DEFAULT NULL
+);
