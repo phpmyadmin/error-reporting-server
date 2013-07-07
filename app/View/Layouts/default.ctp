@@ -17,20 +17,29 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-$cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework');
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<?php echo $this->Html->charset(); ?>
 	<title>
-		<?php echo $cakeDescription ?>:
 		<?php echo $title_for_layout; ?>
+    PHP MY ADMIN - Error Reporting Server
 	</title>
 	<?php
 		echo $this->Html->meta('icon');
 
-		echo $this->Html->css('cake.generic');
+		//echo $this->Html->css('cake.generic');
+		echo $this->Html->css('jquery.dataTables');
+		echo $this->Html->css('jquery.dataTables_themeroller');
+		echo $this->Html->css('bootstrap.min');
+		echo $this->Html->css('bootstrap-responsive.min');
+		echo $this->Html->css('custom');
+
+		echo $this->Html->script('jquery');
+		echo $this->Html->script('jquery.dataTables.min');
+		echo $this->Html->script('bootstrap');
+		echo $this->Html->script('custom');
 
 		echo $this->fetch('meta');
 		echo $this->fetch('css');
@@ -38,23 +47,27 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 	?>
 </head>
 <body>
+  <div class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="#">PHPMyAdmin</a>
+      <ul class="nav">
+        <li class="active"><a href="#">Reports</a></li>
+      </ul>
+      <ul class="nav pull-right">
+        <li><a href="../developer/logout">Logout</a></li>
+      </ul>
+    </div>
+  </div>
 	<div id="container">
 		<div id="header">
-			<h1><?php echo $this->Html->link($cakeDescription, 'http://cakephp.org'); ?></h1>
 		</div>
-		<div id="content">
+		<div id="content" class="container">
 
 			<?php echo $this->Session->flash(); ?>
 
 			<?php echo $this->fetch('content'); ?>
 		</div>
 		<div id="footer">
-			<?php echo $this->Html->link(
-					$this->Html->image('cake.power.gif', array('alt' => $cakeDescription, 'border' => '0')),
-					'http://www.cakephp.org/',
-					array('target' => '_blank', 'escape' => false)
-				);
-			?>
 		</div>
 	</div>
 </body>
