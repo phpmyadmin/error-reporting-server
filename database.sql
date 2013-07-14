@@ -22,10 +22,11 @@ DROP TABLE IF EXISTS developers;
 CREATE TABLE developers (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     github_id INT UNSIGNED,
-    name VARCHAR(50),
+    full_name VARCHAR(50),
     email VARCHAR(70),
     gravatar_id VARCHAR(100),
     access_token VARCHAR(100),
+    has_commit_access BIT(1),
     created DATETIME DEFAULT NULL,
     modified DATETIME DEFAULT NULL
 );

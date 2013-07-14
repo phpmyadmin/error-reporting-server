@@ -20,13 +20,17 @@ $(document).ready(function() {
       });
     },
 	} );
+
   oTable.find("input").on('keyup', function(e) {
     // only search when enter is pressed
     if(e.keyCode == 13) {
       oTable.fnFilter($(this).val(), oTable.find("th").index($(this).parent()));
     }
   });
+
   oTable.find("select").on('change', function(e) {
     oTable.fnFilter($(this).val(), oTable.find("th").index($(this).parent()));
   });
+
+  setTimeout(function(){$(".alert").slideUp()}, 2000)
 } );

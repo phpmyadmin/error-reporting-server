@@ -15,16 +15,29 @@ class ReportsController extends AppController {
     );
   }
 
+  public function view($id) {
+    if (!$id) {
+      throw new NotFoundException(__('Invalid Report'));
+    }
+
+    $report = $this->Report->findById($id);
+    if (!$report) {
+      throw new NotFoundException(__('Invalid Report'));
+    }
+
+    $this->set('report', $report);
+  }
+
   public function submit() {
     $report = $this->request->input('json_decode', true);
     $this->Report->create(array('status' => 'new'));
     $this->Report->save($report);
-    $this->autoRender = false;
     $response = array(
       "success" => true,
-      "message" => "Thank for your submission",
+      "message" => "Thank you for your submission",
       "report_id" => $this->Report->id,
     );
+    $this->autoRender = false;
     return json_encode($response);
   }
 
@@ -46,6 +59,7 @@ class ReportsController extends AppController {
     $paged_params['offset'] = intval($this->request->query('iDisplayStart'));
 
     $rows = $this->Report->find('allDataTable', $paged_params);
+    $rows = Sanitize::clean($rows);
     $total_filtered = $this->Report->find('count', $params);
 
     $response = array(

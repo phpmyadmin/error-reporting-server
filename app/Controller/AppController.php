@@ -21,7 +21,8 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 App::uses('Controller', 'Controller');
-
+App::uses('Developer', 'Model');
+App::uses('Sanitize', 'Utility');
 /**
  * Application Controller
  *
@@ -36,4 +37,35 @@ class AppController extends Controller {
     'DebugKit.Toolbar',
     'Session',
   );
+  public $uses = array('Developer');
+
+  public function beforeFilter() {
+    $params = $this->params->params;
+    $controller = $params["controller"];
+    $action = $params["action"];
+
+    if($params["controller"] === "reports") {
+      $this->set('navigation_class', "active");
+    } else {
+      $this->set('navigation_class', "");
+    }
+
+    if($this->Session->read('Developer.id')) {
+      $current_developer = $this->Developer->
+          findById($this->Session->read('Developer.id'));
+      $current_developer = Sanitize::clean($current_developer);
+
+      $this->set('current_developer', $current_developer["Developer"]);
+      $this->set('developer_signed_in', true);
+    } else {
+      $this->set('developer_signed_in', false);
+
+      if($controller !== "pages" && $controller !== "developers" &&
+          !($action === "submit" && $controller === "reports")) {
+        $this->Session->setFlash("You need to be signed in to do this", "default",
+            array("class" => "alert alert-error"));
+        $this->redirect("/");
+      }
+    }
+  }
 }

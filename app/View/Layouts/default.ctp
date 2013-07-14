@@ -49,12 +49,17 @@
 <body>
   <div class="navbar">
     <div class="navbar-inner">
-      <a class="brand" href="#">PHPMyAdmin</a>
+      <a class="brand" href="/">phpMyAdmin</a>
       <ul class="nav">
-        <li class="active"><a href="#">Reports</a></li>
+        <li class="<?php echo $navigation_class; ?>"><a href="/reports">Reports</a></li>
       </ul>
       <ul class="nav pull-right">
-        <li><a href="../developer/logout">Logout</a></li>
+        <?php if ($developer_signed_in) { ?>
+          <li><a>Hello, <?php echo $current_developer["full_name"]; ?></a></li>
+          <li><a href="/developers/logout">Logout</a></li>
+        <?php } else { ?>
+          <li><a href="/developers/login">Login with Github</a></li>
+        <?php } ?>
       </ul>
     </div>
   </div>
@@ -62,7 +67,6 @@
 		<div id="header">
 		</div>
 		<div id="content" class="container">
-
 			<?php echo $this->Session->flash(); ?>
 
 			<?php echo $this->fetch('content'); ?>
