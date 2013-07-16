@@ -113,11 +113,5 @@ CakeLog::config('error', array(
  * Loads debug kit
  */
 CakePlugin::load('DebugKit');
-Configure::write('Session',
-  array(
-    'defaults' => 'php',
-    'timeout' => 43200
-  )
-);
 
 require 'oauth.php';
