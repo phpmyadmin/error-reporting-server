@@ -7,8 +7,17 @@
   ?>">
   <thead>
     <tr>
-      <th><input id="id_filter" style="width: 100%" type="number"/></th>
-      <th></th>
+      <th><input id="id_filter" style="width: 100%;margin-left:-10px" type="number"/></th>
+      <th>
+        <select id="error_name_filter" style="width: 100%">
+          <option></option>
+          <?php
+            foreach ($distinct_error_names as $id => $name) { 
+              echo "<option value='$name'>$name</option>";
+            }
+          ?>
+        </select>
+      </th>
       <th></th>
       <th>
         <select id="pam_version_filter" style="width: 100%">

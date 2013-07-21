@@ -1,16 +1,26 @@
 <?php
+App::uses('Sanitize', 'Utility');
+App::uses('AppController', 'Controller');
+
 class ReportsController extends AppController {
-  public $helpers = array('Html', 'Form');
+  public $components = array('RequestHandler');
+  public $helpers = array('Html', 'Form', 'Reports');
 
   public function index() {
     $this->set('distinct_statuses',
       $this->Report->find('arrayList', array(
-        'fields' => array('DISTINCT Report.status'), 
+        'fields' => array('DISTINCT Report.status'),
       ))
     );
     $this->set('distinct_versions',
       $this->Report->find('arrayList', array(
-        'fields' => array('DISTINCT Report.pma_version'), 
+        'fields' => array('DISTINCT Report.pma_version'),
+      ))
+    );
+    $this->set('distinct_error_names',
+      $this->Report->find('arrayList', array(
+        'fields' => array('DISTINCT Report.error_name'),
+        'conditions' => array('error_name !=' => ''),
       ))
     );
   }
@@ -21,11 +31,40 @@ class ReportsController extends AppController {
     }
 
     $report = $this->Report->findById($id);
-    if (!$report) {
+    if (!$report || $this->RequestHandler->accepts('json')) {
       throw new NotFoundException(__('Invalid Report'));
     }
 
+    $report['Report']['full_report'] =
+        Sanitize::clean(json_decode($report['Report']['full_report'], true));
+
     $this->set('report', $report);
+
+    $this->Report->read(null, $id);
+    $this->set('related_reports', $this->Report->get_related_reports());
+    $this->set('reports_with_description',
+        $this->Report->get_related_reports_with_description());
+
+    $this->setSimilarFields($id);
+  }
+
+  public function json($id) {
+    if (!$id) {
+      throw new NotFoundException(__('Invalid Report'));
+    }
+
+    $report = $this->Report->findById($id);
+    if (!$report || $this->RequestHandler->accepts('json')) {
+      throw new NotFoundException(__('Invalid Report'));
+    }
+
+    $report['Report']['full_report'] =
+        json_decode($report['Report']['full_report'], true);
+    $report['Report']['stacktrace'] =
+        json_decode($report['Report']['stacktrace'], true);
+
+    $this->autoRender = false;
+    return json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
   }
 
   public function submit() {
@@ -42,7 +81,6 @@ class ReportsController extends AppController {
   }
 
   public function ajax() {
-    CakeLog::write("debug", print_r($this->request["url"], true));
     $aColumns = array('id', 'error_name', 'error_message', 'pma_version',
           'status');
     $search_conditions = $this->getSearchConditions($aColumns);
@@ -72,6 +110,19 @@ class ReportsController extends AppController {
     return json_encode($response);
   }
 
+## PRIVATE HELPERS
+  private function setSimilarFields($id) {
+    $fields = array('browser', 'pma_version', 'php_version', 'server_software');
+
+    $this->Report->read(null, $id);
+
+    foreach($fields as $field) {
+      list($entries_with_count, $total_entries) =
+          $this->Report->get_related_by_field($field, 25, true);
+      $this->set("${field}_related_entries", $entries_with_count);
+      $this->set("${field}_distinct_count", $total_entries);
+    }
+  }
   private function getSearchConditions($aColumns) {
     $search_conditions = array('OR' => array());
     if ( $this->request->query('sSearch') != "" )
@@ -84,7 +135,7 @@ class ReportsController extends AppController {
         }
       }
     }
-    
+
     /* Individual column filtering */
     for ( $i=0 ; $i<count($aColumns) ; $i++ )
     {

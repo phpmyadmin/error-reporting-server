@@ -5,7 +5,12 @@ $(document).ready(function() {
 		"sAjaxSource": $('#reports_table').data('ajax-url'),
     "aoColumnDefs": [
       { "bSearchable": false, "aTargets": [ 0 ] },
-      { "sClass": "centered", "aTargets": [ -1, -2 ] },
+      { "sClass": "center", "aTargets": [ -1, -2 ] },
+      { "fnRender": function ( oObj ) {
+					return '<a href="/reports/view/' + oObj.aData[0] + '">'+oObj.aData[0]+'</a>';
+				},
+				"aTargets": [ 0 ]
+      },
     ],
     "aoColumns": [
       { "sWidth": "10%" },
@@ -30,6 +35,23 @@ $(document).ready(function() {
 
   oTable.find("select").on('change', function(e) {
     oTable.fnFilter($(this).val(), oTable.find("th").index($(this).parent()));
+  });
+
+  $('#toggle-stacktrace').click(function(e) {
+    if($('#stacktrace').hasClass('shown')) {
+      $('#toggle-stacktrace').html('Show stacktrace');
+
+      $('#stacktrace').slideUp(function() {
+        $(this).removeClass('shown');
+      })
+    } else {
+      $('#toggle-stacktrace').html('Hide stacktrace');
+
+      $('#stacktrace').slideDown(function() {
+        $(this).addClass('shown');
+      })
+    }
+    return false;
   });
 
   setTimeout(function(){$(".alert").slideUp()}, 2000)
