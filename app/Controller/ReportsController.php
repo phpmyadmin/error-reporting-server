@@ -39,6 +39,7 @@ class ReportsController extends AppController {
         Sanitize::clean(json_decode($report['Report']['full_report'], true));
 
     $this->set('report', $report);
+    $this->set('project_name', Configure::read('SourceForgeProjectName'));
 
     $this->Report->read(null, $id);
     $this->set('related_reports', $this->Report->get_related_reports());

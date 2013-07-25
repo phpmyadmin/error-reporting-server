@@ -1,5 +1,6 @@
 <h1>Error Report #<?php echo $report["Report"]["id"]; ?>
-  <small>[<?php echo $report["Report"]["status"]; ?>]</small></h1>
+  <small>[<?php echo $report["Report"]["status"]; ?>]</small>
+</h1>
 <table cellspacing="0" class="table table-bordered error-report">
   <tr>
     <td>Error Name</td>
@@ -8,6 +9,18 @@
   <tr>
     <td>Error Message</td>
     <td><?php echo $report["Report"]["error_message"]; ?></td>
+  </tr>
+  <tr>
+    <td>Sourceforge Report</td>
+    <td><?php if($report['Report']['sourceforge_bug_id']) {
+      echo $this->Html->link('#' . $report['Report']['sourceforge_bug_id'],
+          "https://sourceforge.net/p/$project_name/bugs/".
+          $report['Report']['sourceforge_bug_id'] . "/");
+    } else {
+      echo $this->Html->link('Submit report', '/source_forge/new_ticket/'
+          . $report['Report']['id']);
+    } ?>
+    </td>
   </tr>
   <tr>
     <td>PMA Versions</td>
