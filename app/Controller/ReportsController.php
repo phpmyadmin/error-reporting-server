@@ -70,7 +70,7 @@ class ReportsController extends AppController {
   public function submit() {
     $report = $this->request->input('json_decode', true);
     $this->Report->create(array('status' => 'new'));
-    $this->Report->save($report);
+    $this->Report->save_from_submission($report);
     $response = array(
       "success" => true,
       "message" => "Thank you for your submission",

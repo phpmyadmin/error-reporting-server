@@ -33,8 +33,7 @@ class Report extends AppModel {
     'arrayList' => true,
     'groupedCount'=> true);
 
-  public function save($raw_report = array(), $validate = true,
-      $fieldList = array()) {
+  public function save_from_submission($raw_report = array()) {
     $schematized_report = array(
       'pma_version' => $raw_report['pma_version'],
       'php_version' => $this->get_simple_php_version($raw_report['php_version']),
@@ -48,7 +47,7 @@ class Report extends AppModel {
       'full_report' => json_encode($raw_report),
       'stacktrace' => json_encode($raw_report['exception']['stack']),
     );
-    return parent::save($schematized_report, $validate, $fieldList);
+    return $this->save($schematized_report);
   }
 
   public function get_related_reports() {
