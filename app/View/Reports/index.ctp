@@ -2,7 +2,7 @@
 <table id="reports_table" data-ajax-url="<?php 
     echo Router::url(array(
       'controller' => 'reports',
-      'action' => 'ajax')
+      'action' => 'data_tables')
     );
   ?>">
   <thead>

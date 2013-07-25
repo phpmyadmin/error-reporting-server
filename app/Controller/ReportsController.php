@@ -80,7 +80,7 @@ class ReportsController extends AppController {
     return json_encode($response);
   }
 
-  public function ajax() {
+  public function data_tables() {
     $aColumns = array('id', 'error_name', 'error_message', 'pma_version',
           'status');
     $search_conditions = $this->getSearchConditions($aColumns);
