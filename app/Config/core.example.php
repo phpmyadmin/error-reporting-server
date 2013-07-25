@@ -21,6 +21,7 @@
  */
 
 /**
+ * [CHANGE ME]
  * CakePHP Debug Level:
  *
  * Production Mode:
@@ -192,11 +193,18 @@
 	));
 
 /**
+ * The name of the project on sourceforge to submit the reports to
+ */
+  Configure::write('SourceForgeProjectName', 'phpmyadmin');
+
+/**
+ * [CHANGE ME]
  * A random string used in security hashing methods.
  */
 	Configure::write('Security.salt', 's3b0qyJfIXhi9gVYDG9VoUubWwxnIR2G0FgaC9mi');
 
 /**
+ * [CHANGE ME]
  * A random numeric string (digits only) used to encrypt/decrypt strings.
  */
 	Configure::write('Security.cipherSeed', '30683645354249674083945768597');
