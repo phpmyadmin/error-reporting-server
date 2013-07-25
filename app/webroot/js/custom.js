@@ -54,5 +54,5 @@ $(document).ready(function() {
     return false;
   });
 
-  setTimeout(function(){$(".alert").slideUp()}, 2000)
+  setTimeout(function(){$(".alert.alert-success").slideUp()}, 2000)
 } );
