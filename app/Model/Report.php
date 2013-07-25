@@ -99,7 +99,8 @@ class Report extends AppModel {
   }
 
   private function get_server($signature) {
-    if (preg_match("/(Apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)/i",
+    if (preg_match("/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)"
+        . "|(lighttpd\/\d+\.\d+)/i",
         $signature, $matches)) {
       return $matches[0];
     } else {
