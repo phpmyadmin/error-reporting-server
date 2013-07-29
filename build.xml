@@ -95,5 +95,5 @@
   </apply>
  </target>
 
- <target name="build" depends="clean,phpcpd,phpcs,phploc,lint,jshint"/>
+ <target name="build" depends="clean,phpmd,phpcpd,phpcs,phploc,lint,jshint"/>
 </project>
