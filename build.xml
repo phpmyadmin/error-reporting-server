@@ -60,6 +60,7 @@
    <arg line="
            --ignore=*/lib/Cake/*,*/vendor/*
               --report=checkstyle
+              --extensions=php
               --report-file='${basedir}/build/logs/checkstyle.xml'
               --standard=CakePHP
               ${source}" />
