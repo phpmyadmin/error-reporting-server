@@ -110,8 +110,9 @@ CakeLog::config('error', array(
 ));
 
 /**
- * Loads debug kit
+ * Loads plugins
  */
 CakePlugin::load('DebugKit');
+CakePlugin::load('Migrations');
 
 require 'oauth.php';
