@@ -1,18 +1,22 @@
 <?php
+/* vim: set noexpandtab sw=2 ts=2 sts=2: */
+
 class DevelopersController extends AppController {
+
 	public $helpers = array('Html', 'Form');
+
 	public $components = array(
 		'GithubApi',
 		'Session'
 	);
 
 	public function beforeFilter() {
-		$this->GithubApi->github_config = Configure::read('GithubConfig');
-		$this->GithubApi->github_repo = Configure::read('GithubRepoPath');
+		$this->GithubApi->githubConfig = Configure::read('GithubConfig');
+		$this->GithubApi->githubRepo = Configure::read('GithubRepoPath');
 	}
 
 	public function login() {
-		$url = $this->GithubApi->get_redirect_url('user:email');
+		$url = $this->GithubApi->getRedirectUrl('user:email');
 		$this->redirect($url);
 	}
 
@@ -20,9 +24,9 @@ class DevelopersController extends AppController {
 		$code = $this->request->query('code');
 		$access_token = $this->GithubApi->get_access_token($code);
 		if($access_token) {
-			$user_info = $this->GithubApi->get_user_info($access_token);
+			$user_info = $this->GithubApi->getUserInfo($access_token);
 			$user_info["has_commit_access"] =
-					$this->GithubApi->can_commit_to($user_info["login"], $this->github_repo);
+					$this->GithubApi->canCommitTo($user_info["login"], $this->github_repo);
 
 			$this->authenticate_developer($user_info, $access_token);
 
@@ -43,10 +47,10 @@ class DevelopersController extends AppController {
 		$this->redirect("/");
 	}
 
-	public function current_developer() {
+	public function currentDeveloper() {
 		$this->autoRender = false;
-		return json_encode($this->GithubApi->can_commit_to("m0hamed",
-		"m0hamed/phpmyadmin"));
+		return json_encode($this->GithubApi->canCommitTo("m0hamed",
+				"m0hamed/phpmyadmin"));
 	}
 
 	private function authenticate_developer($user_info, $access_token) {
