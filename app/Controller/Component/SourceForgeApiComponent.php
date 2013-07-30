@@ -1,4 +1,6 @@
 <?php
+/* vim: set noexpandtab sw=2 ts=2 sts=2: */
+
 define('REQUEST_TOKEN_URL', 'https://sourceforge.net/rest/oauth/request_token');
 define('ACCESS_TOKEN_URL', 'https://sourceforge.net/rest/oauth/access_token');
 define('AUTHORIZE_URL', 'https://sourceforge.net/rest/oauth/authorize');

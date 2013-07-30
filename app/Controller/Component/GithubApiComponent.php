@@ -14,7 +14,7 @@ class GithubApiComponent extends Component {
 		return $this->sendRequest($url, $data, $method, $returnStatus);
 	}
 
-	public function get_access_token($code) {
+	public function getAccessToken($code) {
 		$url = "https://github.com/login/oauth/access_token";
 		$data = array_merge(
 			$this->githubConfig,

@@ -1,4 +1,6 @@
 <?php
+/* vim: set noexpandtab sw=2 ts=2 sts=2: */
+
 class SourceForgeController extends AppController {
 	public $helpers = array('Html', 'Form');
 	public $components = array('SourceForgeApi');

@@ -1,9 +1,13 @@
 <?php
+/* vim: set noexpandtab sw=2 ts=2 sts=2: */
+
 App::uses('Sanitize', 'Utility');
 App::uses('AppController', 'Controller');
 
 class ReportsController extends AppController {
+
 	public $components = array('RequestHandler');
+
 	public $helpers = array('Html', 'Form', 'Reports');
 
 	public function index() {
@@ -42,9 +46,9 @@ class ReportsController extends AppController {
 		$this->set('project_name', Configure::read('SourceForgeProjectName'));
 
 		$this->Report->read(null, $id);
-		$this->set('related_reports', $this->Report->get_related_reports());
-		$this->set('reports_with_description',
-				$this->Report->get_related_reports_with_description());
+		$this->set('related_reports', $this->Report->getRelatedReports());
+		$this->set('reportsWithDescription',
+				$this->Report->getRelatedReportsWithDescription());
 
 		$this->setSimilarFields($id);
 	}
@@ -71,7 +75,7 @@ class ReportsController extends AppController {
 	public function submit() {
 		$report = $this->request->input('json_decode', true);
 		$this->Report->create(array('status' => 'new'));
-		$this->Report->save_from_submission($report);
+		$this->Report->saveFromSubmission($report);
 		$response = array(
 			"success" => true,
 			"message" => "Thank you for your submission",
@@ -118,21 +122,21 @@ class ReportsController extends AppController {
 		$this->Report->read(null, $id);
 
 		foreach($fields as $field) {
-			list($entries_with_count, $total_entries) =
-					$this->Report->get_related_by_field($field, 25, true);
-			$this->set("${field}_related_entries", $entries_with_count);
-			$this->set("${field}_distinct_count", $total_entries);
+			list($entriesWithCount, $totalEntries) =
+					$this->Report->getRelatedByField($field, 25, true);
+			$this->set("${field}_related_entries", $entriesWithCount);
+			$this->set("${field}_distinct_count", $totalEntries);
 		}
 	}
+
 	private function getSearchConditions($aColumns) {
-		$search_conditions = array('OR' => array());
-		$count_acolumns = count($aColumns);
+		$searchConditions = array('OR' => array());
 		if ( $this->request->query('sSearch') != "" )
 		{
-			for ( $i=0 ; $i<$count_acolumns ; $i++ )
+			for ( $i=0 ; $i<count($aColumns) ; $i++ )
 			{
 				if ($this->request->query('bSearchable_' . $i) == "true") {
-					$search_conditions['OR'][] = array($aColumns[$i] . " LIKE" => "%" .
+					$searchConditions['OR'][] = array($aColumns[$i] . " LIKE" => "%" .
 							$this->request->query('sSearch') . "%");
 				}
 			}
@@ -143,11 +147,11 @@ class ReportsController extends AppController {
 		{
 			if ($this->request->query('sSearch_' . $i) != '')
 			{
-				$search_conditions[] = array($aColumns[$i] . " LIKE" =>
+				$searchConditions[] = array($aColumns[$i] . " LIKE" =>
 						"%" . $this->request->query('sSearch_' . $i) . "%");
 			}
 		}
-		return $search_conditions;
+		return $searchConditions;
 	}
 
 	private function getOrder($aColumns) {
