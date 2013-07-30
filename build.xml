@@ -32,7 +32,7 @@
    <arg line="${source_comma_sep}
               xml
               codesize,design,naming,unusedcode
-              --exclude lib/Cake/,vendors/
+              --exclude lib/Cake/,vendors/,app/Plugin/
               --reportfile '${basedir}/build/logs/pmd.xml'" />
   </exec>
  </target>
@@ -58,7 +58,7 @@
  <target name="phpcs" description="Generate checkstyle.xml using PHP_CodeSniffer excluding test, tcpdf directories">
   <exec executable="phpcs">
    <arg line="
-           --ignore=*/lib/Cake/*,*/vendors/*
+           --ignore=*/lib/Cake/*,*/vendors/*,*/app/Plugin/*
               --report=checkstyle
               --extensions=php
               --report-file='${basedir}/build/logs/checkstyle.xml'
