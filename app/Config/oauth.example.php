@@ -4,8 +4,8 @@
  * from the application configuration page on github.
  */
 Configure::write('GithubConfig', array(
-  'client_id' => '<application-client-id>',
-  'client_secret' => '<application-client-secret>'
+	'client_id' => '<application-client-id>',
+	'client_secret' => '<application-client-secret>'
 ));
 
 /**
@@ -17,8 +17,8 @@ Configure::write('GithubRepoPath', 'phpmyadmin/phpmyadmin');
  * Configures sourceforge application details for authentication
  */
 Configure::write('SourceForgeConfig', array(
-  'consumer_key' => '<application-consumer-key>',
-  'consumer_secret' => '<application-consumer-secret>'
+	'consumer_key' => '<application-consumer-key>',
+	'consumer_secret' => '<application-consumer-secret>'
 ));
 
 /**
@@ -27,6 +27,6 @@ Configure::write('SourceForgeConfig', array(
  * user. You can then enter the resultant token here
  */
 Configure::write('SourceForgeCredentials', array(
-  'key' => 'b9404a915db97d594cac',
-  'secret' => '2af63d5258742d4f0c9820c26252b435210faf58d0e2af2a248e1b11ce0d92ca80cba6bba98e0828'
+	'key' => 'b9404a915db97d594cac',
+	'secret' => '2af63d5258742d4f0c9820c26252b435210faf58d0e2af2a248e1b11ce0d92ca80cba6bba98e0828'
 ));
