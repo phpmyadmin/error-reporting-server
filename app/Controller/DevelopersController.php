@@ -23,7 +23,7 @@ class DevelopersController extends AppController {
 	public function callback() {
 		$code = $this->request->query('code');
 		$access_token = $this->GithubApi->get_access_token($code);
-		if($access_token) {
+		if ($access_token) {
 			$user_info = $this->GithubApi->getUserInfo($access_token);
 			$user_info["has_commit_access"] =
 					$this->GithubApi->canCommitTo($user_info["login"], $this->github_repo);
@@ -55,7 +55,7 @@ class DevelopersController extends AppController {
 
 	private function authenticate_developer($user_info, $access_token) {
 		$developer = $this->Developer->findByGithubId($user_info['id']);
-		if(!$developer) {
+		if (!$developer) {
 			$this->Developer->create();
 		} else {
 			$this->Developer->id = $developer["Developer"]["id"];

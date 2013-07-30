@@ -13,7 +13,7 @@ class SourceForgeController extends AppController {
 	public function authorize() {
 		$requestToken =
 				$this->SourceForgeApi->getRequestToken('/source_forge/callback');
-		if($requestToken) {
+		if ($requestToken) {
 			$this->Session->write('sourceforge_request_token', $requestToken);
 			$this->redirect($this->SourceForgeApi->getRedirectUrl($requestToken));
 		}
@@ -46,7 +46,7 @@ class SourceForgeController extends AppController {
 		$data = $this->getTicketData($reportId);
 		$response = $this->SourceForgeApi->createTicket(
 				Configure::read('SourceForgeProjectName'), $data);
-		if($response->code[0] === "3") {
+		if ($response->code[0] === "3") {
 			// success
 			preg_match("<rest/p/.*/bugs/(\d+)/>",
 					$response->headers['Location'], $matches);

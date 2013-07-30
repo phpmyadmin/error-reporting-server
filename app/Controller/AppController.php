@@ -47,13 +47,13 @@ class AppController extends Controller {
 		$controller = $params["controller"];
 		$action = $params["action"];
 
-		if($params["controller"] === "reports") {
+		if ($params["controller"] === "reports") {
 			$this->set('navigation_class', "active");
 		} else {
 			$this->set('navigation_class', "");
 		}
 
-		if($this->Session->read('Developer.id')) {
+		if ($this->Session->read('Developer.id')) {
 			$current_developer = $this->Developer->
 					findById($this->Session->read('Developer.id'));
 			$current_developer = Sanitize::clean($current_developer);
@@ -63,7 +63,7 @@ class AppController extends Controller {
 		} else {
 			$this->set('developer_signed_in', false);
 
-			if($controller !== "pages" && $controller !== "developers" &&
+			if ($controller !== "pages" && $controller !== "developers" &&
 					!($action === "submit" && $controller === "reports")) {
 				$this->Session->setFlash("You need to be signed in to do this", "default",
 						array("class" => "alert alert-error"));

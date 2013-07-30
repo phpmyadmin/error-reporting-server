@@ -7,7 +7,7 @@ class GithubApiComponent extends Component {
 	public function apiRequest($url = "/", $data = array(), $method = "GET",
 			$returnStatus=false) {
 		$url = "https://api.github.com" . $url;
-		if(strtoupper($method) === "GET") {
+		if (strtoupper($method) === "GET") {
 			$url .= "?" . http_build_query($data);
 			$data = array();
 		}
@@ -43,7 +43,7 @@ class GithubApiComponent extends Component {
 		curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
 		$response = curl_exec($curlHandle);
 		$decodedResponse = json_decode($response, true);
-		if($returnCode) {
+		if ($returnCode) {
 			$status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
 			return array($decodedResponse, $status);
 		} else {
