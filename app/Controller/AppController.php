@@ -10,12 +10,14 @@
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * Copyright (c) phpMyAdmin (http://phpmyadmin.net)
  *
  * Licensed under The MIT License
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright		Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @copyright		Copyright (c) phpMyAdmin (http://phpmyadmin.net)
  * @link				http://cakephp.org CakePHP(tm) Project
  * @package			app.Controller
  * @since				CakePHP(tm) v 0.2.9
