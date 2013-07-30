@@ -5,7 +5,7 @@ class SourceForgeController extends AppController {
 	public $uses = array('Report');
 
 	public function beforeFilter() {
-		$this->SourceForgeApi->access_token =
+		$this->SourceForgeApi->accessToken =
 				Configure::read('SourceForgeCredentials');
 		parent::beforeFilter();
 	}
@@ -28,13 +28,13 @@ class SourceForgeController extends AppController {
 		return json_encode($accessToken);
 	}
 
-	public function create_ticket($report_id) {
+	public function create_ticket($reportId) {
 
-		if (!$report_id) {
+		if (!$reportId) {
 				throw new NotFoundException(__('Invalid report'));
 		}
 
-		$report = $this->Report->findById($report_id);
+		$report = $this->Report->findById($reportId);
 		if (!$report) {
 				throw new NotFoundException(__('Invalid report'));
 		}
@@ -43,30 +43,30 @@ class SourceForgeController extends AppController {
 			return;
 		}
 
-		$data = $this->get_ticket_data($report_id);
+		$data = $this->getTicketData($reportId);
 		$response = $this->SourceForgeApi->createTicket(
 				Configure::read('SourceForgeProjectName'), $data);
 		if($response->code[0] === "3") {
 			// success
 			preg_match("<rest/p/.*/bugs/(\d+)/>",
 					$response->headers['Location'], $matches);
-			$this->Report->read(null, $report_id);
+			$this->Report->read(null, $reportId);
 			$this->Report->save(array('sourceforge_bug_id' => $matches[1]));
 
 			$this->Session->setFlash('Source forge ticket has been created for this'
 					. 'report', "default", array("class" => "alert alert-success"));
 			$this->redirect(array('controller' => 'reports', 'action' => 'view',
-					$report_id));
+					$reportId));
 		} else {
 			//fail
 			$response->body = json_decode($response->body, true);
-			$this->Session->setFlash($this->get_validation_errors(
+			$this->Session->setFlash($this->getValidationErrors(
 					$response->body['errors']), "default",
 					array("class" => "alert alert-error"));
 		}
 	}
 
-	private function get_ticket_data($report_id) {
+	private function getTicketData($reportId) {
 		$data = array(
 			'ticket_form.summary' => $this->request->data['Ticket']['summary'],
 			'ticket_form.description' => $this->request->data['Ticket']['description'],
@@ -81,7 +81,7 @@ class SourceForgeController extends AppController {
 		return $data;
 	}
 
-	private function get_validation_errors($errors) {
+	private function getValidationErrors($errors) {
 		$error_string = "There were some problems with the ticket submission:";
 		$error_string .= '<ul>';
 
