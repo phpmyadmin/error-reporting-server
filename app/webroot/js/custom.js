@@ -10,20 +10,20 @@ $(document).ready(function() {
 					return '<a href="/reports/view/' + oObj.aData[0] + '">'+oObj.aData[0]+'</a>';
 				},
 				"aTargets": [ 0 ]
-      },
+      }
     ],
     "aoColumns": [
       { "sWidth": "10%" },
       { "sWidth": "20%" },
       { "sWidth": "40%" },
       { "sWidth": "15%" },
-      { "sWidth": "10%" },
+      { "sWidth": "10%" }
     ],
     "fnServerData": function (sSource, aoData, fnCallback) {
       $.getJSON( sSource, aoData, function (json) {
           fnCallback(json);
       });
-    },
+    }
 	} );
 
   oTable.find("input").on('keyup', function(e) {
@@ -43,16 +43,16 @@ $(document).ready(function() {
 
       $('#stacktrace').slideUp(function() {
         $(this).removeClass('shown');
-      })
+      });
     } else {
       $('#toggle-stacktrace').html('Hide stacktrace');
 
       $('#stacktrace').slideDown(function() {
         $(this).addClass('shown');
-      })
+      });
     }
     return false;
   });
 
-  setTimeout(function(){$(".alert.alert-success").slideUp()}, 2000)
+  setTimeout(function(){$(".alert.alert-success").slideUp()}, 2000);
 } );
