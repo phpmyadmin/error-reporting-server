@@ -1,6 +1,9 @@
 <?php
+/* vim: set noexpandtab sw=2 ts=2 sts=2: */
+
 App::uses('AppModel', 'Model');
 class Report extends AppModel {
+
 	public $validate = array(
 		'error_message' => array(
 			'rule' => 'notEmpty',
@@ -33,72 +36,72 @@ class Report extends AppModel {
 		'arrayList' => true,
 		'groupedCount'=> true);
 
-	public function save_from_submission($raw_report = array()) {
-		$schematized_report = array(
-			'pma_version' => $raw_report['pma_version'],
-			'php_version' => $this->get_simple_php_version($raw_report['php_version']),
-			'steps' => $raw_report['steps'],
-			'error_message' => $raw_report['exception']['message'],
-			'error_name' => $raw_report['exception']['name'],
-			'browser' => $raw_report['browser_name']. " "
-					. $this->get_major_version($raw_report['browser_version']),
-			'user_os' => $raw_report['user_os'],
-			'server_software' => $this->get_server($raw_report['server_software']),
-			'full_report' => json_encode($raw_report),
-			'stacktrace' => json_encode($raw_report['exception']['stack']),
+	public function saveFromSubmission($rawReport = array()) {
+		$schematizedReport = array(
+			'pma_version' => $rawReport['pma_version'],
+			'php_version' => $this->getSimplePhpVersion($rawReport['php_version']),
+			'steps' => $rawReport['steps'],
+			'error_message' => $rawReport['exception']['message'],
+			'error_name' => $rawReport['exception']['name'],
+			'browser' => $rawReport['browser_name'] . " "
+					. $this->getMajorVersion($rawReport['browser_version']),
+			'user_os' => $rawReport['user_os'],
+			'server_software' => $this->getServer($rawReport['server_software']),
+			'full_report' => json_encode($rawReport),
+			'stacktrace' => json_encode($rawReport['exception']['stack']),
 		);
-		return $this->save($schematized_report);
+		return $this->save($schematizedReport);
 	}
 
-	public function get_related_reports() {
+	public function getRelatedReports() {
 		return $this->find('all', array(
 			'limit' => 50,
-			'conditions' => $this->related_reports_conditions(),
+			'conditions' => $this->relatedReportsConditions(),
 			'order' => 'created desc'
 		));
 	}
 
-	public function get_related_reports_with_description() {
+	public function getRelatedReportsWithDescription() {
 		return $this->find('all', array(
 			'conditions' => array(
-				$this->related_reports_conditions(),
+				$this->relatedReportsConditions(),
 				'steps IS NOT NULL'
 			),
 			'order' => 'steps desc'
 		));
 	}
 
-	public function get_related_by_field($field_name, $limit = 10, $count = false) {
-		$query_details = array(
-			'fields' => array("DISTINCT $field_name", "COUNT(id) as count"),
+	public function getRelatedByField($fieldName, $limit = 10, $count = false) {
+		$queryDetails = array(
+			'fields' => array("DISTINCT $fieldName", "COUNT(id) as count"),
 			'conditions' => array(
-				$this->related_reports_conditions(),
-				"$field_name IS NOT NULL",
+				$this->relatedReportsConditions(),
+				"$fieldName IS NOT NULL",
 			),
 			'limit' => $limit,
-			'group' => "$field_name",
+			'group' => "$fieldName",
 			'order' => 'count DESC'
 		);
 
-		$grouped_count = $this->find('groupedCount', $query_details);
+		$groupedCount = $this->find('groupedCount', $queryDetails);
 
 		if ($count) {
-			$query_details['limit'] = null;
-			$total_count = $this->find('count', $query_details);
+			$queryDetails['limit'] = null;
+			$totalCount = $this->find('count', $queryDetails);
 
-			return array($grouped_count, $total_count);
+			return array($groupedCount, $totalCount);
 		} else {
-			return $grouped_count;
+			return $groupedCount;
 		}
 	}
 
-	private function get_major_version($full_version) {
-		preg_match("/^\d+/", $full_version, $matches);
-		$simple_version = $matches[0];
-		return $simple_version;
+	private function getMajorVersion($fullVersion) {
+		preg_match("/^\d+/", $fullVersion, $matches);
+		$simpleVersion = $matches[0];
+		return $simpleVersion;
 	}
 
-	private function get_server($signature) {
+	private function getServer($signature) {
 		if (preg_match("/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)"
 				. "|(lighttpd\/\d+\.\d+)/i",
 				$signature, $matches)) {
@@ -108,20 +111,20 @@ class Report extends AppModel {
 		}
 	}
 
-	private function get_simple_php_version($php_version) {
-		preg_match("/^\d+\.\d+/", $php_version, $matches);
-		$simple_version = $matches[0];
-		return $simple_version;
+	private function getSimplePhpVersion($phpVersion) {
+		preg_match("/^\d+\.\d+/", $phpVersion, $matches);
+		$simpleVersion = $matches[0];
+		return $simpleVersion;
 	}
 
 	private function get_latest_report() {
 		$report = $this->find("first", array(
-			'conditions' => $this->related_reports_conditions(),
+			'conditions' => $this->relatedReportsConditions(),
 			'order' => 'created desc'
 		));
 	}
 
-	private function related_reports_conditions() {
+	private function relatedReportsConditions() {
 		$conditions = array(array('related_report_id' => $this->id));
 
 		if ($this->data["Report"]["related_report_id"]) {

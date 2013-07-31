@@ -1,57 +1,60 @@
 <?php
+/* vim: set noexpandtab sw=2 ts=2 sts=2: */
+
 App::uses('Component', 'Controller');
 class GithubApiComponent extends Component {
-	public function api_request($url = "/", $data = array(), $method = "GET",
-			$return_status=false) {
+
+	public function apiRequest($url = "/", $data = array(), $method = "GET",
+			$returnStatus=false) {
 		$url = "https://api.github.com" . $url;
-		if(strtoupper($method) === "GET") {
+		if (strtoupper($method) === "GET") {
 			$url .= "?" . http_build_query($data);
 			$data = array();
 		}
-		return $this->send_request($url, $data, $method, $return_status);
+		return $this->sendRequest($url, $data, $method, $returnStatus);
 	}
 
-	public function get_access_token($code) {
+	public function getAccessToken($code) {
 		$url = "https://github.com/login/oauth/access_token";
 		$data = array_merge(
-			$this->github_config,
+			$this->githubConfig,
 			array(
 				'code' => $code,
 			)
 		);
-		$decoded_response = $this->send_request($url, $data, "POST");
-		return $decoded_response['access_token'];
+		$decodedResponse = $this->sendRequest($url, $data, "POST");
+		return $decodedResponse['access_token'];
 	}
 
-	public function get_user_info($access_token) {
+	public function getUserInfo($access_token) {
 		$url = "/user";
 		$data = array(
 			'access_token' => $access_token,
 		);
-		return $this->api_request($url, $data, "GET");
+		return $this->apiRequest($url, $data, "GET");
 	}
 
-	public function send_request($url, $data, $method, $return_code=false) {
-		$curl_handle = curl_init($url);
-		curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, $method);
-		curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Accept: application/json'));
-		curl_setopt($curl_handle, CURLOPT_USERAGENT, 'PHP My Admin - Error Reporting Server');
-		curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query($data));
-		curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
-		$response = curl_exec($curl_handle);
-		$decoded_response = json_decode($response, true);
-		if($return_code) {
-			$status = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
-			return array($decoded_response, $status);
+	public function sendRequest($url, $data, $method, $returnCode=false) {
+		$curlHandle = curl_init($url);
+		curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $method);
+		curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+		curl_setopt($curlHandle, CURLOPT_USERAGENT, 'PHP My Admin - Error Reporting Server');
+		curl_setopt($curlHandle, CURLOPT_POSTFIELDS, http_build_query($data));
+		curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
+		$response = curl_exec($curlHandle);
+		$decodedResponse = json_decode($response, true);
+		if ($returnCode) {
+			$status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
+			return array($decodedResponse, $status);
 		} else {
-			return $decoded_response;
+			return $decodedResponse;
 		}
 	}
 	
-	public function get_redirect_url($scope) {
+	public function getRedirectUrl($scope) {
 		$url = "https://github.com/login/oauth/authorize";
 		$data = array(
-			'client_id' => $this->github_config['client_id'],
+			'client_id' => $this->githubConfig['client_id'],
 			'redirect_uri' => Router::url(
 				array(
 					'controller' => 'developers',
@@ -65,9 +68,9 @@ class GithubApiComponent extends Component {
 		return $url;
 	}
 
-	public function can_commit_to($username, $repo_path) {
+	public function canCommitTo($username, $repoPath) {
 		list($response, $status) = $this->
-				api_request("/repos/$repo_path/collaborators/$username",
+				apiRequest("/repos/$repoPath/collaborators/$username",
 				array(), "GET", true);
 		return $status === 204;
 	}

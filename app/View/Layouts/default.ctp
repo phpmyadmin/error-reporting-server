@@ -55,7 +55,9 @@
       </ul>
       <ul class="nav pull-right">
         <?php if ($developer_signed_in) { ?>
-          <li><a>Hello, <?php echo $current_developer["full_name"]; ?></a></li>
+          <li>
+            <p class="navbar-text">Hello, <?php echo $current_developer["full_name"]; ?></p>
+          </li>
           <li><a href="/developers/logout">Logout</a></li>
         <?php } else { ?>
           <li><a href="/developers/login">Login with Github</a></li>
