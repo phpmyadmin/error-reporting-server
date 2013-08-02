@@ -121,7 +121,7 @@ class ReportsController extends AppController {
 
 		$this->Report->read(null, $id);
 
-		foreach($fields as $field) {
+		foreach ($fields as $field) {
 			list($entriesWithCount, $totalEntries) =
 					$this->Report->getRelatedByField($field, 25, true);
 			$this->set("${field}_related_entries", $entriesWithCount);
@@ -131,10 +131,8 @@ class ReportsController extends AppController {
 
 	protected function _getSearchConditions($aColumns) {
 		$searchConditions = array('OR' => array());
-		if ( $this->request->query('sSearch') != "" )
-		{
-			for ( $i = 0 ; $i < count($aColumns) ; $i++ )
-			{
+		if ( $this->request->query('sSearch') != "" ) {
+			for ( $i = 0 ; $i < count($aColumns) ; $i++ ) {
 				if ($this->request->query('bSearchable_' . $i) == "true") {
 					$searchConditions['OR'][] = array($aColumns[$i] . " LIKE" => "%" .
 							$this->request->query('sSearch') . "%");
@@ -143,10 +141,8 @@ class ReportsController extends AppController {
 		}
 
 		/* Individual column filtering */
-		for ( $i = 0 ; $i < count($aColumns) ; $i++ )
-		{
-			if ($this->request->query('sSearch_' . $i) != '')
-			{
+		for ( $i = 0 ; $i < count($aColumns) ; $i++ ) {
+			if ($this->request->query('sSearch_' . $i) != '') {
 				$searchConditions[] = array($aColumns[$i] . " LIKE" =>
 						"%" . $this->request->query('sSearch_' . $i) . "%");
 			}
@@ -155,14 +151,11 @@ class ReportsController extends AppController {
 	}
 
 	protected function _getOrder($aColumns) {
-		if ( $this->request->query('iSortCol_0') != null )
-		{
+		if ( $this->request->query('iSortCol_0') != null ) {
 			$order = array();
-			for ( $i = 0 ; $i < intval($this->request->query('iSortingCols')) ; $i++ )
-			{
+			for ( $i = 0 ; $i < intval($this->request->query('iSortingCols')) ; $i++ ) {
 				if ( $this->request->query('bSortable_'
-						. intval($this->request->query('iSortCol_' . $i))) == "true" )
-				{
+						. intval($this->request->query('iSortCol_' . $i))) == "true" ) {
 					$order[] = array(
 						$aColumns[intval($this->request->query('iSortCol_' . $i))] =>
 							$this->request->query('sSortDir_' . $i)
