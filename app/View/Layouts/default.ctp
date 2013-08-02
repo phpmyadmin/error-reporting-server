@@ -24,7 +24,7 @@
 	<?php echo $this->Html->charset(); ?>
 	<title>
 		<?php echo $title_for_layout; ?>
-    PHP MY ADMIN - Error Reporting Server
+    phpMyAdmin - Error Reporting Server
 	</title>
 	<?php
 		echo $this->Html->meta('icon');
