@@ -26,6 +26,15 @@ In order to deploy the app in this repo you need to follow these steps:
       CustomLog "/var/log/httpd/dummy-host.example.com-access_log" common
 </VirtualHost>
 ```
+- Configuration for lighttpd:
+```
+$HTTP["host"] =~ "^reports.phpmyadmin.net$" {
+    server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
+    url.rewrite-if-not-file =(
+        "^([^\?]*)(\?(.+))?$" => "/index.php?url=$1&$3"
+    )
+}
+```
 - Create the database for the server
 - Rename the example files database.example.php and core.example.php to database.php and core.php respectively and fill out the required info. Make sure to change the salts and the debug level in the core.php file and the database credentials in the database.php file
 - Rename the oauth.example.php to oauth.php and follow the instructions to set the appropriate variables in the file
