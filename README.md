@@ -31,3 +31,6 @@ In order to deploy the app in this repo you need to follow these steps:
 - Rename the oauth.example.php to oauth.php and follow the instructions to set the appropriate variables in the file
 - Run the migrations to generate the migrations table `Console/cake Migrations.migration run all -p Migrations`
 - Run the migrations that have been created so far to setup the database `Console/cake Migrations.migration run all`
+
+## Creating the github app ##
+The callback for the github app should be /developers/callback
