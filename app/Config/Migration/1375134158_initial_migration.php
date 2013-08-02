@@ -27,7 +27,7 @@ class InitialMigration extends CakeMigration {
 					'access_token' => array('type' => 'string', 'null' => true, 'default' => NULL, 'length' => 100, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
 					'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
 					'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
-					'has_commit_access' => array('type' => 'text', 'null' => false, 'default' => 'b\'0\'', 'length' => 1),
+					'has_commit_access' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 					'indexes' => array(
 						'PRIMARY' => array('column' => 'id', 'unique' => 1),
 						'github_id' => array('column' => 'github_id', 'unique' => 1),

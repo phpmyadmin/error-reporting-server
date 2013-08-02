@@ -17,7 +17,7 @@ class AppSchema extends CakeSchema {
 		'access_token' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 100, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
 		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-		'has_commit_access' => array('type' => 'text', 'null' => false, 'default' => 'b\'0\'', 'length' => 1),
+		'has_commit_access' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
 			'github_id' => array('column' => 'github_id', 'unique' => 1)
