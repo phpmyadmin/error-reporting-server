@@ -56,7 +56,7 @@ class Report extends AppModel {
 	public function getRelatedReports() {
 		return $this->find('all', array(
 			'limit' => 50,
-			'conditions' => $this->relatedReportsConditions(),
+			'conditions' => $this->_relatedReportsConditions(),
 			'order' => 'created desc'
 		));
 	}
@@ -64,7 +64,7 @@ class Report extends AppModel {
 	public function getRelatedReportsWithDescription() {
 		return $this->find('all', array(
 			'conditions' => array(
-				$this->relatedReportsConditions(),
+				$this->_relatedReportsConditions(),
 				'steps IS NOT NULL'
 			),
 			'order' => 'steps desc'
@@ -75,7 +75,7 @@ class Report extends AppModel {
 		$queryDetails = array(
 			'fields' => array("DISTINCT $fieldName", "COUNT(id) as count"),
 			'conditions' => array(
-				$this->relatedReportsConditions(),
+				$this->_relatedReportsConditions(),
 				"$fieldName IS NOT NULL",
 			),
 			'limit' => $limit,
