@@ -117,14 +117,7 @@ class Report extends AppModel {
 		return $simpleVersion;
 	}
 
-	private function get_latest_report() {
-		$report = $this->find("first", array(
-			'conditions' => $this->relatedReportsConditions(),
-			'order' => 'created desc'
-		));
-	}
-
-	private function relatedReportsConditions() {
+	protected function _relatedReportsConditions() {
 		$conditions = array(array('related_report_id' => $this->id));
 
 		if ($this->data["Report"]["related_report_id"]) {
