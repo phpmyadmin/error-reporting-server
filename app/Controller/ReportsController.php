@@ -133,7 +133,7 @@ class ReportsController extends AppController {
 		$searchConditions = array('OR' => array());
 		if ( $this->request->query('sSearch') != "" )
 		{
-			for ( $i=0 ; $i<count($aColumns) ; $i++ )
+			for ( $i = 0 ; $i < count($aColumns) ; $i++ )
 			{
 				if ($this->request->query('bSearchable_' . $i) == "true") {
 					$searchConditions['OR'][] = array($aColumns[$i] . " LIKE" => "%" .
@@ -143,7 +143,7 @@ class ReportsController extends AppController {
 		}
 
 		/* Individual column filtering */
-		for ( $i=0 ; $i<count($aColumns) ; $i++ )
+		for ( $i = 0 ; $i < count($aColumns) ; $i++ )
 		{
 			if ($this->request->query('sSearch_' . $i) != '')
 			{
@@ -158,7 +158,7 @@ class ReportsController extends AppController {
 		if ( $this->request->query('iSortCol_0') != null )
 		{
 			$order = array();
-			for ( $i=0 ; $i<intval($this->request->query('iSortingCols')) ; $i++ )
+			for ( $i = 0 ; $i < intval($this->request->query('iSortingCols')) ; $i++ )
 			{
 				if ( $this->request->query('bSortable_'
 						. intval($this->request->query('iSortCol_' . $i))) == "true" )
