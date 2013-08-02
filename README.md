@@ -54,3 +54,6 @@ $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
 - Run the migrations that have been created so far to setup the database 
   in the `app` directory
   `Console/cake Migrations.migration run all`
+
+## Creating the github app ##
+The callback for the github app should be /developers/callback
