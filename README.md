@@ -43,7 +43,14 @@ $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
 }
 ```
 - Create the database for the server
-- Rename the example files database.example.php and core.example.php to database.php and core.php respectively and fill out the required info. Make sure to change the salts and the debug level in the core.php file and the database credentials in the database.php file
-- Rename the oauth.example.php to oauth.php and follow the instructions to set the appropriate variables in the file
-- Run the migrations to generate the migrations table `Console/cake Migrations.migration run all -p Migrations`
-- Run the migrations that have been created so far to setup the database `Console/cake Migrations.migration run all`
+- Rename the example files `database.example.php` and `core.example.php` to
+  `database.php` and `core.php` respectively and fill out the required info.
+  Make sure to change the salts and the debug level in the core.php file and
+  the database credentials in the `database.php` file.
+- Rename the `oauth.example.php` to `oauth.php` and follow the instructions to
+  set the appropriate variables in the file.
+- Run the migrations to generate the migrations table in the `app` directory
+  `Console/cake Migrations.migration run all -p Migrations`
+- Run the migrations that have been created so far to setup the database 
+  in the `app` directory
+  `Console/cake Migrations.migration run all`
