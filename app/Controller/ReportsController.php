@@ -50,7 +50,7 @@ class ReportsController extends AppController {
 		$this->set('reportsWithDescription',
 				$this->Report->getRelatedReportsWithDescription());
 
-		$this->setSimilarFields($id);
+		$this->_setSimilarFields($id);
 	}
 
 	public function json($id) {
@@ -88,8 +88,8 @@ class ReportsController extends AppController {
 	public function data_tables() {
 		$aColumns = array('id', 'error_name', 'error_message', 'pma_version',
 					'status');
-		$search_conditions = $this->getSearchConditions($aColumns);
-		$order_conditions = $this->getOrder($aColumns);
+		$search_conditions = $this->_getSearchConditions($aColumns);
+		$order_conditions = $this->_getOrder($aColumns);
 
 		$params = array(
 			'fields' => $aColumns,
@@ -116,7 +116,7 @@ class ReportsController extends AppController {
 	}
 
 ## PRIVATE HELPERS
-	private function setSimilarFields($id) {
+	protected function _setSimilarFields($id) {
 		$fields = array('browser', 'pma_version', 'php_version', 'server_software');
 
 		$this->Report->read(null, $id);
@@ -129,7 +129,7 @@ class ReportsController extends AppController {
 		}
 	}
 
-	private function getSearchConditions($aColumns) {
+	protected function _getSearchConditions($aColumns) {
 		$searchConditions = array('OR' => array());
 		if ( $this->request->query('sSearch') != "" )
 		{
@@ -154,7 +154,7 @@ class ReportsController extends AppController {
 		return $searchConditions;
 	}
 
-	private function getOrder($aColumns) {
+	protected function _getOrder($aColumns) {
 		if ( $this->request->query('iSortCol_0') != null )
 		{
 			$order = array();
@@ -175,4 +175,3 @@ class ReportsController extends AppController {
 		}
 	}
 }
-
