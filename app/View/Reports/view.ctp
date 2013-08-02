@@ -25,7 +25,7 @@
   <tr>
     <td>PMA Versions</td>
     <td>
-      <?php echo $this->Reports->entries_from_related_reports(
+      <?php echo $this->Reports->entriesFromRelateReports(
           $pma_version_related_entries, $pma_version_distinct_count);
       ?>
     </td>
@@ -33,7 +33,7 @@
   <tr>
     <td>PHP Versions</td>
     <td>
-      <?php echo $this->Reports->entries_from_related_reports(
+      <?php echo $this->Reports->entriesFromRelateReports(
           $php_version_related_entries, $php_version_distinct_count);
       ?>
     </td>
@@ -41,7 +41,7 @@
   <tr>
     <td>Browsers</td>
     <td>
-      <?php echo $this->Reports->entries_from_related_reports(
+      <?php echo $this->Reports->entriesFromRelateReports(
           $browser_related_entries, $browser_distinct_count);
       ?>
     </td>
@@ -49,7 +49,7 @@
   <tr>
     <td>Server Software</td>
     <td>
-      <?php echo $this->Reports->entries_from_related_reports(
+      <?php echo $this->Reports->entriesFromRelateReports(
           $server_software_related_entries, $server_software_distinct_count);
       ?>
     </td>
@@ -74,7 +74,7 @@
       <?php } ?>
       <p>Related reports with a description:
         <?php echo $this->Reports->
-            create_reports_links($reports_with_description); ?>
+            createReportsLinks($reports_with_description); ?>
       </p>
     </td>
   </tr>
@@ -96,7 +96,7 @@
   <tr>
     <td>Related reports</td>
     <td>
-      <?php echo $this->Reports->create_reports_links($related_reports); ?>
+      <?php echo $this->Reports->createReportsLinks($related_reports); ?>
     </td>
   </tr>
 </table>
