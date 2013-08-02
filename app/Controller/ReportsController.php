@@ -72,19 +72,6 @@ class ReportsController extends AppController {
 		return json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	}
 
-	public function submit() {
-		$report = $this->request->input('json_decode', true);
-		$this->Report->create(array('status' => 'new'));
-		$this->Report->saveFromSubmission($report);
-		$response = array(
-			"success" => true,
-			"message" => "Thank you for your submission",
-			"report_id" => $this->Report->id,
-		);
-		$this->autoRender = false;
-		return json_encode($response);
-	}
-
 	public function data_tables() {
 		$aColumns = array('id', 'error_name', 'error_message', 'pma_version',
 					'status');
