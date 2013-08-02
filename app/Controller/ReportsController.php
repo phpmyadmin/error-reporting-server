@@ -88,26 +88,26 @@ class ReportsController extends AppController {
 	public function data_tables() {
 		$aColumns = array('id', 'error_name', 'error_message', 'pma_version',
 					'status');
-		$search_conditions = $this->_getSearchConditions($aColumns);
-		$order_conditions = $this->_getOrder($aColumns);
+		$searchConditions = $this->_getSearchConditions($aColumns);
+		$orderConditions = $this->_getOrder($aColumns);
 
 		$params = array(
 			'fields' => $aColumns,
-			'conditions' => $search_conditions,
-			'order' => $order_conditions,
+			'conditions' => $searchConditions,
+			'order' => $orderConditions,
 		);
 
-		$paged_params = $params;
-		$paged_params['limit'] = intval($this->request->query('iDisplayLength'));
-		$paged_params['offset'] = intval($this->request->query('iDisplayStart'));
+		$pagedParams = $params;
+		$pagedParams['limit'] = intval($this->request->query('iDisplayLength'));
+		$pagedParams['offset'] = intval($this->request->query('iDisplayStart'));
 
-		$rows = $this->Report->find('allDataTable', $paged_params);
+		$rows = $this->Report->find('allDataTable', $pagedParams);
 		$rows = Sanitize::clean($rows);
-		$total_filtered = $this->Report->find('count', $params);
+		$totalFiltered = $this->Report->find('count', $params);
 
 		$response = array(
 			'iTotalRecords' => $this->Report->find('count'),
-			'iTotalDisplayRecords' => $total_filtered,
+			'iTotalDisplayRecords' => $totalFiltered,
 			'sEcho' => intval($this->request->query('sEcho')),
 			'aaData' => $rows
 		);
