@@ -1,13 +1,20 @@
 Error Reporting Server
 ======================
 
-phpmyadmin server side component for the error reporting system. It uses CakePHP v2.3 with some extra plugins like migrations, debugkit and OAuth component.
+phpmyadmin server side component for the error reporting system. It uses
+CakePHP v2.3 with some extra plugins like migrations, debugkit and OAuth
+component.
 
 # How To deploy #
 
 In order to deploy the app in this repo you need to follow these steps:
+
 - Clone this repo or extract the zip file
-- Add a virtual hosts entry pointing at the directory where you extracted the files in the previous step. Make sure that the installation is in the document root. The directory entry should look similar to this:
+- Add a virtual hosts entry pointing at the directory where you extracted the
+  files in the previous step. Make sure that the installation is in the
+  document root. 
+
+    - For apache it should look similar to this:
 ```
 <VirtualHost *:80>
       ServerAdmin webmaster@localhost
@@ -26,7 +33,7 @@ In order to deploy the app in this repo you need to follow these steps:
       CustomLog "/var/log/httpd/dummy-host.example.com-access_log" common
 </VirtualHost>
 ```
-- Configuration for lighttpd:
+    - Configuration for lighttpd:
 ```
 $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
     server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
