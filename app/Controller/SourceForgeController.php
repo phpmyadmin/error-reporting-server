@@ -2,8 +2,11 @@
 /* vim: set noexpandtab sw=2 ts=2 sts=2: */
 
 class SourceForgeController extends AppController {
+
 	public $helpers = array('Html', 'Form');
+
 	public $components = array('SourceForgeApi');
+
 	public $uses = array('Report');
 
 	public function beforeFilter() {
@@ -31,7 +34,6 @@ class SourceForgeController extends AppController {
 	}
 
 	public function create_ticket($reportId) {
-
 		if (!$reportId) {
 				throw new NotFoundException(__('Invalid report'));
 		}
@@ -45,7 +47,7 @@ class SourceForgeController extends AppController {
 			return;
 		}
 
-		$data = $this->getTicketData($reportId);
+		$data = $this->_getTicketData($reportId);
 		$response = $this->SourceForgeApi->createTicket(
 				Configure::read('SourceForgeProjectName'), $data);
 		if ($response->code[0] === "3") {
@@ -62,13 +64,13 @@ class SourceForgeController extends AppController {
 		} else {
 			//fail
 			$response->body = json_decode($response->body, true);
-			$this->Session->setFlash($this->getValidationErrors(
+			$this->Session->setFlash($this->_getValidationErrors(
 					$response->body['errors']), "default",
 					array("class" => "alert alert-error"));
 		}
 	}
 
-	private function getTicketData($reportId) {
+	protected function _getTicketData($reportId) {
 		$data = array(
 			'ticket_form.summary' => $this->request->data['Ticket']['summary'],
 			'ticket_form.description' => $this->request->data['Ticket']['description'],
@@ -83,18 +85,18 @@ class SourceForgeController extends AppController {
 		return $data;
 	}
 
-	private function getValidationErrors($errors) {
-		$error_string = "There were some problems with the ticket submission:";
-		$error_string .= '<ul>';
+	protected function _getValidationErrors($errors) {
+		$errorString = "There were some problems with the ticket submission:";
+		$errorString .= '<ul>';
 
-		foreach($errors['ticket_form'] as $field => $message) {
-			$error_string .= "<li>";
-			$error_string .= "$field: $message";
-			$error_string .= "</li>";
+		foreach ($errors['ticket_form'] as $field => $message) {
+			$errorString .= "<li>";
+			$errorString .= "$field: $message";
+			$errorString .= "</li>";
 		}
 
-		$error_string .= '</ul>';
-		return $error_string;
+		$errorString .= '</ul>';
+		return $errorString;
 	}
 
 }
