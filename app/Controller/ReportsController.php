@@ -134,8 +134,8 @@ class ReportsController extends AppController {
 		if ( $this->request->query('sSearch') != "" ) {
 			for ( $i = 0; $i < count($aColumns); $i++ ) {
 				if ($this->request->query('bSearchable_' . $i) == "true") {
-					$searchConditions['OR'][] = array($aColumns[$i] . " LIKE" => "%" .
-							$this->request->query('sSearch') . "%");
+					$searchConditions['OR'][] = array($aColumns[$i] . " LIKE" =>
+							"%" . $this->request->query('sSearch') . "%");
 				}
 			}
 		}
