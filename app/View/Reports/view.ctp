@@ -56,7 +56,7 @@
   </tr>
   <tr>
     <td>Incident Count</td>
-    <td><?php echo count($incidents) ." incidents of this bug"; ?></td>
+    <td><?php echo count($incidents) . " incidents of this bug"; ?></td>
   </tr>
   <tr>
     <td>Submition Date</td>
@@ -64,15 +64,6 @@
       <?php echo $report["Report"]["created"]; ?>
       and it was last seen on
       <?php echo $incidents[0]["Incident"]["created"]; ?>
-    </td>
-  </tr>
-  <tr>
-    <td>Steps leading to the error</td>
-    <td>
-      <p>Incidents with a description:
-        <?php echo $this->Reports->
-            createIncidentsLinks($incidents_with_description); ?>
-      </p>
     </td>
   </tr>
   <tr>
@@ -85,9 +76,11 @@
     </td>
   </tr>
   <tr>
-    <td>Related reports</td>
+    <td>Incidents</td>
     <td>
       <?php echo $this->Reports->createIncidentsLinks($incidents); ?>
     </td>
   </tr>
 </table>
+<h4>Descriptions submited by users:</h4>
+<?php echo $this->Reports->incidentsDescriptions($incidents_with_description); ?>
