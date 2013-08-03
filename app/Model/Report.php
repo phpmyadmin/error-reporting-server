@@ -36,23 +36,6 @@ class Report extends AppModel {
 		'arrayList' => true,
 		'groupedCount'=> true);
 
-	public function saveFromSubmission($rawReport = array()) {
-		$schematizedReport = array(
-			'pma_version' => $rawReport['pma_version'],
-			'php_version' => $this->getSimplePhpVersion($rawReport['php_version']),
-			'steps' => $rawReport['steps'],
-			'error_message' => $rawReport['exception']['message'],
-			'error_name' => $rawReport['exception']['name'],
-			'browser' => $rawReport['browser_name'] . " "
-					. $this->getMajorVersion($rawReport['browser_version']),
-			'user_os' => $rawReport['user_os'],
-			'server_software' => $this->getServer($rawReport['server_software']),
-			'full_report' => json_encode($rawReport),
-			'stacktrace' => json_encode($rawReport['exception']['stack']),
-		);
-		return $this->save($schematizedReport);
-	}
-
 	public function getRelatedReports() {
 		return $this->find('all', array(
 			'limit' => 50,
@@ -93,28 +76,6 @@ class Report extends AppModel {
 		} else {
 			return $groupedCount;
 		}
-	}
-
-	private function getMajorVersion($fullVersion) {
-		preg_match("/^\d+/", $fullVersion, $matches);
-		$simpleVersion = $matches[0];
-		return $simpleVersion;
-	}
-
-	private function getServer($signature) {
-		if (preg_match("/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)"
-				. "|(lighttpd\/\d+\.\d+)/i",
-				$signature, $matches)) {
-			return $matches[0];
-		} else {
-			return "UNKNOWN";
-		}
-	}
-
-	private function getSimplePhpVersion($phpVersion) {
-		preg_match("/^\d+\.\d+/", $phpVersion, $matches);
-		$simpleVersion = $matches[0];
-		return $simpleVersion;
 	}
 
 	protected function _relatedReportsConditions() {

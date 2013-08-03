@@ -74,14 +74,14 @@ class Incident extends AppModel {
 	protected function _getSchematizedIncident($bugReport) {
 		$schematizedReport = array(
 			'pma_version' => $bugReport['pma_version'],
-			'php_version' => $this->getSimplePhpVersion($bugReport['php_version']),
+			'php_version' => $this->_getSimplePhpVersion($bugReport['php_version']),
 			'steps' => $bugReport['steps'],
 			'error_message' => $bugReport['exception']['message'],
 			'error_name' => $bugReport['exception']['name'],
 			'browser' => $bugReport['browser_name'] . " "
-					. $this->getMajorVersion($bugReport['browser_version']),
+					. $this->_getMajorVersion($bugReport['browser_version']),
 			'user_os' => $bugReport['user_os'],
-			'server_software' => $this->getServer($bugReport['server_software']),
+			'server_software' => $this->_getServer($bugReport['server_software']),
 			'full_report' => json_encode($bugReport),
 			'stacktrace' => json_encode($bugReport['exception']['stack']),
 		);
@@ -104,6 +104,28 @@ class Incident extends AppModel {
 			} else {
 				return array($level["url"], $level["line"]);
 			}
+		}
+	}
+
+	protected function _getMajorVersion($fullVersion) {
+		preg_match("/^\d+/", $fullVersion, $matches);
+		$simpleVersion = $matches[0];
+		return $simpleVersion;
+	}
+
+	protected function _getSimplePhpVersion($phpVersion) {
+		preg_match("/^\d+\.\d+/", $phpVersion, $matches);
+		$simpleVersion = $matches[0];
+		return $simpleVersion;
+	}
+
+	protected function _getServer($signature) {
+		if (preg_match("/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)"
+				. "|(lighttpd\/\d+\.\d+)/i",
+				$signature, $matches)) {
+			return $matches[0];
+		} else {
+			return "UNKNOWN";
 		}
 	}
 }
