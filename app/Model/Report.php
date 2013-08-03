@@ -7,28 +7,8 @@ class Report extends AppModel {
 	public $validate = array(
 		'error_message' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
-		),
-		'pma_version' => array(
-			'rule' => 'notEmpty',
-			'required'	 => true,
-		),
-		'php_version' => array(
-			'rule' => 'notEmpty',
-			'required'	 => true,
-		),
-		'full_report' => array(
-			'rule' => 'notEmpty',
-			'required'	 => true,
-		),
-		'stacktrace' => array(
-			'rule' => 'notEmpty',
-			'required'	 => true,
-		),
-		'browser' => array(
-			'rule' => 'notEmpty',
-			'required'	 => true,
-		),
+			'required'	 => true
+		)
 	);
 
 	public $findMethods = array(
