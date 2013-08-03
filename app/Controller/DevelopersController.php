@@ -22,13 +22,13 @@ class DevelopersController extends AppController {
 
 	public function callback() {
 		$code = $this->request->query('code');
-		$access_token = $this->GithubApi->getAccessToken($code);
-		if ($access_token) {
-			$user_info = $this->GithubApi->getUserInfo($access_token);
-			$user_info["has_commit_access"] =
-					$this->GithubApi->canCommitTo($user_info["login"], $this->github_repo);
+		$accessToken = $this->GithubApi->getAccessToken($code);
+		if ($accessToken) {
+			$userInfo = $this->GithubApi->getUserInfo($accessToken);
+			$userInfo["has_commit_access"] = $this->GithubApi->canCommitTo(
+					$userInfo["login"], $this->GithubApi->githubRepo);
 
-			$this->authenticateDeveloper($user_info, $access_token);
+			$this->_authenticateDeveloper($userInfo, $accessToken);
 
 			$this->Session->setFlash("You have been logged in successfully",
 					"default", array("class" => "alert alert-success"));
@@ -37,7 +37,7 @@ class DevelopersController extends AppController {
 					. "Please try again later", "default",
 					array("class" => "alert alert-error"));
 		}
-		$this->redirect(array("controller"=>"reports","action"=>"index"));
+		$this->redirect(array("controller" => "reports","action" => "index"));
 	}
 
 	public function logout() {
@@ -53,14 +53,14 @@ class DevelopersController extends AppController {
 				"m0hamed/phpmyadmin"));
 	}
 
-	private function authenticateDeveloper($user_info, $access_token) {
-		$developer = $this->Developer->findByGithubId($user_info['id']);
+	protected function _authenticateDeveloper($userInfo, $accessToken) {
+		$developer = $this->Developer->findByGithubId($userInfo['id']);
 		if (!$developer) {
 			$this->Developer->create();
 		} else {
 			$this->Developer->id = $developer["Developer"]["id"];
 		}
-		$this->Developer->saveFromGithub($user_info, $access_token);
+		$this->Developer->saveFromGithub($userInfo, $accessToken);
 		$this->Session->write("Developer.id", $this->Developer->id);
 	}
 }
