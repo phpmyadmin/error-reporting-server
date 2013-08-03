@@ -50,7 +50,7 @@ class ReportsController extends AppController {
 		$this->set('reportsWithDescription',
 				$this->Report->getRelatedReportsWithDescription());
 
-		$this->setSimilarFields($id);
+		$this->_setSimilarFields($id);
 	}
 
 	public function json($id) {
@@ -88,26 +88,26 @@ class ReportsController extends AppController {
 	public function data_tables() {
 		$aColumns = array('id', 'error_name', 'error_message', 'pma_version',
 					'status');
-		$search_conditions = $this->getSearchConditions($aColumns);
-		$order_conditions = $this->getOrder($aColumns);
+		$searchConditions = $this->_getSearchConditions($aColumns);
+		$orderConditions = $this->_getOrder($aColumns);
 
 		$params = array(
 			'fields' => $aColumns,
-			'conditions' => $search_conditions,
-			'order' => $order_conditions,
+			'conditions' => $searchConditions,
+			'order' => $orderConditions,
 		);
 
-		$paged_params = $params;
-		$paged_params['limit'] = intval($this->request->query('iDisplayLength'));
-		$paged_params['offset'] = intval($this->request->query('iDisplayStart'));
+		$pagedParams = $params;
+		$pagedParams['limit'] = intval($this->request->query('iDisplayLength'));
+		$pagedParams['offset'] = intval($this->request->query('iDisplayStart'));
 
-		$rows = $this->Report->find('allDataTable', $paged_params);
+		$rows = $this->Report->find('allDataTable', $pagedParams);
 		$rows = Sanitize::clean($rows);
-		$total_filtered = $this->Report->find('count', $params);
+		$totalFiltered = $this->Report->find('count', $params);
 
 		$response = array(
 			'iTotalRecords' => $this->Report->find('count'),
-			'iTotalDisplayRecords' => $total_filtered,
+			'iTotalDisplayRecords' => $totalFiltered,
 			'sEcho' => intval($this->request->query('sEcho')),
 			'aaData' => $rows
 		);
@@ -116,12 +116,12 @@ class ReportsController extends AppController {
 	}
 
 ## PRIVATE HELPERS
-	private function setSimilarFields($id) {
+	protected function _setSimilarFields($id) {
 		$fields = array('browser', 'pma_version', 'php_version', 'server_software');
 
 		$this->Report->read(null, $id);
 
-		foreach($fields as $field) {
+		foreach ($fields as $field) {
 			list($entriesWithCount, $totalEntries) =
 					$this->Report->getRelatedByField($field, 25, true);
 			$this->set("${field}_related_entries", $entriesWithCount);
@@ -129,12 +129,10 @@ class ReportsController extends AppController {
 		}
 	}
 
-	private function getSearchConditions($aColumns) {
+	protected function _getSearchConditions($aColumns) {
 		$searchConditions = array('OR' => array());
-		if ( $this->request->query('sSearch') != "" )
-		{
-			for ( $i=0 ; $i<count($aColumns) ; $i++ )
-			{
+		if ( $this->request->query('sSearch') != "" ) {
+			for ( $i = 0; $i < count($aColumns); $i++ ) {
 				if ($this->request->query('bSearchable_' . $i) == "true") {
 					$searchConditions['OR'][] = array($aColumns[$i] . " LIKE" => "%" .
 							$this->request->query('sSearch') . "%");
@@ -143,10 +141,8 @@ class ReportsController extends AppController {
 		}
 
 		/* Individual column filtering */
-		for ( $i=0 ; $i<count($aColumns) ; $i++ )
-		{
-			if ($this->request->query('sSearch_' . $i) != '')
-			{
+		for ( $i = 0; $i < count($aColumns); $i++ ) {
+			if ($this->request->query('sSearch_' . $i) != '') {
 				$searchConditions[] = array($aColumns[$i] . " LIKE" =>
 						"%" . $this->request->query('sSearch_' . $i) . "%");
 			}
@@ -154,15 +150,12 @@ class ReportsController extends AppController {
 		return $searchConditions;
 	}
 
-	private function getOrder($aColumns) {
-		if ( $this->request->query('iSortCol_0') != null )
-		{
+	protected function _getOrder($aColumns) {
+		if ( $this->request->query('iSortCol_0') != null ) {
 			$order = array();
-			for ( $i=0 ; $i<intval($this->request->query('iSortingCols')) ; $i++ )
-			{
+			for ( $i = 0; $i < intval($this->request->query('iSortingCols')); $i++ ) {
 				if ( $this->request->query('bSortable_'
-						. intval($this->request->query('iSortCol_' . $i))) == "true" )
-				{
+						. intval($this->request->query('iSortCol_' . $i))) == "true" ) {
 					$order[] = array(
 						$aColumns[intval($this->request->query('iSortCol_' . $i))] =>
 							$this->request->query('sSortDir_' . $i)
@@ -175,4 +168,3 @@ class ReportsController extends AppController {
 		}
 	}
 }
-
