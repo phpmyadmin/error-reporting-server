@@ -34,24 +34,28 @@ class Incident extends AppModel {
 
 	public $belongsTo = array('Report');
 
-	public function getClosestReport($exception) {
-		List($location, $linenumber) = $this->_getProperLevel($exception["stack"]);
+	public $findMethods = array(
+		'groupedCount'=> true
+  );
+
+	protected function _getClosestReport($exception) {
+		List($location, $linenumber) = $this->_getIdentifyingLocation($exception["stack"]);
 		$report = $this->Report->findByLocationAndLinenumber($location, $linenumber);
 		return $report;
 	}
 
 	public function createIncidentFromBugReport($bugReport) {
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
-		$closestReport = $this->getClosestReport($bugReport["exception"]);
+		$closestReport = $this->_getClosestReport($bugReport["exception"]);
 
 		if($closestReport) {
 			$schematizedIncident["report_id"] = $closestReport["Report"]["id"];
 			return $this->save($schematizedIncident);
 		} else {
-			$report = $this->getReportDetails($bugReport);
+			$report = $this->_getReportDetails($bugReport);
 			$data = array(
-				'Incident' => $schematizedIncident;
-				'Report' => $report;
+				'Incident' => $schematizedIncident,
+				'Report' => $report
 			);
 			$this->saveAssociated($data);
 		}
@@ -59,11 +63,11 @@ class Incident extends AppModel {
 
 	protected function _getReportDetails($bugReport) {
 		List($location, $linenumber) =
-				$this->_getProperLevel($bugReport["exception"]["stack"]);
+				$this->_getIdentifyingLocation($bugReport["exception"]["stack"]);
 
 		$reportDetails = array(
-			'error_message' => 'error_message',
-			'error_name' => 'error_name',
+			'error_message' => $bugReport['exception']['message'],
+			'error_name' => $bugReport['exception']['name'],
 			'status' => 'new',
 			'location' => $location,
 			'linenumber' => $linenumber,
@@ -127,5 +131,18 @@ class Incident extends AppModel {
 		} else {
 			return "UNKNOWN";
 		}
+	}
+
+	protected function _findGroupedCount($state, $query, $results = array()) {
+		if ($state === 'before') {
+			return $query;
+		}
+		$output = array();
+		foreach ($results as $row) {
+			foreach ($row['Incident'] as $key => $value) {
+				$output[$value] = $row[0]['count'];
+			}
+		}
+		return $output;
 	}
 }

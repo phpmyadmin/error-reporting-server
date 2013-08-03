@@ -22,11 +22,11 @@ class ReportsHelper extends AppHelper {
 		return $fullString;
 	}
 
-	public function createReportsLinks($reports) {
+	public function createIncidentsLinks($incidents) {
 		$links = array();
-		foreach ($reports as $report) {
-			$reportId = $report["Report"]["id"];
-			$links[] = "<a href='/reports/view/$reportId'>#$reportId</a>";
+		foreach ($incidents as $incident) {
+			$incidentId = $incident["Incident"]["id"];
+			$links[] = "<a href='/incidents/view/$incidentId'>#$incidentId</a>";
 		}
 		$string = implode(", ", $links);
 		return $string;

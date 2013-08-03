@@ -55,26 +55,23 @@
     </td>
   </tr>
   <tr>
-    <td>Reports Count</td>
-    <td><?php echo count($related_reports) ." reports of this bug"; ?></td>
+    <td>Incident Count</td>
+    <td><?php echo count($incidents) ." incidents of this bug"; ?></td>
   </tr>
   <tr>
     <td>Submition Date</td>
     <td>
       <?php echo $report["Report"]["created"]; ?>
       and it was last seen on
-      <?php echo $related_reports[0]["Report"]["created"]; ?>
+      <?php echo $incidents[0]["Incident"]["created"]; ?>
     </td>
   </tr>
   <tr>
     <td>Steps leading to the error</td>
     <td>
-      <?php if ($report["Report"]["steps"]) { ?>
-        <pre><?php echo $report["Report"]["steps"]; ?></pre>
-      <?php } ?>
-      <p>Related reports with a description:
+      <p>Incidents with a description:
         <?php echo $this->Reports->
-            createReportsLinks($reports_with_description); ?>
+            createIncidentsLinks($incidents_with_description); ?>
       </p>
     </td>
   </tr>
@@ -88,15 +85,9 @@
     </td>
   </tr>
   <tr>
-    <td>Full Report</td>
-    <td>
-      <a href="/reports/json/<?php echo $report["Report"]["id"]; ?>">click here</a>
-    </td>
-  </tr>
-  <tr>
     <td>Related reports</td>
     <td>
-      <?php echo $this->Reports->createReportsLinks($related_reports); ?>
+      <?php echo $this->Reports->createIncidentsLinks($incidents); ?>
     </td>
   </tr>
 </table>

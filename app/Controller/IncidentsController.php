@@ -12,16 +12,34 @@ class IncidentsController extends AppController {
 			$response = array(
 				"success" => true,
 				"message" => "Thank you for your submission",
-				"report_id" => $this->Incident->id,
+				"incident_id" => $this->Incident->id,
 			);
 		} else {
 			$response = array(
 				"success" => false,
-				"message" => "There was a problem with your submission."
+				"message" => "There was a problem with your submission.",
 			);
 		}
 		$this->autoRender = false;
-		return json_encode($response);
+		return json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	}
 
+	public function json($id) {
+		if (!$id) {
+			throw new NotFoundException(__('Invalid Incident'));
+		}
+
+		$incident = $this->Incident->findById($id);
+		if (!$incident || $this->RequestHandler->accepts('json')) {
+			throw new NotFoundException(__('Invalid Incident'));
+		}
+
+		$incident['Incident']['full_report'] =
+				json_decode($incident['Incident']['full_report'], true);
+		$incident['Incident']['stacktrace'] =
+				json_decode($incident['Incident']['stacktrace'], true);
+
+		$this->autoRender = false;
+		return json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	}
 }

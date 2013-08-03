@@ -3,6 +3,12 @@
 
 App::uses('AppModel', 'Model');
 class Report extends AppModel {
+	
+	public $hasMany = array(
+		'Incident' => array(
+			'dependant' => true
+		)
+	);
 
 	public $validate = array(
 		'error_message' => array(
@@ -14,43 +20,49 @@ class Report extends AppModel {
 	public $findMethods = array(
 		'allDataTable' =>	true,
 		'arrayList' => true,
-		'groupedCount'=> true);
+  );
 
-	public function getRelatedReports() {
-		return $this->find('all', array(
+	public function getIncidents() {
+		return $this->Incident->find('all', array(
+      'recursive' => -1,
 			'limit' => 50,
-			'conditions' => $this->_relatedReportsConditions(),
+			'conditions' => $this->_relatedIncidentsConditions(),
 			'order' => 'created desc'
 		));
 	}
 
-	public function getRelatedReportsWithDescription() {
-		return $this->find('all', array(
+	public function getIncidentsWithDescription() {
+		return $this->Incident->find('all', array(
+      'recursive' => -1,
 			'conditions' => array(
-				$this->_relatedReportsConditions(),
-				'steps IS NOT NULL'
+        'NOT' => array(
+          'Incident.steps' => null
+        ),
+        $this->_relatedIncidentsConditions(),
 			),
-			'order' => 'steps desc'
+			'order' => 'Incident.steps desc'
 		));
 	}
 
 	public function getRelatedByField($fieldName, $limit = 10, $count = false) {
 		$queryDetails = array(
-			'fields' => array("DISTINCT $fieldName", "COUNT(id) as count"),
+			'fields' => array("DISTINCT Incident.$fieldName", "COUNT(*) as count"),
 			'conditions' => array(
-				$this->_relatedReportsConditions(),
-				"$fieldName IS NOT NULL",
+				$this->_relatedIncidentsConditions(),
+        'NOT' => array(
+          "Incident.$fieldName" => null
+        )
 			),
 			'limit' => $limit,
 			'group' => "$fieldName",
 			'order' => 'count DESC'
 		);
 
-		$groupedCount = $this->find('groupedCount', $queryDetails);
+		$groupedCount = $this->Incident->find('groupedCount', $queryDetails);
 
 		if ($count) {
 			$queryDetails['limit'] = null;
-			$totalCount = $this->find('count', $queryDetails);
+			$totalCount = $this->Incident->find('count', $queryDetails);
 
 			return array($groupedCount, $totalCount);
 		} else {
@@ -58,16 +70,9 @@ class Report extends AppModel {
 		}
 	}
 
-	protected function _relatedReportsConditions() {
-		$conditions = array(array('related_report_id' => $this->id));
-
-		if ($this->data["Report"]["related_report_id"]) {
-			$conditions[] = array('related_report_id' =>
-					$this->data["Report"]["related_report_id"]);
-			$conditions[] = array('id' =>
-					$this->data["Report"]["related_report_id"]);
-		}
-		return array('OR' => $conditions);
+	protected function _relatedIncidentsConditions() {
+		$conditions = array(array('report_id' => $this->id));
+		return $conditions;
 	}
 
 	protected function _findAllDataTable($state, $query, $results = array()) {
@@ -93,19 +98,6 @@ class Report extends AppModel {
 		foreach ($results as $row) {
 			foreach ($row['Report'] as $key => $value) {
 				$output[] = $value;
-			}
-		}
-		return $output;
-	}
-
-	protected function _findGroupedCount($state, $query, $results = array()) {
-		if ($state === 'before') {
-			return $query;
-		}
-		$output = array();
-		foreach ($results as $row) {
-			foreach ($row['Report'] as $key => $value) {
-				$output[$value] = $row[0]['count'];
 			}
 		}
 		return $output;

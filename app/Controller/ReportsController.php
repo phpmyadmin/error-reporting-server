@@ -29,47 +29,32 @@ class ReportsController extends AppController {
 		);
 	}
 
+  public function test($id) {
+    $this->Report->recursive = -1;
+    $report = $this->Report->read(null, $id);
+		$this->autoRender = false;
+		return json_encode($this->Report->getIncidentsWithDescription());
+  }
+
 	public function view($id) {
 		if (!$id) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
 
 		$report = $this->Report->findById($id);
-		if (!$report || $this->RequestHandler->accepts('json')) {
+		if (!$report) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
-
-		$report['Report']['full_report'] =
-				Sanitize::clean(json_decode($report['Report']['full_report'], true));
 
 		$this->set('report', $report);
 		$this->set('project_name', Configure::read('SourceForgeProjectName'));
 
 		$this->Report->read(null, $id);
-		$this->set('related_reports', $this->Report->getRelatedReports());
-		$this->set('reportsWithDescription',
-				$this->Report->getRelatedReportsWithDescription());
+		$this->set('incidents', $this->Report->getIncidents());
+		$this->set('incidents_with_description',
+				$this->Report->getIncidentsWithDescription());
 
 		$this->_setSimilarFields($id);
-	}
-
-	public function json($id) {
-		if (!$id) {
-			throw new NotFoundException(__('Invalid Report'));
-		}
-
-		$report = $this->Report->findById($id);
-		if (!$report || $this->RequestHandler->accepts('json')) {
-			throw new NotFoundException(__('Invalid Report'));
-		}
-
-		$report['Report']['full_report'] =
-				json_decode($report['Report']['full_report'], true);
-		$report['Report']['stacktrace'] =
-				json_decode($report['Report']['stacktrace'], true);
-
-		$this->autoRender = false;
-		return json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	}
 
 	public function data_tables() {

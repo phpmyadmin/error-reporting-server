@@ -66,7 +66,7 @@ class AppController extends Controller {
 			$this->set('developer_signed_in', false);
 
 			if ($controller !== "pages" && $controller !== "developers" &&
-					!($action === "submit" && $controller === "reports")) {
+					!($action === "create" && $controller === "incidents")) {
 				$this->Session->setFlash("You need to be signed in to do this", "default",
 						array("class" => "alert alert-error"));
 				$this->redirect("/");
