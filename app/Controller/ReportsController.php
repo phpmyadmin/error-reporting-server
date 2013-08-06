@@ -88,7 +88,40 @@ class ReportsController extends AppController {
 		return json_encode($response);
 	}
 
-## PRIVATE HELPERS
+	public function mark_related_to($reportId) {
+		$relatedTo = $this->request->query("related_to");
+		if (!$reportId || !$relatedTo) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$report = $this->Report->read(null, $reportId);
+		if (!$report) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$this->Report->addToRelatedGroup($relatedTo);
+		$this->Session->setFlash("This report has been marked the same as #"
+				. $relatedTo, "default", array("class" => "alert alert-success"));
+		$this->redirect("/reports/view/$reportId");
+	}
+
+	public function unmark_related_to($reportId) {
+		if (!$reportId) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$report = $this->Report->read(null, $reportId);
+		if (!$report) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$this->Report->removeFromRelatedGroup();
+		$this->Session->setFlash("This report has been marked as different."
+				, "default", array("class" => "alert alert-success"));
+		$this->redirect("/reports/view/$reportId");
+	}
+
+## HELPERS
 	protected function _setSimilarFields($id) {
 		$fields = array('browser', 'pma_version', 'php_version', 'server_software');
 

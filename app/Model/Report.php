@@ -49,6 +49,26 @@ class Report extends AppModel {
 		));
 	}
 
+	public function removeFromRelatedGroup() {
+		$this->saveField("related_to", null);
+		$report = $this->findByRelatedTo($this->id);
+		if ($report) {
+			$this->updateAll(
+				array("related_to" => $report["Report"]["id"]),
+				array("related_to" => $this->id)
+			);
+		}
+	}
+
+	public function addToRelatedGroup($related_to) {
+		$report = $this->findById($related_to);
+		if ($report && $report["Report"]["related_to"]) {
+			$this->saveField("related_to", $report["Report"]["related_to"]);
+		} else {
+			$this->saveField("related_to", $related_to);
+		}
+	}
+
 	public function getRelatedByField($fieldName, $limit = 10, $count = false) {
 		$queryDetails = array(
 			'fields' => array("DISTINCT Incident.$fieldName", "COUNT(*) as count"),
