@@ -2,6 +2,7 @@
 /* vim: set noexpandtab sw=2 ts=2 sts=2: */
 
 App::uses('AppModel', 'Model');
+App::uses('Sanitize', 'Utility');
 
 class Incident extends AppModel {
 
@@ -79,7 +80,7 @@ class Incident extends AppModel {
 		$schematizedReport = array(
 			'pma_version' => $bugReport['pma_version'],
 			'php_version' => $this->_getSimplePhpVersion($bugReport['php_version']),
-			'steps' => $bugReport['steps'],
+			'steps' => Sanitize::html($bugReport['steps']),
 			'error_message' => $bugReport['exception']['message'],
 			'error_name' => $bugReport['exception']['name'],
 			'browser' => $bugReport['browser_name'] . " "
