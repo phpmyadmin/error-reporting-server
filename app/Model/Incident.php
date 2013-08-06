@@ -37,7 +37,7 @@ class Incident extends AppModel {
 
 	public $findMethods = array(
 		'groupedCount'=> true
-  );
+	);
 
 	protected function _getClosestReport($exception) {
 		List($location, $linenumber) = $this->_getIdentifyingLocation($exception["stack"]);

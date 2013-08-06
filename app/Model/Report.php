@@ -38,12 +38,11 @@ class Report extends AppModel {
 
 	public function getIncidentsWithDescription() {
 		return $this->Incident->find('all', array(
-      'recursive' => -1,
 			'conditions' => array(
-        'NOT' => array(
-          'Incident.steps' => null
-        ),
-        $this->_relatedIncidentsConditions(),
+				'NOT' => array(
+					'Incident.steps' => null
+				),
+				$this->_relatedIncidentsConditions(),
 			),
 			'order' => 'Incident.steps desc'
 		));
@@ -74,12 +73,12 @@ class Report extends AppModel {
 			'fields' => array("DISTINCT Incident.$fieldName", "COUNT(*) as count"),
 			'conditions' => array(
 				$this->_relatedIncidentsConditions(),
-        'NOT' => array(
-          "Incident.$fieldName" => null
-        )
+				'NOT' => array(
+					"Incident.$fieldName" => null
+				)
 			),
 			'limit' => $limit,
-			'group' => "$fieldName",
+			'group' => "Incident.$fieldName",
 			'order' => 'count DESC'
 		);
 
