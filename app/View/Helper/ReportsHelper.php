@@ -32,9 +32,24 @@ class ReportsHelper extends AppHelper {
 		return $string;
 	}
 
+	public function createReportsLinks($reports) {
+		$links = array();
+		foreach ($reports as $report) {
+			$links[] = $this->linkToReport($report);
+		}
+		$string = implode(", ", $links);
+		return $string;
+	}
+
 	public function linkToIncident($incident) {
 		$incidentId = $incident["Incident"]["id"];
-		$link = "<a href='/incidents/view/$incidentId'>#$incidentId</a>";
+		$link = "<a href='/incidents/json/$incidentId'>#$incidentId</a>";
+		return $link;
+	}
+
+	public function linkToReport($report) {
+		$reportId = $report["Report"]["id"];
+		$link = "<a href='/reports/view/$reportId'>#$reportId</a>";
 		return $link;
 	}
 

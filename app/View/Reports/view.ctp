@@ -1,6 +1,22 @@
 <h1>Error Report #<?php echo $report["Report"]["id"]; ?>
   <small>[<?php echo $report["Report"]["status"]; ?>]</small>
 </h1>
+<?php if (empty($related_reports)) { ?>
+  <form class="form-inline" action="/reports/mark_related_to/<?php
+      echo $report["Report"]["id"]; ?>">
+    <span>Mark the same as:</span>
+    <input type="number" name="related_to" />
+    <input type="submit" value="submit" />
+  </form>
+<?php } else { ?>
+  <p>
+    This report is the same as the following reports:
+    (<?php echo $this->Reports->createReportsLinks($related_reports); ?>).
+    <a href="/reports/unmark_related_to/<?php echo $report["Report"]["id"]; ?>">
+      Remove from this group
+    </a>
+  </p>
+<?php } ?>
 <table cellspacing="0" class="table table-bordered error-report">
   <tr>
     <td>Error Name</td>

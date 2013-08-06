@@ -95,7 +95,36 @@ class Report extends AppModel {
 	}
 
 	protected function _relatedIncidentsConditions() {
-		$conditions = array(array('report_id' => $this->id));
+		$conditions = array(array('Incident.report_id' => $this->id));
+
+		$conditions[] = array("AND" => 
+			array('Report.related_to' => $this->id),
+			'Incident.report_id = Report.id',
+		);
+
+		if ($this->data["Report"]["related_to"]) {
+			$conditions[] = array('Incident.report_id' =>
+					$this->data["Report"]["related_to"]);
+			$conditions[] = array("AND" =>
+				array('Report.related_to' => $this->data["Report"]["related_to"]),
+				'Incident.report_id = Report.id'
+			);
+		}
+
+		return array('OR' => $conditions);
+	}
+
+	protected function _relatedReportsConditions() {
+		$conditions = array(array('related_to' => $this->id));
+
+		if ($this->data["Report"]["related_to"]) {
+			$conditions[] = array('related_to' =>
+					$this->data["Report"]["related_to"]);
+			$conditions[] = array('id' =>
+					$this->data["Report"]["related_to"]);
+		}
+		$conditions = array(array('OR' => $conditions));
+		$conditions[] = array("Report.id !=" => $this->id);
 		return $conditions;
 	}
 
