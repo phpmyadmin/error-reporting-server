@@ -29,19 +29,19 @@ class ReportsController extends AppController {
 		);
 	}
 
-  public function test($id) {
-    $this->Report->recursive = -1;
-    $report = $this->Report->read(null, $id);
+	public function test($id) {
+		$this->Report->recursive = -1;
+		$report = $this->Report->read(null, $id);
 		$this->autoRender = false;
 		return json_encode($this->Report->getIncidentsWithDescription());
-  }
+	}
 
-	public function view($id) {
-		if (!$id) {
+	public function view($reportId) {
+		if (!$reportId) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
 
-		$report = $this->Report->findById($id);
+		$report = $this->Report->findById($reportId);
 		if (!$report) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
@@ -49,12 +49,13 @@ class ReportsController extends AppController {
 		$this->set('report', $report);
 		$this->set('project_name', Configure::read('SourceForgeProjectName'));
 
-		$this->Report->read(null, $id);
+		$this->Report->read(null, $reportId);
 		$this->set('incidents', $this->Report->getIncidents());
 		$this->set('incidents_with_description',
 				$this->Report->getIncidentsWithDescription());
+		$this->set('related_reports', $this->Report->getRelatedReports());
 
-		$this->_setSimilarFields($id);
+		$this->_setSimilarFields($reportId);
 	}
 
 	public function data_tables() {

@@ -20,14 +20,19 @@ class Report extends AppModel {
 	public $findMethods = array(
 		'allDataTable' =>	true,
 		'arrayList' => true,
-  );
+	);
 
 	public function getIncidents() {
 		return $this->Incident->find('all', array(
-      'recursive' => -1,
 			'limit' => 50,
 			'conditions' => $this->_relatedIncidentsConditions(),
-			'order' => 'created desc'
+			'order' => 'Incident.created desc'
+		));
+	}
+
+	public function getRelatedReports() {
+		return $this->find("all", array(
+			'conditions' => $this->_relatedReportsConditions(),
 		));
 	}
 
