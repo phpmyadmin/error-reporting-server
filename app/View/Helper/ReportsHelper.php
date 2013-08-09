@@ -65,4 +65,50 @@ class ReportsHelper extends AppHelper {
 		}
 		return $descriptions;
 	}
+	
+	public function getStacktrace($stacktrace, $divClass) {
+		$html = "";
+		$html .= "<div class='$divClass'>";
+		foreach ($stacktrace as $level) {
+			$html .= $this->_getStackLevelInfo($level);
+			$html .= "<pre>";
+			$html .= join("\n", $level["context"]);
+			$html .= "</pre>";
+		}
+		$html .= "</div>";
+		return $html;
+	}
+
+	public function getStacktracesForIncidents($incidents) {
+		$count = 0;
+		$html = '<div class="row">';
+		foreach ($incidents as $incident) {
+			$class = "well span5";
+
+			if ($count % 2 == 1) {
+				$class .= " ";
+			} else {
+				$html .= "</div><div class='row'>";
+			}
+
+			$html .= $this->getStacktrace(
+					json_decode($incident["Incident"]["stacktrace"], true),
+					$class);
+			$count++;
+		}
+		$html .= '</div>';
+		return $html;
+	}
+
+	protected function _getStackLevelInfo($level) {
+		$html = "<span>";
+		$elements = array("filename", "scriptname", "line", "func", "column");
+		foreach ($elements as $element) {
+			if (isset($level[$element])) {
+				$html .= "$element: " . $level[$element] . "; ";
+			}
+		}
+		$html .= "</span>";
+		return $html;
+	}
 }

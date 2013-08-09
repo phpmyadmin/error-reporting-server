@@ -48,6 +48,15 @@ class Report extends AppModel {
 		));
 	}
 
+	public function getIncidentsWithDifferentStacktrace() {
+		return $this->Incident->find('all', array(
+			'conditions' => array(
+				'Incident.different_stacktrace' => 1,
+				$this->_relatedIncidentsConditions(),
+			)
+		));
+	}
+
 	public function removeFromRelatedGroup() {
 		$this->saveField("related_to", null);
 		$report = $this->findByRelatedTo($this->id);

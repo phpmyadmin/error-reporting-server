@@ -35,6 +35,7 @@ class AppSchema extends CakeSchema {
 		'steps' => array('type' => 'text', 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
 		'stacktrace' => array('type' => 'text', 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
 		'full_report' => array('type' => 'text', 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
+		'different_stacktrace' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 		'report_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10),
 		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),

@@ -53,6 +53,8 @@ class ReportsController extends AppController {
 		$this->set('incidents', $this->Report->getIncidents());
 		$this->set('incidents_with_description',
 				$this->Report->getIncidentsWithDescription());
+		$this->set('incidents_with_stacktrace',
+				$this->Report->getIncidentsWithDifferentStacktrace());
 		$this->set('related_reports', $this->Report->getRelatedReports());
 
 		$this->_setSimilarFields($reportId);

@@ -51,14 +51,30 @@ class Incident extends AppModel {
 
 		if($closestReport) {
 			$schematizedIncident["report_id"] = $closestReport["Report"]["id"];
+
+			$this->Report->read(null, $closestReport["Report"]["id"]);
+			$incidents = $this->Report->getIncidentsWithDifferentStacktrace();
+			$schematizedIncident["different_stacktrace"] =
+					$this->_hasDifferentStacktrace($schematizedIncident, $incidents);
 			return $this->save($schematizedIncident);
 		} else {
 			$report = $this->_getReportDetails($bugReport);
+			$schematizedIncident["different_stacktrace"] = 1;
 			$data = array(
 				'Incident' => $schematizedIncident,
 				'Report' => $report
 			);
 			$this->saveAssociated($data);
+		}
+	}
+
+	protected function _hasDifferentStacktrace($omac, $incidents) {
+		$omac["stacktrace"] = json_decode($omac["stacktrace"], true);
+		foreach ($incidents as $incident) {
+			$incident["stacktrace"] = json_decode($incident["stacktrace"], true);
+			if (!$this->_isSameStacktrace($omac["stacktrace"], $incident["stacktrace"])) {
+				return true;
+			}
 		}
 	}
 
@@ -145,5 +161,23 @@ class Incident extends AppModel {
 			}
 		}
 		return $output;
+	}
+
+	protected function _isSameStacktrace($stacktraceA, $stacktraceB) {
+		if (count($stacktraceA) != count($stacktraceB)) {
+			return false;
+		}
+
+		for ($i = 0; $i < count($stacktraceA); $i++) {
+			$levelA = $stacktraceA[$i];
+			$levelB = $stacktraceB($i);
+			$elements = array("filename", "scriptname", "line", "func", "column");
+			foreach ($elements as $element) {
+				if($levelA[$element] !== $levelB[$element]) {
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 }

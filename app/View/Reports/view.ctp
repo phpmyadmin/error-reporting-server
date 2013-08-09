@@ -83,20 +83,15 @@
     </td>
   </tr>
   <tr>
-    <td>Stack</td>
-    <td>
-      <a href="#" id="toggle-stacktrace">Show stacktrace</a>
-      <pre id="stacktrace" style="display: none;"><?php echo
-        json_encode($report["Report"]["full_report"]['exception']['stack'],
-        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES); ?></pre>
-    </td>
-  </tr>
-  <tr>
     <td>Incidents</td>
     <td>
       <?php echo $this->Reports->createIncidentsLinks($incidents); ?>
     </td>
   </tr>
 </table>
+
+<h4>Stacktraces:</h4>
+<?php echo $this->Reports->getStacktracesForIncidents($incidents_with_stacktrace); ?>
+
 <h4>Descriptions submited by users:</h4>
 <?php echo $this->Reports->incidentsDescriptions($incidents_with_description); ?>
