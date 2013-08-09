@@ -6,7 +6,7 @@
       echo $report["Report"]["id"]; ?>">
     <span>Mark the same as:</span>
     <input type="number" name="related_to" />
-    <input type="submit" value="submit" />
+    <input type="submit" value="submit" class="btn btn-primary" />
   </form>
 <?php } else { ?>
   <p>
