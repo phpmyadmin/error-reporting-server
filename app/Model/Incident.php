@@ -39,12 +39,6 @@ class Incident extends AppModel {
 		'groupedCount'=> true
 	);
 
-	protected function _getClosestReport($exception) {
-		List($location, $linenumber) = $this->_getIdentifyingLocation($exception["stack"]);
-		$report = $this->Report->findByLocationAndLinenumber($location, $linenumber);
-		return $report;
-	}
-
 	public function createIncidentFromBugReport($bugReport) {
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
 		$closestReport = $this->_getClosestReport($bugReport["exception"]);
@@ -76,6 +70,12 @@ class Incident extends AppModel {
 				return true;
 			}
 		}
+	}
+
+	protected function _getClosestReport($exception) {
+		List($location, $linenumber) = $this->_getIdentifyingLocation($exception["stack"]);
+		$report = $this->Report->findByLocationAndLinenumber($location, $linenumber);
+		return $report;
 	}
 
 	protected function _getReportDetails($bugReport) {
