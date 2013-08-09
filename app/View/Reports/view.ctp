@@ -71,6 +71,14 @@
     </td>
   </tr>
   <tr>
+    <td>User OS</td>
+    <td>
+      <?php echo $this->Reports->entriesFromRelateReports(
+          $user_os_related_entries, $user_os_distinct_count);
+      ?>
+    </td>
+  </tr>
+  <tr>
     <td>Incident Count</td>
     <td><?php echo count($incidents) . " incidents of this bug"; ?></td>
   </tr>
