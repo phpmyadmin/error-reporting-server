@@ -66,10 +66,16 @@ class ReportsHelper extends AppHelper {
 		return $descriptions;
 	}
 	
-	public function getStacktrace($stacktrace, $divClass) {
+	public function getStacktrace($incident, $divClass) {
 		$html = "";
 		$html .= "<div class='$divClass'>";
-		foreach ($stacktrace as $level) {
+
+		if (is_string($incident["Incident"]["stacktrace"])) {
+			$incident["Incident"]["stacktrace"] =
+					json_decode($incident["Incident"]["stacktrace"], true);
+		}
+
+		foreach ($incident["Incident"]["stacktrace"] as $level) {
 			$html .= $this->_getStackLevelInfo($level);
 			$html .= "<pre>";
 			$html .= join("\n", $level["context"]);
@@ -91,9 +97,7 @@ class ReportsHelper extends AppHelper {
 				$html .= "</div><div class='row'>";
 			}
 
-			$html .= $this->getStacktrace(
-					json_decode($incident["Incident"]["stacktrace"], true),
-					$class);
+			$html .= $this->getStacktrace($incident, $class);
 			$count++;
 		}
 		$html .= '</div>';
