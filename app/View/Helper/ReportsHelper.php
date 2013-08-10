@@ -43,7 +43,7 @@ class ReportsHelper extends AppHelper {
 
 	public function linkToIncident($incident) {
 		$incidentId = $incident["Incident"]["id"];
-		$link = "<a href='/incidents/json/$incidentId'>#$incidentId</a>";
+		$link = "<a href='/incidents/view/$incidentId'>#$incidentId</a>";
 		return $link;
 	}
 

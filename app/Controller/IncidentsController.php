@@ -42,4 +42,22 @@ class IncidentsController extends AppController {
 		$this->autoRender = false;
 		return json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	}
+
+	public function view($incidentId) {
+		if (!$incidentId) {
+			throw new NotFoundException(__('Invalid Incident'));
+		}
+
+		$incident = $this->Incident->findById($incidentId);
+		if (!$incident) {
+			throw new NotFoundException(__('Invalid Incident'));
+		}
+
+		$incident['Incident']['full_report'] =
+				json_decode($incident['Incident']['full_report'], true);
+		$incident['Incident']['stacktrace'] =
+				json_decode($incident['Incident']['stacktrace'], true);
+
+		$this->set('incident', $incident);
+	}
 }
