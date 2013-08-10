@@ -30,7 +30,7 @@ class IncidentsController extends AppController {
 		}
 
 		$incident = $this->Incident->findById($id);
-		if (!$incident || $this->RequestHandler->accepts('json')) {
+		if (!$incident) {
 			throw new NotFoundException(__('Invalid Incident'));
 		}
 
