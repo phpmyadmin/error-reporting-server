@@ -10,7 +10,7 @@
   </form>
 <?php } else { ?>
   <p>
-    This report is the same as the following reports:
+    This report has been marked the same as the following reports:
     (<?php echo $this->Reports->createReportsLinks($related_reports); ?>).
     <a href="/reports/unmark_related_to/<?php echo $report["Report"]["id"]; ?>">
       Remove from this group
