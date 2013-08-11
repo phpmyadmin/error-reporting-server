@@ -15,6 +15,12 @@
     </td>
   </tr>
   <tr>
+    <td>Submition Date</td>
+    <td>
+      <?php echo $incident["Incident"]["created"]; ?>
+    </td>
+  </tr>
+  <tr>
     <td>PMA Version</td>
     <td>
       <?php echo $incident["Incident"]["full_report"]["pma_version"]; ?>
@@ -24,6 +30,13 @@
     <td>PHP Version</td>
     <td>
       <?php echo $incident["Incident"]["full_report"]["php_version"]; ?>
+    </td>
+  </tr>
+  <tr>
+    <td>Browser</td>
+    <td>
+      <?php echo $incident["Incident"]["full_report"]["browser_name"] . " " .
+          $incident["Incident"]["full_report"]["browser_version"]; ?>
     </td>
   </tr>
   <tr>
@@ -45,15 +58,46 @@
     </td>
   </tr>
   <tr>
-    <td>Submition Date</td>
+    <td>Locale</td>
     <td>
-      <?php echo $incident["Incident"]["created"]; ?>
+      <?php echo $incident["Incident"]["full_report"]["locale"]; ?>
+    </td>
+  </tr>
+  <tr>
+    <td>Script name</td>
+    <td>
+      <?php echo $incident["Incident"]["full_report"]["script_name"]; ?>
+    </td>
+  </tr>
+  <tr>
+    <td>URI</td>
+    <td>
+      <?php echo $incident["Incident"]["full_report"]["exception"]["uri"]; ?>
+    </td>
+  </tr>
+  <tr>
+    <td>Configuration storage enabled</td>
+    <td>
+      <?php
+        if ($incident["Incident"]["full_report"]["configuration_storage_enabled"]) {
+          echo "true";
+        } else {
+          echo "false";
+        }
+      ?>
     </td>
   </tr>
 </table>
 
+<h4>Description submited by user:</h4>
+<pre>
+<?php echo $incident["Incident"]["steps"]; ?>
+</pre>
+
 <h4>Stacktrace:</h4>
 <?php echo $this->Incidents->getStacktrace($incident, "well"); ?>
 
-<h4>Description submited by user:</h4>
-<?php echo $this->Reports->incidentsDescriptions(array($incident)); ?>
+<h4>Microhistory:</h4>
+<pre>
+<?php echo json_encode($incident["Incident"]["full_report"]["microhistory"], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES); ?>
+</pre>
