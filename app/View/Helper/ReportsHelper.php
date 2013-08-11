@@ -11,7 +11,7 @@ class ReportsHelper extends AppHelper {
 		parent::__construct($view, $settings);
 	}
 
-	public function entriesFromRelateReports($entries, $totalCount) {
+	public function entriesFromIncidents($entries, $totalCount) {
 		$entries = Sanitize::clean($entries);
 		$values = array();
 		foreach($entries as $entry => $count) {

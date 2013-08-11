@@ -41,7 +41,7 @@
   <tr>
     <td>PMA Versions</td>
     <td>
-      <?php echo $this->Reports->entriesFromRelateReports(
+      <?php echo $this->Reports->entriesFromIncidents(
           $pma_version_related_entries, $pma_version_distinct_count);
       ?>
     </td>
@@ -49,7 +49,7 @@
   <tr>
     <td>PHP Versions</td>
     <td>
-      <?php echo $this->Reports->entriesFromRelateReports(
+      <?php echo $this->Reports->entriesFromIncidents(
           $php_version_related_entries, $php_version_distinct_count);
       ?>
     </td>
@@ -57,7 +57,7 @@
   <tr>
     <td>Browsers</td>
     <td>
-      <?php echo $this->Reports->entriesFromRelateReports(
+      <?php echo $this->Reports->entriesFromIncidents(
           $browser_related_entries, $browser_distinct_count);
       ?>
     </td>
@@ -65,7 +65,7 @@
   <tr>
     <td>Server Software</td>
     <td>
-      <?php echo $this->Reports->entriesFromRelateReports(
+      <?php echo $this->Reports->entriesFromIncidents(
           $server_software_related_entries, $server_software_distinct_count);
       ?>
     </td>
@@ -73,7 +73,7 @@
   <tr>
     <td>User OS</td>
     <td>
-      <?php echo $this->Reports->entriesFromRelateReports(
+      <?php echo $this->Reports->entriesFromIncidents(
           $user_os_related_entries, $user_os_distinct_count);
       ?>
     </td>
