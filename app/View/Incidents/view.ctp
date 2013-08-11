@@ -53,7 +53,7 @@
 </table>
 
 <h4>Stacktrace:</h4>
-<?php echo $this->Reports->getStacktrace($incident, "well"); ?>
+<?php echo $this->Incidents->getStacktrace($incident, "well"); ?>
 
 <h4>Description submited by user:</h4>
 <?php echo $this->Reports->incidentsDescriptions(array($incident)); ?>

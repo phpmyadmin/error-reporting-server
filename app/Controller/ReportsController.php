@@ -8,7 +8,7 @@ class ReportsController extends AppController {
 
 	public $components = array('RequestHandler');
 
-	public $helpers = array('Html', 'Form', 'Reports');
+	public $helpers = array('Html', 'Form', 'Reports', 'Incidents');
 
 	public function index() {
 		$this->set('distinct_statuses',

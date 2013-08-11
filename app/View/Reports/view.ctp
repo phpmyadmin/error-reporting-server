@@ -93,7 +93,7 @@
   <tr>
     <td>Incidents</td>
     <td>
-      <?php echo $this->Reports->createIncidentsLinks($incidents); ?>
+      <?php echo $this->Incidents->createIncidentsLinks($incidents); ?>
     </td>
   </tr>
 </table>
@@ -102,4 +102,4 @@
 <?php echo $this->Reports->getStacktracesForIncidents($incidents_with_stacktrace); ?>
 
 <h4>Descriptions submited by users:</h4>
-<?php echo $this->Reports->incidentsDescriptions($incidents_with_description); ?>
+<?php echo $this->Incidents->incidentsDescriptions($incidents_with_description); ?>
