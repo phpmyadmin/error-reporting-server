@@ -7,7 +7,8 @@ $(document).ready(function() {
       { "bSearchable": false, "aTargets": [ 0 ] },
       { "sClass": "center", "aTargets": [ -1, -2 ] },
       { "fnRender": function ( oObj ) {
-					return '<a href="/reports/view/' + oObj.aData[0] + '">'+oObj.aData[0]+'</a>';
+					return '<a class="block" href="/reports/view/' + oObj.aData[0]
+              + '">'+oObj.aData[0]+'</a>';
 				},
 				"aTargets": [ 0 ]
       }

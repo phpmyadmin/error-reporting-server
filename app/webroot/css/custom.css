@@ -10,10 +10,15 @@ table.error-report tr td:first-child {
   font-weight: bold;
   width: 15%;
 }
+
 table.error-report tr pre{
   word-break: normal;
 }
 
 .count {
   color: blueviolet;
+}
+
+.block {
+  display: block;
 }
