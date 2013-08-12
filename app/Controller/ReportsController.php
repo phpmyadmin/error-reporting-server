@@ -8,7 +8,7 @@ class ReportsController extends AppController {
 
 	public $components = array('RequestHandler');
 
-	public $helpers = array('Html', 'Form', 'Reports');
+	public $helpers = array('Html', 'Form', 'Reports', 'Incidents');
 
 	public function index() {
 		$this->set('distinct_statuses',
@@ -29,60 +29,35 @@ class ReportsController extends AppController {
 		);
 	}
 
-	public function view($id) {
-		if (!$id) {
+	public function test($id) {
+		$this->Report->recursive = -1;
+		$report = $this->Report->read(null, $id);
+		$this->autoRender = false;
+		return json_encode($this->Report->getIncidentsWithDescription());
+	}
+
+	public function view($reportId) {
+		if (!$reportId) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
 
-		$report = $this->Report->findById($id);
-		if (!$report || $this->RequestHandler->accepts('json')) {
+		$report = $this->Report->findById($reportId);
+		if (!$report) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
-
-		$report['Report']['full_report'] =
-				Sanitize::clean(json_decode($report['Report']['full_report'], true));
 
 		$this->set('report', $report);
 		$this->set('project_name', Configure::read('SourceForgeProjectName'));
 
-		$this->Report->read(null, $id);
+		$this->Report->read(null, $reportId);
+		$this->set('incidents', $this->Report->getIncidents());
+		$this->set('incidents_with_description',
+				$this->Report->getIncidentsWithDescription());
+		$this->set('incidents_with_stacktrace',
+				$this->Report->getIncidentsWithDifferentStacktrace());
 		$this->set('related_reports', $this->Report->getRelatedReports());
-		$this->set('reportsWithDescription',
-				$this->Report->getRelatedReportsWithDescription());
 
-		$this->_setSimilarFields($id);
-	}
-
-	public function json($id) {
-		if (!$id) {
-			throw new NotFoundException(__('Invalid Report'));
-		}
-
-		$report = $this->Report->findById($id);
-		if (!$report || $this->RequestHandler->accepts('json')) {
-			throw new NotFoundException(__('Invalid Report'));
-		}
-
-		$report['Report']['full_report'] =
-				json_decode($report['Report']['full_report'], true);
-		$report['Report']['stacktrace'] =
-				json_decode($report['Report']['stacktrace'], true);
-
-		$this->autoRender = false;
-		return json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-	}
-
-	public function submit() {
-		$report = $this->request->input('json_decode', true);
-		$this->Report->create(array('status' => 'new'));
-		$this->Report->saveFromSubmission($report);
-		$response = array(
-			"success" => true,
-			"message" => "Thank you for your submission",
-			"report_id" => $this->Report->id,
-		);
-		$this->autoRender = false;
-		return json_encode($response);
+		$this->_setSimilarFields($reportId);
 	}
 
 	public function data_tables() {
@@ -115,9 +90,43 @@ class ReportsController extends AppController {
 		return json_encode($response);
 	}
 
-## PRIVATE HELPERS
+	public function mark_related_to($reportId) {
+		$relatedTo = $this->request->query("related_to");
+		if (!$reportId || !$relatedTo) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$report = $this->Report->read(null, $reportId);
+		if (!$report) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$this->Report->addToRelatedGroup($relatedTo);
+		$this->Session->setFlash("This report has been marked the same as #"
+				. $relatedTo, "default", array("class" => "alert alert-success"));
+		$this->redirect("/reports/view/$reportId");
+	}
+
+	public function unmark_related_to($reportId) {
+		if (!$reportId) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$report = $this->Report->read(null, $reportId);
+		if (!$report) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$this->Report->removeFromRelatedGroup();
+		$this->Session->setFlash("This report has been marked as different."
+				, "default", array("class" => "alert alert-success"));
+		$this->redirect("/reports/view/$reportId");
+	}
+
+## HELPERS
 	protected function _setSimilarFields($id) {
-		$fields = array('browser', 'pma_version', 'php_version', 'server_software');
+		$fields = array('browser', 'pma_version', 'php_version', 'server_software',
+				'user_os');
 
 		$this->Report->read(null, $id);
 
