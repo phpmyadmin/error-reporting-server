@@ -58,18 +58,21 @@ class Incident extends AppModel {
 				'Incident' => $schematizedIncident,
 				'Report' => $report
 			);
-			$this->saveAssociated($data);
+			return $this->saveAssociated($data);
 		}
 	}
 
-	protected function _hasDifferentStacktrace($omac, $incidents) {
-		$omac["stacktrace"] = json_decode($omac["stacktrace"], true);
+	protected function _hasDifferentStacktrace($newIncident, $incidents) {
+		$newIncident["stacktrace"] = json_decode($newIncident["stacktrace"], true);
 		foreach ($incidents as $incident) {
-			$incident["stacktrace"] = json_decode($incident["stacktrace"], true);
-			if (!$this->_isSameStacktrace($omac["stacktrace"], $incident["stacktrace"])) {
-				return true;
+			$incident["Incident"]["stacktrace"] =
+					json_decode($incident["Incident"]["stacktrace"], true);
+			if ($this->_isSameStacktrace($newIncident["stacktrace"],
+					$incident["Incident"]["stacktrace"])) {
+				return false;
 			}
 		}
+		return true;
 	}
 
 	protected function _getClosestReport($exception) {
@@ -93,10 +96,11 @@ class Incident extends AppModel {
 	}
 
 	protected function _getSchematizedIncident($bugReport) {
+    $bugReport = Sanitize::clean($bugReport);
 		$schematizedReport = array(
 			'pma_version' => $bugReport['pma_version'],
 			'php_version' => $this->_getSimplePhpVersion($bugReport['php_version']),
-			'steps' => Sanitize::html($bugReport['steps']),
+			'steps' => $bugReport['steps'],
 			'error_message' => $bugReport['exception']['message'],
 			'error_name' => $bugReport['exception']['name'],
 			'browser' => $bugReport['browser_name'] . " "
@@ -170,7 +174,7 @@ class Incident extends AppModel {
 
 		for ($i = 0; $i < count($stacktraceA); $i++) {
 			$levelA = $stacktraceA[$i];
-			$levelB = $stacktraceB($i);
+			$levelB = $stacktraceB[$i];
 			$elements = array("filename", "scriptname", "line", "func", "column");
 			foreach ($elements as $element) {
 				if($levelA[$element] !== $levelB[$element]) {

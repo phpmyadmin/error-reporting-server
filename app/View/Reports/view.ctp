@@ -33,7 +33,7 @@
           "https://sourceforge.net/p/$project_name/bugs/".
           $report['Report']['sourceforge_bug_id'] . "/");
     } else {
-      echo $this->Html->link('Submit report', '/source_forge/new_ticket/'
+      echo $this->Html->link('Submit report', '/source_forge/create_ticket/'
           . $report['Report']['id']);
     } ?>
     </td>
