@@ -19,17 +19,16 @@ class RemoveUnneededFieldsFormReports extends CakeMigration {
 		'up' => array(
 			'create_field' => array(
 				'reports' => array(
-					'location' => array('type' => 'text', 'null' => false, 'default' => NULL, 'collate' => 'utf8_general_ci', 'charset' => 'utf8', 'after' => 'status'),
 					'related_to' => array('type' => 'integer', 'null' => true, 'default' => NULL, 'length' => 10, 'after' => 'sourceforge_bug_id'),
 				),
 			),
 			'drop_field' => array(
-				'reports' => array('php_version', 'browser', 'user_os', 'server_software', 'steps', 'stacktrace', 'full_report', 'related_report_id', 'filename',),
+				'reports' => array('php_version', 'browser', 'user_os', 'server_software', 'steps', 'stacktrace', 'full_report', 'related_report_id',),
 			),
 		),
 		'down' => array(
 			'drop_field' => array(
-				'reports' => array('location', 'related_to',),
+				'reports' => array('related_to',),
 			),
 			'create_field' => array(
 				'reports' => array(
@@ -41,7 +40,6 @@ class RemoveUnneededFieldsFormReports extends CakeMigration {
 					'stacktrace' => array('type' => 'text', 'null' => true, 'default' => NULL, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
 					'full_report' => array('type' => 'text', 'null' => true, 'default' => NULL, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
 					'related_report_id' => array('type' => 'integer', 'null' => true, 'default' => NULL, 'length' => 10),
-					'filename' => array('type' => 'text', 'null' => false, 'default' => NULL, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
 				),
 			),
 		),
