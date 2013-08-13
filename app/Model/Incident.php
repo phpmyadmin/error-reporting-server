@@ -96,7 +96,7 @@ class Incident extends AppModel {
 	}
 
 	protected function _getSchematizedIncident($bugReport) {
-    $bugReport = Sanitize::clean($bugReport);
+		$bugReport = Sanitize::clean($bugReport);
 		$schematizedReport = array(
 			'pma_version' => $bugReport['pma_version'],
 			'php_version' => $this->_getSimplePhpVersion($bugReport['php_version']),
@@ -177,7 +177,10 @@ class Incident extends AppModel {
 			$levelB = $stacktraceB[$i];
 			$elements = array("filename", "scriptname", "line", "func", "column");
 			foreach ($elements as $element) {
-				if($levelA[$element] !== $levelB[$element]) {
+				if (isset($levelA[$element]) xor isset($levelB[$element])) {
+					return false;
+				}
+				if ($levelA[$element] !== $levelB[$element]) {
 					return false;
 				}
 			}
