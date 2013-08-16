@@ -39,6 +39,7 @@
 		echo $this->Html->script('jquery');
 		echo $this->Html->script('jquery.dataTables.min');
 		echo $this->Html->script('bootstrap');
+		echo $this->Html->script('raphael-min.js');
 		echo $this->Html->script('g.raphael-min.js');
 		echo $this->Html->script('g.pie-min.js');
 		echo $this->Html->script('custom');
