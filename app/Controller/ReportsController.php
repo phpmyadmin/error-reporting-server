@@ -130,6 +130,8 @@ class ReportsController extends AppController {
 
 		$this->Report->read(null, $id);
 
+		$this->set('columns', $fields);
+
 		foreach ($fields as $field) {
 			list($entriesWithCount, $totalEntries) =
 					$this->Report->getRelatedByField($field, 25, true);

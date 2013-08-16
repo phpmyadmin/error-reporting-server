@@ -3,9 +3,10 @@
 App::uses('AppHelper', 'View/Helper');
 App::uses('IncidentsHelper', 'View/Helper');
 App::uses('Sanitize', 'Utility');
+App::uses('Inflector', 'Utility');
 
 class ReportsHelper extends AppHelper {
-  public $helpers = array('Incidents');
+	public $helpers = array('Incidents');
 
 	public function __construct(View $view, $settings = array()) {
 		parent::__construct($view, $settings);
@@ -56,6 +57,22 @@ class ReportsHelper extends AppHelper {
 			$count++;
 		}
 		$html .= '</div>';
+		return $html;
+	}
+
+	public function getChartArray($arrayName, $columns, $relatedEntries) {
+		$html = "var $arrayName = [], chart = {};";
+		foreach ($columns as $column) {
+			$html .= "chart = {};";
+			$html .= "chart.name = '$column';";
+			$html .= "chart.title = '" . Inflector::humanize($column) . "';";
+			$html .= "chart.labels = []; chart.values = [];";
+			foreach ($relatedEntries[$column] as $entry => $count) {
+				$html .= "chart.labels.push('$entry ($count)');";
+				$html .= "chart.values.push($count);";
+			}
+			$html .= "$arrayName.push(chart);";
+		}
 		return $html;
 	}
 

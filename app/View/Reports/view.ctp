@@ -103,3 +103,18 @@
 
 <h4>Descriptions submited by users:</h4>
 <?php echo $this->Incidents->incidentsDescriptions($incidents_with_description); ?>
+<h4>Stats and Graphs</h4>
+<span id="graphs"></span>
+<script type="text/javascript">
+  <?php echo $this->Reports->getChartArray("chartArray", $columns,
+      $related_entries); ?>
+  window.onload = function () {
+    chartArray.forEach(function(chart) {
+      var span_id = "graph_" + chart.name;
+      var $span = $("<span class='span5'>").attr("id", span_id);
+      $("#graphs").append($span);
+      console.log(chart);
+      piechart(span_id, chart.title, chart.values, chart.labels);
+    });
+  };
+</script>
