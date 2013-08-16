@@ -42,6 +42,7 @@
 		echo $this->Html->script('raphael-min.js');
 		echo $this->Html->script('g.raphael-min.js');
 		echo $this->Html->script('g.pie-min.js');
+		echo $this->Html->script('pie.js');
 		echo $this->Html->script('custom');
 
 		echo $this->fetch('meta');
