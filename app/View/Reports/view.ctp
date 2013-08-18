@@ -63,6 +63,22 @@
     </td>
   </tr>
   <tr>
+    <td>Script Name</td>
+    <td>
+      <?php echo $this->Reports->entriesFromIncidents(
+          $related_entries["script_name"], $script_name_distinct_count);
+      ?>
+    </td>
+  </tr>
+  <tr>
+    <td>Configuration Storage</td>
+    <td>
+      <?php echo $this->Reports->entriesFromIncidents(
+          $related_entries["configuration_storage"], $configuration_storage_distinct_count);
+      ?>
+    </td>
+  </tr>
+  <tr>
     <td>Server Software</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(

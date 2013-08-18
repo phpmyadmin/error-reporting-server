@@ -106,6 +106,8 @@ class Incident extends AppModel {
 			'browser' => $bugReport['browser_name'] . " "
 					. $this->_getMajorVersion($bugReport['browser_version']),
 			'user_os' => $bugReport['user_os'],
+			'script_name' => $bugReport['script_name'],
+			'configuration_storage' => $bugReport['configuration_storage'],
 			'server_software' => $this->_getServer($bugReport['server_software']),
 			'full_report' => json_encode($bugReport),
 			'stacktrace' => json_encode($bugReport['exception']['stack']),

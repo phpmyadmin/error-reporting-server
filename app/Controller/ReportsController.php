@@ -126,7 +126,7 @@ class ReportsController extends AppController {
 ## HELPERS
 	protected function _setSimilarFields($id) {
 		$fields = array('browser', 'pma_version', 'php_version', 'server_software',
-				'user_os');
+				'user_os', 'script_name', 'configuration_storage');
 
 		$this->Report->read(null, $id);
 
