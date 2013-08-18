@@ -41,7 +41,7 @@ class Incident extends AppModel {
 
 	public function createIncidentFromBugReport($bugReport) {
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
-		$closestReport = $this->_getClosestReport($bugReport["exception"]);
+		$closestReport = $this->_getClosestReport($bugReport);
 
 		if($closestReport) {
 			$schematizedIncident["report_id"] = $closestReport["Report"]["id"];
@@ -75,9 +75,11 @@ class Incident extends AppModel {
 		return true;
 	}
 
-	protected function _getClosestReport($exception) {
-		List($location, $linenumber) = $this->_getIdentifyingLocation($exception["stack"]);
-		$report = $this->Report->findByLocationAndLinenumber($location, $linenumber);
+	protected function _getClosestReport($bugReport) {
+		List($location, $linenumber) =
+				$this->_getIdentifyingLocation($bugReport['exception']['stack']);
+		$report = $this->Report->findByLocationAndLinenumberAndPmaVersion(
+				$location, $linenumber, $bugReport['pma_version']);
 		return $report;
 	}
 
@@ -91,6 +93,7 @@ class Incident extends AppModel {
 			'status' => 'new',
 			'location' => $location,
 			'linenumber' => $linenumber,
+			'pma_version' => $bugReport['pma_version'],
 		);
 		return $reportDetails;
 	}
