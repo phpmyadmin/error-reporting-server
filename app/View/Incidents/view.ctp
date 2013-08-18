@@ -66,7 +66,7 @@
   <tr>
     <td>Script name</td>
     <td>
-      <?php echo $incident["Incident"]["full_report"]["scriptname"]; ?>
+      <?php echo $incident["Incident"]["script_name"]; ?>
     </td>
   </tr>
   <tr>
