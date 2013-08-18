@@ -129,7 +129,6 @@
       var span_id = "graph_" + chart.name;
       var $span = $("<span class='span5'>").attr("id", span_id);
       $("#graphs").append($span);
-      console.log(chart);
       piechart(span_id, chart.title, chart.values, chart.labels);
     });
   };

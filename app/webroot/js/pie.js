@@ -1,6 +1,5 @@
 function piechart(element_id, title, values, labels, radius) {
   radius = radius || 100;
-  console.log(arguments);
   var rad = Math.PI / 180,
       width = $('#' + element_id).width(),
       pincrease = 0.1,
