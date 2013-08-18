@@ -122,19 +122,25 @@ class Incident extends AppModel {
 	protected function _getIdentifyingLocation($stacktrace) {
 		foreach ($stacktrace as $level) {
 			if (isset($level["filename"])) {
-				if ($level["filename"] !== "tracekit.js"
-						&& $level["filename"] !== "error_report.js") {
-					return array($level["filename"], $level["line"]);
-				} else {
+				// ignore unrelated files that sometimes appear in the error report
+				if ($level["filename"] === "tracekit.js") {
 					continue;
+				} elseif($level["filename"] === "error_report.js") {
+					// incase the error is in the error_report.js file
+					if(!isset($fallback)) {
+						$fallback = array($level["filename"], $level["line"]);
+					}
+					continue;
+				} else {
+					return array($level["filename"], $level["line"]);
 				}
-			}
-			if (isset($level["uri"])) {
-				return array($level["uri"], $level["line"]);
+			} elseif (isset($level["scriptname"])) {
+				return array($level["scriptname"], $level["line"]);
 			} else {
-				return array($level["url"], $level["line"]);
+				continue;
 			}
 		}
+		return $fallback;
 	}
 
 	protected function _getMajorVersion($fullVersion) {
