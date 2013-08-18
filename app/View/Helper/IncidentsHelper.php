@@ -62,7 +62,7 @@ class IncidentsHelper extends AppHelper {
 
 		foreach ($incident["Incident"]["stacktrace"] as $level) {
 			$html .= $this->_getStackLevelInfo($level);
-			$html .= "<pre class='brush: js; tab-size: 2; html-script: true'>";
+			$html .= "<pre class='brush: js; tab-size: 2'>";
 			$html .= join("\n", Sanitize::clean($level["context"]));
 			$html .= "</pre>";
 		}
