@@ -34,11 +34,16 @@
 		echo $this->Html->css('jquery.dataTables_themeroller');
 		echo $this->Html->css('bootstrap.min');
 		echo $this->Html->css('bootstrap-responsive.min');
+		echo $this->Html->css('shCore.css');
+		echo $this->Html->css('shThemeDefault.css');
 		echo $this->Html->css('custom');
 
 		echo $this->Html->script('jquery');
 		echo $this->Html->script('jquery.dataTables.min');
 		echo $this->Html->script('bootstrap');
+		echo $this->Html->script('shCore.js');
+		echo $this->Html->script('shBrushXml.js');
+		echo $this->Html->script('shBrushJScript.js');
 		echo $this->Html->script('raphael-min.js');
 		echo $this->Html->script('g.raphael-min.js');
 		echo $this->Html->script('g.pie-min.js');

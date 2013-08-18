@@ -56,4 +56,7 @@ $(document).ready(function() {
   });
 
   setTimeout(function(){$(".alert.alert-success").slideUp()}, 2000);
+
+  SyntaxHighlighter.defaults['toolbar'] = false;
+  SyntaxHighlighter.all();
 } );
