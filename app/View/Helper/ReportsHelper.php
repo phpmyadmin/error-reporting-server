@@ -63,6 +63,7 @@ class ReportsHelper extends AppHelper {
 	public function getChartArray($arrayName, $columns, $relatedEntries) {
 		$html = "var $arrayName = [], chart = {};";
 		foreach ($columns as $column) {
+			$column = htmlspecialchars($column);
 			$html .= "chart = {};";
 			$html .= "chart.name = '$column';";
 			$html .= "chart.title = '" . Inflector::humanize($column) . "';";
