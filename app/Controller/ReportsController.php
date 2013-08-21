@@ -126,16 +126,19 @@ class ReportsController extends AppController {
 ## HELPERS
 	protected function _setSimilarFields($id) {
 		$fields = array('browser', 'pma_version', 'php_version', 'server_software',
-				'user_os');
+				'user_os', 'script_name', 'configuration_storage');
 
 		$this->Report->read(null, $id);
+
+		$this->set('columns', $fields);
 
 		foreach ($fields as $field) {
 			list($entriesWithCount, $totalEntries) =
 					$this->Report->getRelatedByField($field, 25, true);
-			$this->set("${field}_related_entries", $entriesWithCount);
+			$relatedEntries[$field] = $entriesWithCount;
 			$this->set("${field}_distinct_count", $totalEntries);
 		}
+		$this->set("related_entries", $relatedEntries);
 	}
 
 	protected function _getSearchConditions($aColumns) {

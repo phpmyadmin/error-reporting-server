@@ -41,7 +41,7 @@ class Incident extends AppModel {
 
 	public function createIncidentFromBugReport($bugReport) {
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
-		$closestReport = $this->_getClosestReport($bugReport["exception"]);
+		$closestReport = $this->_getClosestReport($bugReport);
 
 		if($closestReport) {
 			$schematizedIncident["report_id"] = $closestReport["Report"]["id"];
@@ -75,9 +75,11 @@ class Incident extends AppModel {
 		return true;
 	}
 
-	protected function _getClosestReport($exception) {
-		List($location, $linenumber) = $this->_getIdentifyingLocation($exception["stack"]);
-		$report = $this->Report->findByLocationAndLinenumber($location, $linenumber);
+	protected function _getClosestReport($bugReport) {
+		List($location, $linenumber) =
+				$this->_getIdentifyingLocation($bugReport['exception']['stack']);
+		$report = $this->Report->findByLocationAndLinenumberAndPmaVersion(
+				$location, $linenumber, $bugReport['pma_version']);
 		return $report;
 	}
 
@@ -91,6 +93,7 @@ class Incident extends AppModel {
 			'status' => 'new',
 			'location' => $location,
 			'linenumber' => $linenumber,
+			'pma_version' => $bugReport['pma_version'],
 		);
 		return $reportDetails;
 	}
@@ -106,6 +109,8 @@ class Incident extends AppModel {
 			'browser' => $bugReport['browser_name'] . " "
 					. $this->_getMajorVersion($bugReport['browser_version']),
 			'user_os' => $bugReport['user_os'],
+			'script_name' => $bugReport['script_name'],
+			'configuration_storage' => $bugReport['configuration_storage'],
 			'server_software' => $this->_getServer($bugReport['server_software']),
 			'full_report' => json_encode($bugReport),
 			'stacktrace' => json_encode($bugReport['exception']['stack']),
@@ -117,19 +122,25 @@ class Incident extends AppModel {
 	protected function _getIdentifyingLocation($stacktrace) {
 		foreach ($stacktrace as $level) {
 			if (isset($level["filename"])) {
-				if ($level["filename"] !== "tracekit.js"
-						&& $level["filename"] !== "error_report.js") {
-					return array($level["filename"], $level["line"]);
-				} else {
+				// ignore unrelated files that sometimes appear in the error report
+				if ($level["filename"] === "tracekit.js") {
 					continue;
+				} elseif($level["filename"] === "error_report.js") {
+					// incase the error is in the error_report.js file
+					if(!isset($fallback)) {
+						$fallback = array($level["filename"], $level["line"]);
+					}
+					continue;
+				} else {
+					return array($level["filename"], $level["line"]);
 				}
-			}
-			if (isset($level["uri"])) {
-				return array($level["uri"], $level["line"]);
+			} elseif (isset($level["scriptname"])) {
+				return array($level["scriptname"], $level["line"]);
 			} else {
-				return array($level["url"], $level["line"]);
+				continue;
 			}
 		}
+		return $fallback;
 	}
 
 	protected function _getMajorVersion($fullVersion) {

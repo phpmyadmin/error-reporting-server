@@ -42,7 +42,7 @@
     <td>PMA Versions</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $pma_version_related_entries, $pma_version_distinct_count);
+          $related_entries["pma_version"], $pma_version_distinct_count);
       ?>
     </td>
   </tr>
@@ -50,7 +50,7 @@
     <td>PHP Versions</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $php_version_related_entries, $php_version_distinct_count);
+          $related_entries["php_version"], $php_version_distinct_count);
       ?>
     </td>
   </tr>
@@ -58,7 +58,23 @@
     <td>Browsers</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $browser_related_entries, $browser_distinct_count);
+          $related_entries["browser"], $browser_distinct_count);
+      ?>
+    </td>
+  </tr>
+  <tr>
+    <td>Script Name</td>
+    <td>
+      <?php echo $this->Reports->entriesFromIncidents(
+          $related_entries["script_name"], $script_name_distinct_count);
+      ?>
+    </td>
+  </tr>
+  <tr>
+    <td>Configuration Storage</td>
+    <td>
+      <?php echo $this->Reports->entriesFromIncidents(
+          $related_entries["configuration_storage"], $configuration_storage_distinct_count);
       ?>
     </td>
   </tr>
@@ -66,7 +82,7 @@
     <td>Server Software</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $server_software_related_entries, $server_software_distinct_count);
+          $related_entries["server_software"], $server_software_distinct_count);
       ?>
     </td>
   </tr>
@@ -74,7 +90,7 @@
     <td>User OS</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $user_os_related_entries, $user_os_distinct_count);
+          $related_entries["user_os"], $user_os_distinct_count);
       ?>
     </td>
   </tr>
@@ -103,3 +119,17 @@
 
 <h4>Descriptions submited by users:</h4>
 <?php echo $this->Incidents->incidentsDescriptions($incidents_with_description); ?>
+<h4>Stats and Graphs</h4>
+<span id="graphs"></span>
+<script type="text/javascript">
+  <?php echo $this->Reports->getChartArray("chartArray", $columns,
+      $related_entries); ?>
+  window.onload = function () {
+    chartArray.forEach(function(chart) {
+      var span_id = "graph_" + chart.name;
+      var $span = $("<span class='span5'>").attr("id", span_id);
+      $("#graphs").append($span);
+      piechart(span_id, chart.title, chart.values, chart.labels);
+    });
+  };
+</script>
