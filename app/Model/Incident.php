@@ -6,6 +6,8 @@ App::uses('Sanitize', 'Utility');
 
 class Incident extends AppModel {
 
+  public $actsAs = array('Summarizable');
+
 	public $validate = array(
 		'error_message' => array(
 			'rule' => 'notEmpty',
@@ -34,10 +36,6 @@ class Incident extends AppModel {
 	);
 
 	public $belongsTo = array('Report');
-
-	public $findMethods = array(
-		'groupedCount'=> true
-	);
 
 	public function createIncidentFromBugReport($bugReport) {
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
@@ -163,19 +161,6 @@ class Incident extends AppModel {
 		} else {
 			return "UNKNOWN";
 		}
-	}
-
-	protected function _findGroupedCount($state, $query, $results = array()) {
-		if ($state === 'before') {
-			return $query;
-		}
-		$output = array();
-		foreach ($results as $row) {
-			foreach ($row['Incident'] as $key => $value) {
-				$output[$value] = $row[0]['count'];
-			}
-		}
-		return $output;
 	}
 
 	protected function _isSameStacktrace($stacktraceA, $stacktraceB) {
