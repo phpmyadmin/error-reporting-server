@@ -11,6 +11,7 @@ class ReportsController extends AppController {
 	public $helpers = array('Html', 'Form', 'Reports', 'Incidents');
 
 	public function index() {
+		$this->Report->recursive = -1;
 		$this->set('distinct_statuses',
 			$this->Report->find('arrayList', array(
 				'fields' => array('DISTINCT Report.status'),
@@ -153,7 +154,7 @@ class ReportsController extends AppController {
 		for ( $i = 0; $i < count($aColumns); $i++ ) {
 			if ($this->request->query('sSearch_' . $i) != '') {
 				$searchConditions[] = array($aColumns[$i] . " LIKE" =>
-						"%" . $this->request->query('sSearch_' . $i) . "%");
+						$this->request->query('sSearch_' . $i));
 			}
 		}
 		return $searchConditions;
