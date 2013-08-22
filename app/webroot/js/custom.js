@@ -1,5 +1,6 @@
 $(document).ready(function() {
 	oTable = $('#reports_table').dataTable( {
+		"bSortCellsTop": true,
 		"bProcessing": true,
 		"bServerSide": true,
 		"sAjaxSource": $('#reports_table').data('ajax-url'),

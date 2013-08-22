@@ -7,6 +7,13 @@
   ?>">
   <thead>
     <tr>
+      <th>ID</th>
+      <th>Exception Name</th>
+      <th>Message</th>
+      <th>PMA Version</th>
+      <th>Status</th>
+    </tr>
+    <tr>
       <th><input id="id_filter" style="width: 100%;margin-left:-10px" type="number"/></th>
       <th>
         <select id="error_name_filter" style="width: 100%">
@@ -39,13 +46,6 @@
           ?>
         </select>
       </th>
-    </tr>
-    <tr>
-      <th>ID</th>
-      <th>Exception Name</th>
-      <th>Message</th>
-      <th>PMA Version</th>
-      <th>Status</th>
     </tr>
   </thead>
 
