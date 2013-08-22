@@ -17,29 +17,29 @@ In order to deploy the app in this repo you need to follow these steps:
     - For apache it should look similar to this:
 ```
 <VirtualHost *:80>
-      ServerAdmin webmaster@localhost
-      ServerName reports.phpmyadmin.net
+			ServerAdmin webmaster@localhost
+			ServerName reports.phpmyadmin.net
 
-      DocumentRoot /path/to/repo/dir/app/webroot
-      <Directory /path/to/repo/dir/app/webroot/>
-        AddType application/x-httpd-php .html
-        Options Indexes FollowSymLinks MultiViews
-        AllowOverride All
-        Order allow,deny
-        allow from all
-      </Directory>
+			DocumentRoot /path/to/repo/dir/app/webroot
+			<Directory /path/to/repo/dir/app/webroot/>
+				AddType application/x-httpd-php .html
+				Options Indexes FollowSymLinks MultiViews
+				AllowOverride All
+				Order allow,deny
+				allow from all
+			</Directory>
 
-      ErrorLog "/var/log/httpd/dummy-host.example.com-error_log"
-      CustomLog "/var/log/httpd/dummy-host.example.com-access_log" common
+			ErrorLog "/var/log/httpd/dummy-host.example.com-error_log"
+			CustomLog "/var/log/httpd/dummy-host.example.com-access_log" common
 </VirtualHost>
 ```
     - Configuration for lighttpd:
 ```
 $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
-    server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
-    url.rewrite-if-not-file =(
-        "^([^\?]*)(\?(.+))?$" => "/index.php?url=$1&$3"
-    )
+		server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
+		url.rewrite-if-not-file =(
+				"^([^\?]*)(\?(.+))?$" => "/index.php?url=$1&$3"
+		)
 }
 ```
 - Create the database for the server
@@ -53,7 +53,7 @@ $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
   `Console/cake Migrations.migration run all -p Migrations`
 - Run the migrations that have been created so far to setup the database 
   in the `app` directory
-  `Console/cake Migrations.migration run all`
+  `Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition`
 
 ## Creating the github app ##
 The callback for the github app should be /developers/callback

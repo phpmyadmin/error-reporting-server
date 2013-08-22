@@ -22,3 +22,8 @@ table.error-report tr pre{
 .block {
   display: block;
 }
+
+#reports_table thead tr:last-child th input,
+#reports_table thead tr:last-child th select {
+  margin-bottom: 0;
+}
