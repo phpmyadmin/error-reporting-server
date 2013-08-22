@@ -17,29 +17,29 @@ In order to deploy the app in this repo you need to follow these steps:
     - For apache it should look similar to this:
 ```
 <VirtualHost *:80>
-      ServerAdmin webmaster@localhost
-      ServerName reports.phpmyadmin.net
+			ServerAdmin webmaster@localhost
+			ServerName reports.phpmyadmin.net
 
-      DocumentRoot /path/to/repo/dir/app/webroot
-      <Directory /path/to/repo/dir/app/webroot/>
-        AddType application/x-httpd-php .html
-        Options Indexes FollowSymLinks MultiViews
-        AllowOverride All
-        Order allow,deny
-        allow from all
-      </Directory>
+			DocumentRoot /path/to/repo/dir/app/webroot
+			<Directory /path/to/repo/dir/app/webroot/>
+				AddType application/x-httpd-php .html
+				Options Indexes FollowSymLinks MultiViews
+				AllowOverride All
+				Order allow,deny
+				allow from all
+			</Directory>
 
-      ErrorLog "/var/log/httpd/dummy-host.example.com-error_log"
-      CustomLog "/var/log/httpd/dummy-host.example.com-access_log" common
+			ErrorLog "/var/log/httpd/dummy-host.example.com-error_log"
+			CustomLog "/var/log/httpd/dummy-host.example.com-access_log" common
 </VirtualHost>
 ```
     - Configuration for lighttpd:
 ```
 $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
-    server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
-    url.rewrite-if-not-file =(
-        "^([^\?]*)(\?(.+))?$" => "/index.php?url=$1&$3"
-    )
+		server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
+		url.rewrite-if-not-file =(
+				"^([^\?]*)(\?(.+))?$" => "/index.php?url=$1&$3"
+		)
 }
 ```
 - Create the database for the server
