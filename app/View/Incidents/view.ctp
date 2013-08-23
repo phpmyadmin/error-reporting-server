@@ -66,7 +66,7 @@
   <tr>
     <td>Script name</td>
     <td>
-      <?php echo $incident["Incident"]["full_report"]["script_name"]; ?>
+      <?php echo $incident["Incident"]["script_name"]; ?>
     </td>
   </tr>
   <tr>
@@ -78,13 +78,7 @@
   <tr>
     <td>Configuration storage enabled</td>
     <td>
-      <?php
-        if ($incident["Incident"]["full_report"]["configuration_storage_enabled"]) {
-          echo "true";
-        } else {
-          echo "false";
-        }
-      ?>
+      <?php echo $incident["Incident"]["full_report"]["configuration_storage"]; ?>
     </td>
   </tr>
 </table>
