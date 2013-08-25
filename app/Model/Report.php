@@ -3,7 +3,7 @@
 
 App::uses('AppModel', 'Model');
 class Report extends AppModel {
-	
+
 	public $hasMany = array(
 		'Incident' => array(
 			'dependant' => true
@@ -77,11 +77,11 @@ class Report extends AppModel {
 		}
 	}
 
-	public function getRelatedByField($fieldName, $limit = 10, $count = false) {
+	public function getRelatedByField($fieldName, $limit = 10, $count = false,
+			$related = true, $timeLimit = null) {
 		$queryDetails = array(
 			'fields' => array("DISTINCT Incident.$fieldName", "COUNT(*) as count"),
 			'conditions' => array(
-				$this->_relatedIncidentsConditions(),
 				'NOT' => array(
 					"Incident.$fieldName" => null
 				)
@@ -90,6 +90,16 @@ class Report extends AppModel {
 			'group' => "Incident.$fieldName",
 			'order' => 'count DESC'
 		);
+
+		if ($related) {
+			$queryDetails["conditions"][] = $this->_relatedIncidentsConditions();
+		}
+
+		if ($timeLimit) {
+			$queryDetails["conditions"][] = array(
+				'Incident.created >=' => $timeLimit
+			);
+		}
 
 		$groupedCount = $this->Incident->find('groupedCount', $queryDetails);
 

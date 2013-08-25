@@ -41,13 +41,25 @@
 		echo $this->Html->script('jquery');
 		echo $this->Html->script('jquery.dataTables.min');
 		echo $this->Html->script('bootstrap');
-		echo $this->Html->script('shCore.js');
-		echo $this->Html->script('shBrushXml.js');
-		echo $this->Html->script('shBrushJScript.js');
-		echo $this->Html->script('raphael-min.js');
-		echo $this->Html->script('g.raphael-min.js');
-		echo $this->Html->script('g.pie-min.js');
-		echo $this->Html->script('pie.js');
+		echo $this->Html->script('shCore');
+		echo $this->Html->script('shBrushXml');
+		echo $this->Html->script('shBrushJScript');
+		echo $this->Html->script('raphael-min');
+		echo $this->Html->script('g.raphael-min');
+		echo $this->Html->script('g.pie-min');
+		echo $this->Html->script('g.line-min');
+		echo $this->Html->script('g.bar-min');
+		echo $this->Html->script('g.dot-min');
+		echo $this->Html->script('jquery.jqplot.min.js');
+		echo $this->Html->script('jqplot.barRenderer.min.js');
+		echo $this->Html->script('jqplot.highlighter.min.js');
+		echo $this->Html->script('jqplot.dateAxisRenderer.min.js');
+		echo $this->Html->script('jqplot.categoryAxisRenderer.min.js');
+		echo $this->Html->script('jqplot.pointLabels.min.js');
+		echo $this->Html->script('jqplot.canvasTextRenderer.min.js');
+		echo $this->Html->script('jqplot.canvasAxisTickRenderer.min.js');
+		echo $this->Html->script('jqplot.cursor.min.js');
+		echo $this->Html->script('pie');
 		echo $this->Html->script('custom');
 
 		echo $this->fetch('meta');
@@ -60,7 +72,18 @@
     <div class="navbar-inner">
       <a class="brand" href="/">phpMyAdmin</a>
       <ul class="nav">
-        <li class="<?php echo $navigation_class; ?>"><a href="/reports">Reports</a></li>
+				<?php
+					$controllers = array('reports', 'stats');
+					foreach ($controllers as $controller) {
+						$class = '';
+						if ($current_controller === $controller) {
+							$class = 'active';
+						}
+						echo "<li class='$class'><a href='/$controller'>";
+						echo Inflector::humanize($controller);
+						echo "</a></li>";
+					}
+				?>
       </ul>
       <ul class="nav pull-right">
         <?php if ($developer_signed_in) { ?>

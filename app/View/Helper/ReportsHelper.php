@@ -77,6 +77,16 @@ class ReportsHelper extends AppHelper {
 		return $html;
 	}
 
+	public function getLineChartData($arrayName, $entries) {
+		$html = "var $arrayName = [];";
+		foreach ($entries as $entry) {
+			$entry = $entry[0];
+			$html .= "$arrayName.push(['" . $entry["date"] . "', "
+					. $entry["count"] . "]);";
+		}
+		return $html;
+	}
+
 	protected function _getStackLevelInfo($level) {
 		$html = "<span>";
 		$elements = array("filename", "scriptname", "line", "func", "column");

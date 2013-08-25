@@ -10,6 +10,8 @@ class ReportsController extends AppController {
 
 	public $helpers = array('Html', 'Form', 'Reports', 'Incidents');
 
+	public $uses = array('Incident', 'Report');
+
 	public function index() {
 		$this->Report->recursive = -1;
 		$this->set('distinct_statuses',
@@ -126,14 +128,11 @@ class ReportsController extends AppController {
 
 ## HELPERS
 	protected function _setSimilarFields($id) {
-		$fields = array('browser', 'pma_version', 'php_version', 'server_software',
-				'user_os', 'script_name', 'configuration_storage');
-
 		$this->Report->read(null, $id);
 
-		$this->set('columns', $fields);
+		$this->set('columns', $this->Incident->summarizableFields);
 
-		foreach ($fields as $field) {
+		foreach ($this->Incident->summarizableFields as $field) {
 			list($entriesWithCount, $totalEntries) =
 					$this->Report->getRelatedByField($field, 25, true);
 			$relatedEntries[$field] = $entriesWithCount;

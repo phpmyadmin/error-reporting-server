@@ -26,6 +26,7 @@
 App::uses('Controller', 'Controller');
 App::uses('Developer', 'Model');
 App::uses('Sanitize', 'Utility');
+App::uses('Inflector', 'Utility');
 /**
  * Application Controller
  *
@@ -48,12 +49,7 @@ class AppController extends Controller {
 		$params = $this->params->params;
 		$controller = $params["controller"];
 		$action = $params["action"];
-
-		if ($params["controller"] === "reports") {
-			$this->set('navigation_class', "active");
-		} else {
-			$this->set('navigation_class', "");
-		}
+    $this->set('current_controller', $controller);
 
 		if ($this->Session->read('Developer.id')) {
 			$current_developer = $this->Developer->

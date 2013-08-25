@@ -37,6 +37,44 @@ class Incident extends AppModel {
 
 	public $belongsTo = array('Report');
 
+	public $summarizableFields = array('browser', 'pma_version', 'php_version',
+			'server_software', 'user_os', 'script_name', 'configuration_storage');
+
+	public function __construct($id = false, $table = null, $ds = null) {
+		parent::__construct($id, $table, $ds);
+
+		$this->filterTimes = array(
+			'all_time' => array(
+				'label' => 'All Time',
+				'limit' => null,
+				'group' => "DATE_FORMAT(Incident.created, '%m %Y') as grouped_by",
+			),
+			'day' => array(
+				'label' => 'Last Day',
+				'limit' => date('Y-m-d', strtotime('-1 day')),
+				'group' =>
+						"DATE_FORMAT(Incident.created, '%a %b %d %Y %H') as grouped_by",
+			),
+			'week' => array(
+				'label' => 'Last Week',
+				'limit' => date('Y-m-d', strtotime('-1 week')),
+				'group' =>
+						"DATE_FORMAT(Incident.created, '%a %b %d %Y') as grouped_by",
+			),
+			'month' => array(
+				'label' => 'Last Month',
+				'limit' => date('Y-m-d', strtotime('-1 month')),
+				'group' =>
+						"DATE_FORMAT(Incident.created, '%a %b %d %Y') as grouped_by",
+			),
+			'year' => array(
+				'label' => 'Last Year',
+				'limit' => date('Y-m-d', strtotime('-1 year')),
+				'group' => "DATE_FORMAT(Incident.created, '%b %u %Y') as grouped_by",
+			),
+		);
+	}
+
 	public function createIncidentFromBugReport($bugReport) {
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
 		$closestReport = $this->_getClosestReport($bugReport);
