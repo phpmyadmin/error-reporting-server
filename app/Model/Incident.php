@@ -89,7 +89,7 @@ class Incident extends AppModel {
 			return $this->save($schematizedIncident);
 		} else {
 			$report = $this->_getReportDetails($bugReport);
-			$schematizedIncident["different_stacktrace"] = 1;
+			$schematizedIncident["different_stacktrace"] = true;
 			$data = array(
 				'Incident' => $schematizedIncident,
 				'Report' => $report
@@ -214,6 +214,11 @@ class Incident extends AppModel {
 				if (isset($levelA[$element]) xor isset($levelB[$element])) {
 					return false;
 				}
+
+				if (!isset($levelA[$element]) && !isset($levelB[$element])) {
+					continue;
+				}
+
 				if ($levelA[$element] !== $levelB[$element]) {
 					return false;
 				}

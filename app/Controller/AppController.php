@@ -65,7 +65,7 @@ class AppController extends Controller {
 					!($action === "create" && $controller === "incidents")) {
 				$this->Session->setFlash("You need to be signed in to do this", "default",
 						array("class" => "alert alert-error"));
-				$this->redirect("/");
+				return $this->redirect("/");
 			}
 		}
 	}
