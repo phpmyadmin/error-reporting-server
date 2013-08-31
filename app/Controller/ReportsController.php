@@ -32,13 +32,6 @@ class ReportsController extends AppController {
 		);
 	}
 
-	public function test($id) {
-		$this->Report->recursive = -1;
-		$report = $this->Report->read(null, $id);
-		$this->autoRender = false;
-		return json_encode($this->Report->getIncidentsWithDescription());
-	}
-
 	public function view($reportId) {
 		if (!$reportId) {
 			throw new NotFoundException(__('Invalid Report'));
