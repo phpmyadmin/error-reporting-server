@@ -6,6 +6,8 @@ App::uses('Sanitize', 'Utility');
 
 class Incident extends AppModel {
 
+  public $actsAs = array('Summarizable');
+
 	public $validate = array(
 		'error_message' => array(
 			'rule' => 'notEmpty',
@@ -35,9 +37,43 @@ class Incident extends AppModel {
 
 	public $belongsTo = array('Report');
 
-	public $findMethods = array(
-		'groupedCount'=> true
-	);
+	public $summarizableFields = array('browser', 'pma_version', 'php_version',
+			'server_software', 'user_os', 'script_name', 'configuration_storage');
+
+	public function __construct($id = false, $table = null, $ds = null) {
+		parent::__construct($id, $table, $ds);
+
+		$this->filterTimes = array(
+			'all_time' => array(
+				'label' => 'All Time',
+				'limit' => null,
+				'group' => "DATE_FORMAT(Incident.created, '%m %Y') as grouped_by",
+			),
+			'day' => array(
+				'label' => 'Last Day',
+				'limit' => date('Y-m-d', strtotime('-1 day')),
+				'group' =>
+						"DATE_FORMAT(Incident.created, '%a %b %d %Y %H') as grouped_by",
+			),
+			'week' => array(
+				'label' => 'Last Week',
+				'limit' => date('Y-m-d', strtotime('-1 week')),
+				'group' =>
+						"DATE_FORMAT(Incident.created, '%a %b %d %Y') as grouped_by",
+			),
+			'month' => array(
+				'label' => 'Last Month',
+				'limit' => date('Y-m-d', strtotime('-1 month')),
+				'group' =>
+						"DATE_FORMAT(Incident.created, '%a %b %d %Y') as grouped_by",
+			),
+			'year' => array(
+				'label' => 'Last Year',
+				'limit' => date('Y-m-d', strtotime('-1 year')),
+				'group' => "DATE_FORMAT(Incident.created, '%b %u %Y') as grouped_by",
+			),
+		);
+	}
 
 	public function createIncidentFromBugReport($bugReport) {
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
@@ -53,7 +89,7 @@ class Incident extends AppModel {
 			return $this->save($schematizedIncident);
 		} else {
 			$report = $this->_getReportDetails($bugReport);
-			$schematizedIncident["different_stacktrace"] = 1;
+			$schematizedIncident["different_stacktrace"] = true;
 			$data = array(
 				'Incident' => $schematizedIncident,
 				'Report' => $report
@@ -165,19 +201,6 @@ class Incident extends AppModel {
 		}
 	}
 
-	protected function _findGroupedCount($state, $query, $results = array()) {
-		if ($state === 'before') {
-			return $query;
-		}
-		$output = array();
-		foreach ($results as $row) {
-			foreach ($row['Incident'] as $key => $value) {
-				$output[$value] = $row[0]['count'];
-			}
-		}
-		return $output;
-	}
-
 	protected function _isSameStacktrace($stacktraceA, $stacktraceB) {
 		if (count($stacktraceA) != count($stacktraceB)) {
 			return false;
@@ -191,6 +214,11 @@ class Incident extends AppModel {
 				if (isset($levelA[$element]) xor isset($levelB[$element])) {
 					return false;
 				}
+
+				if (!isset($levelA[$element]) && !isset($levelB[$element])) {
+					continue;
+				}
+
 				if ($levelA[$element] !== $levelB[$element]) {
 					return false;
 				}

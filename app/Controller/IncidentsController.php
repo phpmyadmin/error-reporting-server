@@ -29,6 +29,7 @@ class IncidentsController extends AppController {
 			throw new NotFoundException(__('Invalid Incident'));
 		}
 
+		$this->Incident->recursive = -1;
 		$incident = $this->Incident->findById($id);
 		if (!$incident) {
 			throw new NotFoundException(__('Invalid Incident'));

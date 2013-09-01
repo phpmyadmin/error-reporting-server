@@ -114,5 +114,6 @@ CakeLog::config('error', array(
  */
 CakePlugin::load('DebugKit');
 CakePlugin::load('Migrations');
+CakePlugin::load('Phpunit');
 
 require 'oauth.php';

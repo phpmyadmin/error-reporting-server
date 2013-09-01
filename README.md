@@ -36,10 +36,10 @@ In order to deploy the app in this repo you need to follow these steps:
     - Configuration for lighttpd:
 ```
 $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
-		server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
-		url.rewrite-if-not-file =(
+			server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
+			url.rewrite-if-not-file =(
 				"^([^\?]*)(\?(.+))?$" => "/index.php?url=$1&$3"
-		)
+			)
 }
 ```
 - Create the database for the server
@@ -57,3 +57,10 @@ $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
 
 ## Creating the github app ##
 The callback for the github app should be /developers/callback
+
+## How to run the test suite ##
+If you are on a development machine you can use the webrunner at `/test.php`
+However if you need a command line runner. You can use:
+```
+app/Console/cake test app AllTests
+```

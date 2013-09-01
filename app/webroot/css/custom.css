@@ -27,3 +27,11 @@ table.error-report tr pre{
 #reports_table thead tr:last-child th select {
   margin-bottom: 0;
 }
+
+.jqplot-yaxis {
+	margin-right: 10px;
+}
+
+.jqplot-xaxis {
+	margin-top: 5px;
+}
