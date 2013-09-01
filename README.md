@@ -36,10 +36,10 @@ In order to deploy the app in this repo you need to follow these steps:
     - Configuration for lighttpd:
 ```
 $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
-		server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
-		url.rewrite-if-not-file =(
+			server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
+			url.rewrite-if-not-file =(
 				"^([^\?]*)(\?(.+))?$" => "/index.php?url=$1&$3"
-		)
+			)
 }
 ```
 - Create the database for the server
