@@ -29,7 +29,7 @@ class Incident extends AppModel {
 /**
  * @var Array
  * @link http://book.cakephp.org/2.0/en/models/behaviors.html#using-behaviors
- * @see Model::actAs
+ * @see Model::$actsAs
  */
 	public $actsAs = array('Summarizable');
 
@@ -37,7 +37,7 @@ class Incident extends AppModel {
  * @var Array
  * @link http://book.cakephp.org/2.0/en/models/model-attributes.html#validate
  * @link http://book.cakephp.org/2.0/en/models/data-validation.html
- * @see Model::validate
+ * @see Model::$validate
  */
 	public $validate = array(
 		'error_message' => array(
@@ -69,7 +69,7 @@ class Incident extends AppModel {
 /**
  * @var Array
  * @link http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html#belongsto
- * @see Model::belongsTo
+ * @see Model::$belongsTo
  */
 	public $belongsTo = array('Report');
 

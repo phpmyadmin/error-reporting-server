@@ -28,7 +28,7 @@ class Report extends AppModel {
 /**
  * @var array
  * @link http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html#hasmany
- * @see Cake::Model::hasMany
+ * @see Cake::Model::$hasMany
  */
 	public $hasMany = array(
 		'Incident' => array(
@@ -40,7 +40,7 @@ class Report extends AppModel {
  * @var Array
  * @link http://book.cakephp.org/2.0/en/models/model-attributes.html#validate
  * @link http://book.cakephp.org/2.0/en/models/data-validation.html
- * @see Model::validate
+ * @see Model::$validate
  */
 	public $validate = array(
 		'error_message' => array(
@@ -53,6 +53,7 @@ class Report extends AppModel {
  * List of valid finder method options, supplied as the first parameter to find().
  *
  * @var array
+ * @see Model::$findMethods
  */
 	public $findMethods = array(
 		'allDataTable' =>	true,
