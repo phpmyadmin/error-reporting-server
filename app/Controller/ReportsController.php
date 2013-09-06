@@ -71,6 +71,7 @@ class ReportsController extends AppController {
 		$this->set('incidents_with_stacktrace',
 				$this->Report->getIncidentsWithDifferentStacktrace());
 		$this->set('related_reports', $this->Report->getRelatedReports());
+		$this->set('status', $this->Report->status);
 
 		$this->_setSimilarFields($reportId);
 	}
@@ -134,6 +135,28 @@ class ReportsController extends AppController {
 
 		$this->Report->removeFromRelatedGroup();
 		$this->Session->setFlash("This report has been marked as different."
+				, "default", array("class" => "alert alert-success"));
+		$this->redirect("/reports/view/$reportId");
+	}
+
+	public function change_state($reportId) {
+		if (!$reportId) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$report = $this->Report->read(null, $reportId);
+		if (!$report) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$state = $this->request->data['state'];
+		$newState = $this->Report->status[$state];
+		if (!$newState) {
+			throw new NotFoundException(__('Invalid State'));
+		}
+
+		$this->Report->saveField("status", $state);
+		$this->Session->setFlash("The state has been successfully changed."
 				, "default", array("class" => "alert alert-success"));
 		$this->redirect("/reports/view/$reportId");
 	}

@@ -61,3 +61,7 @@ $(document).ready(function() {
 	SyntaxHighlighter.defaults['toolbar'] = false;
 	SyntaxHighlighter.all();
 } );
+
+function showStateForm() {
+	$('#state-form').slideToggle();
+}

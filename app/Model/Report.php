@@ -61,6 +61,17 @@ class Report extends AppModel {
 	);
 
 /**
+ * List of valid finder method options, supplied as the first parameter to find().
+ *
+ * @var array
+ */
+	public $status = array(
+		'new' =>	'New',
+		'fixed' =>	'Fixed',
+		'wontfix' =>	"Won't Fix",
+	);
+
+/**
  * Retrieves the incident records that are related to the current report
  *
  * @return Array the list of incidents ordered by creation date desc
