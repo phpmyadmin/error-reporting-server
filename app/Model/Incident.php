@@ -1,13 +1,44 @@
 <?php
 /* vim: set noexpandtab sw=2 ts=2 sts=2: */
+/**
+ * An incident a representing a single incident of a submited bug
+ *
+ * phpMyAdmin Error reporting server
+ * Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
+ *
+ * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
+ * @package       Server.Model
+ * @link          http://www.phpmyadmin.net
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
+ */
 
 App::uses('AppModel', 'Model');
 App::uses('Sanitize', 'Utility');
 
+/**
+ * An incident a representing a single incident of a submited bug
+ *
+ * @package       Server.Model
+ */
 class Incident extends AppModel {
 
-  public $actsAs = array('Summarizable');
+/**
+ * @var Array
+ * @link http://book.cakephp.org/2.0/en/models/behaviors.html#using-behaviors
+ * @see Model::$actsAs
+ */
+	public $actsAs = array('Summarizable');
 
+/**
+ * @var Array
+ * @link http://book.cakephp.org/2.0/en/models/model-attributes.html#validate
+ * @link http://book.cakephp.org/2.0/en/models/data-validation.html
+ * @see Model::$validate
+ */
 	public $validate = array(
 		'error_message' => array(
 			'rule' => 'notEmpty',
@@ -35,8 +66,18 @@ class Incident extends AppModel {
 		),
 	);
 
+/**
+ * @var Array
+ * @link http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html#belongsto
+ * @see Model::$belongsTo
+ */
 	public $belongsTo = array('Report');
 
+/**
+ * The fields which are summarized in the report page with charts and are also
+ * used in the overall stats and charts for the website
+ * @var Array
+ */
 	public $summarizableFields = array('browser', 'pma_version', 'php_version',
 			'server_software', 'user_os', 'script_name', 'configuration_storage');
 
@@ -75,6 +116,16 @@ class Incident extends AppModel {
 		);
 	}
 
+/**
+ * creates an incident/report record given a raw bug report object
+ *
+ * This gets a decoded bug report from the submitted json body. This has not
+ * yet been santized. It either adds it as an incident to another report or
+ * creates a new report if nothing matches.
+ *
+ * @param Array $bugReport the bug report being submitted
+ * @return Boolean If the report/incident was correctly saved
+ */
 	public function createIncidentFromBugReport($bugReport) {
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
 		$closestReport = $this->_getClosestReport($bugReport);
@@ -98,6 +149,14 @@ class Incident extends AppModel {
 		}
 	}
 
+/**
+ * checks weather a schematized incident has a different stacktrace than a
+ * group of incident records.
+ *
+ * @param Array the incident being checked
+ * @param Array the incidents being checked against
+ * @return Boolean If the incident has a different stacktrace than the group
+ */
 	protected function _hasDifferentStacktrace($newIncident, $incidents) {
 		$newIncident["stacktrace"] = json_decode($newIncident["stacktrace"], true);
 		foreach ($incidents as $incident) {
@@ -111,6 +170,15 @@ class Incident extends AppModel {
 		return true;
 	}
 
+/**
+ * retrieves the closest report to a given bug report
+ *
+ * it checks for another report with the same line number, filename and
+ * pma_version
+ *
+ * @param Array $bugReport the bug report being checked
+ * @return Array the first similar report or null
+ */
 	protected function _getClosestReport($bugReport) {
 		List($location, $linenumber) =
 				$this->_getIdentifyingLocation($bugReport['exception']['stack']);
@@ -119,6 +187,12 @@ class Incident extends AppModel {
 		return $report;
 	}
 
+/**
+ * creates the report data from an incident that has no related report.
+ *
+ * @param Array $bugReport the bug report the report record is being created for
+ * @return Array an array with the report fields can be used with Report->save
+ */
 	protected function _getReportDetails($bugReport) {
 		List($location, $linenumber) =
 				$this->_getIdentifyingLocation($bugReport["exception"]["stack"]);
@@ -134,6 +208,12 @@ class Incident extends AppModel {
 		return $reportDetails;
 	}
 
+/**
+ * creates the incident data from the submitted bug report.
+ *
+ * @param Array $bugReport the bug report the report record is being created for
+ * @return Array an array with the incident fields can be used with ِIncident->save
+ */
 	protected function _getSchematizedIncident($bugReport) {
 		$bugReport = Sanitize::clean($bugReport);
 		$schematizedReport = array(
@@ -155,6 +235,21 @@ class Incident extends AppModel {
 		return $schematizedReport;
 	}
 
+/**
+ * Gets the identifiying location info from a stacktrace
+ *
+ * This is used to skip stacktrace levels that are within the error reporting js
+ * files that sometimes appear in the stacktrace but are not related to the bug
+ * report
+ *
+ * returns two things in an array:
+ * - the first element is the filename/scriptname of the error
+ * - the second element is the linenumber of the error
+ *
+ * @param Array $stacktrace the stacktrace being examined
+ * @return Array an array with the filename/scriptname and linenumber of the
+ *	 error
+ */
 	protected function _getIdentifyingLocation($stacktrace) {
 		foreach ($stacktrace as $level) {
 			if (isset($level["filename"])) {
@@ -162,7 +257,8 @@ class Incident extends AppModel {
 				if ($level["filename"] === "tracekit.js") {
 					continue;
 				} elseif($level["filename"] === "error_report.js") {
-					// incase the error is in the error_report.js file
+					// incase the error really is in the error_report.js file save it for
+					// later
 					if(!isset($fallback)) {
 						$fallback = array($level["filename"], $level["line"]);
 					}
@@ -179,18 +275,36 @@ class Incident extends AppModel {
 		return $fallback;
 	}
 
+/**
+ * Gets the major version number of a version string
+ *
+ * @param String $fullVersion the version string
+ * @return String the major version part
+ */
 	protected function _getMajorVersion($fullVersion) {
 		preg_match("/^\d+/", $fullVersion, $matches);
 		$simpleVersion = $matches[0];
 		return $simpleVersion;
 	}
 
+/**
+ * Gets the major and minor version number of a version string
+ *
+ * @param String $phpVersion the version string
+ * @return String the major and minor version part
+ */
 	protected function _getSimplePhpVersion($phpVersion) {
 		preg_match("/^\d+\.\d+/", $phpVersion, $matches);
 		$simpleVersion = $matches[0];
 		return $simpleVersion;
 	}
 
+/**
+ * Gets the server name and version from the server signature
+ *
+ * @param String $signature the server signature
+ * @return String the server name and version or UNKNOWN
+ */
 	protected function _getServer($signature) {
 		if (preg_match("/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)"
 				. "|(lighttpd\/\d+\.\d+)/i",
@@ -201,6 +315,13 @@ class Incident extends AppModel {
 		}
 	}
 
+/**
+ * checks whether two stacktraces are identical or not
+ *
+ * @param Array $stacktraceA the first stacktrace
+ * @param Array $stacktraceB the second stacktrace
+ * @return Boolean true if the stacktrace is the same true otherwise false
+ */
 	protected function _isSameStacktrace($stacktraceA, $stacktraceB) {
 		if (count($stacktraceA) != count($stacktraceB)) {
 			return false;

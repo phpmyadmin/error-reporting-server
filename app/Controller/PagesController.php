@@ -13,11 +13,16 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
+ * This file was originally released by cakePHP and modified by
+ * phpMyAdmin. You can check the commit log for changes to this file.
+ *
  * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
- * @package       app.Controller
+ * @copyright     Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
+ * @link          http://www.phpmyadmin.net
+ * @package       Server.Controller
  * @since         CakePHP(tm) v 0.2.9
- * @license       http://www.opensource.org/licenses/mit-license.php MIT License
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License.
  */
 App::uses('AppController', 'Controller');
 
@@ -26,7 +31,7 @@ App::uses('AppController', 'Controller');
  *
  * Override this controller by placing a copy in controllers directory of an application
  *
- * @package       app.Controller
+ * @package       Server.Controller
  * @link http://book.cakephp.org/2.0/en/controllers/pages-controller.html
  */
 class PagesController extends AppController {
