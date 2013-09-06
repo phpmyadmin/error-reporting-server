@@ -17,7 +17,7 @@
   <form class="form-inline" action="/reports/mark_related_to/<?php
       echo $report["Report"]["id"]; ?>">
     <span>Mark the same as:</span>
-    <input type="number" name="related_to" />
+    <input type="number" min="1" name="related_to" />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
 <?php } else { ?>
