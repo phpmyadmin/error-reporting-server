@@ -42,10 +42,17 @@ class AppController extends Controller {
 
 	public $uses = array('Developer');
 
+	public $whitelist = array(
+		'developers',
+		'pages',
+		'incidents' => array(
+			'create',
+		),
+	);
+
 	public function beforeFilter() {
 		$params = $this->params->params;
 		$controller = $params["controller"];
-		$action = $params["action"];
     $this->set('current_controller', $controller);
 
 		if ($this->Session->read('Developer.id')) {
@@ -57,13 +64,25 @@ class AppController extends Controller {
 			$this->set('developer_signed_in', true);
 		} else {
 			$this->set('developer_signed_in', false);
-
-			if ($controller !== "pages" && $controller !== "developers" &&
-					!($action === "create" && $controller === "incidents")) {
-				$this->Session->setFlash("You need to be signed in to do this", "default",
-						array("class" => "alert alert-error"));
-				return $this->redirect("/");
-			}
+			$this->_checkAccess();
 		}
+	}
+
+	protected function _checkAccess() {
+		$params = $this->params->params;
+		$controller = $params["controller"];
+		$action = $params["action"];
+
+		if (in_array($controller, $this->whitelist)) {
+			return;
+		}
+		if (isset($this->whitelist[$controller]) &&
+				in_array($action, $this->whitelist[$controller])) {
+			return;
+		}
+
+		$this->Session->setFlash("You need to be signed in to do this", "default",
+				array("class" => "alert alert-error"));
+		return $this->redirect($this->referer());
 	}
 }
