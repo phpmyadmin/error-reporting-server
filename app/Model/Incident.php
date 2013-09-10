@@ -150,7 +150,7 @@ class Incident extends AppModel {
 	}
 
 /**
- * checks weather a schematized incident has a different stacktrace than a
+ * checks whether a schematized incident has a different stacktrace than a
  * group of incident records.
  *
  * @param Array the incident being checked
@@ -257,7 +257,7 @@ class Incident extends AppModel {
 				if ($level["filename"] === "tracekit.js") {
 					continue;
 				} elseif($level["filename"] === "error_report.js") {
-					// incase the error really is in the error_report.js file save it for
+					// in case the error really is in the error_report.js file save it for
 					// later
 					if(!isset($fallback)) {
 						$fallback = array($level["filename"], $level["line"]);
