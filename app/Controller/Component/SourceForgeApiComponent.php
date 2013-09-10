@@ -24,7 +24,7 @@ App::import('Vendor', 'OAuth/OAuthClient');
 App::uses('Component', 'Controller');
 
 /**
- * Source forge api component handling comunication with source forge
+ * SourceForge.net api component handling comunication with SourceForge.net
  *
  * @package       Server.Controller.Component
  */
@@ -34,7 +34,7 @@ class SourceForgeApiComponent extends Component {
  * creates a new client using the consumer secret and key in configuration files
  *
  * @return OAuthClient the client which can then be used in an authentication
- * requestt
+ *                     request
  */
 	public function createClient() {
 		$sourceForgeConfig = Configure::read('SourceForgeConfig');
@@ -43,14 +43,14 @@ class SourceForgeApiComponent extends Component {
 	}
 
 /**
- * requests an access token from sourceforge from a request token. The request
+ * requests an access token from SourceForge.net from a request token. The request
  * token needs to be authorized by the user. You need to redirect the user to
- * the source forge authorization url which you can get throup
+ * the SourceForge.net authorization url which you can get through
  * SourceForgeApiComponent::getRedirectUrl($requestToken)
  *
- * @param OAuthToken $requestToken that has been authorized by the user
- * @return OAuthToken access token returned by sourceforge which can then be used in
- * api requests
+ * @param  OAuthToken $requestToken that has been authorized by the user
+ * @return OAuthToken access token returned by SourceForge.net which can then
+ *                    be used in api requests
  */
 	public function getAccessToken($requestToken) {
 		$client = $this->createClient();
@@ -58,13 +58,13 @@ class SourceForgeApiComponent extends Component {
 	}
 
 /**
- * requests a request token from sourceforge using a callback url for the user
+ * requests a request token from SourceForge.net using a callback url for the user
  * to return to.
  *
- * @param String $callbackAction the action path to redirect the user to after
- * authorizing the token
- * @return OAuthToken request token returned by sourceforge which can then be
- * authorized by a user.
+ * @param  String     $callbackAction the action path to redirect the user to after
+ *                                    authorizing the token
+ * @return OAuthToken request token returned by SourceForge.net which can then be
+ *                    authorized by a user.
  */
 	public function getRequestToken($callbackAction) {
 		$client = $this->createClient();
@@ -75,7 +75,7 @@ class SourceForgeApiComponent extends Component {
 /**
  * generates the url to redirect the user to authorize the request token
  *
- * @param OAuthToken $requestToken the request token to be authorized.
+ * @param  OAuthToken $requestToken the request token to be authorized.
  * @return String the url to redirect the user to.
  */
 	public function getRedirectUrl($requestToken) {
@@ -83,14 +83,14 @@ class SourceForgeApiComponent extends Component {
 	}
 
 /**
- * Submits a create ticket request to the source forge api. It uses the access
+ * Submits a create ticket request to the SourceForge.net api. It uses the access
  * token that must be set as a property on this component, through
  * SourceForgeApiComponent->accessToken
  *
- * @param String $project the project name of the source forge project to submit
- * the ticket to.
- * @param Array $data the ticket data to submit.
- * @return Array the response returned by sourceforge.
+ * @param  String $project the project name of the SourceForge.net project to submit
+ *                         the ticket to.
+ * @param  Array  $data the ticket data to submit.
+ * @return Array  the response returned by SourceForge.net
  */
 	public function createTicket($project, $data) {
 		$client = $this->createClient();
