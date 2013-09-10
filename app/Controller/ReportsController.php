@@ -1,9 +1,28 @@
 <?php
 /* vim: set noexpandtab sw=2 ts=2 sts=2: */
-
+/**
+ * Reports controller handling reports creation and rendering
+ *
+ * phpMyAdmin Error reporting server
+ * Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
+ *
+ * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
+ * @package       Server.Controller
+ * @link          http://www.phpmyadmin.net
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
+ */
 App::uses('Sanitize', 'Utility');
 App::uses('AppController', 'Controller');
 
+/**
+ * Reports controller handling reports modification and rendering
+ *
+ * @package       Server.Controller
+ */
 class ReportsController extends AppController {
 
 	public $components = array('RequestHandler');
@@ -52,6 +71,7 @@ class ReportsController extends AppController {
 		$this->set('incidents_with_stacktrace',
 				$this->Report->getIncidentsWithDifferentStacktrace());
 		$this->set('related_reports', $this->Report->getRelatedReports());
+		$this->set('status', $this->Report->status);
 
 		$this->_setSimilarFields($reportId);
 	}
@@ -115,6 +135,28 @@ class ReportsController extends AppController {
 
 		$this->Report->removeFromRelatedGroup();
 		$this->Session->setFlash("This report has been marked as different."
+				, "default", array("class" => "alert alert-success"));
+		$this->redirect("/reports/view/$reportId");
+	}
+
+	public function change_state($reportId) {
+		if (!$reportId) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$report = $this->Report->read(null, $reportId);
+		if (!$report) {
+			throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$state = $this->request->data['state'];
+		$newState = $this->Report->status[$state];
+		if (!$newState) {
+			throw new NotFoundException(__('Invalid State'));
+		}
+
+		$this->Report->saveField("status", $state);
+		$this->Session->setFlash("The state has been successfully changed."
 				, "default", array("class" => "alert alert-success"));
 		$this->redirect("/reports/view/$reportId");
 	}
