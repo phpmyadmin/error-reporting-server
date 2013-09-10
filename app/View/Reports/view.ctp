@@ -1,12 +1,24 @@
-<h1>Error Report #<?php echo $report["Report"]["id"]; ?>
-  <small>[<?php echo $report["Report"]["status"]; ?>]</small>
-</h1>
+<div>
+	<h1 style="display: inline">Error Report #<?php echo $report["Report"]["id"]; ?>
+		<small>[<?php echo $status[$report["Report"]["status"]]; ?>]</small>
+	</h1>
+	<a href="#" onclick="showStateForm(); return false">Change state</a>
+</div>
+<br />
+<form class="form-inline" id="state-form" style="display: none"
+		action="/reports/change_state/<?php echo $report["Report"]["id"]; ?>"
+		method="post">
+	<span>Change state to:</span>
+	<?php echo $this->Form->select('state', $status, array('value' =>
+			$report["Report"]["status"], 'empty' => false)); ?>
+	<input type="submit" value="Change" class="btn btn-primary" />
+</form>
 <?php if (empty($related_reports)) { ?>
   <form class="form-inline" action="/reports/mark_related_to/<?php
       echo $report["Report"]["id"]; ?>">
     <span>Mark the same as:</span>
-    <input type="number" name="related_to" />
-    <input type="submit" value="submit" class="btn btn-primary" />
+    <input type="number" min="1" name="related_to" />
+    <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
 <?php } else { ?>
   <p>

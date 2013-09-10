@@ -1,9 +1,29 @@
 <?php
 /* vim: set noexpandtab sw=2 ts=2 sts=2: */
+/**
+ * Stats controller handling stats preview
+ *
+ * phpMyAdmin Error reporting server
+ * Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
+ *
+ * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
+ * @package       Server.Controller
+ * @link          http://www.phpmyadmin.net
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
+ */
 
 App::uses('Sanitize', 'Utility');
 App::uses('AppController', 'Controller');
 
+/**
+ * Stats controller handling stats preview
+ *
+ * @package       Server.Controller
+ */
 class StatsController extends AppController {
 
 	public $uses = array("Report", "Incident");
