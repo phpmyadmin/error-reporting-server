@@ -234,12 +234,12 @@ class Incident extends AppModel {
 		$bugReport = Sanitize::clean($bugReport);
 		$schematizedReport = array(
 			'pma_version' => $bugReport['pma_version'],
-			'php_version' => $this->_getSimplePhpVersion($bugReport['php_version']),
+			'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
 			'steps' => $bugReport['steps'],
 			'error_message' => $bugReport['exception']['message'],
 			'error_name' => $bugReport['exception']['name'],
 			'browser' => $bugReport['browser_name'] . " "
-					. $this->_getMajorVersion($bugReport['browser_version']),
+					. $this->_getSimpleVersion($bugReport['browser_version'], 1),
 			'user_os' => $bugReport['user_os'],
 			'script_name' => $bugReport['script_name'],
 			'configuration_storage' => $bugReport['configuration_storage'],
@@ -291,26 +291,20 @@ class Incident extends AppModel {
 		return $fallback;
 	}
 
-/**
- * Gets the major version number of a version string
- *
- * @param String $fullVersion the version string
- * @return String the major version part
- */
-	protected function _getMajorVersion($fullVersion) {
-		preg_match("/^\d+/", $fullVersion, $matches);
-		$simpleVersion = $matches[0];
-		return $simpleVersion;
-	}
 
 /**
- * Gets the major and minor version number of a version string
+ * Gets a part of a version string according to the specified version Length
  *
- * @param String $phpVersion the version string
+ * @param  String $phpVersion the version string
+ * @param  String $versionLength the number of version components to return. eg
+ *                               1 for major version only and 2 for major and
+ *                               minor version
  * @return String the major and minor version part
  */
-	protected function _getSimplePhpVersion($phpVersion) {
-		preg_match("/^\d+\.\d+/", $phpVersion, $matches);
+	protected function _getSimpleVersion($versionString, $versionLength) {
+		$versionLength = (int) $versionLength;
+		preg_match("/^(\d+\.){" . ($versionLength - 1) . "}\d+/", $versionString,
+				$matches);
 		$simpleVersion = $matches[0];
 		return $simpleVersion;
 	}
