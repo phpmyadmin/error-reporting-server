@@ -64,6 +64,22 @@ class Incident extends AppModel {
 			'rule' => 'notEmpty',
 			'required'	 => true,
 		),
+		'user_os' => array(
+			'rule' => 'notEmpty',
+			'required'	 => true,
+		),
+		'script_name' => array(
+			'rule' => 'notEmpty',
+			'required'	 => true,
+		),
+		'server_software' => array(
+			'rule' => 'notEmpty',
+			'required'	 => true,
+		),
+		'configuration_storage' => array(
+			'rule' => 'notEmpty',
+			'required'	 => true,
+		),
 	);
 
 /**
