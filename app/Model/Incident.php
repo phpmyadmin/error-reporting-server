@@ -347,4 +347,18 @@ class Incident extends AppModel {
 			return true;
 		}
 	}
+
+	protected function _getStackHash($stacktrace) {
+		$handle = hash_init("md5");
+		foreach ($stacktrace as $level) {
+			$elements = array("filename", "scriptname", "line", "func", "column");
+			foreach ($elements as $element) {
+				if (!isset($level[$element])) {
+					continue;
+				}
+				hash_update($handle, $level[$element]);
+			}
+		}
+		return hash_final($handle);
+	}
 }

@@ -70,6 +70,41 @@ class IncidentTest extends CakeTestCase {
 		$this->assertEquals(false, $result);
 	}
 
+	public function testGetStackHash() {
+		$method = new ReflectionMethod('Incident', '_getStackHash');
+		$method->setAccessible(true);
+
+		$stacktrace1 = array(
+			array(
+				'filename' => 'file1',
+				'line' => 300,
+			),
+			array(
+				'filename' => 'file2',
+				'line' => 200,
+			)
+		);
+
+		$stacktrace2 = array(
+			array(
+				'line' => 300,
+				'filename' => 'file1',
+			),
+			array(
+				'line' => 200,
+				'filename' => 'file2',
+			)
+		);
+
+		$result = $method->invoke($this->Incident,
+				$stacktrace1);
+		$this->assertEquals("a441639902837d88db25214812c0cd83", $result);
+
+		$result = $method->invoke($this->Incident,
+				$stacktrace2);
+		$this->assertEquals("a441639902837d88db25214812c0cd83", $result);
+	}
+
 	public function testGetServer() {
 		$method = new ReflectionMethod('Incident', '_getServer');
 		$method->setAccessible(true);
