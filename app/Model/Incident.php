@@ -64,6 +64,10 @@ class Incident extends AppModel {
 			'rule' => 'notEmpty',
 			'required'	 => true,
 		),
+		'stackhash' => array(
+			'rule' => 'notEmpty',
+			'required'	 => true,
+		),
 	);
 
 /**
@@ -228,6 +232,7 @@ class Incident extends AppModel {
 			'script_name' => $bugReport['script_name'],
 			'configuration_storage' => $bugReport['configuration_storage'],
 			'server_software' => $this->_getServer($bugReport['server_software']),
+			'stackhash' => $this->_getStackHash($bugReport['exception']['stack']),
 			'full_report' => json_encode($bugReport),
 			'stacktrace' => json_encode($bugReport['exception']['stack']),
 		);

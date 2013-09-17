@@ -231,6 +231,7 @@ class IncidentTest extends CakeTestCase {
 			'script_name' => 'tbl_relation.php',
 			'configuration_storage' => 'enabled',
 			'server_software' => 'NginX/1.17',
+			'stackhash' => '9db5408094f1e76ef7161b7bbf3ddfe4',
 			'full_report' => json_encode($cleanBugReport),
 			'stacktrace' => json_encode($cleanBugReport['exception']['stack']),
 		);
