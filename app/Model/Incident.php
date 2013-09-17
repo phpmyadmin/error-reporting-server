@@ -303,6 +303,14 @@ class Incident extends AppModel {
  */
 	protected function _getSimpleVersion($versionString, $versionLength) {
 		$versionLength = (int) $versionLength;
+		if ($versionLength < 1) {
+			$versionLength = 1;
+		}
+		/* modify the re to accept a variable number of version components. I
+		 * atleast take one component and optionally get more components if need be.
+		 * previous code makes sure that the $versionLength variable is a positive
+		 * int
+		 */
 		preg_match("/^(\d+\.){" . ($versionLength - 1) . "}\d+/", $versionString,
 				$matches);
 		$simpleVersion = $matches[0];

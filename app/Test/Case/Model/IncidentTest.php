@@ -4,7 +4,7 @@ App::uses('View', 'View');
 App::uses('Incident', 'Model');
 
 class IncidentTest extends CakeTestCase {
-	
+
 	public function setUp() {
 		parent::setUp();
 		$this->Incident = ClassRegistry::init('Incident');
@@ -106,6 +106,14 @@ class IncidentTest extends CakeTestCase {
 		$result = $method->invoke($this->Incident,
 				"15.3.12.17", 3);
 		$this->assertEquals("15.3.12", $result);
+
+		$result = $method->invoke($this->Incident,
+				"15.3.12.17", "wrong argument");
+		$this->assertEquals("15", $result);
+
+		$result = $method->invoke($this->Incident,
+				"15.3.12.17", -1);
+		$this->assertEquals("15", $result);
 	}
 
 	public function testGetIdentifyingLocation() {
