@@ -75,11 +75,10 @@ class GithubApiComponent extends Component {
  * @return Arrray the github info returned by github as an associative array
  */
 	public function getUserInfo($accessToken) {
-		$url = "/user";
 		$data = array(
 			'access_token' => $accessToken,
 		);
-		return $this->apiRequest($url, $data, "GET");
+		return $this->apiRequest("user", $data, "GET");
 	}
 
 /**
