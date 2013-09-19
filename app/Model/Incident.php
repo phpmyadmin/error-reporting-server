@@ -136,15 +136,9 @@ class Incident extends AppModel {
 
 		if($closestReport) {
 			$schematizedIncident["report_id"] = $closestReport["Report"]["id"];
-
-			$this->Report->read(null, $closestReport["Report"]["id"]);
-			$incidents = $this->Report->getIncidentsWithDifferentStacktrace();
-			$schematizedIncident["different_stacktrace"] =
-					$this->_hasDifferentStacktrace($schematizedIncident, $incidents);
 			return $this->save($schematizedIncident);
 		} else {
 			$report = $this->_getReportDetails($bugReport);
-			$schematizedIncident["different_stacktrace"] = true;
 			$data = array(
 				'Incident' => $schematizedIncident,
 				'Report' => $report

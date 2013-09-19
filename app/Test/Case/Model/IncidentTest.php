@@ -248,8 +248,8 @@ class IncidentTest extends CakeTestCase {
 
 		$model = $this->getMockForModel('Incident', array('_getIdentifyingLocation'));
 		$model->expects($this->once())
-        ->method('_getIdentifyingLocation')
-        ->will($this->returnValue(array('error.js', 312)));
+				->method('_getIdentifyingLocation')
+				->will($this->returnValue(array('error.js', 312)));
 
 		$result = $method->invoke($model,
 				$bugReport);
@@ -277,14 +277,14 @@ class IncidentTest extends CakeTestCase {
 
 		$incident = $this->getMockForModel('Incident', array('_getIdentifyingLocation'));
 		$incident->expects($this->once())
-        ->method('_getIdentifyingLocation')
-        ->will($this->returnValue(array('error.js', 312)));
+				->method('_getIdentifyingLocation')
+				->will($this->returnValue(array('error.js', 312)));
 
 		$report = $this->getMockForModel('Report',
 				array('findByLocationAndLinenumberAndPmaVersion'));
 		$report->expects($this->once())
-        ->method('findByLocationAndLinenumberAndPmaVersion')
-        ->will($this->returnValue($returnedReport));
+				->method('findByLocationAndLinenumberAndPmaVersion')
+				->will($this->returnValue($returnedReport));
 
 		$incident->Report = $report;
 
@@ -349,36 +349,31 @@ class IncidentTest extends CakeTestCase {
 				array('_getClosestReport', 'save', 'saveAssociated',
 				'_getSchematizedIncident'));
 		$incident->expects($this->any())
-        ->method('_getClosestReport')
-        ->will($this->onConsecutiveCalls($closestReport, null));
+				->method('_getClosestReport')
+				->will($this->onConsecutiveCalls($closestReport, null));
 		$incident->expects($this->any())
-        ->method('_getSchematizedIncident')
-        ->will($this->returnValue(array('stacktrace' => '')));
+				->method('_getSchematizedIncident')
+				->will($this->returnValue(array('stacktrace' => '')));
 		$incident->expects($this->once())
-        ->method('save')
-				->with($this->equalTo(array('different_stacktrace' => true,
-						'report_id' => 2, 'stacktrace' => '')))
-        ->will($this->returnValue(true));
+				->method('save')
+				->with($this->equalTo(array('report_id' => 2, 'stacktrace' => '')))
+				->will($this->returnValue(true));
 
 
 		$report = $this->getMockForModel('Report',
-				array('getIncidentsWithDifferentStacktrace', 'read'));
-
-		$report->expects($this->once())
-        ->method('getIncidentsWithDifferentStacktrace')
-        ->will($this->returnValue(array()));
+				array('read'));
 
 		$result = $incident->createIncidentFromBugReport($bugReport);
 
 		$this->assertEquals(true, $result);
 
 		$incident->expects($this->once())
-        ->method('_getClosestReport')
-        ->will($this->returnValue(null));
+				->method('_getClosestReport')
+				->will($this->returnValue(null));
 
 		$incident->expects($this->once())
-        ->method('saveAssociated')
-        ->will($this->returnValue(true));
+				->method('saveAssociated')
+				->will($this->returnValue(true));
 
 		$result = $incident->createIncidentFromBugReport($bugReport);
 
