@@ -28,7 +28,6 @@ class IncidentFixture extends CakeTestFixture {
 			'steps' => 'Lorem ipsum dolor sit amet',
 			'stacktrace' => '[{}]',
 			'full_report' => '{}',
-			'different_stacktrace' => 1,
 			'report_id' => 1,
 			'created' => '2013-08-29 18:10:01',
 			'modified' => '2013-08-29 18:10:01'
@@ -48,7 +47,6 @@ class IncidentFixture extends CakeTestFixture {
 			'steps' => 'Lorem ipsum dolor sit amet',
 			'stacktrace' => 'Lorem ipsum dolor sit amet',
 			'full_report' => 'Lorem ipsum dolor sit amet',
-			'different_stacktrace' => 0,
 			'report_id' => 4,
 			'created' => '2013-08-29 18:10:01',
 			'modified' => '2013-08-29 18:10:01'
@@ -68,7 +66,6 @@ class IncidentFixture extends CakeTestFixture {
 			'steps' => null,
 			'stacktrace' => 'Lorem ipsum dolor sit amet',
 			'full_report' => 'Lorem ipsum dolor sit amet',
-			'different_stacktrace' => 1,
 			'report_id' => 4,
 			'created' => '2013-08-29 18:10:00',
 			'modified' => '2013-08-29 18:10:00'
@@ -89,7 +86,6 @@ class IncidentFixture extends CakeTestFixture {
 			'steps' => null,
 			'stacktrace' => 'Lorem ipsum dolor sit amet',
 			'full_report' => 'Lorem ipsum dolor sit amet',
-			'different_stacktrace' => 1,
 			'report_id' => 3,
 			'created' => '2013-08-29 18:10:00',
 			'modified' => '2013-08-29 18:10:00'

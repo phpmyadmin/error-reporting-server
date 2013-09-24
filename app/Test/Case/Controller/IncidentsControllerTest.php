@@ -52,7 +52,6 @@ class IncidentsControllerTest extends ControllerTestCase {
 				'steps' => 'Lorem ipsum dolor sit amet',
 				'stacktrace' => array(array()),
 				'full_report' => array(),
-				'different_stacktrace' => '1',
 				'report_id' => '1',
 				'created' => '2013-08-29 18:10:01',
 				'modified' => '2013-08-29 18:10:01'
