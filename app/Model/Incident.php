@@ -365,6 +365,12 @@ class Incident extends AppModel {
 		}
 	}
 
+/**
+ * returns the hash pertaining to a stacktrace
+ *
+ * @param Array $stacktrace the stacktrace in question
+ * @return String the hash string of the stacktrace
+ */
 	protected function _getStackHash($stacktrace) {
 		$handle = hash_init("md5");
 		foreach ($stacktrace as $level) {
