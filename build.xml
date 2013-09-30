@@ -62,7 +62,7 @@
  <target name="phpcs" description="Generate checkstyle.xml using PHP_CodeSniffer excluding test, tcpdf directories">
   <exec executable="phpcs">
    <arg line="
-           --ignore=*/lib/Cake/*,*/vendors/*,*/app/Plugin/*,*/app/Config/Migration/
+           --ignore=*/lib/Cake/*,*/vendors/*,*/app/Plugin/*,*/app/Config/Migration/,*/app/Vendor/*
               --report=checkstyle
               --extensions=php
               --report-file='${basedir}/build/logs/checkstyle.xml'
