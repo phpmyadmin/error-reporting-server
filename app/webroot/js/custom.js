@@ -1,5 +1,5 @@
-$(document).ready(function() {
-	oTable = $('#reports_table').dataTable( {
+$(document).ready(function () {
+	oTable = $('#reports_table').dataTable({
 		"bSortCellsTop": true,
 		"bProcessing": true,
 		"bServerSide": true,
@@ -7,9 +7,9 @@ $(document).ready(function() {
 		"aoColumnDefs": [
 			{ "bSearchable": false, "aTargets": [ 0 ] },
 			{ "sClass": "center", "aTargets": [ -1, -2 ] },
-			{ "fnRender": function ( oObj ) {
-					return '<a class="block" href="/reports/view/' + oObj.aData[0]
-							+ '">'+oObj.aData[0]+'</a>';
+			{ "fnRender": function (oObj) {
+					return '<a class="block" href="/reports/view/' + oObj.aData[0] +
+						'">' + oObj.aData[0] + '</a>';
 				},
 				"aTargets": [ 0 ]
 			}
@@ -22,45 +22,50 @@ $(document).ready(function() {
 			{ "sWidth": "10%" }
 		],
 		"fnServerData": function (sSource, aoData, fnCallback) {
-			$.getJSON( sSource, aoData, function (json) {
-					fnCallback(json);
+			$.getJSON(sSource, aoData, function (json) {
+				fnCallback(json);
 			});
 		}
-	} );
+	});
 
-	oTable.find("input").on('keyup', function(e) {
+	oTable.find("input").on('keyup', function (e) {
 		// only search when enter is pressed
-		if(e.keyCode == 13) {
+		if (e.keyCode == 13) {
 			oTable.fnFilter($(this).val(), oTable.find("tr:last-child th").index($(this).parent()));
 		}
 	});
 
-	oTable.find("select").on('change', function(e) {
+	oTable.find("select").on('change', function (e) {
 		oTable.fnFilter($(this).val(), oTable.find("tr:last-child th").index($(this).parent()));
 	});
 
-	$('#toggle-stacktrace').click(function(e) {
-		if($('#stacktrace').hasClass('shown')) {
+	$('#toggle-stacktrace').click(function (e) {
+		if ($('#stacktrace').hasClass('shown')) {
 			$('#toggle-stacktrace').html('Show stacktrace');
 
-			$('#stacktrace').slideUp(function() {
+			$('#stacktrace').slideUp(function () {
 				$(this).removeClass('shown');
 			});
 		} else {
 			$('#toggle-stacktrace').html('Hide stacktrace');
 
-			$('#stacktrace').slideDown(function() {
+			$('#stacktrace').slideDown(function () {
 				$(this).addClass('shown');
 			});
 		}
 		return false;
 	});
 
-	setTimeout(function(){$(".alert.alert-success").slideUp();}, 2000);
+	setTimeout(
+		function () {
+			$(".alert.alert-success").slideUp();
+		},
+		2000
+	);
 
 	SyntaxHighlighter.defaults['toolbar'] = false;
 	SyntaxHighlighter.all();
-} );
+});
 
 function showStateForm() {
 	$('#state-form').slideToggle();
