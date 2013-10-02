@@ -45,7 +45,7 @@ class Report extends AppModel {
 	public $validate = array(
 		'error_message' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true
+			'required' => true
 		)
 	);
 
@@ -217,7 +217,7 @@ class Report extends AppModel {
 	protected function _relatedIncidentsConditions() {
 		$conditions = array(array('Incident.report_id' => $this->id));
 
-		$conditions[] = array("AND" => 
+		$conditions[] = array("AND" =>
 			array('Report.related_to' => $this->id),
 			'Incident.report_id = Report.id',
 		);

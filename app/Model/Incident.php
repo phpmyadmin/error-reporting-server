@@ -42,43 +42,43 @@ class Incident extends AppModel {
 	public $validate = array(
 		'error_message' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 		'pma_version' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 		'php_version' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 		'full_report' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 		'stacktrace' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 		'browser' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 		'user_os' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 		'script_name' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 		'server_software' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 		'configuration_storage' => array(
 			'rule' => 'notEmpty',
-			'required'	 => true,
+			'required' => true,
 		),
 	);
 
