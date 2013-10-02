@@ -42,6 +42,7 @@
    <arg line="--log-pmd '${basedir}/build/logs/pmd-cpd.xml'
               --exclude lib/Cake
               --exclude vendors
+              --exclude app/Vendor
               --exclude app/Plugin
               --exclude app/Config/Migration
               ${source}" />
@@ -53,6 +54,7 @@
    <arg line="--log-csv '${basedir}/build/logs/phploc.csv'
               --exclude lib/Cake
               --exclude vendors
+              --exclude app/Vendor
               --exclude app/Plugin
               --exclude app/Config/Migration
               ${source}" />
