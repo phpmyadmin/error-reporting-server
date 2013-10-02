@@ -63,7 +63,7 @@ $(document).ready(function () {
 		2000
 	);
 
-	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.defaults.toolbar = false;
 	SyntaxHighlighter.all();
 });
 
