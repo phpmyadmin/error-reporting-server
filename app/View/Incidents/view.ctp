@@ -85,7 +85,7 @@
 
 <h4>Description submited by user:</h4>
 <pre>
-<?php echo $incident["Incident"]["steps"]; ?>
+<?php echo nl2br($incident["Incident"]["steps"]); ?>
 </pre>
 
 <h4>Stacktrace:</h4>
