@@ -231,7 +231,7 @@ class Incident extends AppModel {
  * @return Array an array with the incident fields can be used with ِIncident->save
  */
 	protected function _getSchematizedIncident($bugReport) {
-		$bugReport = Sanitize::clean($bugReport);
+		$bugReport = Sanitize::clean($bugReport, array('escape' => false));
 		$schematizedReport = array(
 			'pma_version' => $bugReport['pma_version'],
 			'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
