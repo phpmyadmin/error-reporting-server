@@ -71,7 +71,7 @@ class IncidentTest extends CakeTestCase {
 	}
 
 	public function testGetStackHash() {
-		$method = new ReflectionMethod('Incident', '_getStackHash');
+		$method = new ReflectionMethod('Incident', 'getStackHash');
 		$method->setAccessible(true);
 
 		$stacktrace1 = array(

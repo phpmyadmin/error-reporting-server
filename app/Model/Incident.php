@@ -221,7 +221,7 @@ class Incident extends AppModel {
 			'script_name' => $bugReport['script_name'],
 			'configuration_storage' => $bugReport['configuration_storage'],
 			'server_software' => $this->_getServer($bugReport['server_software']),
-			'stackhash' => $this->_getStackHash($bugReport['exception']['stack']),
+			'stackhash' => $this->getStackHash($bugReport['exception']['stack']),
 			'full_report' => json_encode($bugReport),
 			'stacktrace' => json_encode($bugReport['exception']['stack']),
 		);
@@ -317,7 +317,7 @@ class Incident extends AppModel {
  * @param Array $stacktrace the stacktrace in question
  * @return String the hash string of the stacktrace
  */
-	protected function _getStackHash($stacktrace) {
+	public function getStackHash($stacktrace) {
 		$handle = hash_init("md5");
 		foreach ($stacktrace as $level) {
 			$elements = array("filename", "scriptname", "line", "func", "column");
