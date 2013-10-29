@@ -2,7 +2,7 @@
 class CustomShell extends AppShell {
 	public $uses = array('Incident');
 
-	public function main() {
+	public function addHashesToOldRecords() {
 		$incidents = $this->Incident->find('all', array(
 			'conditions' => array('Incident.stackhash' => '')
 		));
@@ -15,5 +15,11 @@ class CustomShell extends AppShell {
 			$this->Incident->saveField("stackhash", $stackhash);
 			$this->out('Hash is ' . $stackhash);
 		}
+	}
+
+	public function main() {
+		$this->out('This is a custom shell for tasks created for the error reporting server');
+		$this->out('The currently available tasks are:');
+		$this->out('* addHashesToOldRecords');
 	}
 }

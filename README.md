@@ -64,3 +64,11 @@ However if you need a command line runner. You can use:
 ```
 app/Console/cake test app AllTests
 ```
+
+## Running the stackhash update shell ##
+There is a new way of finding unique stacktraces that uses hashes that did not
+exist previously. I created a shell to calculate those hashes for old records so
+that they can work with the new code. To use the shell you can just type:
+```
+Console/cake custom addHashesToOldRecords
+```
