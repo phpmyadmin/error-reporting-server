@@ -164,27 +164,6 @@ class Incident extends AppModel {
 	}
 
 /**
- * checks whether a schematized incident has a different stacktrace than a
- * group of incident records.
- *
- * @param Array the incident being checked
- * @param Array the incidents being checked against
- * @return Boolean If the incident has a different stacktrace than the group
- */
-	protected function _hasDifferentStacktrace($newIncident, $incidents) {
-		$newIncident["stacktrace"] = json_decode($newIncident["stacktrace"], true);
-		foreach ($incidents as $incident) {
-			$incident["Incident"]["stacktrace"] =
-					json_decode($incident["Incident"]["stacktrace"], true);
-			if ($this->_isSameStacktrace($newIncident["stacktrace"],
-					$incident["Incident"]["stacktrace"])) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-/**
  * retrieves the closest report to a given bug report
  *
  * it checks for another report with the same line number, filename and
@@ -329,39 +308,6 @@ class Incident extends AppModel {
 			return $matches[0];
 		} else {
 			return "UNKNOWN";
-		}
-	}
-
-/**
- * checks whether two stacktraces are identical or not
- *
- * @param Array $stacktraceA the first stacktrace
- * @param Array $stacktraceB the second stacktrace
- * @return Boolean true if the stacktrace is the same true otherwise false
- */
-	protected function _isSameStacktrace($stacktraceA, $stacktraceB) {
-		if (count($stacktraceA) != count($stacktraceB)) {
-			return false;
-		}
-
-		for ($i = 0; $i < count($stacktraceA); $i++) {
-			$levelA = $stacktraceA[$i];
-			$levelB = $stacktraceB[$i];
-			$elements = array("filename", "scriptname", "line", "func", "column");
-			foreach ($elements as $element) {
-				if (isset($levelA[$element]) xor isset($levelB[$element])) {
-					return false;
-				}
-
-				if (!isset($levelA[$element]) && !isset($levelB[$element])) {
-					continue;
-				}
-
-				if ($levelA[$element] !== $levelB[$element]) {
-					return false;
-				}
-			}
-			return true;
 		}
 	}
 
