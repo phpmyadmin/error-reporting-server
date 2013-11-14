@@ -4,6 +4,9 @@ php:
 before_script:
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar install --dev --no-interaction
+  - cp app/Config/core.example.php app/Config/core.php
+  - cp app/Config/database.travis.php app/Config/database.php
+  - mysql -e 'create database pmaerr;'
 script:
   - app/Console/cake test app AllTests
 after_script:
