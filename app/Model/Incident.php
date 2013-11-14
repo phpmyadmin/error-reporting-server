@@ -64,6 +64,10 @@ class Incident extends AppModel {
 			'rule' => 'notEmpty',
 			'required' => true,
 		),
+		'stackhash' => array(
+			'rule' => 'notEmpty',
+			'required'	 => true,
+		),
 		'user_os' => array(
 			'rule' => 'notEmpty',
 			'required' => true,
@@ -148,42 +152,15 @@ class Incident extends AppModel {
 
 		if($closestReport) {
 			$schematizedIncident["report_id"] = $closestReport["Report"]["id"];
-
-			$this->Report->read(null, $closestReport["Report"]["id"]);
-			$incidents = $this->Report->getIncidentsWithDifferentStacktrace();
-			$schematizedIncident["different_stacktrace"] =
-					$this->_hasDifferentStacktrace($schematizedIncident, $incidents);
 			return $this->save($schematizedIncident);
 		} else {
 			$report = $this->_getReportDetails($bugReport);
-			$schematizedIncident["different_stacktrace"] = true;
 			$data = array(
 				'Incident' => $schematizedIncident,
 				'Report' => $report
 			);
 			return $this->saveAssociated($data);
 		}
-	}
-
-/**
- * checks whether a schematized incident has a different stacktrace than a
- * group of incident records.
- *
- * @param Array the incident being checked
- * @param Array the incidents being checked against
- * @return Boolean If the incident has a different stacktrace than the group
- */
-	protected function _hasDifferentStacktrace($newIncident, $incidents) {
-		$newIncident["stacktrace"] = json_decode($newIncident["stacktrace"], true);
-		foreach ($incidents as $incident) {
-			$incident["Incident"]["stacktrace"] =
-					json_decode($incident["Incident"]["stacktrace"], true);
-			if ($this->_isSameStacktrace($newIncident["stacktrace"],
-					$incident["Incident"]["stacktrace"])) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 /**
@@ -244,6 +221,7 @@ class Incident extends AppModel {
 			'script_name' => $bugReport['script_name'],
 			'configuration_storage' => $bugReport['configuration_storage'],
 			'server_software' => $this->_getServer($bugReport['server_software']),
+			'stackhash' => $this->getStackHash($bugReport['exception']['stack']),
 			'full_report' => json_encode($bugReport),
 			'stacktrace' => json_encode($bugReport['exception']['stack']),
 		);
@@ -334,35 +312,22 @@ class Incident extends AppModel {
 	}
 
 /**
- * checks whether two stacktraces are identical or not
+ * returns the hash pertaining to a stacktrace
  *
- * @param Array $stacktraceA the first stacktrace
- * @param Array $stacktraceB the second stacktrace
- * @return Boolean true if the stacktrace is the same true otherwise false
+ * @param Array $stacktrace the stacktrace in question
+ * @return String the hash string of the stacktrace
  */
-	protected function _isSameStacktrace($stacktraceA, $stacktraceB) {
-		if (count($stacktraceA) != count($stacktraceB)) {
-			return false;
-		}
-
-		for ($i = 0; $i < count($stacktraceA); $i++) {
-			$levelA = $stacktraceA[$i];
-			$levelB = $stacktraceB[$i];
+	public function getStackHash($stacktrace) {
+		$handle = hash_init("md5");
+		foreach ($stacktrace as $level) {
 			$elements = array("filename", "scriptname", "line", "func", "column");
 			foreach ($elements as $element) {
-				if (isset($levelA[$element]) xor isset($levelB[$element])) {
-					return false;
-				}
-
-				if (!isset($levelA[$element]) && !isset($levelB[$element])) {
+				if (!isset($level[$element])) {
 					continue;
 				}
-
-				if ($levelA[$element] !== $levelB[$element]) {
-					return false;
-				}
+				hash_update($handle, $level[$element]);
 			}
-			return true;
 		}
+		return hash_final($handle);
 	}
 }

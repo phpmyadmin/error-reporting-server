@@ -46,12 +46,12 @@ class IncidentsControllerTest extends ControllerTestCase {
 				'browser' => 'Lorem ipsum dolor sit amet',
 				'user_os' => 'Lorem ipsum dolor sit amet',
 				'server_software' => 'Lorem ipsum dolor sit amet',
+				'stackhash' => 'hash1',
 				'configuration_storage' => 'Lorem ipsum dolor sit amet',
 				'script_name' => 'Lorem ipsum dolor sit amet',
 				'steps' => 'Lorem ipsum dolor sit amet',
 				'stacktrace' => array(array()),
 				'full_report' => array(),
-				'different_stacktrace' => '1',
 				'report_id' => '1',
 				'created' => '2013-08-29 18:10:01',
 				'modified' => '2013-08-29 18:10:01'

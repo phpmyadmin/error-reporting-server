@@ -44,6 +44,7 @@ class DevelopersController extends AppController {
 		$code = $this->request->query('code');
 		$accessToken = $this->GithubApi->getAccessToken($code);
 		if ($accessToken) {
+			// TODO: Handle errors from the api in rare circumstances
 			$userInfo = $this->GithubApi->getUserInfo($accessToken);
 			$userInfo["has_commit_access"] = $this->GithubApi->canCommitTo(
 					$userInfo["login"], $this->GithubApi->githubRepo);

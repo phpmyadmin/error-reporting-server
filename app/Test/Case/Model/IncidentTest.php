@@ -70,6 +70,41 @@ class IncidentTest extends CakeTestCase {
 		$this->assertEquals(false, $result);
 	}
 
+	public function testGetStackHash() {
+		$method = new ReflectionMethod('Incident', 'getStackHash');
+		$method->setAccessible(true);
+
+		$stacktrace1 = array(
+			array(
+				'filename' => 'file1',
+				'line' => 300,
+			),
+			array(
+				'filename' => 'file2',
+				'line' => 200,
+			)
+		);
+
+		$stacktrace2 = array(
+			array(
+				'line' => 300,
+				'filename' => 'file1',
+			),
+			array(
+				'line' => 200,
+				'filename' => 'file2',
+			)
+		);
+
+		$result = $method->invoke($this->Incident,
+				$stacktrace1);
+		$this->assertEquals("a441639902837d88db25214812c0cd83", $result);
+
+		$result = $method->invoke($this->Incident,
+				$stacktrace2);
+		$this->assertEquals("a441639902837d88db25214812c0cd83", $result);
+	}
+
 	public function testGetServer() {
 		$method = new ReflectionMethod('Incident', '_getServer');
 		$method->setAccessible(true);
@@ -203,6 +238,7 @@ class IncidentTest extends CakeTestCase {
 			'script_name' => 'tbl_relation.php',
 			'configuration_storage' => 'enabled',
 			'server_software' => 'NginX/1.17',
+			'stackhash' => '9db5408094f1e76ef7161b7bbf3ddfe4',
 			'full_report' => json_encode($cleanBugReport),
 			'stacktrace' => json_encode($cleanBugReport['exception']['stack']),
 		);
@@ -219,8 +255,8 @@ class IncidentTest extends CakeTestCase {
 
 		$model = $this->getMockForModel('Incident', array('_getIdentifyingLocation'));
 		$model->expects($this->once())
-        ->method('_getIdentifyingLocation')
-        ->will($this->returnValue(array('error.js', 312)));
+				->method('_getIdentifyingLocation')
+				->will($this->returnValue(array('error.js', 312)));
 
 		$result = $method->invoke($model,
 				$bugReport);
@@ -248,14 +284,14 @@ class IncidentTest extends CakeTestCase {
 
 		$incident = $this->getMockForModel('Incident', array('_getIdentifyingLocation'));
 		$incident->expects($this->once())
-        ->method('_getIdentifyingLocation')
-        ->will($this->returnValue(array('error.js', 312)));
+				->method('_getIdentifyingLocation')
+				->will($this->returnValue(array('error.js', 312)));
 
 		$report = $this->getMockForModel('Report',
 				array('findByLocationAndLinenumberAndPmaVersion'));
 		$report->expects($this->once())
-        ->method('findByLocationAndLinenumberAndPmaVersion')
-        ->will($this->returnValue($returnedReport));
+				->method('findByLocationAndLinenumberAndPmaVersion')
+				->will($this->returnValue($returnedReport));
 
 		$incident->Report = $report;
 
@@ -320,36 +356,31 @@ class IncidentTest extends CakeTestCase {
 				array('_getClosestReport', 'save', 'saveAssociated',
 				'_getSchematizedIncident'));
 		$incident->expects($this->any())
-        ->method('_getClosestReport')
-        ->will($this->onConsecutiveCalls($closestReport, null));
+				->method('_getClosestReport')
+				->will($this->onConsecutiveCalls($closestReport, null));
 		$incident->expects($this->any())
-        ->method('_getSchematizedIncident')
-        ->will($this->returnValue(array('stacktrace' => '')));
+				->method('_getSchematizedIncident')
+				->will($this->returnValue(array('stacktrace' => '')));
 		$incident->expects($this->once())
-        ->method('save')
-				->with($this->equalTo(array('different_stacktrace' => true,
-						'report_id' => 2, 'stacktrace' => '')))
-        ->will($this->returnValue(true));
+				->method('save')
+				->with($this->equalTo(array('report_id' => 2, 'stacktrace' => '')))
+				->will($this->returnValue(true));
 
 
 		$report = $this->getMockForModel('Report',
-				array('getIncidentsWithDifferentStacktrace', 'read'));
-
-		$report->expects($this->once())
-        ->method('getIncidentsWithDifferentStacktrace')
-        ->will($this->returnValue(array()));
+				array('read'));
 
 		$result = $incident->createIncidentFromBugReport($bugReport);
 
 		$this->assertEquals(true, $result);
 
 		$incident->expects($this->once())
-        ->method('_getClosestReport')
-        ->will($this->returnValue(null));
+				->method('_getClosestReport')
+				->will($this->returnValue(null));
 
 		$incident->expects($this->once())
-        ->method('saveAssociated')
-        ->will($this->returnValue(true));
+				->method('saveAssociated')
+				->will($this->returnValue(true));
 
 		$result = $incident->createIncidentFromBugReport($bugReport);
 
