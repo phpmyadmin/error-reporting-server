@@ -1,0 +1,6 @@
+language: php
+php:
+  - "5.5"
+script:
+  - app/Console/cake test app AllTests
+
