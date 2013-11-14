@@ -1,6 +1,9 @@
 Error Reporting Server
 ======================
 
+[![Build Status](https://travis-ci.org/phpmyadmin/error-reporting-server.png?branch=master)](https://travis-ci.org/phpmyadmin/error-reporting-server)
+[![Coverage Status](https://coveralls.io/repos/phpmyadmin/error-reporting-server/badge.png)](https://coveralls.io/r/phpmyadmin/error-reporting-server)
+
 phpMyAdmin server side component for the error reporting system. It uses
 CakePHP v2.3 with some extra plugins like migrations, debugkit and OAuth
 component.
