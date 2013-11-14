@@ -1,7 +1,7 @@
 Error Reporting Server
 ======================
 
-phpmyadmin server side component for the error reporting system. It uses
+phpMyAdmin server side component for the error reporting system. It uses
 CakePHP v2.3 with some extra plugins like migrations, debugkit and OAuth
 component.
 
