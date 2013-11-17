@@ -10,66 +10,6 @@ class IncidentTest extends CakeTestCase {
 		$this->Incident = ClassRegistry::init('Incident');
 	}
 
-	public function testIsSameStacktrace() {
-		$stacktrace = array(
-			array(
-				'filename' => 'file1',
-				'line' => 300,
-			),
-			array(
-				'filename' => 'file2',
-				'line' => 200,
-			)
-		);
-
-		$stacktrace_different_key = array(
-			array(
-				'scriptname' => 'script1',
-				'line' => 300,
-			),
-			array(
-				'filename' => 'file2',
-				'line' => 100,
-			)
-		);
-
-		$stacktrace_different_value = array(
-			array(
-				'filename' => 'file2',
-				'line' => 300,
-			),
-			array(
-				'filename' => 'file2',
-				'line' => 100,
-			)
-		);
-
-		$stacktrace_different_size = array(
-			array(
-				'scriptname' => 'script1',
-				'line' => 300,
-			),
-		);
-
-		$method = new ReflectionMethod('Incident', '_isSameStacktrace');
-		$method->setAccessible(true);
-
-		$result = $method->invoke($this->Incident, $stacktrace, $stacktrace);
-		$this->assertEquals(true, $result);
-
-		$result = $method->invoke($this->Incident, $stacktrace,
-				$stacktrace_different_key);
-		$this->assertEquals(false, $result);
-
-		$result = $method->invoke($this->Incident, $stacktrace,
-				$stacktrace_different_value);
-		$this->assertEquals(false, $result);
-
-		$result = $method->invoke($this->Incident, $stacktrace,
-				$stacktrace_different_size);
-		$this->assertEquals(false, $result);
-	}
-
 	public function testGetStackHash() {
 		$method = new ReflectionMethod('Incident', 'getStackHash');
 		$method->setAccessible(true);
@@ -299,51 +239,6 @@ class IncidentTest extends CakeTestCase {
 				$bugReport);
 
 		$this->assertEquals($returnedReport, $result);
-	}
-
-	public function testHasDifferentStacktrace() {
-		$method = new ReflectionMethod('Incident', '_hasDifferentStacktrace');
-		$method->setAccessible(true);
-
-		$stacktrace = json_encode(array(
-			array(
-				'filename' => 'file1',
-				'line' => 300,
-			),
-			array(
-				'filename' => 'file2',
-				'line' => 200,
-			)
-		));
-
-		$stacktrace_different = json_encode(array(
-			array(
-				'scriptname' => 'script1',
-				'line' => 300,
-			),
-			array(
-				'filename' => 'file2',
-				'line' => 200,
-			)
-		));
-
-		$result = $method->invoke($this->Incident,
-				array('stacktrace' => $stacktrace),
-				array(array('Incident' => array('stacktrace' => $stacktrace))));
-
-		$this->assertEquals(false, $result);
-
-		$result = $method->invoke($this->Incident,
-				array('stacktrace' => $stacktrace_different),
-				array(array('Incident' => array('stacktrace' => $stacktrace))));
-
-		$this->assertEquals(true, $result);
-
-		$result = $method->invoke($this->Incident,
-				array('stacktrace' => $stacktrace_different),
-				array());
-
-		$this->assertEquals(true, $result);
 	}
 
 	public function testCreateIncidentFromBugReport() {
