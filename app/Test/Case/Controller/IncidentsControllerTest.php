@@ -5,8 +5,6 @@ class IncidentsControllerTest extends ControllerTestCase {
 	public $fixtures = array('app.report', 'app.incident', 'app.developer');
 
 	public function setUp() {
-		PHPUnit_Framework_Error_Warning::$enabled = FALSE;
-		PHPUnit_Framework_Error_Notice::$enabled = FALSE;
 		$this->Incidents = $this->generate('Incidents', array(
 			'components' => array(
 				'Session',
