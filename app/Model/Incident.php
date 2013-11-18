@@ -212,7 +212,6 @@ class Incident extends AppModel {
 		$schematizedReport = array(
 			'pma_version' => $bugReport['pma_version'],
 			'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
-			'steps' => $bugReport['steps'],
 			'error_message' => $bugReport['exception']['message'],
 			'error_name' => $bugReport['exception']['name'],
 			'browser' => $bugReport['browser_name'] . " "
@@ -225,6 +224,10 @@ class Incident extends AppModel {
 			'full_report' => json_encode($bugReport),
 			'stacktrace' => json_encode($bugReport['exception']['stack']),
 		);
+
+		if (isset($bugReport['steps'])) {
+			$schematizedReport["steps"] = $bugReport['steps'];
+		}
 
 		return $schematizedReport;
 	}
