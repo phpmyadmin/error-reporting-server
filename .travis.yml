@@ -9,9 +9,8 @@ before_script:
   - cp app/Config/oauth.example.php app/Config/oauth.php
   - mysql -e 'create database pmaerr;'
 script:
-  - cd app
-  - Console/cake Migrations.migration run all -p Migrations
-  - Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition
-  - Console/cake test app AllTests
+  - app/Console/cake Migrations.migration run all -p Migrations
+  - app/Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition
+  - app/Console/cake test app AllTests
 after_script:
   - php vendor/bin/coveralls -v
