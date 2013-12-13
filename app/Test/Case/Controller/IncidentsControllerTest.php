@@ -5,15 +5,9 @@ class IncidentsControllerTest extends ControllerTestCase {
 	public $fixtures = array('app.report', 'app.incident', 'app.developer');
 
 	public function setUp() {
-		$this->Incidents = $this->generate('Incidents', array(
-			'components' => array(
-				'Session',
-			)
-    ));
-		$this->Incidents->Session
-        ->expects($this->any())
-        ->method('read')
-				->will($this->returnValue(1));
+		$this->Incidents = $this->generate('Incidents', array());
+		$Session = new SessionComponent(new ComponentCollection());
+		$Session->write("Developer.id", 1);
 		$this->Report = ClassRegistry::init('Report');
 	}
 
@@ -48,8 +42,19 @@ class IncidentsControllerTest extends ControllerTestCase {
 				'configuration_storage' => 'Lorem ipsum dolor sit amet',
 				'script_name' => 'Lorem ipsum dolor sit amet',
 				'steps' => 'Lorem ipsum dolor sit amet',
-				'stacktrace' => array(array()),
-				'full_report' => array(),
+				'stacktrace' => array(array("context"=>array("test"))),
+				'full_report' => array(
+					'pma_version' => '',
+          'php_version' => '',
+          'browser_name' => '',
+          'browser_version' => '',
+          'user_agent_string' => '',
+          'server_software' => '',
+          'locale' => '',
+          'exception' => array("uri" => ""),
+          'configuration_storage' => '',
+          'microhistory' => '',
+				),
 				'report_id' => '1',
 				'created' => '2013-08-29 18:10:01',
 				'modified' => '2013-08-29 18:10:01'

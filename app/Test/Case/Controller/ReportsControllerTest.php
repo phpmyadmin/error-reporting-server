@@ -4,15 +4,9 @@ class ReportsControllerTest extends ControllerTestCase {
 	public $fixtures = array('app.report', 'app.incident', 'app.developer');
 
 	public function setUp() {
-		$this->Reports = $this->generate('Reports', array(
-			'components' => array(
-				'Session',
-			)
-    ));
-		$this->Reports->Session
-        ->expects($this->any())
-        ->method('read')
-				->will($this->returnValue(1));
+		$this->Reports = $this->generate('Reports');
+		$Session = new SessionComponent(new ComponentCollection());
+		$Session->write("Developer.id", 1);
 	}
 
 	public function testIndex() {
