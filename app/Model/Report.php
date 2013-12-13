@@ -159,6 +159,16 @@ class Report extends AppModel {
 	}
 
 /**
+ * Returns the full url to the current report
+ *
+ * @return String url
+ */
+	public function getUrl() {
+		return Router::url(array("controller" => "reports", "action" => "view",
+				$this->id), true);
+	}
+
+/**
  * groups related incidents by distinct values of a field. It may also provide
  * the number of groups, whether to only include incidents that are related
  * to the current report and also to only limit the search to incidents
