@@ -147,6 +147,9 @@ class Incident extends AppModel {
  * @return Boolean If the report/incident was correctly saved
  */
 	public function createIncidentFromBugReport($bugReport) {
+		if ($bugReport == null) {
+			return false;
+		}
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
 		$closestReport = $this->_getClosestReport($bugReport);
 

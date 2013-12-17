@@ -26,8 +26,11 @@ class IncidentFixture extends CakeTestFixture {
 			'configuration_storage' => 'Lorem ipsum dolor sit amet',
 			'script_name' => 'Lorem ipsum dolor sit amet',
 			'steps' => 'Lorem ipsum dolor sit amet',
-			'stacktrace' => '[{}]',
-			'full_report' => '{}',
+			'stacktrace' => '[{"context": ["test"]}]',
+			'full_report' => '{"pma_version": "", "php_version": "","browser_name": ""
+					, "browser_version": "", "user_agent_string": "", "server_software":
+					"", "locale": "", "exception":{"uri":""}, "configuration_storage":"",
+					"microhistory":""}',
 			'report_id' => 1,
 			'created' => '2013-08-29 18:10:01',
 			'modified' => '2013-08-29 18:10:01'
@@ -45,8 +48,8 @@ class IncidentFixture extends CakeTestFixture {
 			'configuration_storage' => 'Lorem ipsum dolor sit amet',
 			'script_name' => 'Lorem ipsum dolor sit amet',
 			'steps' => 'Lorem ipsum dolor sit amet',
-			'stacktrace' => 'Lorem ipsum dolor sit amet',
-			'full_report' => 'Lorem ipsum dolor sit amet',
+			'stacktrace' => '[{"context": ["test"]}]',
+			'full_report' => '{"pma_version": "1.2"}',
 			'report_id' => 4,
 			'created' => '2013-08-29 18:10:01',
 			'modified' => '2013-08-29 18:10:01'
@@ -64,8 +67,8 @@ class IncidentFixture extends CakeTestFixture {
 			'configuration_storage' => 'Lorem ipsum dolor sit amet',
 			'script_name' => 'Lorem ipsum dolor sit amet',
 			'steps' => null,
-			'stacktrace' => 'Lorem ipsum dolor sit amet',
-			'full_report' => 'Lorem ipsum dolor sit amet',
+			'stacktrace' => '[{"context": ["test"]}]',
+			'full_report' => '{"pma_version": "1.2"}',
 			'report_id' => 4,
 			'created' => '2013-08-29 18:10:00',
 			'modified' => '2013-08-29 18:10:00'
@@ -84,8 +87,8 @@ class IncidentFixture extends CakeTestFixture {
 			'configuration_storage' => 'Lorem ipsum dolor sit amet',
 			'script_name' => 'Lorem ipsum dolor sit amet',
 			'steps' => null,
-			'stacktrace' => 'Lorem ipsum dolor sit amet',
-			'full_report' => 'Lorem ipsum dolor sit amet',
+			'stacktrace' => '[{"context": ["test"]}]',
+			'full_report' => '{"pma_version": "1.2"}',
 			'report_id' => 3,
 			'created' => '2013-08-29 18:10:00',
 			'modified' => '2013-08-29 18:10:00'
