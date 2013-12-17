@@ -51,6 +51,12 @@ class ReportTest extends CakeTestCase {
 		$this->assertEquals(count($incidents), 1);
 	}
 
+	public function testGetUrl() {
+		$this->Report->read(null, 1);
+		$this->assertStringEndsWith("/reports/view/1",
+				$this->Report->getUrl());
+	}
+
 	public function testAddToRelatedGroup() {
 		$this->Report->read(null, 2);
 		$this->Report->addToRelatedGroup(4);

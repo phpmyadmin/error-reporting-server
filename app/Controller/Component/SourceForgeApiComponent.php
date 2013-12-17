@@ -38,7 +38,7 @@ class SourceForgeApiComponent extends Component {
  */
 	public function createClient() {
 		$sourceForgeConfig = Configure::read('SourceForgeConfig');
-		return new OAuthClient($source_forge_config['consumer_key'],
+		return new OAuthClient($sourceForgeConfig['consumer_key'],
 				$sourceForgeConfig['consumer_secret']);
 	}
 

@@ -78,7 +78,7 @@ class SourceForgeController extends AppController {
 			$this->Report->save(array('sourceforge_bug_id' => $matches[1]));
 
 			$this->Session->setFlash('Source forge ticket has been created for this'
-					. 'report', "default", array("class" => "alert alert-success"));
+					. ' report', "default", array("class" => "alert alert-success"));
 			$this->redirect(array('controller' => 'reports', 'action' => 'view',
 					$reportId));
 		} else {
@@ -93,7 +93,8 @@ class SourceForgeController extends AppController {
 	protected function _getTicketData($reportId) {
 		$data = array(
 			'ticket_form.summary' => $this->request->data['Ticket']['summary'],
-			'ticket_form.description' => $this->request->data['Ticket']['description'],
+			'ticket_form.description' => $this->_augmentDescription(
+					$this->request->data['Ticket']['description'], $reportId),
 			'ticket_form.status' => 'open',
 			'ticket_form.labels' => $this->request->data['Ticket']['labels'],
 			'ticket_form._milestone' => $this->request->data['Ticket']['milestone'],
@@ -119,4 +120,17 @@ class SourceForgeController extends AppController {
 		return $errorString;
 	}
 
+/**
+ * Returns the description with the added string to link to the report
+ * @param String $description the original description submitted by the dev
+ * @param String $reportId the report id relating to the ticket
+ *
+ * @return String augmented description
+ */
+	protected function _augmentDescription($description, $reportId) {
+		$this->Report->read(null, $reportId);
+		return "$description\n\n\nThis report is related to user submitted report "
+				. "[#" . $this->Report->id . "](" . $this->Report->getUrl()
+				. ") on the phpmyadmin error reporting server.";
+	}
 }
