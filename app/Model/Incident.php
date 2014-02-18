@@ -40,10 +40,6 @@ class Incident extends AppModel {
  * @see Model::$validate
  */
 	public $validate = array(
-		'error_message' => array(
-			'rule' => 'notEmpty',
-			'required' => true,
-		),
 		'pma_version' => array(
 			'rule' => 'notEmpty',
 			'required' => true,
