@@ -81,6 +81,11 @@ class SourceForgeController extends AppController {
 					. ' report', "default", array("class" => "alert alert-success"));
 			$this->redirect(array('controller' => 'reports', 'action' => 'view',
 					$reportId));
+		} else if ($response->code === "403") {
+			$this->Session->setFlash(
+					"Unauthorised access to SourceForge ticketing system. SourceForge"
+					. " credentials may be out of date. Please check and try again"
+					. " later.", "default", array("class" => "alert alert-error"));
 		} else {
 			//fail
 			$response->body = json_decode($response->body, true);
