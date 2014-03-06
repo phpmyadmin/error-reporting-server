@@ -84,8 +84,12 @@ class SourceForgeController extends AppController {
 		} else {
 			//fail
 			$response->body = json_decode($response->body, true);
-			$this->Session->setFlash($this->_getValidationErrors(
-					$response->body['errors']), "default",
+			CakeLog::write('custom', 'Submission for sourceforge ticket may have failed.',
+					'sourceforge');
+			CakeLog::write('custom', 'Response dump:', 'sourceforge');
+			CakeLog::write('custom', print_r($response["raw"], true), 'sourceforge');
+			$this->Session->setFlash($this->_getErrors(
+					$response->body), "default",
 					array("class" => "alert alert-error"));
 		}
 	}
@@ -106,17 +110,27 @@ class SourceForgeController extends AppController {
 		return $data;
 	}
 
-	protected function _getValidationErrors($errors) {
-		$errorString = "There were some problems with the ticket submission:";
-		$errorString .= '<ul>';
+	protected function _getErrors($body) {
+		$errorString = "There were some problems with the ticket submission."
+				." Returned status is (" . $body["status"] . ")";
 
-		foreach ($errors['ticket_form'] as $field => $message) {
-			$errorString .= "<li>";
-			$errorString .= "$field: $message";
-			$errorString .= "</li>";
+		$errors = $body["errors"];
+		if ($body["status"] === "Validation Error") {
+			$errorString .= '<ul>';
+			foreach ($errors['ticket_form'] as $field => $message) {
+				$errorString .= "<li>";
+				$errorString .= "$field: $message";
+				$errorString .= "</li>";
+			}
+			$errorString .= '</ul>';
+		} else {
+			$errorString .= "<br/> Here is the dump for the errors field provided by"
+					. " sourceforge: <br/>"
+					. "<pre>"
+					. print_r($errors, true)
+					. "</pre>";
 		}
 
-		$errorString .= '</ul>';
 		return $errorString;
 	}
 
