@@ -113,7 +113,7 @@ CakeLog::config('error', array(
 
 CakeLog::config('sourceforge', array(
 	'engine' => 'FileLog',
-	'types' => array('custom'),
+	'types' => array('sourceforge'),
 	'scopes' => array('sourceforge'),
 	'file' => 'sourceforge',
 ));

@@ -84,12 +84,11 @@ class SourceForgeController extends AppController {
 		} else {
 			//fail
 			$response->body = json_decode($response->body, true);
-			CakeLog::write('custom', 'Submission for sourceforge ticket may have failed.',
+			CakeLog::write('sourceforge', 'Submission for sourceforge ticket may have failed.',
 					'sourceforge');
-			CakeLog::write('custom', 'Response dump:', 'sourceforge');
-			CakeLog::write('custom', print_r($response["raw"], true), 'sourceforge');
-			$this->Session->setFlash($this->_getErrors(
-					$response->body), "default",
+			CakeLog::write('sourceforge', 'Response dump:', 'sourceforge');
+			CakeLog::write('sourceforge', print_r($response["raw"], true), 'sourceforge');
+			$this->Session->setFlash($this->_getErrors( $response->body), "default",
 					array("class" => "alert alert-error"));
 		}
 	}
