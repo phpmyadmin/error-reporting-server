@@ -81,15 +81,19 @@ class SourceForgeController extends AppController {
 					. ' report', "default", array("class" => "alert alert-success"));
 			$this->redirect(array('controller' => 'reports', 'action' => 'view',
 					$reportId));
+		} else if ($response->code === "403") {
+			$this->Session->setFlash(
+					"Unauthorised access to SourceForge ticketing system. SourceForge"
+					. " credentials may be out of date. Please check and try again"
+					. " later.", "default", array("class" => "alert alert-error"));
 		} else {
 			//fail
 			$response->body = json_decode($response->body, true);
-			CakeLog::write('custom', 'Submission for sourceforge ticket may have failed.',
+			CakeLog::write('sourceforge', 'Submission for sourceforge ticket may have failed.',
 					'sourceforge');
-			CakeLog::write('custom', 'Response dump:', 'sourceforge');
-			CakeLog::write('custom', print_r($response["raw"], true), 'sourceforge');
-			$this->Session->setFlash($this->_getErrors(
-					$response->body), "default",
+			CakeLog::write('sourceforge', 'Response dump:', 'sourceforge');
+			CakeLog::write('sourceforge', print_r($response["raw"], true), 'sourceforge');
+			$this->Session->setFlash($this->_getErrors( $response->body), "default",
 					array("class" => "alert alert-error"));
 		}
 	}
