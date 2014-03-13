@@ -2,8 +2,7 @@ language: php
 php:
   - "5.5"
 before_script:
-  - curl -s http://getcomposer.org/installer | php
-  - php composer.phar install --dev --no-interaction
+  - composer install --dev --no-interaction
   - cp app/Config/core.example.php app/Config/core.php
   - cp app/Config/database.travis.php app/Config/database.php
   - cp app/Config/oauth.example.php app/Config/oauth.php
