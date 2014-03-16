@@ -17,6 +17,8 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+/* Define baseURL */
+$baseURL = Router::url('/',true);
 ?>
 <!DOCTYPE html>
 <html>
@@ -70,7 +72,7 @@
 <body>
   <div class="navbar">
     <div class="navbar-inner">
-      <a class="brand" href="/">phpMyAdmin</a>
+      <a class="brand" href="<?php echo $baseURL; ?>">phpMyAdmin</a>
       <ul class="nav">
 				<?php
 					$controllers = array('reports', 'stats');
@@ -79,7 +81,7 @@
 						if ($current_controller === $controller) {
 							$class = 'active';
 						}
-						echo "<li class='$class'><a href='/$controller'>";
+						echo "<li class='$class'><a href='".$baseURL.$controller."'>";
 						echo Inflector::humanize($controller);
 						echo "</a></li>";
 					}
@@ -90,9 +92,9 @@
           <li>
             <p class="navbar-text">Hello, <?php echo $current_developer["full_name"]; ?></p>
           </li>
-          <li><a href="/developers/logout">Logout</a></li>
+          <li><a href="<?php echo $baseURL.'developers/logout'; ?>" >Logout</a></li>
         <?php } else { ?>
-          <li><a href="/developers/login">Login with Github</a></li>
+          <li><a href="<?php echo $baseURL.'developers/login'; ?>">Login with Github</a></li>
         <?php } ?>
       </ul>
     </div>

@@ -23,7 +23,6 @@ In order to deploy the app in this repo you need to follow these steps:
 			ServerAdmin webmaster@localhost
 			ServerName reports.phpmyadmin.net
 
-			DocumentRoot /path/to/repo/dir/app/webroot
 			<Directory /path/to/repo/dir/app/webroot/>
 				AddType application/x-httpd-php .html
 				Options Indexes FollowSymLinks MultiViews
