@@ -1,7 +1,7 @@
 <?php
 /* vim: set noexpandtab sw=2 ts=2 sts=2: */
 /**
- * Sourceforge controller handling source forge ticket submition and creation
+ * Sourceforge controller handling source forge ticket submission and creation
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
@@ -17,7 +17,7 @@
  */
 
 /**
- * Sourceforge controller handling source forge ticket submition and creation
+ * Sourceforge controller handling source forge ticket submission and creation
  *
  * @package       Server.Controller
  */

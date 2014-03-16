@@ -15,7 +15,7 @@
     </td>
   </tr>
   <tr>
-    <td>Submition Date</td>
+    <td>Submission Date</td>
     <td>
       <?php echo $incident["Incident"]["created"]; ?>
     </td>

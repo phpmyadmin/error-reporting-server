@@ -111,7 +111,7 @@
     <td><?php echo count($incidents) . " incidents of this bug"; ?></td>
   </tr>
   <tr>
-    <td>Submition Date</td>
+    <td>Submission Date</td>
     <td>
       <?php echo $report["Report"]["created"]; ?>
       and it was last seen on
