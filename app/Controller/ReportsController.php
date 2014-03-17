@@ -84,7 +84,10 @@ class ReportsController extends AppController {
 
 		$params = array(
 			'fields' => $aColumns,
-			'conditions' => $searchConditions,
+			'conditions' => array(
+					$searchConditions,
+					'related_to' => NULL
+				),
 			'order' => $orderConditions,
 		);
 
