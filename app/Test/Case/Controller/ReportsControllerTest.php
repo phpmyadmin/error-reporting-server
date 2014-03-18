@@ -72,12 +72,11 @@ class ReportsControllerTest extends ControllerTestCase {
 		));
 		$expected = array(
 			'iTotalRecords' => 3,
-			'iTotalDisplayRecords' => 3,
+			'iTotalDisplayRecords' => 2,
 			'sEcho' => 1,
 			'aaData' => array(
 				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new'),
-				array('2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new'),
-				array('4', 'error1', 'Lorem ipsum dolor sit amet', '3.8', 'new')
+				array('2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new')
 			)
 		);
 		$result = json_decode($this->contents, true);
