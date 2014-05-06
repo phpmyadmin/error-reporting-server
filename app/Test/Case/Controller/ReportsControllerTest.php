@@ -10,7 +10,7 @@ class ReportsControllerTest extends ControllerTestCase {
 	}
 
 	public function testIndex() {
-		$result = $this->testAction('/reports', array(
+		$this->testAction('/reports', array(
 			'return' => 'vars'
 		));
 
@@ -21,7 +21,7 @@ class ReportsControllerTest extends ControllerTestCase {
 	}
 
 	public function testView() {
-		$result = $this->testAction('/reports/view/1', array(
+		$this->testAction('/reports/view/1', array(
 			'return' => 'vars'
 		));
 
@@ -52,12 +52,12 @@ class ReportsControllerTest extends ControllerTestCase {
 		$this->assertEquals(1, count($this->vars['related_reports']));
 
 		$this->setExpectedException('NotFoundException');
-		$result = $this->testAction('/reports/view/3', array(
+		$this->testAction('/reports/view/3', array(
 			'return' => 'vars'
 		));
 
 		$this->setExpectedException('NotFoundException');
-		$result = $this->testAction('/reports/view', array(
+		$this->testAction('/reports/view', array(
 			'return' => 'vars'
 		));
 	}
