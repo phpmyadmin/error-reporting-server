@@ -262,9 +262,6 @@ class IncidentTest extends CakeTestCase {
 				->will($this->returnValue(true));
 
 
-		$report = $this->getMockForModel('Report',
-				array('read'));
-
 		$result = $incident->createIncidentFromBugReport($bugReport);
 
 		$this->assertEquals(true, $result);
