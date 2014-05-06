@@ -2,3 +2,5 @@
 imports:
     - javascript
     - php
+filter:
+    excluded_paths: [lib/Cake/*, vendors/*, app/Vendor/*, app/Plugin/*, app/Config/Migration/*]
