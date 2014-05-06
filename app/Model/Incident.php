@@ -275,7 +275,6 @@ class Incident extends AppModel {
 /**
  * Gets a part of a version string according to the specified version Length
  *
- * @param  String $phpVersion the version string
  * @param  String $versionLength the number of version components to return. eg
  *                               1 for major version only and 2 for major and
  *                               minor version
