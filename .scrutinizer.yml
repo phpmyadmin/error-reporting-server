@@ -3,4 +3,4 @@ imports:
     - javascript
     - php
 filter:
-    excluded_paths: [lib/Cake/*, vendors/*, app/Vendor/*, app/Plugin/*, app/Config/Migration/*, app/webroot/js/bootstrap*, app/webroot/js/g*, app/webroot/js/g.*, app/webroot/js/jqplot*, app/webroot/js/sh*, app/webroot/js/raphael*]
+    excluded_paths: [lib/Cake/*, vendors/*, app/Vendor/*, app/Plugin/*, app/Config/Migration/*, app/webroot/js/bootstrap*, app/webroot/js/jquery*, app/webroot/js/g.*, app/webroot/js/jqplot*, app/webroot/js/sh*, app/webroot/js/raphael*]
