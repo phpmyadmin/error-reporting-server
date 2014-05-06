@@ -179,6 +179,9 @@ class ReportsController extends AppController {
 		$this->set("related_entries", $relatedEntries);
 	}
 
+	/**
+	 * @param string[] $aColumns
+	 */
 	protected function _getSearchConditions($aColumns) {
 		$searchConditions = array('OR' => array());
 		if ( $this->request->query('sSearch') != "" ) {
@@ -200,6 +203,9 @@ class ReportsController extends AppController {
 		return $searchConditions;
 	}
 
+	/**
+	 * @param string[] $aColumns
+	 */
 	protected function _getOrder($aColumns) {
 		if ( $this->request->query('iSortCol_0') != null ) {
 			$order = array();
