@@ -40,7 +40,7 @@ class ReportsHelper extends AppHelper {
 		$link = "<a href='/reports/view/$reportId'>#$reportId</a>";
 		return $link;
 	}
-	
+
 	public function getStacktracesForIncidents($incidents) {
 		$count = 0;
 		$html = '<div class="row">';
@@ -84,18 +84,6 @@ class ReportsHelper extends AppHelper {
 			$html .= "$arrayName.push(['" . $entry["date"] . "', "
 					. $entry["count"] . "]);";
 		}
-		return $html;
-	}
-
-	protected function _getStackLevelInfo($level) {
-		$html = "<span>";
-		$elements = array("filename", "scriptname", "line", "func", "column");
-		foreach ($elements as $element) {
-			if (isset($level[$element])) {
-				$html .= "$element: " . $level[$element] . "; ";
-			}
-		}
-		$html .= "</span>";
 		return $html;
 	}
 }
