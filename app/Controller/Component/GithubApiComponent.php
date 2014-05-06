@@ -90,8 +90,6 @@ class GithubApiComponent extends Component {
  *                      with POST requests. GET requests need the data appended
  *	                    in the url.
  * @param String  $method the method type of the request
- * @param Boolean $returnStatus whether to return the status code with the
- *                              request
  * @return Array the returned response decoded and optionally the status code,
  *               eg: array($decodedResponse, $statusCode) or just $decodedResponse
  */
