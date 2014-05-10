@@ -14,4 +14,4 @@ script:
   - app/Console/cake test app AllTests --coverage-clover build/logs/clover.xml --configuration=phpunit.xml
 after_script:
   - php vendor/bin/coveralls -v
-  - if [[ -f build/logs/clover.xml ]] ; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml ; fi
+  - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
