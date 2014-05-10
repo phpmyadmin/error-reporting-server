@@ -9,20 +9,6 @@ class IncidentsHelper extends AppHelper {
 		parent::__construct($view, $settings);
 	}
 
-	public function entriesFromIncidents($entries, $totalCount) {
-		$entries = Sanitize::clean($entries);
-		$values = array();
-		foreach($entries as $entry => $count) {
-			$values[] = "$entry <span class='count'>($count)</span>";
-		}
-		$fullString = implode(", ", $values);
-		$remaining = $totalCount - count($values);
-		if ($remaining) {
-			$fullString .= " <small>and $remaining others</small>";
-		}
-		return $fullString;
-	}
-
 	public function createIncidentsLinks($incidents) {
 		$links = array();
 		foreach ($incidents as $incident) {
