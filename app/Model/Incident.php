@@ -247,6 +247,7 @@ class Incident extends AppModel {
  *	 error
  */
 	protected function _getIdentifyingLocation($stacktrace) {
+		$fallback = 'UNKNOWN';
 		foreach ($stacktrace as $level) {
 			if (isset($level["filename"])) {
 				// ignore unrelated files that sometimes appear in the error report
@@ -255,7 +256,7 @@ class Incident extends AppModel {
 				} elseif($level["filename"] === "error_report.js") {
 					// in case the error really is in the error_report.js file save it for
 					// later
-					if(!isset($fallback)) {
+					if($fallback == 'UNKNOWN')) {
 						$fallback = array($level["filename"], $level["line"]);
 					}
 					continue;
