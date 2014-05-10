@@ -4,3 +4,6 @@ imports:
     - php
 filter:
     excluded_paths: [lib/Cake/*, vendors/*, app/Vendor/*, app/Plugin/*, app/Config/Migration/*, app/webroot/js/bootstrap*, app/webroot/js/jquery*, app/webroot/js/g.*, app/webroot/js/jqplot*, app/webroot/js/sh*, app/webroot/js/raphael*]
+tools:
+    external_code_coverage:
+        timeout: 3600 # Timeout in seconds.

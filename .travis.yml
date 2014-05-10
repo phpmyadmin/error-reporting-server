@@ -7,9 +7,11 @@ before_script:
   - cp app/Config/database.travis.php app/Config/database.php
   - cp app/Config/oauth.example.php app/Config/oauth.php
   - mysql -e 'create database pmaerr;'
+  - wget https://scrutinizer-ci.com/ocular.phar
 script:
   - app/Console/cake Migrations.migration run all -p Migrations
   - app/Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition
   - app/Console/cake test app AllTests --coverage-clover build/logs/clover.xml --configuration=phpunit.xml
 after_script:
   - php vendor/bin/coveralls -v
+  - if [[ -f build/logs/clover.xml ]] ; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml ; fi
