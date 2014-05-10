@@ -169,6 +169,7 @@ class ReportsController extends AppController {
 		$this->Report->read(null, $id);
 
 		$this->set('columns', $this->Incident->summarizableFields);
+		$relatedEntries = array();
 
 		foreach ($this->Incident->summarizableFields as $field) {
 			list($entriesWithCount, $totalEntries) =

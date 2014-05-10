@@ -32,6 +32,7 @@ class StatsController extends AppController {
 
 	public function stats() {
 		$filter = $this->_getTimeFilter();
+		$relatedEntries = array();
 		foreach ($this->Incident->summarizableFields as $field) {
 			$entriesWithCount = $this->Report->
 					getRelatedByField($field, 25, false, false, $filter["limit"]);
@@ -60,7 +61,7 @@ class StatsController extends AppController {
 
 		$this->Incident->recursive = -1;
 		$downloadStats = $this->Incident->find('all', $query);
-		
+
 		$this->set('download_stats', $downloadStats);
 	}
 
