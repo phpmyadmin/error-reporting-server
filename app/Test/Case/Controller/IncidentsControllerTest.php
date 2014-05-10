@@ -69,13 +69,13 @@ class IncidentsControllerTest extends ControllerTestCase {
 		$bugReportDecoded = json_decode($bugReport, true);
 		$bugReportDecoded = Sanitize::clean($bugReportDecoded);
 
-		$result = $this->testAction('/incidents/create', array(
+		$this->testAction('/incidents/create', array(
 			'return' => 'contents',
 			'method' => 'post',
 			'data' => $bugReport,
 		));
 
-		$result = $this->testAction('/incidents/create', array(
+		$this->testAction('/incidents/create', array(
 			'return' => 'contents',
 			'method' => 'post',
 			'data' => $bugReport,
