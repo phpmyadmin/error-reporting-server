@@ -59,6 +59,11 @@ $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
   `Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition`
 
 ## Creating the github app ##
+
+The application relies on authentication using GitHub. To obtain the client ID
+and key, visit application settings in your Github profile and register an
+application there.
+
 The callback for the github app should be /developers/callback
 
 ## How to run the test suite ##
