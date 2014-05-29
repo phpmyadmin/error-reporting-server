@@ -18,7 +18,23 @@ In order to deploy the app in this repo you need to follow these steps:
   files in the previous step. Make sure that the installation is in the
   document root. 
 
-    - For apache it should look similar to this:
+- Create the database for the server
+- Rename the example files `database.example.php` and `core.example.php` to
+  `database.php` and `core.php` respectively and fill out the required info.
+  Make sure to change the salts and the debug level in the core.php file and
+  the database credentials in the `database.php` file.
+- Rename the `oauth.example.php` to `oauth.php` and follow the instructions to
+  set the appropriate variables in the file.
+- Run the migrations to generate the migrations table in the `app` directory
+  `Console/cake Migrations.migration run all -p Migrations`
+- Run the migrations that have been created so far to setup the database 
+  in the `app` directory
+  `Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition`
+
+
+## Web server setup ##
+
+- Configuration for Apache:
 ```
 <VirtualHost *:80>
 			ServerAdmin webmaster@localhost
@@ -36,7 +52,7 @@ In order to deploy the app in this repo you need to follow these steps:
 			CustomLog "/var/log/httpd/dummy-host.example.com-access_log" common
 </VirtualHost>
 ```
-    - Configuration for lighttpd:
+- Configuration for lighttpd:
 ```
 $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
 			server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
@@ -45,7 +61,7 @@ $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
 			)
 }
 ```
-    - Configuration for nginx:
+- Configuration for nginx:
 ```
 server {
         listen [::]:80;
@@ -77,19 +93,6 @@ server {
         }
 }
 ```
-
-- Create the database for the server
-- Rename the example files `database.example.php` and `core.example.php` to
-  `database.php` and `core.php` respectively and fill out the required info.
-  Make sure to change the salts and the debug level in the core.php file and
-  the database credentials in the `database.php` file.
-- Rename the `oauth.example.php` to `oauth.php` and follow the instructions to
-  set the appropriate variables in the file.
-- Run the migrations to generate the migrations table in the `app` directory
-  `Console/cake Migrations.migration run all -p Migrations`
-- Run the migrations that have been created so far to setup the database 
-  in the `app` directory
-  `Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition`
 
 ## Creating the github app ##
 
