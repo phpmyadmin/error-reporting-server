@@ -45,6 +45,39 @@ $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
 			)
 }
 ```
+    - Configuration for nginx:
+```
+server {
+        listen [::]:80;
+        listen [::]:443 ssl;
+
+        root /home/reports/error-reporting-server/app/webroot/;
+        index index.html index.htm index.php;
+
+        server_name reports.phpmyadmin.net;
+
+        location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ /index.html;
+        }
+
+        location ~ \.php$ {
+                fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        #       # With php5-fpm:
+                fastcgi_pass unix:/var/run/php5-fpm-reports.sock;
+                fastcgi_index index.php;
+                include fastcgi_params;
+        }
+
+        # CakePHP
+        if (!-e $request_filename) {
+                rewrite ^/(.+)$ /index.php?url=$1 last;
+                break;
+        }
+}
+```
+
 - Create the database for the server
 - Rename the example files `database.example.php` and `core.example.php` to
   `database.php` and `core.php` respectively and fill out the required info.
@@ -67,6 +100,7 @@ application there.
 The callback for the github app should be /developers/callback
 
 ## How to run the test suite ##
+
 If you are on a development machine you can use the webrunner at `/test.php`
 However if you need a command line runner. You can use:
 ```
@@ -74,6 +108,7 @@ app/Console/cake test app AllTests
 ```
 
 ## Running the stackhash update shell ##
+
 There is a new way of finding unique stacktraces that uses hashes that did not
 exist previously. I created a shell to calculate those hashes for old records so
 that they can work with the new code. To use the shell you can just type:
