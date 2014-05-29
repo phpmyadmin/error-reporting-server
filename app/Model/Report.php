@@ -307,8 +307,7 @@ class Report extends AppModel {
 		}
 		$output = array();
 		foreach ($results as $row) {
-			$value = array_values($row['Report']);
-			$output[] = $value[0];
+			$output[] = array_values($row['Report'])[0];
 		}
 		return $output;
 	}
