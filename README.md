@@ -17,14 +17,14 @@ In order to deploy the app in this repo you need to follow these steps:
 - Add a virtual hosts entry pointing at the directory where you extracted the
   files in the previous step. Make sure that the installation is in the
   document root. 
-
+- Configure the web server (see below)
 - Create the database for the server
 - Rename the example files `database.example.php` and `core.example.php` to
   `database.php` and `core.php` respectively and fill out the required info.
   Make sure to change the salts and the debug level in the core.php file and
   the database credentials in the `database.php` file.
-- Rename the `oauth.example.php` to `oauth.php` and follow the instructions to
-  set the appropriate variables in the file.
+- Rename the `oauth.example.php` to `oauth.php` and follow the instructions below 
+  to set the appropriate variables in the file.
 - Run the migrations to generate the migrations table in the `app` directory
   `Console/cake Migrations.migration run all -p Migrations`
 - Run the migrations that have been created so far to setup the database 
@@ -94,15 +94,30 @@ server {
 }
 ```
 
-## Creating the github app ##
+## Oath configuration setup ##
+
+### Creating the GitHub app ###
 
 The application relies on authentication using GitHub. To obtain the client ID
 and key, visit application settings in your Github profile and register an
 application there.
 
-The callback for the github app should be /developers/callback
+The callback for the github app should be /developers/callback.
 
-## How to run the test suite ##
+The obtained cliend ID and secret should be stored in the app/Config/oauth.php.
+
+### Creating the SourceForge.net app ###
+
+The reporting bugs to SourceForge.net requires an application registered on
+SourceForge.net. You can do this on OAuth tab of your account. The generated
+consumer key and secrets  need to be stored in app/Config/oauth.php.
+
+Once you have this, an account which will post bug reports to SourceForge.net
+needs to be authorized to do so. For doing this, you can obtain credentias, you
+need to visit ``/source_forge/authorize`` URL and store resulting key and
+secret in app/Config/oauth.php.
+
+# How to run the test suite #
 
 If you are on a development machine you can use the webrunner at `/test.php`
 However if you need a command line runner. You can use:
@@ -110,7 +125,7 @@ However if you need a command line runner. You can use:
 app/Console/cake test app AllTests
 ```
 
-## Running the stackhash update shell ##
+# Running the stackhash update shell #
 
 There is a new way of finding unique stacktraces that uses hashes that did not
 exist previously. I created a shell to calculate those hashes for old records so

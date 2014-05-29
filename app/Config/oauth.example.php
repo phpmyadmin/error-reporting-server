@@ -23,7 +23,7 @@ Configure::write('SourceForgeConfig', array(
 
 /**
  * Configures sourceforge access token for the account that submits the reports.
- * You can use the sourceforge/authorize action to get access token for any
+ * You can use the /source_forge/authorize action to get access token for any
  * user. You can then enter the resultant token here
  */
 Configure::write('SourceForgeCredentials', array(
