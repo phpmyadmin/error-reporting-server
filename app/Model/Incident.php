@@ -140,26 +140,67 @@ class Incident extends AppModel {
  * creates a new report if nothing matches.
  *
  * @param Array $bugReport the bug report being submitted
- * @return Boolean If the report/incident was correctly saved
+ * @return Array of inserted incident ids. If the report/incident was not 
+ *			correctly saved, false is put in it place.
  */
 	public function createIncidentFromBugReport($bugReport) {
 		if ($bugReport == null) {
 			return false;
 		}
+		$incident_ids = array();	// array to hold ids of all the inserted incidents
+		$isSaved = false;
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
-		$closestReport = $this->_getClosestReport($bugReport);
+		if($bugReport['exception_type'] == 'js'){
+			$closestReport = $this->_getClosestReport($bugReport);
 
-		if($closestReport) {
-			$schematizedIncident["report_id"] = $closestReport["Report"]["id"];
-			return $this->save($schematizedIncident);
-		} else {
-			$report = $this->_getReportDetails($bugReport);
-			$data = array(
-				'Incident' => $schematizedIncident,
-				'Report' => $report
-			);
-			return $this->saveAssociated($data);
+			if($closestReport) {
+				$schematizedIncident["report_id"] = $closestReport["Report"]["id"];
+				$isSaved = $this->save($schematizedIncident);
+			} else {
+				$report = $this->_getReportDetails($bugReport);
+				$data = array(
+					'Incident' => $schematizedIncident,
+					'Report' => $report
+				);
+				$isSaved = $this->saveAssociated($data);
+			}
+
+			if($isSaved) {
+				array_push($incident_ids,$this->id);
+			} else {
+				array_push($incident_ids,false);
+			}
+
+		} elseif($bugReport['exception_type'] == 'php') {
+			$tmpIncident = new Incident();
+			foreach($schematizedIncident as $index => $si){
+				// find closest report. If not found, create a new report.
+				$closestReport = $this->_getClosestReport($bugReport, $index);
+				if($closestReport) {
+					$si["report_id"] = $closestReport["Report"]["id"];
+					$isSaved = $tmpIncident->save($si);
+				
+				} else {
+					//no close report. Create a new report.
+					$report = $this->_getReportDetails($bugReport,$index);
+					$data = array(
+						'Incident' => $si,
+						'Report' => $report
+					);
+					$isSaved = $tmpIncident->saveAssociated($data);
+				}
+
+				if($isSaved) {
+					array_push($incident_ids,$tmpIncident->id);
+					// create a new incident otherwise save() overwrites the previous object.
+					$tmpIncident = new Incident();
+				} else {
+					array_push($incident_ids,false);
+				}
+			}
 		}
+
+		return $incident_ids;
 	}
 
 /**
@@ -169,13 +210,21 @@ class Incident extends AppModel {
  * pma_version
  *
  * @param Array $bugReport the bug report being checked
+ *			Integer $index: for php exception type.
  * @return Array the first similar report or null
  */
-	protected function _getClosestReport($bugReport) {
-		List($location, $linenumber) =
-				$this->_getIdentifyingLocation($bugReport['exception']['stack']);
+	protected function _getClosestReport($bugReport, $index) {
+		if($bugReport['exception_type'] == 'js') {
+			List($location, $linenumber) =
+					$this->_getIdentifyingLocation($bugReport['exception']['stack']);
+		} elseif($bugReport['exception_type'] == 'php') {
+			$location = $bugReport['errors'][$index]['file'];
+			$linenumber = $bugReport['errors'][$index]['lineNum'];
+		} else {
+			return false;
+		}
 		$report = $this->Report->findByLocationAndLinenumberAndPmaVersion(
-				$location, $linenumber, $bugReport['pma_version']);
+					$location, $linenumber, $bugReport['pma_version']);
 		return $report;
 	}
 
@@ -183,19 +232,38 @@ class Incident extends AppModel {
  * creates the report data from an incident that has no related report.
  *
  * @param Array $bugReport the bug report the report record is being created for
+ *			Integer $index: for php exception type.
  * @return Array an array with the report fields can be used with Report->save
  */
-	protected function _getReportDetails($bugReport) {
-		List($location, $linenumber) =
+	protected function _getReportDetails($bugReport, $index) {
+		
+		if($bugReport['exception_type'] == 'js') {
+			List($location, $linenumber) =
 				$this->_getIdentifyingLocation($bugReport["exception"]["stack"]);
 
-		$reportDetails = array(
-			'error_message' => $bugReport['exception']['message'],
-			'error_name' => $bugReport['exception']['name'],
-			'status' => 'new',
-			'location' => $location,
-			'linenumber' => $linenumber,
-			'pma_version' => $bugReport['pma_version'],
+			$reportDetails = array(
+					'error_message' => $bugReport['exception']['message'],
+					'error_name' => $bugReport['exception']['name'],
+					);
+		} elseif($bugReport['exception_type'] == 'php') {
+			$location = $bugReport['errors'][$index]['file'];
+			$linenumber = $bugReport['errors'][$index]['lineNum'];
+			$reportDetails = array(
+					'error_message' => $bugReport['errors'][$index]['msg'],
+					'error_name' => $bugReport['errors'][$index]['type'],
+					);
+		} else {
+			return false;
+		}
+
+		$reportDetails = array_merge(
+			$reportDetails,
+			array(
+				'status' => 'new',
+				'location' => $location,
+				'linenumber' => $linenumber,
+				'pma_version' => $bugReport['pma_version'],
+			)
 		);
 		return $reportDetails;
 	}
@@ -207,25 +275,58 @@ class Incident extends AppModel {
  * @return Array an array with the incident fields can be used with ِIncident->save
  */
 	protected function _getSchematizedIncident($bugReport) {
+		// TODO: reduce duplicate code. Use $schematizedCommonReport & array merge.
 		$bugReport = Sanitize::clean($bugReport, array('escape' => false));
-		$schematizedReport = array(
-			'pma_version' => $bugReport['pma_version'],
-			'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
-			'error_message' => $bugReport['exception']['message'],
-			'error_name' => $bugReport['exception']['name'],
-			'browser' => $bugReport['browser_name'] . " "
-					. $this->_getSimpleVersion($bugReport['browser_version'], 1),
-			'user_os' => $bugReport['user_os'],
-			'script_name' => $bugReport['script_name'],
-			'configuration_storage' => $bugReport['configuration_storage'],
-			'server_software' => $this->_getServer($bugReport['server_software']),
-			'stackhash' => $this->getStackHash($bugReport['exception']['stack']),
-			'full_report' => json_encode($bugReport),
-			'stacktrace' => json_encode($bugReport['exception']['stack']),
-		);
+		if($bugReport['exception_type'] == 'js') {
+			$schematizedReport = array(
+				'pma_version' => $bugReport['pma_version'],
+				'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
+				'error_message' => $bugReport['exception']['message'],
+				'error_name' => $bugReport['exception']['name'],
+				'browser' => $bugReport['browser_name'] . " "
+						. $this->_getSimpleVersion($bugReport['browser_version'], 1),
+				'user_os' => $bugReport['user_os'],
+				'script_name' => $bugReport['script_name'],
+				'configuration_storage' => $bugReport['configuration_storage'],
+				'server_software' => $this->_getServer($bugReport['server_software']),
+				'stackhash' => $this->getStackHash($bugReport['exception']['stack']),
+				'full_report' => json_encode($bugReport),
+				'stacktrace' => json_encode($bugReport['exception']['stack']),
+				'exception_type' => 0 	//'js'
+			);
 
-		if (isset($bugReport['steps'])) {
-			$schematizedReport["steps"] = $bugReport['steps'];
+			if (isset($bugReport['steps'])) {
+				$schematizedReport["steps"] = $bugReport['steps'];
+			}
+		} elseif($bugReport['exception_type'] == 'php') {
+			$schematizedCommonReport = array(
+				'exception_type' => 1, 		// 'php'
+				'pma_version' => $bugReport['pma_version'],
+				'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
+				'browser' => $bugReport['browser_name'] . " "
+						. $this->_getSimpleVersion($bugReport['browser_version'], 1),
+				'user_os' => $bugReport['user_os'],
+				'configuration_storage' => $bugReport['configuration_storage'],
+				'server_software' => $this->_getServer($bugReport['server_software']),
+				'full_report' => json_encode($bugReport)
+			);
+			$schematizedReport = array();
+			// for each "errors"
+			foreach($bugReport['errors'] as $error){
+				 $tmpReport = array_merge(
+					$schematizedCommonReport,
+					array(
+						'error_name' => $error['type'],
+						'error_message' => $error['msg'],
+						'script_name' => $error['file'],
+						'stacktrace' => json_encode($error['stackTrace']),
+						'stackhash' => $error['stackhash']
+						)
+					);
+				 array_push($schematizedReport,$tmpReport);
+			}
+		} else {
+			return false;
 		}
 
 		return $schematizedReport;
