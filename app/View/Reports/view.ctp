@@ -31,6 +31,10 @@
 <?php } ?>
 <table cellspacing="0" class="table table-bordered error-report">
   <tr>
+    <td>Error Type</td>
+    <td><?php echo (($incidents[0]["Incident"]["exception_type"] == 1) ? ('php') : ('js') ); ?></td>
+  </tr>
+  <tr>
     <td>Error Name</td>
     <td><?php echo $report["Report"]["error_name"]; ?></td>
   </tr>
