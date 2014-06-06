@@ -145,7 +145,7 @@ class Incident extends AppModel {
  */
 	public function createIncidentFromBugReport($bugReport) {
 		if ($bugReport == null) {
-			return false;
+			return array(false);
 		}
 		$incident_ids = array();	// array to hold ids of all the inserted incidents
 		$isSaved = false;

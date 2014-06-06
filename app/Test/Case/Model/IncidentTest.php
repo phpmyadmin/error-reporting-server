@@ -181,6 +181,7 @@ class IncidentTest extends CakeTestCase {
 			'stackhash' => '9db5408094f1e76ef7161b7bbf3ddfe4',
 			'full_report' => json_encode($cleanBugReport),
 			'stacktrace' => json_encode($cleanBugReport['exception']['stack']),
+			'exception_type' => 0
 		);
 
 		$this->assertEquals($expected, $result);
@@ -245,37 +246,14 @@ class IncidentTest extends CakeTestCase {
 		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
 		$bugReport = json_decode($bugReport, true);
 
-		$closestReport = array('Report' => array('id' => 2));
+		// Case-1: 'js', closest report = null
+		$result = $this->Incident->createIncidentFromBugReport($bugReport);
+		$this->assertEquals(array(1), $result);
 
-		$incident = $this->getMockForModel('Incident',
-				array('_getClosestReport', 'save', 'saveAssociated',
-				'_getSchematizedIncident'));
-		$incident->expects($this->any())
-				->method('_getClosestReport')
-				->will($this->onConsecutiveCalls($closestReport, null));
-		$incident->expects($this->any())
-				->method('_getSchematizedIncident')
-				->will($this->returnValue(array('stacktrace' => '')));
-		$incident->expects($this->once())
-				->method('save')
-				->with($this->equalTo(array('report_id' => 2, 'stacktrace' => '')))
-				->will($this->returnValue(true));
+		// [TODO]Case-2: 'js' Incident, closest report = some report.
 
+		// [TODO]Case-3: 'php' Incident, closest report = null.
 
-		$result = $incident->createIncidentFromBugReport($bugReport);
-
-		$this->assertEquals(true, $result);
-
-		$incident->expects($this->once())
-				->method('_getClosestReport')
-				->will($this->returnValue(null));
-
-		$incident->expects($this->once())
-				->method('saveAssociated')
-				->will($this->returnValue(true));
-
-		$result = $incident->createIncidentFromBugReport($bugReport);
-
-		$this->assertEquals(true, $result);
+		// [TODO]Case-4: 'php' Incident, closest report = some report.	
 	}
 }

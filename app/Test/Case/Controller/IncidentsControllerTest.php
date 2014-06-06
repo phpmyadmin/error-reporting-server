@@ -57,7 +57,8 @@ class IncidentsControllerTest extends ControllerTestCase {
 				),
 				'report_id' => '1',
 				'created' => '2013-08-29 18:10:01',
-				'modified' => '2013-08-29 18:10:01'
+				'modified' => '2013-08-29 18:10:01',
+				'exception_type' => null
 			)
 		);
 
