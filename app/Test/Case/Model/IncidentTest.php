@@ -246,14 +246,22 @@ class IncidentTest extends CakeTestCase {
 		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 
-		// Case-1: 'js', closest report = null
+		// Case-1: 'js' report
+
+		// Case-1.1: closest report = null
 		$result = $this->Incident->createIncidentFromBugReport($bugReport);
 		$this->assertEquals(array(1), $result);
 
-		// [TODO]Case-2: 'js' Incident, closest report = some report.
+		// [TODO]Case-1.2: closest report = some report.
 
-		// [TODO]Case-3: 'php' Incident, closest report = null.
+		// Case-2: for 'php' reports
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_php.json");
+		$bugReport = json_decode($bugReport, true);
+		// Case-2.1: closest report = null.
+		$result = $this->Incident->createIncidentFromBugReport($bugReport);
+		$this->assertEquals(array(2,3,4), $result);
 
-		// [TODO]Case-4: 'php' Incident, closest report = some report.	
+		// [TODO]Case-2.2: closest report = some report.
+
 	}
 }
