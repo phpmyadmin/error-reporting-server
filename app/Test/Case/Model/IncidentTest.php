@@ -160,7 +160,7 @@ class IncidentTest extends CakeTestCase {
 		$method = new ReflectionMethod('Incident', '_getSchematizedIncident');
 		$method->setAccessible(true);
 
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 		$cleanBugReport = Sanitize::clean($bugReport);
 
@@ -191,7 +191,7 @@ class IncidentTest extends CakeTestCase {
 		$method = new ReflectionMethod('Incident', '_getReportDetails');
 		$method->setAccessible(true);
 
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 
 		$model = $this->getMockForModel('Incident', array('_getIdentifyingLocation'));
@@ -218,7 +218,7 @@ class IncidentTest extends CakeTestCase {
 		$method = new ReflectionMethod('Incident', '_getClosestReport');
 		$method->setAccessible(true);
 
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 
 		$returnedReport = array('Report' => array());
@@ -243,7 +243,7 @@ class IncidentTest extends CakeTestCase {
 	}
 
 	public function testCreateIncidentFromBugReport() {
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 
 		// Case-1: 'js', closest report = null

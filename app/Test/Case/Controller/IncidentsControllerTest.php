@@ -66,7 +66,7 @@ class IncidentsControllerTest extends ControllerTestCase {
 	}
 
 	public function testCreate() {
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReportDecoded = json_decode($bugReport, true);
 		$bugReportDecoded = Sanitize::clean($bugReportDecoded);
 
