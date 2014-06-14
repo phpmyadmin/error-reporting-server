@@ -191,6 +191,7 @@ class IncidentTest extends CakeTestCase {
 		$method = new ReflectionMethod('Incident', '_getReportDetails');
 		$method->setAccessible(true);
 
+		// case-1: JavaScript BugReport
 		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 
@@ -211,6 +212,23 @@ class IncidentTest extends CakeTestCase {
 			'pma_version' => '4.0'
 		);
 
+		$this->assertEquals($expected, $result);
+
+		// case-2: php BugReport
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_php.json");
+		$bugReport = json_decode($bugReport, true);
+
+		$result = $method->invoke($model,
+				$bugReport, 1);
+
+		$expected = array(
+			'error_message' => 'Undefined variable: hihi',
+			'error_name' => 'Notice',
+			'status' => 'new',
+			'location' => './libraries/Util.class.php',
+			'linenumber' => (int) 557,
+			'pma_version' => '4.3.0-dev'
+		);
 		$this->assertEquals($expected, $result);
 	}
 
