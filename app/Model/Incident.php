@@ -148,7 +148,6 @@ class Incident extends AppModel {
 			return array(false);
 		}
 		$incident_ids = array();	// array to hold ids of all the inserted incidents
-		$isSaved = false;
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
 		if(isset($bugReport['exception_type']) 
 			&& $bugReport['exception_type'] == 'php'
