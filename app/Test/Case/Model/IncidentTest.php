@@ -160,7 +160,8 @@ class IncidentTest extends CakeTestCase {
 		$method = new ReflectionMethod('Incident', '_getSchematizedIncident');
 		$method->setAccessible(true);
 
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		// Case-1: JavaScript Report
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 		$cleanBugReport = Sanitize::clean($bugReport);
 
@@ -181,6 +182,65 @@ class IncidentTest extends CakeTestCase {
 			'stackhash' => '9db5408094f1e76ef7161b7bbf3ddfe4',
 			'full_report' => json_encode($cleanBugReport),
 			'stacktrace' => json_encode($cleanBugReport['exception']['stack']),
+			'exception_type' => 0
+		);
+
+		$this->assertEquals($expected, $result);
+
+		// Case-2: php Report
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_php.json");
+		$bugReport = json_decode($bugReport, true);
+		$cleanBugReport = Sanitize::clean($bugReport);
+
+		$result = $method->invoke($this->Incident,
+				$bugReport);
+
+		$expected = array(
+			array(
+				'pma_version' => '4.3.0-dev',
+				'php_version' => '5.5',
+				'error_message' => 'Undefined variable: haha',
+				'error_name' => 'Notice',
+				'browser' => 'CHROME 27',
+				'user_os' => 'Linux',
+				'script_name' => './libraries/Config.class.php',
+				'configuration_storage' => 'disabled',
+				'server_software' => 'Apache/2.4',
+				'stackhash' => '5063bbe81a2daa6a6ad39c5cd315701c',
+				'full_report' => json_encode($cleanBugReport),
+				'stacktrace' => json_encode($cleanBugReport['errors'][0]['stackTrace']),
+				'exception_type' => 1
+			),
+			array(
+				'pma_version' => '4.3.0-dev',
+				'php_version' => '5.5',
+				'error_message' => 'Undefined variable: hihi',
+				'error_name' => 'Notice',
+				'browser' => 'CHROME 27',
+				'user_os' => 'Linux',
+				'script_name' => './libraries/Util.class.php',
+				'configuration_storage' => 'disabled',
+				'server_software' => 'Apache/2.4',
+				'stackhash' => 'e911a21765eae766463612e033773716',
+				'full_report' => json_encode($cleanBugReport),
+				'stacktrace' => json_encode($cleanBugReport['errors'][1]['stackTrace']),
+				'exception_type' => 1
+			),
+			array(
+				'pma_version' => '4.3.0-dev',
+				'php_version' => '5.5',
+				'error_message' => 'Undefined variable: hehe',
+				'error_name' => 'Notice',
+				'browser' => 'CHROME 27',
+				'user_os' => 'Linux',
+				'script_name' => './index.php',
+				'configuration_storage' => 'disabled',
+				'server_software' => 'Apache/2.4',
+				'stackhash' => '37848b23bdd6e737273516b9575fe407',
+				'full_report' => json_encode($cleanBugReport),
+				'stacktrace' => json_encode($cleanBugReport['errors'][2]['stackTrace']),
+				'exception_type' => 1
+			)
 		);
 
 		$this->assertEquals($expected, $result);
@@ -190,7 +250,8 @@ class IncidentTest extends CakeTestCase {
 		$method = new ReflectionMethod('Incident', '_getReportDetails');
 		$method->setAccessible(true);
 
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		// case-1: JavaScript BugReport
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 
 		$model = $this->getMockForModel('Incident', array('_getIdentifyingLocation'));
@@ -211,13 +272,30 @@ class IncidentTest extends CakeTestCase {
 		);
 
 		$this->assertEquals($expected, $result);
+
+		// case-2: php BugReport
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_php.json");
+		$bugReport = json_decode($bugReport, true);
+
+		$result = $method->invoke($model,
+				$bugReport, 1);
+
+		$expected = array(
+			'error_message' => 'Undefined variable: hihi',
+			'error_name' => 'Notice',
+			'status' => 'new',
+			'location' => './libraries/Util.class.php',
+			'linenumber' => (int) 557,
+			'pma_version' => '4.3.0-dev'
+		);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testGetClosestReport() {
 		$method = new ReflectionMethod('Incident', '_getClosestReport');
 		$method->setAccessible(true);
 
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 
 		$returnedReport = array('Report' => array());
@@ -242,40 +320,25 @@ class IncidentTest extends CakeTestCase {
 	}
 
 	public function testCreateIncidentFromBugReport() {
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReport = json_decode($bugReport, true);
 
-		$closestReport = array('Report' => array('id' => 2));
+		// Case-1: 'js' report
 
-		$incident = $this->getMockForModel('Incident',
-				array('_getClosestReport', 'save', 'saveAssociated',
-				'_getSchematizedIncident'));
-		$incident->expects($this->any())
-				->method('_getClosestReport')
-				->will($this->onConsecutiveCalls($closestReport, null));
-		$incident->expects($this->any())
-				->method('_getSchematizedIncident')
-				->will($this->returnValue(array('stacktrace' => '')));
-		$incident->expects($this->once())
-				->method('save')
-				->with($this->equalTo(array('report_id' => 2, 'stacktrace' => '')))
-				->will($this->returnValue(true));
+		// Case-1.1: closest report = null
+		$result = $this->Incident->createIncidentFromBugReport($bugReport);
+		$this->assertEquals(array(1), $result);
 
+		// [TODO]Case-1.2: closest report = some report.
 
-		$result = $incident->createIncidentFromBugReport($bugReport);
+		// Case-2: for 'php' reports
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_php.json");
+		$bugReport = json_decode($bugReport, true);
+		// Case-2.1: closest report = null.
+		$result = $this->Incident->createIncidentFromBugReport($bugReport);
+		$this->assertEquals(array(2,3,4), $result);
 
-		$this->assertEquals(true, $result);
+		// [TODO]Case-2.2: closest report = some report.
 
-		$incident->expects($this->once())
-				->method('_getClosestReport')
-				->will($this->returnValue(null));
-
-		$incident->expects($this->once())
-				->method('saveAssociated')
-				->will($this->returnValue(true));
-
-		$result = $incident->createIncidentFromBugReport($bugReport);
-
-		$this->assertEquals(true, $result);
 	}
 }

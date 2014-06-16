@@ -27,11 +27,14 @@ class IncidentsController extends AppController {
 
 	public function create() {
 		$bugReport = $this->request->input('json_decode', true);
-		if ($this->Incident->createIncidentFromBugReport($bugReport)) {
+		$result = $this->Incident->createIncidentFromBugReport($bugReport);
+		if (count($result) > 0 
+			&& !in_array(false, $result)
+		) {
 			$response = array(
 				"success" => true,
 				"message" => "Thank you for your submission",
-				"incident_id" => $this->Incident->id,
+				"incident_id" => $result,		// Return a list of incident ids.
 			);
 		} else {
 			$response = array(
@@ -40,6 +43,7 @@ class IncidentsController extends AppController {
 			);
 		}
 		$this->autoRender = false;
+
 		return json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	}
 

@@ -57,7 +57,8 @@ class IncidentsControllerTest extends ControllerTestCase {
 				),
 				'report_id' => '1',
 				'created' => '2013-08-29 18:10:01',
-				'modified' => '2013-08-29 18:10:01'
+				'modified' => '2013-08-29 18:10:01',
+				'exception_type' => null
 			)
 		);
 
@@ -65,7 +66,7 @@ class IncidentsControllerTest extends ControllerTestCase {
 	}
 
 	public function testCreate() {
-		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report.json");
+		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_js.json");
 		$bugReportDecoded = json_decode($bugReport, true);
 		$bugReportDecoded = Sanitize::clean($bugReportDecoded);
 
