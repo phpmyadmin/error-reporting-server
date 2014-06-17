@@ -44,14 +44,48 @@
   </tr>
   <tr>
     <td>Sourceforge Report</td>
-    <td><?php if($report['Report']['sourceforge_bug_id']) {
+    <td>
+    <?php
+    if($report['Report']['sourceforge_bug_id']) {
       echo $this->Html->link('#' . $report['Report']['sourceforge_bug_id'],
           "https://sourceforge.net/p/$project_name/bugs/".
           $report['Report']['sourceforge_bug_id'] . "/");
     } else {
-      echo $this->Html->link('Submit report', '/source_forge/create_ticket/'
+      echo '<table cellspacing="0" class="table table-bordered error-report"'
+          . ' style="width:300px; margin-bottom:5px;">'
+          . '<tr><td style="min-width:130px;">';
+      echo $this->Html->link('Create New Ticket', '/source_forge/create_ticket/'
           . $report['Report']['id']);
-    } ?>
+      
+      echo '</td><td style="min-width:130px;">';
+
+      echo '<form action="'
+          . Router::url('/', true)
+          .'source_forge/link_ticket/'
+          . $report['Report']['id']
+          .'" method="GET" class="form-horizontal" style="margin-bottom:5px;">';
+      echo $this->Form->input('ticket_id', array(
+        'placeholder' => 'Ticket Number',
+        'type' => 'text',
+        'label' => false,
+        'div' => true,
+        'class' => 'input-large',
+        'name' => 'ticket_id'
+        )
+      );
+      echo '<br/>';
+      echo $this->Form->input('Link with existing Ticket', array(
+        'placeholder' => 'Ticket Number',
+        'type' => 'submit',
+        'label' => false,
+        'div' => '',
+        'class'=>'btn btn-primary'
+        )
+      );
+      echo '</form>';
+      echo '</td></tr></table>';
+    }
+    ?>
     </td>
   </tr>
   <tr>

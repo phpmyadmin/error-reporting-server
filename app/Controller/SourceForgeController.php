@@ -98,6 +98,79 @@ class SourceForgeController extends AppController {
 		}
 	}
 
+	/**
+	 * Links error report to existing bug ticket on SF.net
+	 *
+	 */
+	public function link_ticket($reportId) {
+		if (!$reportId) {
+				throw new NotFoundException(__('Invalid reportId'));
+		}
+
+		$report = $this->Report->findById($reportId);
+		if (!$report) {
+				throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$ticket_id = $this->request->query['ticket_id'];
+		if(!$ticket_id) {
+				throw new NotFoundException(__('Invalid Ticket ID!!'));
+		}
+
+		$incident = $this->Report->Incident->findByReportId($reportId);
+		$exception_type = ($incident['Incident']['exception_type']) ? ('php') : ('js');
+
+		// "formatted" text of the comment.
+		$commentText = "Param | Value "
+			. "\n -----------|--------------------"
+			. "\n Error Type | " . $report['Report']['error_name']
+			. "\n Error Message |" . $report['Report']['error_message']
+			. "\n Exception Type |" . $exception_type
+			. "\n Link | [Report#"
+				. $reportId
+				."]("
+				. Router::url('/reports/view/'.$reportId,true)
+				.")"
+			. "\n\n*This comment is posted automatically by phpMyAdmin's "
+			. "[error-reporting-server](http://reports.phpmyadmin.net).*";
+
+		$response = $this->SourceForgeApi->createComment(
+			Configure::read('SourceForgeProjectName'),
+			$ticket_id,
+			array('text' => $commentText)
+		);
+
+		if ($response->code[0] === "3") {
+			$this->Session->setFlash('Source forge ticket has been linked with this'
+						. ' report', "default", array("class" => "alert alert-success"));
+			// add the sourceforge bud id to report
+			$this->Report->read(null, $reportId);
+			$this->Report->save(array('sourceforge_bug_id' => $ticket_id));
+		} else if ($response->code === "403") {
+			$this->Session->setFlash(
+					"Unauthorised access to SourceForge ticketing system. SourceForge"
+					. " credentials may be out of date. Please check and try again"
+					. " later.", "default", array("class" => "alert alert-error"));
+		} else if ($response->code === "404") {
+			$this->Session->setFlash(
+					"Bug Ticket not found on SourceForge."
+					. " Are you sure the ticket number is correct?!! Please check and try again",
+					"default", array("class" => "alert alert-error"));
+		} else {
+			//fail
+			$response->body = json_decode($response->body, true);
+			CakeLog::write('sourceforge', 'Submission for sourceforge ticket may have failed.',
+					'sourceforge');
+			CakeLog::write('sourceforge', 'Response dump:', 'sourceforge');
+			CakeLog::write('sourceforge', print_r($response["raw"], true), 'sourceforge');
+			$this->Session->setFlash($this->_getErrors( $response->body), "default",
+					array("class" => "alert alert-error"));
+		}
+
+		$this->redirect(array('controller' => 'reports', 'action' => 'view',
+						$reportId));
+	}
+
 	protected function _getTicketData($reportId) {
 		$data = array(
 			'ticket_form.summary' => $this->request->data['Ticket']['summary'],
