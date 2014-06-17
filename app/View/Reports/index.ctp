@@ -12,6 +12,7 @@
       <th>Message</th>
       <th>PMA Version</th>
       <th>Status</th>
+      <th>Exception Type</th>
     </tr>
     <tr>
       <th><input id="id_filter" style="width: 100%;margin-left:-10px" type="number"/></th>
@@ -44,6 +45,13 @@
               echo "<option value='$status'>$status</option>";
             }
           ?>
+        </select>
+      </th>
+      <th>
+        <select id="exception_type_filter" style="width: 100%">
+          <option></option>
+          <option value='0'>js</option>
+          <option value='1'>php</option>
         </select>
       </th>
     </tr>
