@@ -3,7 +3,7 @@ class AllTestsTest extends CakeTestSuite {
 	protected $coverageSetup = false;
 
 	public static function suite() {
-		$suite = new self('All tests');
+		$suite = new self();
 		$suite->addTestDirectoryRecursive(TESTS . 'Case');
 		return $suite;
 	}
