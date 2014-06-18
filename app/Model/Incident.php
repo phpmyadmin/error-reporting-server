@@ -152,8 +152,8 @@ class Incident extends AppModel {
 		if(isset($bugReport['exception_type']) 
 			&& $bugReport['exception_type'] == 'php'
 		) {
-			$tmpIncident = new Incident();
 			foreach($schematizedIncident as $index => $si){
+				$tmpIncident = new Incident();
 				// find closest report. If not found, create a new report.
 				$closestReport = $this->_getClosestReport($bugReport, $index);
 				if($closestReport) {
@@ -172,9 +172,6 @@ class Incident extends AppModel {
 
 				if($isSaved) {
 					array_push($incident_ids,$tmpIncident->id);
-					// create a new incident otherwise save() or saveAssociated() 
-					// overwrites the previous object.
-					$tmpIncident = new Incident();
 				} else {
 					array_push($incident_ids,false);
 				}
