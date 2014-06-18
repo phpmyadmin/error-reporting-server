@@ -329,7 +329,7 @@ class IncidentTest extends CakeTestCase {
 
 		// Case-1.1: closest report = null
 		$result = $this->Incident->createIncidentFromBugReport($bugReport);
-		$this->assertEquals(array(1), $result);
+		$this->assertEquals(1, count($result));
 
 		// [TODO]Case-1.2: closest report = some report.
 
@@ -338,7 +338,7 @@ class IncidentTest extends CakeTestCase {
 		$bugReport = json_decode($bugReport, true);
 		// Case-2.1: closest report = null.
 		$result = $this->Incident->createIncidentFromBugReport($bugReport);
-		$this->assertEquals(array(2,3,4), $result);
+		$this->assertEquals(3, count($result));
 
 		// [TODO]Case-2.2: closest report = some report.
 
