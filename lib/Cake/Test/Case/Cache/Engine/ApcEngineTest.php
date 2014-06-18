@@ -2,8 +2,6 @@
 /**
  * ApcEngineTest file
  *
- * PHP 5
- *
  * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -35,6 +33,10 @@ class ApcEngineTest extends CakeTestCase {
 	public function setUp() {
 		parent::setUp();
 		$this->skipIf(!function_exists('apc_store'), 'Apc is not installed or configured properly.');
+
+		if (php_sapi_name() === 'cli') {
+			$this->skipIf(!ini_get('apc.enable_cli'), 'APC is not enabled for the CLI.');
+		}
 
 		$this->_cacheDisable = Configure::read('Cache.disable');
 		Configure::write('Cache.disable', false);

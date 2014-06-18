@@ -1,8 +1,6 @@
 <?php
 /**
- * Cake Socket connection class.
- *
- * PHP 5
+ * CakePHP Socket connection class.
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -21,7 +19,7 @@
 App::uses('Validation', 'Utility');
 
 /**
- * Cake network socket connection class.
+ * CakePHP network socket connection class.
  *
  * Core base class for network communication.
  *
@@ -184,8 +182,9 @@ class CakeSocket {
  *
  * Instead we need to handle those errors manually.
  *
- * @param int $code
- * @param string $message
+ * @param integer $code Code.
+ * @param string $message Message.
+ * @return void
  */
 	protected function _connectionErrorHandler($code, $message) {
 		$this->_connectionErrors[] = $message;
@@ -330,7 +329,6 @@ class CakeSocket {
 
 /**
  * Destructor, used to disconnect from current connection.
- *
  */
 	public function __destruct() {
 		$this->disconnect();
@@ -382,11 +380,10 @@ class CakeSocket {
 		if ($enableCryptoResult === true) {
 			$this->encrypted = $enable;
 			return true;
-		} else {
-			$errorMessage = __d('cake_dev', 'Unable to perform enableCrypto operation on CakeSocket');
-			$this->setLastError(null, $errorMessage);
-			throw new SocketException($errorMessage);
 		}
+		$errorMessage = __d('cake_dev', 'Unable to perform enableCrypto operation on CakeSocket');
+		$this->setLastError(null, $errorMessage);
+		throw new SocketException($errorMessage);
 	}
 
 }

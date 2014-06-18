@@ -2,8 +2,6 @@
 /**
  * CakeValidationSetTest file
  *
- * PHP 5
- *
  * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -26,6 +24,16 @@ App::uses('CakeValidationSet', 'Model/Validator');
  * @package       Cake.Test.Case.Model.Validator
  */
 class CakeValidationSetTest extends CakeTestCase {
+
+/**
+ * override locale to the default (eng).
+ *
+ * @return void
+ */
+	public function setUp() {
+		parent::setUp();
+		Configure::write('Config.language', 'eng');
+	}
 
 /**
  * testValidate method

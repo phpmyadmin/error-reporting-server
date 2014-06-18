@@ -4,8 +4,6 @@
  *
  * Test the Acl Behavior
  *
- * PHP 5
- *
  * CakePHP : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -87,9 +85,8 @@ class AclPerson extends CakeTestModel {
 		}
 		if (!$motherId) {
 			return null;
-		} else {
-			return array('AclPerson' => array('id' => $motherId));
 		}
+		return array('AclPerson' => array('id' => $motherId));
 	}
 
 }
@@ -125,6 +122,7 @@ class AclUser extends CakeTestModel {
 /**
  * parentNode
  *
+ * @return null
  */
 	public function parentNode() {
 		return null;
@@ -163,6 +161,7 @@ class AclPost extends CakeTestModel {
 /**
  * parentNode
  *
+ * @return null
  */
 	public function parentNode() {
 		return null;
@@ -227,6 +226,7 @@ class AclBehaviorTest extends CakeTestCase {
  * @return void
  */
 	public function testSetup() {
+		parent::setUp();
 		$User = new AclUser();
 		$this->assertTrue(isset($User->Behaviors->Acl->settings['User']));
 		$this->assertEquals('requester', $User->Behaviors->Acl->settings['User']['type']);

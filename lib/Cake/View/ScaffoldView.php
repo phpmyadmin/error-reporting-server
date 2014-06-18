@@ -4,8 +4,6 @@
  *
  * Automatic forms and actions generation for rapid web application development.
  *
- * PHP 5
- *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -20,14 +18,15 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-App::uses('ThemeView', 'View');
+App::uses('View', 'View');
 
 /**
  * ScaffoldView provides specific view file loading features for scaffolded views.
  *
- * @package       Cake.View
+ * @package Cake.View
+ * @deprecated Dynamic scaffolding will be removed and replaced in 3.0
  */
-class ScaffoldView extends ThemeView {
+class ScaffoldView extends View {
 
 /**
  * Override _getViewFileName Appends special scaffolding views in.
@@ -58,7 +57,7 @@ class ScaffoldView extends ThemeView {
 
 		$scaffoldAction = 'scaffold.' . $name;
 
-		if (!is_null($this->subDir)) {
+		if ($this->subDir !== null) {
 			$subDir = strtolower($this->subDir) . DS;
 		} else {
 			$subDir = null;

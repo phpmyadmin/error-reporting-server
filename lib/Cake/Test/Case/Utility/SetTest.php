@@ -2,8 +2,6 @@
 /**
  * SetTest file
  *
- * PHP 5
- *
  * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -184,7 +182,7 @@ class SetTest extends CakeTestCase {
 		$expected = array('users' => array('lisa' => array('id' => 5, 'pw' => 'you-will-never-guess', 'age' => 25, 'pet' => 'dog')), 'cakephp', 'ice-cream', 'chocolate');
 		$this->assertEquals($expected, Set::merge($a, $b, $c));
 
-		$this->assertEquals(Set::merge($a, $b, array(), $c), $expected);
+		$this->assertEquals($expected, Set::merge($a, $b, array(), $c));
 
 		$r = Set::merge($a, $b, $c);
 		$this->assertEquals($expected, $r);
@@ -256,7 +254,7 @@ class SetTest extends CakeTestCase {
 
 		$a = array(
 			0 => array('Person' => array('name' => 'Jeff'), 'Friend' => array(array('name' => 'Nate'))),
-			1 => array('Person' => array('name' => 'Tracy'),'Friend' => array(array('name' => 'Lindsay'))),
+			1 => array('Person' => array('name' => 'Tracy'), 'Friend' => array(array('name' => 'Lindsay'))),
 			2 => array('Person' => array('name' => 'Adam'), 'Friend' => array(array('name' => 'Bob')))
 		);
 		$b = array(
@@ -268,15 +266,15 @@ class SetTest extends CakeTestCase {
 		$this->assertEquals($a, $b);
 
 		$a = array(
-			array(7,6,4),
-			array(3,4,5),
-			array(3,2,1),
+			array(7, 6, 4),
+			array(3, 4, 5),
+			array(3, 2, 1),
 		);
 
 		$b = array(
-			array(3,2,1),
-			array(3,4,5),
-			array(7,6,4),
+			array(3, 2, 1),
+			array(3, 4, 5),
+			array(7, 6, 4),
 		);
 
 		$a = Set::sort($a, '{n}.{n}', 'asc');
@@ -884,7 +882,7 @@ class SetTest extends CakeTestCase {
 		$r = Set::extract('/file/.[type=application/x-zip-compressed]', $f);
 		$this->assertEquals($expected, $r);
 
-		$expected = array(array('name' => 'zipfile.zip', 'type' => 'application/zip','tmp_name' => '/tmp/php178.tmp', 'error' => 0, 'size' => '564647'));
+		$expected = array(array('name' => 'zipfile.zip', 'type' => 'application/zip', 'tmp_name' => '/tmp/php178.tmp', 'error' => 0, 'size' => '564647'));
 		$r = Set::extract('/file/.[type=application/zip]', $f);
 		$this->assertEquals($expected, $r);
 
@@ -922,8 +920,8 @@ class SetTest extends CakeTestCase {
 		$this->assertEquals($expected, $r);
 
 		$expected = array(
-			array('name' => 'zipfile.zip','type' => 'application/zip', 'tmp_name' => '/tmp/php178.tmp', 'error' => 0, 'size' => '564647'),
-			array('name' => 'zipfile2.zip','type' => 'application/x zip compressed', 'tmp_name' => '/tmp/php179.tmp', 'error' => 0, 'size' => '354784')
+			array('name' => 'zipfile.zip', 'type' => 'application/zip', 'tmp_name' => '/tmp/php178.tmp', 'error' => 0, 'size' => '564647'),
+			array('name' => 'zipfile2.zip', 'type' => 'application/x zip compressed', 'tmp_name' => '/tmp/php179.tmp', 'error' => 0, 'size' => '354784')
 		);
 		$r = Set::extract('/file/.[tmp_name=/tmp\/php17/]', $f);
 		$this->assertEquals($expected, $r);
@@ -1110,7 +1108,7 @@ class SetTest extends CakeTestCase {
 			)
 		);
 
-		$expected = array(7,2,1);
+		$expected = array(7, 2, 1);
 		$r = Set::extract('/CallType[name=Internal Voice]/../x/hour', $multiple);
 		$this->assertEquals($expected, $r);
 
@@ -1354,6 +1352,8 @@ class SetTest extends CakeTestCase {
 
 /**
  * Test that extract() + matching can hit null things.
+ *
+ * @return void
  */
 	public function testExtractMatchesNull() {
 		$data = array(
@@ -1735,7 +1735,7 @@ class SetTest extends CakeTestCase {
 		$this->assertFalse(Set::check($set, 'Session Test'));
 
 		$expected = array('Session Test' => array('Test Case' => 'test'));
-		$this->assertEquals(Set::insert(array(), 'Session Test.Test Case', "test"), $expected);
+		$this->assertEquals($expected, Set::insert(array(), 'Session Test.Test Case', "test"));
 		$this->assertTrue(Set::check($expected, 'Session Test.Test Case'));
 	}
 
@@ -1856,7 +1856,7 @@ class SetTest extends CakeTestCase {
 
 		$a = array(
 			array('User' => array('id' => 2, 'group_id' => 1,
-				'Data' => array('user' => 'mariano.iglesias','name' => 'Mariano Iglesias'))),
+				'Data' => array('user' => 'mariano.iglesias', 'name' => 'Mariano Iglesias'))),
 			array('User' => array('id' => 14, 'group_id' => 2,
 				'Data' => array('user' => 'phpnut', 'name' => 'Larry E. Masters'))),
 			array('User' => array('id' => 25, 'group_id' => 1,
@@ -1872,8 +1872,8 @@ class SetTest extends CakeTestCase {
 		$result = Set::combine($a, '{n}.User.id', '{n}.User.Data');
 		$expected = array(
 			2 => array('user' => 'mariano.iglesias', 'name' => 'Mariano Iglesias'),
-			14 => array('user' => 'phpnut',	'name' => 'Larry E. Masters'),
-			25 => array('user' => 'gwoo',	'name' => 'The Gwoo'));
+			14 => array('user' => 'phpnut', 'name' => 'Larry E. Masters'),
+			25 => array('user' => 'gwoo', 'name' => 'The Gwoo'));
 		$this->assertEquals($expected, $result);
 
 		$result = Set::combine($a, '{n}.User.id', '{n}.User.Data.name');
@@ -2470,8 +2470,8 @@ class SetTest extends CakeTestCase {
 				array(
 					'Post' => array('id' => '1', 'author_id' => '1', 'title' => 'First Post', 'body' => 'First Post Body', 'published' => 'Y', 'created' => '2007-03-18 10:39:23', 'updated' => '2007-03-18 10:41:31'),
 					'Author' => array('id' => '1', 'user' => 'mariano', 'password' => '5f4dcc3b5aa765d61d8327deb882cf99', 'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31', 'test' => 'working'),
-				)
-				, array(
+				),
+				array(
 					'Post' => array('id' => '2', 'author_id' => '3', 'title' => 'Second Post', 'body' => 'Second Post Body', 'published' => 'Y', 'created' => '2007-03-18 10:41:23', 'updated' => '2007-03-18 10:43:31'),
 					'Author' => array('id' => '3', 'user' => 'larry', 'password' => '5f4dcc3b5aa765d61d8327deb882cf99', 'created' => '2007-03-17 01:20:23', 'updated' => '2007-03-17 01:22:31', 'test' => 'working'),
 				)

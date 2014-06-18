@@ -2,8 +2,6 @@
 /**
  * DigestAuthenticationTest file
  *
- * PHP 5
- *
  * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -73,6 +71,7 @@ class DigestAuthenticationTest extends CakeTestCase {
  * @return void
  */
 	public function setUp() {
+		parent::setUp();
 		$this->HttpSocket = new DigestHttpSocket();
 		$this->HttpSocket->request['method'] = 'GET';
 		$this->HttpSocket->request['uri']['path'] = '/';
@@ -84,6 +83,7 @@ class DigestAuthenticationTest extends CakeTestCase {
  * @return void
  */
 	public function tearDown() {
+		parent::tearDown();
 		unset($this->HttpSocket);
 	}
 

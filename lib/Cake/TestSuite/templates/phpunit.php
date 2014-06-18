@@ -1,9 +1,6 @@
 <?php
 /**
- * Missing PHPUnit
- * error page.
- *
- * PHP 5
+ * Missing PHPUnit error page.
  *
  * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -31,7 +28,7 @@
 	</ul>
 	<p>Once PHPUnit is installed make sure its located on PHP's <code>include_path</code> by checking your php.ini</p>
 	<p>For full instructions on how to <a href="http://www.phpunit.de/manual/current/en/installation.html" target="_blank">install PHPUnit, see the PHPUnit installation guide</a>.</p>
-	<p><a href="http://github.com/sebastianbergmann/phpunit" target="_blank">Download PHPUnit</a></p>
+	<p><a href="https://github.com/sebastianbergmann/phpunit" target="_blank">Download PHPUnit</a></p>
 </div>
 <?php
 include dirname(__FILE__) . DS . 'footer.php';

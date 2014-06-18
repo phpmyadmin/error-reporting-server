@@ -2,8 +2,6 @@
 /**
  * ExceptionRendererTest file
  *
- * PHP 5
- *
  * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -131,7 +129,6 @@ class MyCustomExceptionRenderer extends ExceptionRenderer {
 class MissingWidgetThingException extends NotFoundException {
 }
 
-
 /**
  * ExceptionRendererTest class
  *
@@ -148,6 +145,7 @@ class ExceptionRendererTest extends CakeTestCase {
  */
 	public function setUp() {
 		parent::setUp();
+		Configure::write('Config.language', 'eng');
 		App::build(array(
 			'View' => array(
 				CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS
@@ -272,6 +270,8 @@ class ExceptionRendererTest extends CakeTestCase {
 
 /**
  * test that helpers in custom CakeErrorController are not lost
+ *
+ * @return void
  */
 	public function testCakeErrorHelpersNotLost() {
 		$testApp = CAKE . 'Test' . DS . 'test_app' . DS;
@@ -527,7 +527,7 @@ class ExceptionRendererTest extends CakeTestCase {
 				404
 			),
 			array(
-				new PrivateActionException(array('controller' => 'PostsController' , 'action' => '_secretSauce')),
+				new PrivateActionException(array('controller' => 'PostsController', 'action' => '_secretSauce')),
 				array(
 					'/<h2>Private Method in PostsController<\/h2>/',
 					'/<em>PostsController::<\/em><em>_secretSauce\(\)<\/em>/'
@@ -761,7 +761,7 @@ class ExceptionRendererTest extends CakeTestCase {
 		$ExceptionRenderer->render();
 		$this->assertEquals('', $ExceptionRenderer->controller->layoutPath);
 		$this->assertEquals('', $ExceptionRenderer->controller->subDir);
-		$this->assertEquals('Errors/', $ExceptionRenderer->controller->viewPath);
+		$this->assertEquals('Errors', $ExceptionRenderer->controller->viewPath);
 	}
 
 /**

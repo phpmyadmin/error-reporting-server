@@ -2,8 +2,6 @@
 /**
  * Email Component
  *
- * PHP 5
- *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -29,9 +27,9 @@ App::uses('CakeEmail', 'Network/Email');
  * based on the standard outlined in http://www.rfc-editor.org/rfc/rfc2822.txt
  *
  * @package       Cake.Controller.Component
- * @link http://book.cakephp.org/2.0/en/core-libraries/components/email.html
- * @link http://book.cakephp.org/2.0/en/core-utility-libraries/email.html
- * @deprecated Use Network/CakeEmail
+ * @link          http://book.cakephp.org/2.0/en/core-libraries/components/email.html
+ * @link          http://book.cakephp.org/2.0/en/core-utility-libraries/email.html
+ * @deprecated    Will be removed in 3.0. Use Network/CakeEmail instead
  */
 class EmailComponent extends Component {
 
@@ -425,7 +423,7 @@ class EmailComponent extends Component {
 /**
  * Format addresses to be an array with email as key and alias as value
  *
- * @param array $addresses
+ * @param array $addresses Address to format.
  * @return array
  */
 	protected function _formatAddresses($addresses) {

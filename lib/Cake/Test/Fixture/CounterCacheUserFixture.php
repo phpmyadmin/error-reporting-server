@@ -2,8 +2,6 @@
 /**
  * Short description for file.
  *
- * PHP 5
- *
  * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -24,8 +22,6 @@
  * @package       Cake.Test.Fixture
  */
 class CounterCacheUserFixture extends CakeTestFixture {
-
-	public $name = 'CounterCacheUser';
 
 	public $fields = array(
 		'id' => array('type' => 'integer', 'key' => 'primary'),

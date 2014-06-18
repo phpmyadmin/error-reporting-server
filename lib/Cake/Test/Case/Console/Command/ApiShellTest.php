@@ -2,8 +2,6 @@
 /**
  * ApiShellTest file
  *
- * PHP 5
- *
  * CakePHP :  Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -44,7 +42,7 @@ class ApiShellTest extends CakeTestCase {
 		$this->Shell = $this->getMock(
 			'ApiShell',
 			array('in', 'out', 'createFile', 'hr', '_stop'),
-			array(	$out, $out, $in)
+			array($out, $out, $in)
 		);
 	}
 

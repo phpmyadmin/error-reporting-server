@@ -2,8 +2,6 @@
 /**
  * Test App Comment Model
  *
- * PHP 5
- *
  * CakePHP :  Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -31,5 +29,14 @@ class TestPluginAuthors extends TestPluginAppModel {
 	public $useTable = 'authors';
 
 	public $name = 'TestPluginAuthors';
+
+	public $validate = array(
+		'field' => array(
+			'notEmpty' => array(
+				'rule' => 'notEmpty',
+				'message' => 'I can haz plugin model validation message',
+			),
+		),
+	);
 
 }
