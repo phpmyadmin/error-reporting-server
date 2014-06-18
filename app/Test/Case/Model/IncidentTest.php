@@ -157,7 +157,7 @@ class IncidentTest extends CakeTestCase {
 	}
 
 	public function testGetSchematizedIncident() {
-		$method = new ReflectionMethod('Incident', '_getSchematizedIncident');
+		$method = new ReflectionMethod('Incident', '_getSchematizedIncidents');
 		$method->setAccessible(true);
 
 		// Case-1: JavaScript Report
@@ -169,20 +169,22 @@ class IncidentTest extends CakeTestCase {
 				$bugReport);
 
 		$expected = array(
-			'pma_version' => '4.0',
-			'php_version' => '5.2',
-			'steps' => '&lt;script&gt;test steps',
-			'error_message' => 'a is not defined',
-			'error_name' => 'ReferenceError',
-			'browser' => 'FIREFOX 17',
-			'user_os' => 'Windows',
-			'script_name' => 'tbl_relation.php',
-			'configuration_storage' => 'enabled',
-			'server_software' => 'NginX/1.17',
-			'stackhash' => '9db5408094f1e76ef7161b7bbf3ddfe4',
-			'full_report' => json_encode($cleanBugReport),
-			'stacktrace' => json_encode($cleanBugReport['exception']['stack']),
-			'exception_type' => 0
+			array(
+				'pma_version' => '4.0',
+				'php_version' => '5.2',
+				'steps' => '&lt;script&gt;test steps',
+				'error_message' => 'a is not defined',
+				'error_name' => 'ReferenceError',
+				'browser' => 'FIREFOX 17',
+				'user_os' => 'Windows',
+				'script_name' => 'tbl_relation.php',
+				'configuration_storage' => 'enabled',
+				'server_software' => 'NginX/1.17',
+				'stackhash' => '9db5408094f1e76ef7161b7bbf3ddfe4',
+				'full_report' => json_encode($cleanBugReport),
+				'stacktrace' => json_encode($cleanBugReport['exception']['stack']),
+				'exception_type' => 0
+			)
 		);
 
 		$this->assertEquals($expected, $result);
