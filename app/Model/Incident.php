@@ -140,7 +140,7 @@ class Incident extends AppModel {
  * creates a new report if nothing matches.
  *
  * @param Array $bugReport the bug report being submitted
- * @return Array of inserted incident ids. If the report/incident was not 
+ * @return Array of inserted incident ids. If the report/incident was not
  *			correctly saved, false is put in it place.
  */
 	public function createIncidentFromBugReport($bugReport) {
@@ -149,7 +149,7 @@ class Incident extends AppModel {
 		}
 		$incident_ids = array();	// array to hold ids of all the inserted incidents
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
-		if(isset($bugReport['exception_type']) 
+		if(isset($bugReport['exception_type'])
 			&& $bugReport['exception_type'] == 'php'
 		) {
 			foreach($schematizedIncident as $index => $si){
@@ -159,7 +159,7 @@ class Incident extends AppModel {
 				if($closestReport) {
 					$si["report_id"] = $closestReport["Report"]["id"];
 					$isSaved = $tmpIncident->save($si);
-				
+
 				} else {
 					//no close report. Create a new report.
 					$report = $this->_getReportDetails($bugReport,$index);
@@ -213,7 +213,7 @@ class Incident extends AppModel {
  * @return Array the first similar report or null
  */
 	protected function _getClosestReport($bugReport, $index=0) {
-		if(isset($bugReport['exception_type']) 
+		if(isset($bugReport['exception_type'])
 			&& $bugReport['exception_type'] == 'php'
 		) {
 			$location = $bugReport['errors'][$index]['file'];
@@ -221,7 +221,7 @@ class Incident extends AppModel {
 		} else {
 			List($location, $linenumber) =
 					$this->_getIdentifyingLocation($bugReport['exception']['stack']);
-		} 
+		}
 		$report = $this->Report->findByLocationAndLinenumberAndPmaVersion(
 					$location, $linenumber, $bugReport['pma_version']);
 		return $report;
@@ -235,7 +235,7 @@ class Incident extends AppModel {
  * @return Array an array with the report fields can be used with Report->save
  */
 	protected function _getReportDetails($bugReport, $index=0) {
-		if(isset($bugReport['exception_type']) 
+		if(isset($bugReport['exception_type'])
 			&& $bugReport['exception_type'] == 'php'
 		) {
 			$location = $bugReport['errors'][$index]['file'];
@@ -278,7 +278,7 @@ class Incident extends AppModel {
 	protected function _getSchematizedIncident($bugReport) {
 		// TODO: reduce duplicate code. Use $schematizedCommonReport & array merge.
 		$bugReport = Sanitize::clean($bugReport, array('escape' => false));
-		if(isset($bugReport['exception_type']) 
+		if(isset($bugReport['exception_type'])
 			&& $bugReport['exception_type'] == 'php'
 		) {
 			$schematizedCommonReport = array(
