@@ -147,6 +147,7 @@ class Incident extends AppModel {
 		if ($bugReport == null) {
 			return array(false);
 		}
+		// TODO: This should share the code between PHP and JS reporting
 		$incident_ids = array();	// array to hold ids of all the inserted incidents
 		$schematizedIncident = $this->_getSchematizedIncident($bugReport);
 		if(isset($bugReport['exception_type'])
