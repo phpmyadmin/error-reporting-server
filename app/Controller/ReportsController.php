@@ -78,7 +78,7 @@ class ReportsController extends AppController {
 
 	public function data_tables() {
 		$aColumns = array('id', 'error_name', 'error_message', 'pma_version',
-					'status');
+					'status','exception_type');
 		$searchConditions = $this->_getSearchConditions($aColumns);
 		$orderConditions = $this->_getOrder($aColumns);
 
@@ -99,11 +99,17 @@ class ReportsController extends AppController {
 		$rows = Sanitize::clean($rows);
 		$totalFiltered = $this->Report->find('count', $params);
 
+		// change exception_type from boolean values to strings
+		$dispRows = array();
+		foreach($rows as $row) {
+			$row[5] = (intval($row[5]))?('php'):('js');
+			array_push($dispRows, $row);
+		}
 		$response = array(
 			'iTotalRecords' => $this->Report->find('count'),
 			'iTotalDisplayRecords' => $totalFiltered,
 			'sEcho' => intval($this->request->query('sEcho')),
-			'aaData' => $rows
+			'aaData' => $dispRows
 		);
 		$this->autoRender = false;
 		return json_encode($response);

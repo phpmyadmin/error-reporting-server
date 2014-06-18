@@ -19,6 +19,7 @@ $(document).ready(function () {
 			{ "sWidth": "20%" },
 			{ "sWidth": "40%" },
 			{ "sWidth": "15%" },
+			{ "sWidth": "10%" },
 			{ "sWidth": "10%" }
 		],
 		"fnServerData": function (sSource, aoData, fnCallback) {

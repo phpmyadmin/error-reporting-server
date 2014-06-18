@@ -247,6 +247,7 @@ class Incident extends AppModel {
 					'error_message' => $bugReport['errors'][$index]['msg'],
 					'error_name' => $bugReport['errors'][$index]['type'],
 					);
+			$exception_type = 1;
 		} else {
 			List($location, $linenumber) =
 				$this->_getIdentifyingLocation($bugReport["exception"]["stack"]);
@@ -255,6 +256,7 @@ class Incident extends AppModel {
 					'error_message' => $bugReport['exception']['message'],
 					'error_name' => $bugReport['exception']['name'],
 					);
+			$exception_type = 0;
 		}
 
 		$reportDetails = array_merge(
@@ -264,6 +266,7 @@ class Incident extends AppModel {
 				'location' => $location,
 				'linenumber' => $linenumber,
 				'pma_version' => $bugReport['pma_version'],
+				'exception_type' => $exception_type
 			)
 		);
 		return $reportDetails;

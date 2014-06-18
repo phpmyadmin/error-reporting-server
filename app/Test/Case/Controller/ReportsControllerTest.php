@@ -75,8 +75,8 @@ class ReportsControllerTest extends ControllerTestCase {
 			'iTotalDisplayRecords' => 2,
 			'sEcho' => 1,
 			'aaData' => array(
-				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new'),
-				array('2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new')
+				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js'),
+				array('2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js')
 			)
 		);
 		$result = json_decode($this->contents, true);
@@ -100,8 +100,8 @@ class ReportsControllerTest extends ControllerTestCase {
 			'iTotalDisplayRecords' => 2,
 			'sEcho' => 1,
 			'aaData' => array(
-				array('2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new'),
-				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new'),
+				array('2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js'),
+				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js'),
 			)
 		);
 		$result = json_decode($this->contents, true);
@@ -120,7 +120,7 @@ class ReportsControllerTest extends ControllerTestCase {
 			'iTotalDisplayRecords' => 1,
 			'sEcho' => 1,
 			'aaData' => array(
-				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new'),
+				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js'),
 			)
 		);
 		$result = json_decode($this->contents, true);

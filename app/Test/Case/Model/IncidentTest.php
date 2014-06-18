@@ -268,7 +268,8 @@ class IncidentTest extends CakeTestCase {
 			'status' => 'new',
 			'location' => 'error.js',
 			'linenumber' => (int) 312,
-			'pma_version' => '4.0'
+			'pma_version' => '4.0',
+			'exception_type' => 0
 		);
 
 		$this->assertEquals($expected, $result);
@@ -286,7 +287,8 @@ class IncidentTest extends CakeTestCase {
 			'status' => 'new',
 			'location' => './libraries/Util.class.php',
 			'linenumber' => (int) 557,
-			'pma_version' => '4.3.0-dev'
+			'pma_version' => '4.3.0-dev',
+			'exception_type' => 1
 		);
 		$this->assertEquals($expected, $result);
 	}
