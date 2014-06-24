@@ -70,31 +70,10 @@ class SourceForgeController extends AppController {
 		$data = $this->_getTicketData($reportId);
 		$response = $this->SourceForgeApi->createTicket(
 				Configure::read('SourceForgeProjectName'), $data);
-		if ($response->code[0] === "3") {
-			// success
-			preg_match("<rest/p/.*/bugs/(\d+)/>",
-					$response->headers['Location'], $matches);
-			$this->Report->read(null, $reportId);
-			$this->Report->save(array('sourceforge_bug_id' => $matches[1]));
 
-			$this->Session->setFlash('Source forge ticket has been created for this'
-					. ' report', "default", array("class" => "alert alert-success"));
+		if ($this->_handleSFResponse($response, 1, $reportId)) {
 			$this->redirect(array('controller' => 'reports', 'action' => 'view',
 					$reportId));
-		} else if ($response->code === "403") {
-			$this->Session->setFlash(
-					"Unauthorised access to SourceForge ticketing system. SourceForge"
-					. " credentials may be out of date. Please check and try again"
-					. " later.", "default", array("class" => "alert alert-error"));
-		} else {
-			//fail
-			$response->body = json_decode($response->body, true);
-			CakeLog::write('sourceforge', 'Submission for sourceforge ticket may have failed.',
-					'sourceforge');
-			CakeLog::write('sourceforge', 'Response dump:', 'sourceforge');
-			CakeLog::write('sourceforge', print_r($response["raw"], true), 'sourceforge');
-			$this->Session->setFlash($this->_getErrors( $response->body), "default",
-					array("class" => "alert alert-error"));
 		}
 	}
 
@@ -140,33 +119,7 @@ class SourceForgeController extends AppController {
 			array('text' => $commentText)
 		);
 
-		if ($response->code[0] === "3") {
-			$this->Session->setFlash('Source forge ticket has been linked with this'
-						. ' report', "default", array("class" => "alert alert-success"));
-			// add the sourceforge bud id to report
-			$this->Report->read(null, $reportId);
-			$this->Report->save(array('sourceforge_bug_id' => $ticket_id));
-		} else if ($response->code === "403") {
-			$this->Session->setFlash(
-					"Unauthorised access to SourceForge ticketing system. SourceForge"
-					. " credentials may be out of date. Please check and try again"
-					. " later.", "default", array("class" => "alert alert-error"));
-		} else if ($response->code === "404") {
-			$this->Session->setFlash(
-					"Bug Ticket not found on SourceForge."
-					. " Are you sure the ticket number is correct?!! Please check and try again",
-					"default", array("class" => "alert alert-error"));
-		} else {
-			//fail
-			$response->body = json_decode($response->body, true);
-			CakeLog::write('sourceforge', 'Submission for sourceforge ticket may have failed.',
-					'sourceforge');
-			CakeLog::write('sourceforge', 'Response dump:', 'sourceforge');
-			CakeLog::write('sourceforge', print_r($response["raw"], true), 'sourceforge');
-			$this->Session->setFlash($this->_getErrors( $response->body), "default",
-					array("class" => "alert alert-error"));
-		}
-
+		$this->_handleSFResponse($response, 2, $reportId, $ticket_id);
 		$this->redirect(array('controller' => 'reports', 'action' => 'view',
 						$reportId));
 	}
@@ -223,5 +176,65 @@ class SourceForgeController extends AppController {
 		return "$description\n\n\nThis report is related to user submitted report "
 				. "[#" . $this->Report->id . "](" . $this->Report->getUrl()
 				. ") on the phpmyadmin error reporting server.";
+	}
+
+/**
+ * Sourceforge Response Handler
+ * @param Object $response the response returned by sourceforge API
+ * @param Integer $type type of response. 1 for create_ticket, 2 for link_ticket
+ * @param Integer $report_id report id.
+ * @param Integer $ticket_id ticket id, required for link tivket only.
+ *
+ * @return Boolean value. True on success. False on any type of failure.
+ */
+	protected function _handleSFResponse($response, $type, $report_id,  $ticket_id = 1)
+	{
+		if (!in_array($type, array(1,2))) {
+			throw new InvalidArgumentException('Invalid Argument "$type".');
+		}
+
+		if ($response->code[0] === "3") {
+			// success
+			if ($type == 1) {
+				preg_match("<rest/p/.*/bugs/(\d+)/>",
+					$response->headers['Location'], $matches);
+				$ticket_id = $matches[1];
+			}
+
+			$this->Report->read(null, $report_id);
+			$this->Report->save(array('sourceforge_bug_id' => $ticket_id));
+
+			if ($type == 2) {
+				$msg = 'Source forge ticket has been linked with this report.';
+			} else {
+				$msg = 'Source forge ticket has been created for this report.';
+			}
+			$this->Session->setFlash($msg, "default", array("class" => "alert alert-success"));
+			return true;
+		} else if ($response->code === "403") {
+			$this->Session->setFlash(
+					"Unauthorised access to SourceForge ticketing system. SourceForge"
+					. " credentials may be out of date. Please check and try again"
+					. " later.", "default", array("class" => "alert alert-error"));
+			return false;
+		} else if ($response->code === "404"
+			&& $type == 2
+		) {
+			$this->Session->setFlash(
+					"Bug Ticket not found on SourceForge."
+					. " Are you sure the ticket number is correct?!! Please check and try again",
+					"default", array("class" => "alert alert-error"));
+			return false;
+		} else {
+			//fail
+			$response->body = json_decode($response->body, true);
+			CakeLog::write('sourceforge', 'Submission for sourceforge ticket may have failed.',
+					'sourceforge');
+			CakeLog::write('sourceforge', 'Response dump:', 'sourceforge');
+			CakeLog::write('sourceforge', print_r($response["raw"], true), 'sourceforge');
+			$this->Session->setFlash($this->_getErrors( $response->body), "default",
+					array("class" => "alert alert-error"));
+			return false;
+		}
 	}
 }
