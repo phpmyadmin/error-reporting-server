@@ -113,11 +113,7 @@ class OAuthClient {
     }
 
     private function doGet($url) {
-        $socket = new HttpSocket(
-          array(
-            'ssl_verify_host' => false
-          )
-        );
+        $socket = new HttpSocket();
         $result = $socket->get($url);
         $this->fullResponse = $result;
 
@@ -125,11 +121,7 @@ class OAuthClient {
     }
 
     private function doPost($url, $data) {
-        $socket = new HttpSocket(
-          array(
-            'ssl_verify_peer' => false
-          )
-        );
+        $socket = new HttpSocket();
         $result = $socket->post($url, $data);
         $this->fullResponse = $result;
 
