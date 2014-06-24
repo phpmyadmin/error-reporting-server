@@ -98,4 +98,36 @@ class SourceForgeApiComponent extends Component {
 		return $client->post($accessToken['key'], $accessToken['secret'],
 				"https://sourceforge.net/rest/p/$project/bugs/new", $data);
 	}
+
+/**
+ * Submits a create comment request to the SourceForge.net api. It uses the access
+ * token that must be set as a property on this component, through
+ * SourceForgeApiComponent->accessToken
+ *
+ * @param  String $project the project name of the SourceForge.net project to submit
+ *                         the ticket to.
+ * @param  Array  $data the ticket data to submit.
+ * @param  Array  $ticket_id the bug ticket id on which to comment.
+ * @return Array  the response returned by SourceForge.net
+ */
+	public function createComment($project, $ticket_id, $data) {
+		$client = $this->createClient();
+		$accessToken = $this->accessToken;
+		$url = "https://sourceforge.net/rest/p/" . $project . "/bugs/" . $ticket_id ."/";
+
+		// get the discussion thread URL
+		$ticketInfo = $client->post($accessToken['key'], $accessToken['secret'],
+				$url);
+
+		if(in_array($ticketInfo->code, array('404', '403'))) {
+			return $ticketInfo;
+		}
+
+		$ticketInfo->body = json_decode($ticketInfo->body, true);
+
+		// add the comment on that thread.
+		$url = $ticketInfo->body['ticket']['discussion_thread_url'] . 'new';
+		return $client->post($accessToken['key'], $accessToken['secret'],
+				$url, $data);
+	}
 }
