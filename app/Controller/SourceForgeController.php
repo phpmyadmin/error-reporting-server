@@ -39,7 +39,7 @@ class SourceForgeController extends AppController {
 		$requestToken =
 				$this->SourceForgeApi->getRequestToken('/source_forge/callback');
 		if ($requestToken) {
-			$this->Session->write('sourceforge_request_token', $requestToken);
+			$this->Session->write('sourceforge_request_token', serialize($requestToken));
 			$this->redirect($this->SourceForgeApi->getRedirectUrl($requestToken));
 		}
 		$this->autoRender = false;
@@ -47,7 +47,7 @@ class SourceForgeController extends AppController {
 	}
 
 	public function callback() {
-		$requestToken = $this->Session->read('sourceforge_request_token');
+		$requestToken = unserialize($this->Session->read('sourceforge_request_token'));
 		$accessToken = $this->SourceForgeApi->getAccessToken($requestToken);
 		$this->autoRender = false;
 		return json_encode($accessToken);
