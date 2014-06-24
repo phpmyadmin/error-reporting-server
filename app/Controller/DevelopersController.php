@@ -44,15 +44,19 @@ class DevelopersController extends AppController {
 		$code = $this->request->query('code');
 		$accessToken = $this->GithubApi->getAccessToken($code);
 		if ($accessToken) {
-			// TODO: Handle errors from the api in rare circumstances
-			$userInfo = $this->GithubApi->getUserInfo($accessToken);
-			$userInfo["has_commit_access"] = $this->GithubApi->canCommitTo(
-					$userInfo["login"], $this->GithubApi->githubRepo);
+			list($userInfo, $status) = $this->GithubApi->getUserInfo($accessToken);
+			if ($status != 200) {
+				$this->Session->setFlash($userInfo['message'],
+						array("class" => "alert alert-error"));
+			} else {
+				$userInfo["has_commit_access"] = $this->GithubApi->canCommitTo(
+						$userInfo["login"], $this->GithubApi->githubRepo);
 
-			$this->_authenticateDeveloper($userInfo, $accessToken);
+				$this->_authenticateDeveloper($userInfo, $accessToken);
 
-			$this->Session->setFlash("You have been logged in successfully",
-					"default", array("class" => "alert alert-success"));
+				$this->Session->setFlash("You have been logged in successfully",
+						"default", array("class" => "alert alert-success"));
+			}
 		} else {
 			$this->Session->setFlash("We we not able to authenticate you."
 					. "Please try again later", "default",
