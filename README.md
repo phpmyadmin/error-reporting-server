@@ -99,7 +99,7 @@ server {
 ### Creating the GitHub app ###
 
 The application relies on authentication using GitHub. To obtain the client ID
-and key, visit [application settings in your Github profile][gh-oath] and
+and key, visit [application settings in your Github profile][gh-oauth] and
 register an application there.
 
 The callback for the github app should be ``/developers/callback``.
