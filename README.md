@@ -99,23 +99,28 @@ server {
 ### Creating the GitHub app ###
 
 The application relies on authentication using GitHub. To obtain the client ID
-and key, visit application settings in your Github profile and register an
-application there.
+and key, visit [application settings in your Github profile][gh-oath] and
+register an application there.
 
-The callback for the github app should be /developers/callback.
+The callback for the github app should be ``/developers/callback``.
 
-The obtained cliend ID and secret should be stored in the app/Config/oauth.php.
+The obtained cliend ID and secret should be stored in the ``app/Config/oauth.php``.
+
+[gh-oauth]: https://github.com/settings/applications
 
 ### Creating the SourceForge.net app ###
 
 The reporting bugs to SourceForge.net requires an application registered on
-SourceForge.net. You can do this on OAuth tab of your account. The generated
-consumer key and secrets  need to be stored in app/Config/oauth.php.
+SourceForge.net. You can do this on [OAuth tab of your account][sf-oauth]. The
+generated consumer key and secrets  need to be stored in
+``app/Config/oauth.php``.
 
 Once you have this, an account which will post bug reports to SourceForge.net
 needs to be authorized to do so. For doing this, you can obtain credentias, you
 need to visit ``/source_forge/authorize`` URL and store resulting key and
 secret in app/Config/oauth.php.
+
+[sf-oauth]: https://sourceforge.net/auth/oauth/
 
 # How to run the test suite #
 
