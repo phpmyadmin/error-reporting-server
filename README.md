@@ -139,7 +139,7 @@ that they can work with the new code. To use the shell you can just type:
 Console/cake custom addHashesToOldRecords
 ```
 
-## Requirement ##
+### Requirements ###
  - php >= 5.4
  - MySQL 
  
