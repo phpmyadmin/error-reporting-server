@@ -31,6 +31,10 @@ In order to deploy the app in this repo you need to follow these steps:
   in the `app` directory
   `Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition`
 
+## Requirements ##
+ - php >= 5.4
+ - MySQL 
+ 
 
 ## Web server setup ##
 
@@ -139,10 +143,6 @@ that they can work with the new code. To use the shell you can just type:
 Console/cake custom addHashesToOldRecords
 ```
 
-## Requirements ##
- - php >= 5.4
- - MySQL 
- 
 # Cron Jobs #
 To Schedule & run cron jobs there's a separate script named `cron_dispatcher.php`. We can run cron job using this script. The script is designed to keep MVC of CakePHP as it is and still carry out the job.
 
