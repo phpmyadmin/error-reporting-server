@@ -116,6 +116,13 @@ CakeLog::config('sourceforge', array(
 	'file' => 'sourceforge',
 ));
 
+CakeLog::config('cron_jobs', array(
+	'engine' => 'File',
+	'types' => array('cron_jobs'),
+	'scopes' => array('cron_jobs'),
+	'file' => 'cron_jobs',
+));
+
 /**
  * Loads plugins
  */

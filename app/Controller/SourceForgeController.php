@@ -32,7 +32,9 @@ class SourceForgeController extends AppController {
 	public function beforeFilter() {
 		$this->SourceForgeApi->accessToken =
 				Configure::read('SourceForgeCredentials');
-		parent::beforeFilter();
+		if ($this->action != 'sync_ticket_statuses') {
+			parent::beforeFilter();
+		}
 	}
 
 	public function authorize() {
@@ -236,5 +238,60 @@ class SourceForgeController extends AppController {
 					array("class" => "alert alert-error"));
 			return false;
 		}
+	}
+
+	/**
+	 * Synchronize Report Statuses from SF Bug Tickets
+	 * To be used as a cron job.
+	 * Can not (& should not) be directly accessed via Web.
+	 */
+	public function sync_ticket_statuses(){
+		if (!defined('CRON_DISPATCHER')) {
+			$this->redirect('/');
+			exit();
+		}
+
+		$reports = $this->Report->find(
+			'all',
+			array(
+				'conditions' => array(
+					'NOT' => array(
+						'Report.sourceforge_bug_id' => null
+					)
+				)
+			)
+		);
+
+		foreach ($reports as $key => $report) {
+			$i=0;
+			// fetch the new ticket status
+			do {
+				$new_status = $this->SourceForgeApi->getBugTicketStatus(
+					Configure::read('SourceForgeProjectName'),
+					$report['Report']['sourceforge_bug_id']
+				);
+				$i++;
+			} while($new_status == false && $i <= 3);
+
+			// if fails all three times, then simply write failure
+			// into cron_jobs log and move on.
+			if (!$new_status) {
+				CakeLog::write(
+					'cron_jobs',
+					'FAILED: Fetching status of BugTicket#'
+						. ($report['Report']['sourceforge_bug_id'])
+						. ' associated with Report#'
+						. ($report['Report']['id']),
+					'cron_jobs'
+				);
+				continue;
+			}
+
+			if ($report['Report']['status'] != $new_status) {
+				$this->Report->read(null, $report['Report']['id']);
+				$this->Report->save(array('status' => $new_status));
+			}
+		}
+		$this->autoRender = false;
 	}
 }
