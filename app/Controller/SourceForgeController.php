@@ -124,6 +124,45 @@ class SourceForgeController extends AppController {
 						$reportId));
 	}
 
+	/**
+	 * Un-links error report to associated bug ticket on SF.net
+	 *
+	 */
+	public function unlink_ticket($reportId) {
+		if (!$reportId) {
+				throw new NotFoundException(__('Invalid reportId'));
+		}
+
+		$report = $this->Report->findById($reportId);
+		if (!$report) {
+				throw new NotFoundException(__('Invalid Report'));
+		}
+
+		$ticket_id = $report['Report']['sourceforge_bug_id'];
+		if(!$ticket_id) {
+				throw new NotFoundException(__('Invalid Ticket ID!!'));
+		}
+
+		// "formatted" text of the comment.
+		$commentText = "This Bug Ticket is no longer associated with [Report#"
+			. $reportId
+			. "]("
+			. Router::url('/reports/view/'.$reportId,true)
+			. ")"
+			. "\n\n*This comment is posted automatically by phpMyAdmin's "
+			. "[error-reporting-server](http://reports.phpmyadmin.net).*";
+
+		$response = $this->SourceForgeApi->createComment(
+			Configure::read('SourceForgeProjectName'),
+			$ticket_id,
+			array('text' => $commentText)
+		);
+
+		$this->_handleSFResponse($response, 3, $reportId);
+		$this->redirect(array('controller' => 'reports', 'action' => 'view',
+						$reportId));
+	}
+
 	protected function _getTicketData($reportId) {
 		$data = array(
 			'ticket_form.summary' => $this->request->data['Ticket']['summary'],
@@ -181,7 +220,10 @@ class SourceForgeController extends AppController {
 /**
  * Sourceforge Response Handler
  * @param Object $response the response returned by sourceforge API
- * @param Integer $type type of response. 1 for create_ticket, 2 for link_ticket
+ * @param Integer $type type of response.
+ *			1 for create_ticket,
+ *			2 for link_ticket,
+ *			3 for unlink_ticket,
  * @param Integer $report_id report id.
  * @param Integer $ticket_id ticket id, required for link tivket only.
  *
@@ -189,26 +231,33 @@ class SourceForgeController extends AppController {
  */
 	protected function _handleSFResponse($response, $type, $report_id,  $ticket_id = 1)
 	{
-		if (!in_array($type, array(1,2))) {
+		if (!in_array($type, array(1,2,3))) {
 			throw new InvalidArgumentException('Invalid Argument "$type".');
 		}
 
 		if ($response->code[0] === "3") {
 			// success
-			if ($type == 1) {
-				preg_match("<rest/p/.*/bugs/(\d+)/>",
+			switch ($type) {
+				case 1:
+					$msg = 'Source forge ticket has been created for this report.';
+					preg_match("<rest/p/.*/bugs/(\d+)/>",
 					$response->headers['Location'], $matches);
-				$ticket_id = $matches[1];
+					$ticket_id = $matches[1];
+					break;
+				case 2:
+					$msg = 'Source forge ticket has been linked with this report.';
+					break;
+				case 3:
+					$msg = 'Source forge ticket has been unlinked with this report.';
+					$ticket_id = null;
+					break;
+				default:
+					$msg = 'Something went wrong!!';
+					break;
 			}
 
 			$this->Report->read(null, $report_id);
 			$this->Report->save(array('sourceforge_bug_id' => $ticket_id));
-
-			if ($type == 2) {
-				$msg = 'Source forge ticket has been linked with this report.';
-			} else {
-				$msg = 'Source forge ticket has been created for this report.';
-			}
 			$this->Session->setFlash($msg, "default", array("class" => "alert alert-success"));
 			return true;
 		} else if ($response->code === "403") {
