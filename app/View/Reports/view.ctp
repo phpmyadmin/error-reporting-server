@@ -50,13 +50,25 @@
       echo $this->Html->link('#' . $report['Report']['sourceforge_bug_id'],
           "https://sourceforge.net/p/$project_name/bugs/".
           $report['Report']['sourceforge_bug_id'] . "/");
+      echo '<form action="'
+          . Router::url('/source_forge/unlink_ticket/', true)
+          . $report['Report']['id']
+          .'" method="GET" class="form-horizontal" style="margin-bottom:5px;"'
+          . ' onclick="return window.confirm(\'Are you sure you want to unlink??\');" >';
+      echo $this->Form->input('UnLink with Ticket', array(
+        'type' => 'submit',
+        'label' => false,
+        'class'=>'btn btn-primary'
+        )
+      );
+      echo '</form>';
     } else {
       echo '<table cellspacing="0" class="table table-bordered error-report"'
           . ' style="width:300px; margin-bottom:5px;">'
           . '<tr><td style="min-width:130px;">';
       echo $this->Html->link('Create New Ticket', '/source_forge/create_ticket/'
           . $report['Report']['id']);
-      
+
       echo '</td><td style="min-width:130px;">';
 
       echo '<form action="'
