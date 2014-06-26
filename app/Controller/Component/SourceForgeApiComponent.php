@@ -130,4 +130,34 @@ class SourceForgeApiComponent extends Component {
 		return $client->post($accessToken['key'], $accessToken['secret'],
 				$url, $data);
 	}
+
+/**
+ * Fetches the bug ticket status from SourceForge.net using Allura API.
+ *
+ * @param  String $project the project name of the SourceForge.net project to submit
+ *                         the ticket to.
+ * @param  Integer $ticket_id the bug ticket id on which to comment.
+ *
+ * @return String status of bug ticket returned by SourceForge.net if successful,
+ *					boolean false if failed.
+ */
+	public function getBugTicketStatus($project, $ticket_id) {
+		$client = $this->createClient();
+		$accessToken = $this->accessToken;
+		$url = "https://sourceforge.net/rest/p/" . $project . "/bugs/" . $ticket_id ."/";
+
+		// get the discussion thread URL
+		$ticketInfo = $client->post(
+			$accessToken['key'],
+			$accessToken['secret'],
+			$url
+		);
+
+		if($ticketInfo->code != "200") {
+			return false;
+		}
+
+		$ticketInfo->body = json_decode($ticketInfo->body, true);
+		return $ticketInfo->body['ticket']['status'];
+	}
 }

@@ -31,6 +31,10 @@ In order to deploy the app in this repo you need to follow these steps:
   in the `app` directory
   `Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition`
 
+## Requirements ##
+ - php >= 5.4
+ - MySQL 
+ 
 
 ## Web server setup ##
 
@@ -139,7 +143,21 @@ that they can work with the new code. To use the shell you can just type:
 Console/cake custom addHashesToOldRecords
 ```
 
-### Requirements ###
- - php >= 5.4
- - MySQL 
- 
+# Cron Jobs #
+To Schedule & run cron jobs there's a separate script named `cron_dispatcher.php`. We can run cron job using this script. The script is designed to keep MVC of CakePHP as it is and still carry out the job.
+
+### Execute an Action as Cron Job ###
+`cron_dispatcher.php` takes one argument, namely Relative URL of the action.
+Following is the command to execute any *action* of the application.
+```Shell
+<php parser> app/webroot/cron_dispatcher.php <Action URL relative>
+```
+
+For example there's an action `/source_forge/sync_ticket_statuses` for updating statuses of all the Error Reports from their associated bug tickets on Sourceforge.net. To run it, following is the command.
+```Shell
+php app/webroot/cron_dispatcher.php /source_forge/sync_ticket_statuses
+```
+Run this command periodically and it'll carry out the respective actions.
+
+### Cron Job Logging ###
+A separate log file named `cron_jobs` is maintained for all the cron jobs. All the logging is done via `CakeLog` interface. All the failures and other activity relating to cron jobs should be reported there only. That would make debugging easier in case of failure.

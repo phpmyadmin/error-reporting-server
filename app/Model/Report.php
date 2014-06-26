@@ -69,6 +69,13 @@ class Report extends AppModel {
 		'new' =>	'New',
 		'fixed' =>	'Fixed',
 		'wontfix' =>	"Won't Fix",
+		'open' => 	"Open",
+		'pending' =>	"Pending",
+		'resolved' =>	"Resolved",
+		'invalid' => "Invalid",
+		'duplicate' => "Duplicate",
+		'works-for-me' => "Works for me",
+		'out-of-date' => "Out of Date"
 	);
 
 /**
