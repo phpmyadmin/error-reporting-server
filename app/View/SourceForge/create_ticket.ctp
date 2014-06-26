@@ -21,6 +21,7 @@
         // Ignore whatever after -
         $arr = explode('-',$pma_version);
         $arr = explode('.',$arr[0]);
+        $arr = array_splice($arr, 0, 3);
         $milestone_default_val = implode('.', $arr);
       }
       echo $this->Form->input('summary', array('placeholder' => 'Summary'));
