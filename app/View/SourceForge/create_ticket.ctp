@@ -21,6 +21,9 @@
         // Ignore whatever after -
         $arr = explode('-',$pma_version);
         $arr = explode('.',$arr[0]);
+        // remove custom strings appended to versions like in 4.2.2deb0.1
+        $tmp_arr = preg_split("/[a-zA-Z]+/", $arr[2]);
+        $arr[2] = $tmp_arr[0];
         $arr = array_splice($arr, 0, 3);
         $milestone_default_val = implode('.', $arr);
       }
