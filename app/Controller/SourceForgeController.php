@@ -66,6 +66,7 @@ class SourceForgeController extends AppController {
 		}
 
 		if (empty($this->request->data)) {
+			$this->set('pma_version', $report['Report']['pma_version']);
 			return;
 		}
 
