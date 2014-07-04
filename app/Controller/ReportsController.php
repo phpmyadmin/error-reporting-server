@@ -29,7 +29,7 @@ class ReportsController extends AppController {
 
 	public $helpers = array('Html', 'Form', 'Reports', 'Incidents');
 
-	public $uses = array('Incident', 'Report');
+	public $uses = array('Incident', 'Report', 'Notification', 'Developer');
 
 	public function index() {
 		$this->Report->recursive = -1;
@@ -74,6 +74,19 @@ class ReportsController extends AppController {
 		$this->set('status', $this->Report->status);
 
 		$this->_setSimilarFields($reportId);
+
+		// if there is an unread notification for this report, then mark it as read
+		$current_developer = $this->Developer->
+					findById($this->Session->read('Developer.id'));
+		$current_developer = Sanitize::clean($current_developer);
+		if ($current_developer) {
+			$notification = $this->Notification->deleteAll(
+				array('developer_id' => $current_developer['Developer']['id'],
+					'report_id' => $reportId
+				),
+				false
+			);
+		}
 	}
 
 	public function data_tables() {
