@@ -29,6 +29,44 @@ $(document).ready(function () {
 		}
 	});
 
+	$('#notifications_table').dataTable({
+		"bSortCellsTop": true,
+		"bProcessing": true,
+		"bServerSide": true,
+		"sAjaxSource": $('#notifications_table').data('ajax-url'),
+		"aoColumnDefs": [
+			{ "bSearchable": false, "aTargets": [ 1 ] },
+			{ "sClass": "center", "aTargets": [ 0, 1, 2, 3, 4, 5 ] }
+		],
+		"aoColumns": [
+			{ "sWidth": "5%" },
+			{ "sWidth": "10%" },
+			{ "sWidth": "15%" },
+			{ "sWidth": "30%" },
+			{ "sWidth": "10%" },
+			{ "sWidth": "10%" },
+			{ "sWidth": "10%" }
+		],
+		"fnServerData": function (sSource, aoData, fnCallback) {
+			$.getJSON(sSource, aoData, function (json) {
+				fnCallback(json);
+				// setup necessary CSS for linkable rows.
+				$('#notifications_table tbody tr').hover(function() {
+					$(this).css('cursor', 'pointer');
+				}, function() {
+					$(this).css('cursor', 'auto');
+				});
+			});
+		},
+		"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+			// click on the row anywhere to go to the report.
+			$(nRow).click(function () {
+				// extract the href from the anchor string
+				document.location.href = $($.parseHTML(aData[1])).attr('href');
+			});
+		}
+	});
+
 	oTable.find("input").on('keyup', function (e) {
 		// only search when enter is pressed
 		if (e.keyCode == 13) {
