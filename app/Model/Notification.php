@@ -87,7 +87,12 @@ class Notification extends AppModel {
 			);
 			array_push($notifications,$notification);
 		}
-		$notificationObj = new Notification();
-		return($notificationObj->saveMany($notifications));
+		$res = true;
+		// Following check is necessary in case there're no 'Developers' in the table
+		if ($notifications) {
+			$notificationObj = new Notification();
+			$res = $notificationObj->saveMany($notifications);
+		}
+		return($res);
 	}
 }
