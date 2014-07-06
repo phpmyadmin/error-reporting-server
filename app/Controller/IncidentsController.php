@@ -24,6 +24,7 @@ App::uses('AppController', 'Controller');
  * @package       Server.Controller
  */
 class IncidentsController extends AppController {
+	public $uses = array("Incident", "Notification");
 
 	public function create() {
 		$bugReport = $this->request->input('json_decode', true);

@@ -95,6 +95,12 @@ $(document).ready(function () {
 		return false;
 	});
 
+	// display notifications count
+	if (notifications_count > 0)
+	{
+		$('#nav_notifications a').html($('#nav_notifications a').html() + '(' + notifications_count + ')');
+	}
+
 	setTimeout(
 		function () {
 			$(".alert.alert-success").slideUp();
