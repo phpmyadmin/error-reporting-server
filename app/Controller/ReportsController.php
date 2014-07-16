@@ -80,7 +80,7 @@ class ReportsController extends AppController {
 					findById($this->Session->read('Developer.id'));
 		$current_developer = Sanitize::clean($current_developer);
 		if ($current_developer) {
-			$notification = $this->Notification->deleteAll(
+			$this->Notification->deleteAll(
 				array('developer_id' => $current_developer['Developer']['id'],
 					'report_id' => $reportId
 				),
