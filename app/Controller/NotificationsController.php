@@ -51,7 +51,9 @@ public $components = array('RequestHandler');
 		$dispRows = array();
 		$tmp_row = array();
 		foreach($rows as $row) {
-			$tmp_row[0] = '<input type="checkbox" name="report_notif_'.$row['Notification']['id'].'"/>';
+			$tmp_row[0] = '<input type="checkbox" name="notifs[]" value="'
+				. $row['Notification']['id']
+				. '"/>';
 			$tmp_row[1] ='<a href="'
 				. Router::url(
 					array(
@@ -78,5 +80,30 @@ public $components = array('RequestHandler');
 		);
 		$this->autoRender = false;
 		return json_encode($response);
+	}
+
+	/**
+	 * To carry out mass actions on Notifications.
+	 * Currently it deletes them (marks them "read").
+	 * Can be Extended for other mass operations as well.
+	 * Expects an array of Notification Ids as a POST parameter.
+	 *
+	 */
+	public function mass_action()
+	{
+		$msg = "Selected Notifications have been marked <i>Read</i>!";
+		$flash_class = "alert alert-success";
+		foreach($this->request->data['notifs'] as $notif_id)
+		{
+			if(!$this->Notification->delete(intval($notif_id), false)) {
+				$msg = "<b>ERROR</b>: There was some problem in deleting Notification(ID:"
+					. $notif_id
+					. ")!";
+				$flash_class = "alert alert-error";
+				break;
+			}
+		}
+		$this->Session->setFlash($msg, "default", array("class" => $flash_class));
+		$this->redirect("/notifications/");
 	}
 }

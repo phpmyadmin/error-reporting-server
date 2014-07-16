@@ -56,6 +56,10 @@ $(document).ready(function () {
 				}, function() {
 					$(this).css('cursor', 'auto');
 				});
+				// Stop Redirecting upon checkbox click event
+				$('#notifications_table td input').click(function (e) {
+					e.stopPropagation();
+				});
 			});
 		},
 		"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
