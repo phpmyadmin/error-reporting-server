@@ -28,6 +28,12 @@ public $components = array('RequestHandler');
 
 	public $uses = array('Notification', 'Developer', 'Report');
 
+	public function beforeFilter() {
+		if ($this->action != 'clean_old_notifs') {
+			parent::beforeFilter();
+		}
+	}
+
 	public function index()
 	{
 		// no need to do anything here. Just render the view.
@@ -105,5 +111,29 @@ public $components = array('RequestHandler');
 		}
 		$this->Session->setFlash($msg, "default", array("class" => $flash_class));
 		$this->redirect("/notifications/");
+	}
+
+	/**
+	 * Cron Action to clean older Notifications.
+	 * Can not (& should not) be directly accessed via Web.
+	 */
+	public function clean_old_notifs()
+	{
+		if (!defined('CRON_DISPATCHER')) {
+			$this->redirect('/');
+			exit();
+		}
+		// X Time: All the notifications before this time are to be deleted.
+		// Currently it's set to 60 days from current time.
+		$XTime = time() - 60*24*3600;
+		$conditions = array('Notification.created <' => date('Y-m-d H:i:s', $XTime));
+		if (!$this->Notification->deleteAll($conditions)) {
+			CakeLog::write(
+				'cron_jobs',
+				'FAILED: Deleting older Notifications!!',
+				'cron_jobs'
+			);
+		}
+		$this->autoRender = false;
 	}
 }
