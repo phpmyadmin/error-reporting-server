@@ -47,7 +47,7 @@
           <option></option>
           <?php
             foreach ($distinct_statuses as $id => $status) { 
-              echo "<option value='$status'>$status</option>";
+              echo "<option value='$status'>$statuses[$status]</option>";
             }
           ?>
         </select>

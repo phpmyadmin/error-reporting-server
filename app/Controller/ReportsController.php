@@ -116,6 +116,7 @@ class ReportsController extends AppController {
 		// change exception_type from boolean values to strings
 		$dispRows = array();
 		foreach($rows as $row) {
+			$row[4] = $this->Report->status[$row[4]];
 			$row[5] = (intval($row[5]))?('php'):('js');
 			$input_elem = "<input type='checkbox' name='reports[]' value='"
 				. $row[0]
