@@ -75,8 +75,8 @@ class ReportsControllerTest extends ControllerTestCase {
 			'iTotalDisplayRecords' => 2,
 			'sEcho' => 1,
 			'aaData' => array(
-				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js'),
-				array('2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js')
+				array("<input type='checkbox' name='reports[]' value='1'/>", '1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js'),
+				array("<input type='checkbox' name='reports[]' value='2'/>", '2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js')
 			)
 		);
 		$result = json_decode($this->contents, true);
@@ -86,11 +86,11 @@ class ReportsControllerTest extends ControllerTestCase {
 			'data' => array(
 				'sEcho' => 1,
 				'sSearch' => 'error2',
-				'bSearchable_1' => 'true',
+				'bSearchable_2' => 'true',
 				'iSortCol_0' => '0',
 				'sSortDir_0' => 'desc',
 				'bSortable_0' => 'true',
-				'iSortingCols' => '1',
+				'iSortingCols' => '2',
 			),
 			'method' => 'get',
 			'return' => 'view'
@@ -100,8 +100,8 @@ class ReportsControllerTest extends ControllerTestCase {
 			'iTotalDisplayRecords' => 2,
 			'sEcho' => 1,
 			'aaData' => array(
-				array('2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js'),
-				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js'),
+				array("<input type='checkbox' name='reports[]' value='2'/>", '2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js'),
+				array("<input type='checkbox' name='reports[]' value='1'/>", '1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js'),
 			)
 		);
 		$result = json_decode($this->contents, true);
@@ -110,7 +110,7 @@ class ReportsControllerTest extends ControllerTestCase {
 		$this->testAction('/reports/data_tables', array(
 			'data' => array(
 				'sEcho' => 1,
-				'sSearch_0' => '1',
+				'sSearch_1' => '1',
 			),
 			'method' => 'get',
 			'return' => 'view'
@@ -120,7 +120,7 @@ class ReportsControllerTest extends ControllerTestCase {
 			'iTotalDisplayRecords' => 1,
 			'sEcho' => 1,
 			'aaData' => array(
-				array('1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'new', 'js'),
+				array("<input type='checkbox' name='reports[]' value='1'/>", '1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js'),
 			)
 		);
 		$result = json_decode($this->contents, true);
