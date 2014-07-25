@@ -72,6 +72,13 @@ class Notification extends AppModel {
 		)
 	);
 
+	/**
+	 * To Add Multiple Notifications for New report.
+	 *
+	 * @param integer $report_id id of the new Report
+	 *
+	 * @return Boolean value. True on success. False on any type of failure.
+	 */
 	public static function addNotifications($report_id)
 	{
 		if (!is_int($report_id)) {
