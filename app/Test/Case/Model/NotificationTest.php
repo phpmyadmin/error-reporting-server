@@ -32,7 +32,7 @@ class NotificationTest extends CakeTestCase {
 		$report_id = 2;
 		$developer = new Developer();
 		$devs = $developer->find('all');
-		$res = Notification::addNotifications($report_id);
+		Notification::addNotifications($report_id);
 		$notifs = $this->Notification->find('all', array('conditions' => array('report_id' => $report_id)));
 
 		$this->assertEquals(count($notifs), count($devs));
