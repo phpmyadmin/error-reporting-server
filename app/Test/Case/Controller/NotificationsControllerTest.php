@@ -47,4 +47,30 @@ class NotificationsControllerTest extends ControllerTestCase {
 
 		$this->assertEquals($actual, $expected);
 	}
+
+	public function testCleanOldNotifs() {
+		// Mark one Notification as "not older". Setting 'created' to current time.
+		$notification = new Notification();
+		$notification->read(null, 3);
+		$notification->set('created', date('Y-m-d H:i:s', time()));
+		$notification->save();
+
+		// define constant for Cron Jobs
+		if (!defined('CRON_DISPATCHER')) {
+			define('CRON_DISPATCHER', true);
+		}
+		$this->testAction('/notifications/clean_old_notifs');
+		$actual = $notification->find('all', array('fields' => array('Notification.id')));
+		$expected = array(
+			array(
+				'Notification'=> array(
+					'id' => "3"
+				),
+				'Developer' => array(),
+				'Report' => array()
+			),
+		);
+
+		$this->assertEquals($actual, $expected);
+	}
 }
