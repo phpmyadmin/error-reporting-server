@@ -26,6 +26,23 @@ $(document).ready(function () {
 		"fnServerData": function (sSource, aoData, fnCallback) {
 			$.getJSON(sSource, aoData, function (json) {
 				fnCallback(json);
+				// setup necessary CSS for linkable rows.
+				$('#reports_table tbody tr').hover(function() {
+					$(this).css('cursor', 'pointer');
+				}, function() {
+					$(this).css('cursor', 'auto');
+				});
+				// Stop Redirecting upon checkbox click event
+				$('#reports_table td input').click(function (e) {
+					e.stopPropagation();
+				});
+			});
+		},
+		"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+			// click on the row anywhere to go to the report.
+			$(nRow).click(function () {
+				// extract the href from the anchor string
+				document.location.href = $($.parseHTML(aData[1])).attr('href');
 			});
 		}
 	});
