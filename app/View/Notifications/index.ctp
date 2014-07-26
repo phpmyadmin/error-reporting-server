@@ -30,6 +30,17 @@
 	<tbody>
 	<!-- Table is populated using AJAX-jQuery datatable plugin. -->
 	</tbody>
+	<tfoot>
+	  <tr>
+	    <th></th>
+	    <th></th>
+	    <th></th>
+	    <th></th>
+	    <th></th>
+	    <th></th>
+	    <th></th>
+	  </tr>
+	</tfoot>
 	</table>
 	</form>
 </div>
