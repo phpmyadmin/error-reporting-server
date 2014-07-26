@@ -32,9 +32,23 @@ class NotificationFixture extends CakeTestFixture {
 			'id' => 1,
 			'developer_id' => 1,
 			'report_id' => 1,
-			'created' => '2014-07-04 07:05:09',
-			'modified' => '2014-07-04 07:05:09'
+			'created' => '2014-01-01 07:05:09',
+			'modified' => '2014-01-01 07:05:09'
 		),
+		array(
+			'id' => 2,
+			'developer_id' => 1,
+			'report_id' => 4,
+			'created' => '2014-01-02 07:05:09',
+			'modified' => '2014-01-03 07:05:09'
+		),
+		array(
+			'id' => 3,
+			'developer_id' => 1,
+			'report_id' => 4,
+			'created' => '2014-07-02 07:05:09',
+			'modified' => '2014-07-03 07:05:09'
+		)
 	);
 
 }
