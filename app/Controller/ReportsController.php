@@ -202,7 +202,11 @@ class ReportsController extends AppController {
 		$state = $this->request->data['state'];
 		$newState = $this->Report->status[$state];
 		if (!$newState) {
-			throw new NotFoundException(__('Invalid State'));
+			CakeLog::write(
+				'error',
+				'ERRORED: Invalid param "state" in ReportsController::mass_action()',
+				'alert'
+			);
 			$msg = "ERROR: Invalid State!!";
 		} else if (count($this->request->data['reports']) == 0) {
 			$msg = "No Reports Selected!! Please Select Reports and try again.";
@@ -215,7 +219,11 @@ class ReportsController extends AppController {
 			{
 				$report = $this->Report->read(null, $report_id);
 				if (!$report) {
-					throw new NotFoundException(__('Invalid Report ID:' . $report_id));
+					CakeLog::write(
+						'error',
+						'ERRORED: Invalid report_id in ReportsController::mass_action()',
+						'alert'
+					);
 					$msg = "ERROR:Invalid Report ID:" . $report_id;
 					$flash_class = "alert alert-error";
 					break;
