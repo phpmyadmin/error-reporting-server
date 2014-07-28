@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
+         colors="true"
+         verbose="true"
+         strict="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          >
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">app/</directory>
+            <exclude>
+                <directory suffix=".php">app/Plugin/</directory>
+                <directory suffix=".php">app/Vendor/</directory>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>
