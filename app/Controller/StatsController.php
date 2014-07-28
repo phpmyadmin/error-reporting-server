@@ -26,7 +26,7 @@ App::uses('AppController', 'Controller');
  */
 class StatsController extends AppController {
 
-	public $uses = array("Report", "Incident");
+	public $uses = array("Report", "Incident", "Notification");
 
 	public $helper = array("Reports");
 

@@ -29,7 +29,7 @@ class ReportsController extends AppController {
 
 	public $helpers = array('Html', 'Form', 'Reports', 'Incidents');
 
-	public $uses = array('Incident', 'Report');
+	public $uses = array('Incident', 'Report', 'Notification', 'Developer');
 
 	public function index() {
 		$this->Report->recursive = -1;
@@ -49,6 +49,7 @@ class ReportsController extends AppController {
 				'conditions' => array('error_name !=' => ''),
 			))
 		);
+		$this->set('statuses', $this->Report->status);
 	}
 
 	public function view($reportId) {
@@ -74,6 +75,19 @@ class ReportsController extends AppController {
 		$this->set('status', $this->Report->status);
 
 		$this->_setSimilarFields($reportId);
+
+		// if there is an unread notification for this report, then mark it as read
+		$current_developer = $this->Developer->
+					findById($this->Session->read('Developer.id'));
+		$current_developer = Sanitize::clean($current_developer);
+		if ($current_developer) {
+			$this->Notification->deleteAll(
+				array('developer_id' => $current_developer['Developer']['id'],
+					'report_id' => $reportId
+				),
+				false
+			);
+		}
 	}
 
 	public function data_tables() {
@@ -102,7 +116,12 @@ class ReportsController extends AppController {
 		// change exception_type from boolean values to strings
 		$dispRows = array();
 		foreach($rows as $row) {
+			$row[4] = $this->Report->status[$row[4]];
 			$row[5] = (intval($row[5]))?('php'):('js');
+			$input_elem = "<input type='checkbox' name='reports[]' value='"
+				. $row[0]
+				. "'/>";
+			array_unshift($row, $input_elem);
 			array_push($dispRows, $row);
 		}
 		$response = array(
@@ -170,6 +189,53 @@ class ReportsController extends AppController {
 		$this->redirect("/reports/view/$reportId");
 	}
 
+	/**
+	 * To carry out mass actions on Reports
+	 * Currently only to change their statuses.
+	 * Can be Extended for other mass operations as well.
+	 * Expects an array of Report Ids as a POST parameter.
+	 *
+	 */
+	public function mass_action()
+	{
+		$flash_class = "alert alert-error";
+		$state = $this->request->data['state'];
+		$newState = $this->Report->status[$state];
+		if (!$newState) {
+			CakeLog::write(
+				'error',
+				'ERRORED: Invalid param "state" in ReportsController::mass_action()',
+				'alert'
+			);
+			$msg = "ERROR: Invalid State!!";
+		} else if (count($this->request->data['reports']) == 0) {
+			$msg = "No Reports Selected!! Please Select Reports and try again.";
+		} else {
+			$msg = "Status has been changed to '"
+				. $this->request->data['state']
+				. "' for selected Reports!";
+			$flash_class = "alert alert-success";
+			foreach($this->request->data['reports'] as $report_id)
+			{
+				$report = $this->Report->read(null, $report_id);
+				if (!$report) {
+					CakeLog::write(
+						'error',
+						'ERRORED: Invalid report_id in ReportsController::mass_action()',
+						'alert'
+					);
+					$msg = "ERROR:Invalid Report ID:" . $report_id;
+					$flash_class = "alert alert-error";
+					break;
+				}
+				$this->Report->saveField("status", $state);
+			}
+		}
+
+		$this->Session->setFlash($msg, "default", array("class" => $flash_class));
+		$this->redirect("/reports/");
+	}
+
 ## HELPERS
 	protected function _setSimilarFields($id) {
 		$this->Report->read(null, $id);
@@ -187,13 +253,15 @@ class ReportsController extends AppController {
 	}
 
 	/**
+	 * Indexes are +1'ed because first column is of checkboxes
+	 * and hence it should be ingnored.
 	 * @param string[] $aColumns
 	 */
 	protected function _getSearchConditions($aColumns) {
 		$searchConditions = array('OR' => array());
 		if ( $this->request->query('sSearch') != "" ) {
 			for ( $i = 0; $i < count($aColumns); $i++ ) {
-				if ($this->request->query('bSearchable_' . $i) == "true") {
+				if ($this->request->query('bSearchable_' . ($i+1)) == "true") {
 					$searchConditions['OR'][] = array($aColumns[$i] . " LIKE" =>
 							"%" . $this->request->query('sSearch') . "%");
 				}
@@ -202,15 +270,17 @@ class ReportsController extends AppController {
 
 		/* Individual column filtering */
 		for ( $i = 0; $i < count($aColumns); $i++ ) {
-			if ($this->request->query('sSearch_' . $i) != '') {
+			if ($this->request->query('sSearch_' . ($i+1)) != '') {
 				$searchConditions[] = array($aColumns[$i] . " LIKE" =>
-						$this->request->query('sSearch_' . $i));
+						$this->request->query('sSearch_' . ($i+1)));
 			}
 		}
 		return $searchConditions;
 	}
 
 	/**
+	 * Indexes are +1'ed because first column is of checkboxes
+	 * and hence it should be ingnored.
 	 * @param string[] $aColumns
 	 */
 	protected function _getOrder($aColumns) {
@@ -218,9 +288,9 @@ class ReportsController extends AppController {
 			$order = array();
 			for ( $i = 0; $i < intval($this->request->query('iSortingCols')); $i++ ) {
 				if ( $this->request->query('bSortable_'
-						. intval($this->request->query('iSortCol_' . $i))) == "true" ) {
+						. intval($this->request->query('iSortCol_' . ($i+1)))) == "true" ) {
 					$order[] = array(
-						$aColumns[intval($this->request->query('iSortCol_' . $i))] =>
+						$aColumns[intval($this->request->query('iSortCol_' . ($i+1)))] =>
 							$this->request->query('sSortDir_' . $i)
 					);
 				}

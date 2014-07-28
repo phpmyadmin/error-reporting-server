@@ -54,11 +54,18 @@ class AppController extends Controller {
 		$params = $this->params->params;
 		$controller = $params["controller"];
     $this->set('current_controller', $controller);
+		$notif_count = 0;
 
 		if ($this->Session->read('Developer.id')) {
 			$current_developer = $this->Developer->
 					findById($this->Session->read('Developer.id'));
 			$current_developer = Sanitize::clean($current_developer);
+			$notif_count = $this->Notification->find(
+				'count',
+				array(
+					'conditions' => array('developer_id' => intval($current_developer["Developer"]['id']))
+				)
+			);
 
 			$this->set('current_developer', $current_developer["Developer"]);
 			$this->set('developer_signed_in', true);
@@ -66,6 +73,7 @@ class AppController extends Controller {
 			$this->set('developer_signed_in', false);
 			$this->_checkAccess();
 		}
+		$this->set('notif_count', $notif_count);
 	}
 
 	protected function _checkAccess() {

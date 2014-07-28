@@ -66,6 +66,8 @@ $baseURL = Router::url('/',true);
 		echo $this->fetch('meta');
 		echo $this->fetch('css');
 		echo $this->fetch('script');
+		// set up js global variable for notifications count
+		echo $this->Html->scriptBlock('var notifications_count = ' . $notif_count . ';',array('inline'=>true));
 	?>
 </head>
 <body>
@@ -74,13 +76,13 @@ $baseURL = Router::url('/',true);
       <a class="brand" href="<?php echo $baseURL; ?>">phpMyAdmin</a>
       <ul class="nav">
 				<?php
-					$controllers = array('reports', 'stats');
+					$controllers = array('reports', 'stats', 'notifications');
 					foreach ($controllers as $controller) {
 						$class = '';
 						if ($current_controller === $controller) {
 							$class = 'active';
 						}
-						echo "<li class='$class'><a href='".$baseURL.$controller."'>";
+						echo "<li class='$class' id='nav_".$controller."'><a href='".$baseURL.$controller."'>";
 						echo Inflector::humanize($controller);
 						echo "</a></li>";
 					}

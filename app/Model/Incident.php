@@ -18,6 +18,7 @@
 
 App::uses('AppModel', 'Model');
 App::uses('Sanitize', 'Utility');
+App::import('model','Notification');
 
 /**
  * An incident a representing a single incident of a submited bug
@@ -170,6 +171,18 @@ class Incident extends AppModel {
 
 			if($isSaved) {
 				array_push($incident_ids,$tmpIncident->id);
+				if (!$closestReport) {
+					// add notifications entry
+					$tmpIncident = $tmpIncident->findById($tmpIncident->id);
+					if (!Notification::addNotifications(intval($tmpIncident['Report']['id']))) {
+						CakeLog::write(
+							'error',
+							'ERRORED: Notification::addNotifications() failed on Report#'
+								. $tmpIncident['Report']['id'],
+							'alert'
+						);
+					}
+				}
 			} else {
 				array_push($incident_ids,false);
 			}
