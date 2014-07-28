@@ -9,13 +9,10 @@
          >
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">app/</directory>
-            <exclude>
-                <directory suffix=".php">app/Console/</directory>
-                <directory suffix=".php">app/Plugin/</directory>
-                <directory suffix=".php">app/Vendor/</directory>
-                <directory suffix=".php">app/Config/</directory>
-            </exclude>
+            <directory suffix=".php">app/Controller/</directory>
+            <directory suffix=".php">app/Model/</directory>
+            <directory suffix=".php">app/View/</directory>
+            <directory suffix=".php">app/webroot/</directory>
         </whitelist>
     </filter>
 </phpunit>
