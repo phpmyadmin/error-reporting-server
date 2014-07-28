@@ -3,6 +3,8 @@
          colors="true"
          verbose="true"
          strict="true"
+         timeoutForSmallTests="10"
+         timeoutForMediumTests="30"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
