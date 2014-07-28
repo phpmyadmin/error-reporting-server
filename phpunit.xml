@@ -13,6 +13,7 @@
             <exclude>
                 <directory suffix=".php">app/Plugin/</directory>
                 <directory suffix=".php">app/Vendor/</directory>
+                <directory suffix=".php">app/Config/</directory>
             </exclude>
         </whitelist>
     </filter>
