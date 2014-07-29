@@ -1,4 +1,4 @@
-<h1>phpMyAdmin Error Reporting Sytem</h1>
+<h1>phpMyAdmin Error Reporting System</h1>
 <p>This is the error reporting system for phpMyAdmin. Error reports are sent
 here where they are collected, stored, tagged and archived. They may also be
 siphoned off to the bug tracker at sourceforge.net</p>
