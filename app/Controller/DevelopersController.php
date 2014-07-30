@@ -62,7 +62,11 @@ class DevelopersController extends AppController {
 					. "Please try again later", "default",
 					array("class" => "alert alert-error"));
 		}
-		$this->redirect(array("controller" => "reports","action" => "index"));
+		$last_page = $this->Session->read("last_page");
+		if(empty($last_page)) {
+			$last_page = array("controller" => "reports","action" => "index");
+		}
+		$this->redirect($last_page);
 	}
 
 	public function logout() {

@@ -91,6 +91,7 @@ class AppController extends Controller {
 
 		$this->Session->setFlash("You need to be signed in to do this", "default",
 				array("class" => "alert alert-error"));
+		$this->Session->write("last_page", $this->here);
 		return $this->redirect($this->referer());
 	}
 }
