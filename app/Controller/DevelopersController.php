@@ -58,7 +58,7 @@ class DevelopersController extends AppController {
 						"default", array("class" => "alert alert-success"));
 			}
 		} else {
-			$this->Session->setFlash("We we not able to authenticate you."
+			$this->Session->setFlash("We were not able to authenticate you."
 					. "Please try again later", "default",
 					array("class" => "alert alert-error"));
 		}
