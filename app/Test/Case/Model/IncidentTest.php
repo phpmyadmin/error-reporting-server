@@ -333,7 +333,13 @@ class IncidentTest extends CakeTestCase {
 		$result = $this->Incident->createIncidentFromBugReport($bugReport);
 		$this->assertEquals(1, count($result));
 
-		// [TODO]Case-1.2: closest report = some report.
+		// Case-1.2: closest report = some report.
+		// Previously(in Case-1.1) inserted Reports serve as ClosestReports.
+		$result = $this->Incident->createIncidentFromBugReport($bugReport);
+		$this->assertEquals(1, count($result));
+		// check the incident has been reported under the same 'Report'
+		$result = $this->Incident->Report->find('all');
+		$this->assertEquals(2, count($result[0]['Incident']));
 
 		// Case-2: for 'php' reports
 		$bugReport = file_get_contents(TESTS . 'Fixture' . DS . "report_php.json");
@@ -342,7 +348,14 @@ class IncidentTest extends CakeTestCase {
 		$result = $this->Incident->createIncidentFromBugReport($bugReport);
 		$this->assertEquals(3, count($result));
 
-		// [TODO]Case-2.2: closest report = some report.
-
+		// Case-2.2: closest report = some report.
+		// Previously(in Case-2.1) inserted Reports serve as ClosestReports.
+		$result = $this->Incident->createIncidentFromBugReport($bugReport);
+		$this->assertEquals(3, count($result));
+		// check the incidents have been reported under the same 'Report's
+		$result = $this->Incident->Report->find('all');
+		$this->assertEquals(2, count($result[1]['Incident']));
+		$this->assertEquals(2, count($result[2]['Incident']));
+		$this->assertEquals(2, count($result[3]['Incident']));
 	}
 }
