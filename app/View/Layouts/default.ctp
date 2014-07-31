@@ -45,6 +45,7 @@ $baseURL = Router::url('/',true);
 		echo $this->Html->script('shCore');
 		echo $this->Html->script('shBrushXml');
 		echo $this->Html->script('shBrushJScript');
+		echo $this->Html->script('shBrushPhp');
 		echo $this->Html->script('raphael-min');
 		echo $this->Html->script('g.raphael-min');
 		echo $this->Html->script('g.pie-min');
