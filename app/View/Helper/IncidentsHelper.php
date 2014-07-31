@@ -47,18 +47,44 @@ class IncidentsHelper extends AppHelper {
 		}
 
 		foreach ($incident["Incident"]["stacktrace"] as $level) {
-			$html .= $this->_getStackLevelInfo($level);
-			$html .= "<pre class='brush: js; tab-size: 2'>";
-			$html .= join("\n", $level["context"]);
+			$exception_type = (($incident["Incident"]["exception_type"])?('php'):('js'));
+			$html .= $this->_getStackLevelInfo($level, $exception_type);
+			$html .= "<pre class='brush: "
+				. $exception_type
+				. "; tab-size: 2'>";
+			if($exception_type == 'js') {
+				$html .= join("\n", $level["context"]);
+			} else {
+				$html .= $level["function"];
+				$html .= "(";
+				$argList = "";
+				if (count($level["args"]) > 0) {
+					foreach ($level["args"] as $arg) {
+						$argList .= "\n"
+							. getType($arg)
+							. " => "
+							. $arg;
+						$argList .= ",";
+					}
+					$argList = substr($argList, 0, (strlen($argList)-1));
+					$argList .= "\n";
+				}
+				$html .= $argList;
+				$html .= ")";
+			}
 			$html .= "</pre>";
 		}
 		$html .= "</div>";
 		return $html;
 	}
 
-	protected function _getStackLevelInfo($level) {
+	protected function _getStackLevelInfo($level, $exception_type = 'js') {
 		$html = "<span>";
-		$elements = array("filename", "scriptname", "line", "func", "column");
+		if ($exception_type == 'js') {
+			$elements = array("filename", "scriptname", "line", "func", "column");
+		} else {
+			$elements = array("file", "line", "function", "class");
+		}
 		foreach ($elements as $element) {
 			if (isset($level[$element])) {
 				$html .= "$element: " . $level[$element] . "; ";
