@@ -3,6 +3,12 @@
 </h1>
 <table cellspacing="0" class="table table-bordered error-report">
   <tr>
+    <td>Error Type</td>
+    <td>
+      <?php echo (($incident["Incident"]["exception_type"])?('php'):('js')); ?>
+    </td>
+  </tr>
+  <tr>
     <td>Error Name</td>
     <td>
       <?php echo $incident["Incident"]["error_name"]; ?>
@@ -72,7 +78,13 @@
   <tr>
     <td>URI</td>
     <td>
-      <?php echo $incident["Incident"]["full_report"]["exception"]["uri"]; ?>
+      <?php
+        if ($incident["Incident"]["exception_type"]) {
+          echo 'NA';
+        } else {
+          echo $incident["Incident"]["full_report"]["exception"]["uri"];
+        }
+      ?>
     </td>
   </tr>
   <tr>
@@ -93,5 +105,11 @@
 
 <h4>Microhistory:</h4>
 <pre>
-<?php echo json_encode($incident["Incident"]["full_report"]["microhistory"], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES); ?>
+<?php
+  if (($incident["Incident"]["exception_type"])) {
+    echo 'NA';
+  } else {
+    echo json_encode($incident["Incident"]["full_report"]["microhistory"], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+  }
+?>
 </pre>
