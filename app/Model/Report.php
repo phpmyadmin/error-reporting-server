@@ -129,7 +129,7 @@ class Report extends AppModel {
 	public function getIncidentsWithDifferentStacktrace() {
 		return $this->Incident->find('all', array(
 			'fields' => array('DISTINCT Incident.stackhash', 'Incident.stacktrace',
-					'Incident.full_report'),
+					'Incident.full_report', 'Incident.exception_type'),
 			'conditions' => $this->_relatedIncidentsConditions(),
 			'group' => "Incident.stackhash",
 		));
