@@ -5,7 +5,7 @@ $(document).ready(function () {
 		"bServerSide": true,
 		"sAjaxSource": $('#reports_table').data('ajax-url'),
 		"aoColumnDefs": [
-			{ "bSearchable": false, "aTargets": [ 1 ] },
+			{ "bSearchable": false, "aTargets": [ 1, 6 ] },
 			{ "sClass": "center", "aTargets": [ 0, 1, 4, 5, 6] },
 			{ "fnRender": function (oObj) {
 					return '<a class="block" href="/reports/view/' + oObj.aData[1] +
