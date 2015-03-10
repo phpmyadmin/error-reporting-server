@@ -23,6 +23,7 @@ App::uses('Controller', 'Controller');
 App::uses('Developer', 'Model');
 App::uses('Sanitize', 'Utility');
 App::uses('Inflector', 'Utility');
+App::uses('Notification', 'Model');
 
 /**
  * Application Controller
@@ -40,7 +41,7 @@ class AppController extends Controller {
 		'Session',
 	);
 
-	public $uses = array('Developer');
+	public $uses = array('Developer', 'Notification');
 
 	public $whitelist = array(
 		'developers',
@@ -53,7 +54,7 @@ class AppController extends Controller {
 	public function beforeFilter() {
 		$params = $this->params->params;
 		$controller = $params["controller"];
-    $this->set('current_controller', $controller);
+        $this->set('current_controller', $controller);
 		$notif_count = 0;
 
 		if ($this->Session->read('Developer.id')) {
