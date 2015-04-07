@@ -66,9 +66,12 @@ class StatsController extends AppController {
 	}
 
 	protected function _getTimeFilter() {
-		if (isset($filter)) {
-			$filter = $this->Incident->filterTimes[$this->request->query('filter')];
-			return $filter;
+		$getFilter=$this->request->query('filter');
+		if(isset($getfilter)) {
+			$filter = $this->Incident->filterTimes[$getFilter];
+			if (isset($filter)) {
+				return $filter;
+			} 
 		} else {
 			return $this->Incident->filterTimes["all_time"];
 		}
