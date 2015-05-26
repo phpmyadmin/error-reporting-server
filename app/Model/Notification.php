@@ -56,13 +56,6 @@ class Notification extends AppModel {
  * @var array
  */
 	public $belongsTo = array(
-		'Developer' => array(
-			'className' => 'Developer',
-			'foreignKey' => 'developer_id',
-			'conditions' => '',
-			'fields' => '',
-			'order' => ''
-		),
 		'Report' => array(
 			'className' => 'Report',
 			'foreignKey' => 'report_id',

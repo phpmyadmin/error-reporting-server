@@ -56,19 +56,23 @@ class ReportsController extends AppController {
 		if (!$reportId) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
-
+        $this->Report->unbindModel(
+            array('hasMany' => array('Incident'))
+        );
 		$report = $this->Report->findById($reportId);
 		if (!$report) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
-
+        
 		$this->set('report', $report);
 		$this->set('project_name', Configure::read('SourceForgeProjectName'));
-
+        $this->Report->unbindModel(
+            array('hasMany' => array('Incident'))
+        );
 		$this->Report->read(null, $reportId);
 		$this->set('incidents', $this->Report->getIncidents());
 		$this->set('incidents_with_description',
-				$this->Report->getIncidentsWithDescription());
+            $this->Report->getIncidentsWithDescription());
 		$this->set('incidents_with_stacktrace',
 				$this->Report->getIncidentsWithDifferentStacktrace());
 		$this->set('related_reports', $this->Report->getRelatedReports());
@@ -108,11 +112,13 @@ class ReportsController extends AppController {
 		$pagedParams = $params;
 		$pagedParams['limit'] = intval($this->request->query('iDisplayLength'));
 		$pagedParams['offset'] = intval($this->request->query('iDisplayStart'));
-
+        $this->Report->unbindModel(
+            array('hasMany' => array('Incident'))
+        );
 		$rows = $this->Report->find('allDataTable', $pagedParams);
 		$rows = Sanitize::clean($rows);
 		$totalFiltered = $this->Report->find('count', $params);
-
+        
 		// change exception_type from boolean values to strings
 		$dispRows = array();
 		foreach($rows as $row) {

@@ -20,7 +20,7 @@ class IncidentsHelper extends AppHelper {
 
 	public function linkToIncident($incident) {
 		$incidentId = $incident["Incident"]["id"];
-		$link = "<a href='/incidents/view/$incidentId'>#$incidentId</a>";
+		$link = "<a href='/" . BASE_DIR . "incidents/view/$incidentId'>#$incidentId</a>";
 		return $link;
 	}
 

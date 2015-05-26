@@ -88,7 +88,6 @@ class Incident extends AppModel {
  * @link http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html#belongsto
  * @see Model::$belongsTo
  */
-	public $belongsTo = array('Report');
 
 /**
  * The fields which are summarized in the report page with charts and are also

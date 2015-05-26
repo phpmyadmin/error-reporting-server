@@ -39,7 +39,7 @@ class SourceForgeController extends AppController {
 
 	public function authorize() {
 		$requestToken =
-				$this->SourceForgeApi->getRequestToken('/source_forge/callback');
+			$this->SourceForgeApi->getRequestToken('/' .BASE_DIR . 'source_forge/callback');
 		if ($requestToken) {
 			$this->Session->write('sourceforge_request_token', serialize($requestToken));
 			$this->redirect($this->SourceForgeApi->getRedirectUrl($requestToken));

@@ -25,7 +25,7 @@ App::uses('AppModel', 'Model');
  */
 class Report extends AppModel {
 
-/**
+    /**
  * @var array
  * @link http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html#hasmany
  * @see Cake::Model::$hasMany
@@ -190,7 +190,7 @@ class Report extends AppModel {
  *		of groups. Ex: array('Apache' => 2) or array(array('Apache' => 2), 1)
  */
 	public function getRelatedByField($fieldName, $limit = 10, $count = false,
-			$related = true, $timeLimit = null) {
+		$related = true, $timeLimit = null) {
 		$queryDetails = array(
 			'fields' => array("DISTINCT Incident.$fieldName", "COUNT(*) as count"),
 			'conditions' => array(
@@ -233,19 +233,9 @@ class Report extends AppModel {
  */
 	protected function _relatedIncidentsConditions() {
 		$conditions = array(array('Incident.report_id' => $this->id));
-
-		$conditions[] = array("AND" =>
-			array('Report.related_to' => $this->id),
-			'Incident.report_id = Report.id',
-		);
-
 		if ($this->data["Report"]["related_to"]) {
 			$conditions[] = array('Incident.report_id' =>
 					$this->data["Report"]["related_to"]);
-			$conditions[] = array("AND" =>
-				array('Report.related_to' => $this->data["Report"]["related_to"]),
-				'Incident.report_id = Report.id'
-			);
 		}
 
 		return array('OR' => $conditions);
@@ -312,7 +302,7 @@ class Report extends AppModel {
 		if ($state === 'before') {
 			return $query;
 		}
-		$output = array();
+        $output = array();
 		foreach ($results as $row) {
 			$output[] = array_values($row['Report'])[0];
 		}

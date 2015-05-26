@@ -6,7 +6,7 @@
 </div>
 <br />
 <form class="form-inline" id="state-form" style="display: none"
-		action="/reports/change_state/<?php echo $report["Report"]["id"]; ?>"
+		action="/<?php echo BASE_DIR ?>reports/change_state/<?php echo $report["Report"]["id"]; ?>"
 		method="post">
 	<span>Change state to:</span>
 	<?php echo $this->Form->select('state', $status, array('value' =>
@@ -14,7 +14,7 @@
 	<input type="submit" value="Change" class="btn btn-primary" />
 </form>
 <?php if (empty($related_reports)) { ?>
-  <form class="form-inline" action="/reports/mark_related_to/<?php
+<form class="form-inline" action="/<?php echo BASE_DIR ?>reports/mark_related_to/<?php
       echo $report["Report"]["id"]; ?>">
     <span>Mark the same as:</span>
     <input type="number" min="1" name="related_to" />
@@ -24,7 +24,7 @@
   <p>
     This report has been marked the same as the following reports:
     (<?php echo $this->Reports->createReportsLinks($related_reports); ?>).
-    <a href="/reports/unmark_related_to/<?php echo $report["Report"]["id"]; ?>">
+    <a href="/<?php echo BASE_DIR ?>reports/unmark_related_to/<?php echo $report["Report"]["id"]; ?>">
       Remove from this group
     </a>
   </p>

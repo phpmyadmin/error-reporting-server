@@ -1,5 +1,5 @@
 <h1>Incident #<?php echo $incident["Incident"]["id"]; ?>
-  <small>[Report <?php echo $this->Reports->linkToReport($incident); ?>]</small>
+  <small>[Report <?php echo $this->Reports->linkToReportFromIncident($incident); ?>]</small>
 </h1>
 <table cellspacing="0" class="table table-bordered error-report">
   <tr>
