@@ -210,6 +210,12 @@ class Incident extends AppModel {
 			List($location, $linenumber) =
 					$this->_getIdentifyingLocation($bugReport['exception']['stack']);
 		}
+        $this->bindModel(
+            array('belongsTo' => array(
+                    'Report'
+                )
+            )
+        );
 		$report = $this->Report->findByLocationAndLinenumberAndPmaVersion(
 					$location, $linenumber, $bugReport['pma_version']);
 		return $report;
