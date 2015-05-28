@@ -40,7 +40,6 @@ class NotificationsControllerTest extends ControllerTestCase {
 				'Notification'=> array(
 					'id' => "2"
 				),
-				'Developer' => array(),
 				'Report' => array()
 			),
 		);
@@ -66,7 +65,6 @@ class NotificationsControllerTest extends ControllerTestCase {
 				'Notification'=> array(
 					'id' => "3"
 				),
-				'Developer' => array(),
 				'Report' => array()
 			),
 		);

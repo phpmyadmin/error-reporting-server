@@ -165,6 +165,12 @@ class Incident extends AppModel {
 					'Incident' => $si,
 					'Report' => $report
 				);
+                $tmpIncident->bindModel(
+                    array('belongsTo' => array(
+                            'Report'
+                        )
+                    )
+                );
 				$isSaved = $tmpIncident->saveAssociated($data);
 			}
 
@@ -173,11 +179,11 @@ class Incident extends AppModel {
 				if (!$closestReport) {
 					// add notifications entry
 					$tmpIncident = $tmpIncident->findById($tmpIncident->id);
-					if (!Notification::addNotifications(intval($tmpIncident['Report']['id']))) {
+					if (!Notification::addNotifications(intval($tmpIncident['Incident']['report_id']))) {
 						CakeLog::write(
 							'error',
 							'ERRORED: Notification::addNotifications() failed on Report#'
-								. $tmpIncident['Report']['id'],
+								. $tmpIncident['Incident']['report_id'],
 							'alert'
 						);
 					}
