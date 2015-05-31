@@ -1,0 +1,37 @@
+.centered {
+  text-align: center;
+}
+
+.full_width {
+  width: 100%;
+}
+
+table.error-report tr td:first-child {
+  font-weight: bold;
+  width: 15%;
+}
+
+table.error-report tr pre{
+  word-break: normal;
+}
+
+.count {
+  color: blueviolet;
+}
+
+.block {
+  display: block;
+}
+
+#reports_table thead tr:last-child th input,
+#reports_table thead tr:last-child th select {
+  margin-bottom: 0;
+}
+
+.jqplot-yaxis {
+	margin-right: 10px;
+}
+
+.jqplot-xaxis {
+	margin-top: 5px;
+}

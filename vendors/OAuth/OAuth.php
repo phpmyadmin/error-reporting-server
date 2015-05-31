@@ -1,4 +1,6 @@
 <?php
+namespace vendors\OAuth;
+
 // vim: foldmethod=marker
 
 /* Generic exception class

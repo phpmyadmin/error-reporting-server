@@ -10,9 +10,12 @@
  * Redistributions of files must retain the above copyright notice.
  *
  */
+namespace vendors\OAuth;
+
+use App\Network\Http\HttpSocket;
+use Cake\Utility\Text;
 
 require('OAuth.php');
-App::uses('HttpSocket', 'Network/Http');
 
 class OAuthClient {
     private $url = null;
@@ -113,7 +116,7 @@ class OAuthClient {
     }
 
     private function doGet($url) {
-        $socket = new HttpSocket(
+        $socket = new Client(
           array(
             'ssl_verify_host' => false
           )
@@ -125,7 +128,7 @@ class OAuthClient {
     }
 
     private function doPost($url, $data) {
-        $socket = new HttpSocket(
+        $socket = new Client(
           array(
             'ssl_verify_host' => false
           )
@@ -137,8 +140,7 @@ class OAuthClient {
     }
 
     private function doPostMultipartFormData($url, $authorization, $paths, $data) {
-        App::uses('String', 'Utility');
-        $boundary = String::uuid();
+        $boundary = Text::uuid();
 
         $body = "--{$boundary}\r\n";
 
@@ -156,7 +158,7 @@ class OAuthClient {
             $body .= "--{$boundary}--\r\n";
         }
 
-        $socket = new HttpSocket();
+        $socket = new Client();
         $result = $socket->request(array('method' => 'POST',
                                          'uri' => $url,
                                          'header' => array(
