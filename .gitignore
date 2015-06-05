@@ -9,3 +9,5 @@ app/[Cc]onfig/oauth.php
 !empty
 *.swp
 /build/
+nbproject/
+logs/
