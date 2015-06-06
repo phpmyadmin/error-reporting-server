@@ -7,6 +7,8 @@ use App\Utility\Sanitize;
 use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\ORM\Table;
+use Cake\ORM\TableRegistry;
+use Cake\Network\Exception\NotFoundException;
 /**
  * Reports controller handling reports creation and rendering
  *
@@ -33,7 +35,7 @@ class ReportsController extends AppController {
 	public $components = array('RequestHandler');
 
 	public $helpers = array('Html', 'Form', 'Reports', 'Incidents');
-	public $uses = array('Incident', 'Report', 'Notification', 'Developer');
+	public $uses = array('Incidents', 'Reports', 'Notifications', 'Developers');
 
 	public function index() {
 		$this->Reports->recursive = -1;
@@ -58,35 +60,29 @@ class ReportsController extends AppController {
 		if (!$reportId) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
-        $this->Report->unbindModel(
-            array('hasMany' => array('Incident'))
-        );
-		$report = $this->Report->findById($reportId);
+		$report = $this->Reports->findById($reportId)->toArray();
 		if (!$report) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
         
 		$this->set('report', $report);
 		$this->set('project_name', Configure::read('SourceForgeProjectName'));
-        $this->Report->unbindModel(
-            array('hasMany' => array('Incident'))
-        );
-		$this->Report->read(null, $reportId);
-		$this->set('incidents', $this->Report->getIncidents());
+		$this->Reports->id = $reportId;
+		$this->set('incidents', $this->Reports->getIncidents()->toArray());
 		$this->set('incidents_with_description',
-            $this->Report->getIncidentsWithDescription());
+            $this->Reports->getIncidentsWithDescription());
 		$this->set('incidents_with_stacktrace',
-				$this->Report->getIncidentsWithDifferentStacktrace());
-		$this->set('related_reports', $this->Report->getRelatedReports());
-		$this->set('status', $this->Report->status);
+				$this->Reports->getIncidentsWithDifferentStacktrace());
+		$this->set('related_reports', $this->Reports->getRelatedReports());
+		$this->set('status', $this->Reports->status);
 		$this->_setSimilarFields($reportId);
 
 		// if there is an unread notification for this report, then mark it as read
-		$current_developer = $this->Developer->
-					findById($this->Session->read('Developer.id'));
-		$current_developer = Sanitize::clean($current_developer);
+		$current_developer = TableRegistry::get('Developers')->
+					findById($this->request->session()->read('Developer.id'))->all()->first();
+		//$current_developer = Sanitize::clean($current_developer);
 		if ($current_developer) {
-			$this->Notification->deleteAll(
+			TableRegistry::get('Notifications')->deleteAll(
 				array('developer_id' => $current_developer['Developer']['id'],
 					'report_id' => $reportId
 				),
@@ -176,20 +172,20 @@ class ReportsController extends AppController {
 			throw new NotFoundException(__('Invalid Report'));
 		}
 
-		$report = $this->Report->read(null, $reportId);
+		$report = $this->Reports->get($reportId);
 		if (!$report) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
 
 		$state = $this->request->data['state'];
-		$newState = $this->Report->status[$state];
+		$newState = $this->Reports->status[$state];
 		if (!$newState) {
 			throw new NotFoundException(__('Invalid State'));
 		}
-
-		$this->Report->saveField("status", $state);
-		$this->Session->setFlash("The state has been successfully changed."
-				, "default", array("class" => "alert alert-success"));
+        $report->status = $state;
+		$this->Reports->save($report);
+		$this->Flash->default("The state has been successfully changed."
+				, array("class" => "alert alert-success"));
 		$this->redirect("/reports/view/$reportId");
 	}
 
@@ -204,7 +200,7 @@ class ReportsController extends AppController {
 	{
 		$flash_class = "alert alert-error";
 		$state = $this->request->data['state'];
-		$newState = $this->Report->status[$state];
+		$newState = $this->Reports->status[$state];
 		if (!$newState) {
 			Log::write(
 				'error',
@@ -221,7 +217,7 @@ class ReportsController extends AppController {
 			$flash_class = "alert alert-success";
 			foreach($this->request->data['reports'] as $report_id)
 			{
-				$report = $this->Report->read(null, $report_id);
+				$report = $this->Reports->get($report_id);
 				if (!$report) {
 					Log::write(
 						'error',
@@ -232,27 +228,29 @@ class ReportsController extends AppController {
 					$flash_class = "alert alert-error";
 					break;
 				}
-				$this->Report->saveField("status", $state);
+                $report->status = $state;
+				$this->Reports->save($report);
 			}
 		}
 
-		$this->Session->setFlash($msg, "default", array("class" => $flash_class));
+		$this->Flash->default($msg, array("class" => $flash_class));
 		$this->redirect("/reports/");
 	}
 
 ## HELPERS
 	protected function _setSimilarFields($id) {
-		$this->Report->read(null, $id);
+		$this->Reports->id = $id;
 
-		$this->set('columns', $this->Incident->summarizableFields);
+		$this->set('columns', TableRegistry::get('Incidents')->summarizableFields);
 		$relatedEntries = array();
 
-		foreach ($this->Incident->summarizableFields as $field) {
+		foreach (TableRegistry::get('Incidents')->summarizableFields as $field) {
 			list($entriesWithCount, $totalEntries) =
-					$this->Report->getRelatedByField($field, 25, true);
+					$this->Reports->getRelatedByField($field, 25, true);
 			$relatedEntries[$field] = $entriesWithCount;
 			$this->set("${field}_distinct_count", $totalEntries);
 		}
+        //error_log(json_encode($relatedEntries));
 		$this->set("related_entries", $relatedEntries);
 	}
 

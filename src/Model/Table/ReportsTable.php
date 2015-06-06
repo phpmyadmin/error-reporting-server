@@ -6,6 +6,7 @@ use Cake\ORM\Table;
 use App\Model\AppModel;
 use Cake\Model\Model;
 use Cake\Routing\Router;
+use Cake\ORM\TableRegistry;
 /**
  * Report model representing a group of incidents.
  *
@@ -36,7 +37,7 @@ class ReportsTable extends Table {
  * @see Cake::Model::$hasMany
  */
 	public $hasMany = array(
-		'Incident' => array(
+		'Incidents' => array(
 			'dependant' => true
 		)
 	);
@@ -83,17 +84,24 @@ class ReportsTable extends Table {
 		'out-of-date' => "Out of Date"
 	);
 
+    public function initialize(array $config)
+    {
+        $this->hasMany('Incidents', [
+            'dependent' => true
+        ]);
+    }
 /**
  * Retrieves the incident records that are related to the current report
  *
  * @return Array the list of incidents ordered by creation date desc
  */
 	public function getIncidents() {
-		return $this->Incident->find('all', array(
+		$incidents = TableRegistry::get('Incidents')->find('all', array(
 			'limit' => 50,
 			'conditions' => $this->_relatedIncidentsConditions(),
-			'order' => 'Incident.created desc'
+			'order' => 'Incidents.created desc'
 		));
+        return $incidents;
 	}
 
 /**
@@ -114,14 +122,14 @@ class ReportsTable extends Table {
  * @return Array the list of incidents ordered by description lenght desc
  */
 	public function getIncidentsWithDescription() {
-		return $this->Incident->find('all', array(
+		return TableRegistry::get('Incidents')->find('all', array(
 			'conditions' => array(
 				'NOT' => array(
-					'Incident.steps' => null
+					'Incidents.steps is null'
 				),
 				$this->_relatedIncidentsConditions(),
 			),
-			'order' => 'Incident.steps desc'
+			'order' => 'Incidents.steps desc'
 		));
 	}
 
@@ -132,11 +140,11 @@ class ReportsTable extends Table {
  * @return Array the list of incidents
  */
 	public function getIncidentsWithDifferentStacktrace() {
-		return $this->Incident->find('all', array(
-			'fields' => array('DISTINCT Incident.stackhash', 'Incident.stacktrace',
-					'Incident.full_report', 'Incident.exception_type'),
+		return TableRegistry::get('Incidents')->find('all', array(
+			'fields' => array('DISTINCT Incidents.stackhash', 'Incidents.stacktrace',
+					'Incidents.full_report', 'Incidents.exception_type'),
 			'conditions' => $this->_relatedIncidentsConditions(),
-			'group' => "Incident.stackhash",
+			'group' => "Incidents.stackhash",
 		));
 	}
 
@@ -196,34 +204,36 @@ class ReportsTable extends Table {
  */
 	public function getRelatedByField($fieldName, $limit = 10, $count = false,
 		$related = true, $timeLimit = null) {
-		$queryDetails = array(
-			'fields' => array("DISTINCT Incident.$fieldName", "COUNT(*) as count"),
-			'conditions' => array(
-				'NOT' => array(
-					"Incident.$fieldName" => null
-				)
-			),
+		$queryDetails = [
+			'fields' => ["$fieldName"],
+			'conditions' => [
+				'NOT' => [
+					"Incidents.$fieldName is null"
+				]
+			],
 			'limit' => $limit,
-			'group' => "Incident.$fieldName",
-			'order' => 'count DESC'
-		);
+			'group' => "Incidents.$fieldName"
+		];
 
 		if ($related) {
 			$queryDetails["conditions"][] = $this->_relatedIncidentsConditions();
 		}
 
 		if ($timeLimit) {
-			$queryDetails["conditions"][] = array(
-				'Incident.created >=' => $timeLimit
-			);
+			$queryDetails["conditions"][] = [
+				'Incidents.created >=' => $timeLimit
+			];
 		}
 
-		$groupedCount = $this->Incident->find('groupedCount', $queryDetails);
+		$groupedCount = TableRegistry::get('Incidents')->find("all", $queryDetails);
+        $groupedCount->select([
+            'count' => $groupedCount->func()->count('*')
+        ])->distinct(["$fieldName"])->order('count')->toArray();
+               // error_log($groupedCount);
 
 		if ($count) {
 			$queryDetails['limit'] = null;
-			$totalCount = $this->Incident->find('count', $queryDetails);
-
+			$totalCount = TableRegistry::get('Incidents')->find("all", $queryDetails)->count();
 			return array($groupedCount, $totalCount);
 		} else {
 			return $groupedCount;
@@ -237,11 +247,11 @@ class ReportsTable extends Table {
  * @return Array the related incidents conditions
  */
 	protected function _relatedIncidentsConditions() {
-		$conditions = array(array('Incident.report_id' => $this->id));
-		if ($this->data["Report"]["related_to"]) {
+		$conditions = array(array('Incidents.report_id = '.$this->id));
+		/*if ($this->data["Report"]["related_to"]) { //TODO: fix when fix related reports
 			$conditions[] = array('Incident.report_id' =>
 					$this->data["Report"]["related_to"]);
-		}
+		}*/
 
 		return array('OR' => $conditions);
 	}
@@ -255,14 +265,14 @@ class ReportsTable extends Table {
 	protected function _relatedReportsConditions() {
 		$conditions = array(array('related_to' => $this->id));
 
-		if ($this->data["Report"]["related_to"]) {
+		/*if ($this->related_to) { TODO: fix related to
 			$conditions[] = array('related_to' =>
-					$this->data["Report"]["related_to"]);
+					$this->related_to);
 			$conditions[] = array('id' =>
 					$this->data["Report"]["related_to"]);
-		}
+		}*/
 		$conditions = array(array('OR' => $conditions));
-		$conditions[] = array("Report.id !=" => $this->id);
+		$conditions[] = array("Reports.id !=" => $this->id);
 		return $conditions;
 	}
 

@@ -1,8 +1,9 @@
 <?php
 /* vim: set noexpandtab sw=2 ts=2 sts=2: */
-namespace App\Model;
+namespace App\Model\Table;
 
 use App\Model\AppModel;
+use Cake\ORM\Table;
 use App\Utility\Sanitize;
 use Cake\Core\App;
 use Cake\Log\Log;
@@ -23,14 +24,12 @@ use Cake\Model\Model;
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-App::import('model','Notification');
-
 /**
  * An incident a representing a single incident of a submited bug
  *
  * @package       Server.Model
  */
-class Incident extends AppModel {
+class IncidentsTable extends Table {
 
 /**
  * @var Array

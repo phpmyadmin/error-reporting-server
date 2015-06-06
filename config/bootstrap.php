@@ -69,6 +69,7 @@ try {
     die($e->getMessage() . "\n");
 }
 
+Configure::write('SourceForgeProjectName', 'phpmyadmin');
 // Load an environment local configuration file.
 // You can use a file like app_local.php to provide local overrides to your
 // shared configuration.

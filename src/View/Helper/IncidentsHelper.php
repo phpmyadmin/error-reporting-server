@@ -22,7 +22,7 @@ class IncidentsHelper extends AppHelper {
 	}
 
 	public function linkToIncident($incident) {
-		$incidentId = $incident["Incident"]["id"];
+		$incidentId = $incident["id"];
 		$link = "<a href='/" . BASE_DIR . "incidents/view/$incidentId'>#$incidentId</a>";
 		return $link;
 	}
@@ -34,7 +34,7 @@ class IncidentsHelper extends AppHelper {
 			$descriptions .= $this->linkToIncident($incident);
 			$descriptions .= ":</span>";
 			$descriptions .= "<pre>";
-			$descriptions .= $incident["Incident"]["steps"];
+			$descriptions .= $incident["steps"];
 			$descriptions .= "</pre>";
 		}
 		return $descriptions;
@@ -44,13 +44,13 @@ class IncidentsHelper extends AppHelper {
 		$html = "";
 		$html .= "<div class='$divClass'>";
 
-		if (is_string($incident["Incident"]["stacktrace"])) {
-			$incident["Incident"]["stacktrace"] =
-					json_decode($incident["Incident"]["stacktrace"], true);
+		if (is_string($incident["stacktrace"])) {
+			$incident["stacktrace"] =
+					json_decode($incident["stacktrace"], true);
 		}
 
-		foreach ($incident["Incident"]["stacktrace"] as $level) {
-			$exception_type = (($incident["Incident"]["exception_type"])?('php'):('js'));
+		foreach ($incident["stacktrace"] as $level) {
+			$exception_type = (($incident["exception_type"])?('php'):('js'));
 			$html .= $this->_getStackLevelInfo($level, $exception_type);
 			$html .= "<pre class='brush: "
 				. $exception_type

@@ -1,5 +1,4 @@
 <?php echo $this->Form->create('Ticket', array(
-  'inputDefaults' => array(
     'label' => array(
       'class' => 'control-label'
     ),
@@ -9,7 +8,7 @@
     'class' => 'input-xxlarge',
     'between' => '<div class="controls">',
     'after' => '</div>',
-  ),
+  
   'class' => 'form-horizontal',
 ))?>
   <fieldset>

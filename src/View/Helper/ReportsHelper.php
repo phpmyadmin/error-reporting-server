@@ -15,11 +15,11 @@ class ReportsHelper extends AppHelper {
 		parent::__construct($view, $settings);
 	}
 
-	public function entriesFromIncidents($entries, $totalCount) {
-		$entries = Sanitize::clean($entries);
+	public function entriesFromIncidents($entries, $totalCount, $key) {
+		//$entries = Sanitize::clean($entries);
 		$values = array();
-		foreach($entries as $entry => $count) {
-			$values[] = "$entry <span class='count'>($count)</span>";
+		foreach($entries as $entry) {
+			$values[] = "$entry[$key] <span class='count'>(".$entry['count'].")</span>";
 		}
 		$fullString = implode(", ", $values);
 		$remaining = $totalCount - count($values);
@@ -39,7 +39,7 @@ class ReportsHelper extends AppHelper {
 	}
 
 	public function linkToReport($report) {
-		$reportId = $report["Report"]["id"];
+		$reportId = $report["id"];
 		$link = "<a href=/" . BASE_DIR . "reports/view/$reportId>#$reportId</a>";
 		return $link;
 	}
@@ -77,8 +77,9 @@ class ReportsHelper extends AppHelper {
 			$html .= "chart.name = '$column';";
 			$html .= "chart.title = '" . Inflector::humanize($column) . "';";
 			$html .= "chart.labels = []; chart.values = [];";
-			foreach ($relatedEntries[$column] as $entry => $count) {
-				$html .= "chart.labels.push('$entry ($count)');";
+			foreach ($relatedEntries[$column] as $entry) {
+                $count = $entry['count'];
+				$html .= "chart.labels.push('$entry[$column] ($count)');";
 				$html .= "chart.values.push($count);";
 			}
 			$html .= "$arrayName.push(chart);";

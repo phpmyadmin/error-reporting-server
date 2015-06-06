@@ -10,10 +10,11 @@
  * Redistributions of files must retain the above copyright notice.
  *
  */
-namespace vendors\OAuth;
+namespace vendor\OAuth;
 
 use App\Network\Http\HttpSocket;
 use Cake\Utility\Text;
+use Cake\Network\Http\Client;
 
 require('OAuth.php');
 

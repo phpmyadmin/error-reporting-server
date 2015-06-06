@@ -1,16 +1,17 @@
+<?php use Cake\Routing\Router; ?>
 <div>
-	<h1 style="display: inline">Error Report #<?php echo $report["Report"]["id"]; ?>
-		<small>[<?php echo $status[$report["Report"]["status"]]; ?>]</small>
+	<h1 style="display: inline">Error Report #<?php echo $report[0]['id'] ?>
+		<small>[<?php echo $status[$report[0]['status']]; ?>]</small>
 	</h1>
 	<a href="#" onclick="showStateForm(); return false">Change state</a>
 </div>
 <br />
 <form class="form-inline" id="state-form" style="display: none"
-		action="/<?php echo BASE_DIR ?>reports/change_state/<?php echo $report["Report"]["id"]; ?>"
+		action="/<?php echo BASE_DIR ?>reports/change_state/<?php echo $report[0]["id"]; ?>"
 		method="post">
 	<span>Change state to:</span>
 	<?php echo $this->Form->select('state', $status, array('value' =>
-			$report["Report"]["status"], 'empty' => false)); ?>
+			$report[0]["status"], 'empty' => false)); ?>
 	<input type="submit" value="Change" class="btn btn-primary" />
 </form>
 <?php if (empty($related_reports)) { ?>
@@ -24,7 +25,7 @@
   <p>
     This report has been marked the same as the following reports:
     (<?php echo $this->Reports->createReportsLinks($related_reports); ?>).
-    <a href="/<?php echo BASE_DIR ?>reports/unmark_related_to/<?php echo $report["Report"]["id"]; ?>">
+    <a href="/<?php echo BASE_DIR ?>reports/unmark_related_to/<?php echo $report[0]["id"]; ?>">
       Remove from this group
     </a>
   </p>
@@ -32,27 +33,27 @@
 <table cellspacing="0" class="table table-bordered error-report">
   <tr>
     <td>Error Type</td>
-    <td><?php echo (($incidents[0]["Incident"]["exception_type"] == 1) ? ('php') : ('js') ); ?></td>
+    <td><?php echo (($incidents[0]["exception_type"] == 1) ? ('php') : ('js') ); ?></td>
   </tr>
   <tr>
     <td>Error Name</td>
-    <td><?php echo $report["Report"]["error_name"]; ?></td>
+    <td><?php echo $report[0]["error_name"]; ?></td>
   </tr>
   <tr>
     <td>Error Message</td>
-    <td><?php echo $report["Report"]["error_message"]; ?></td>
+    <td><?php echo $report[0]["error_message"]; ?></td>
   </tr>
   <tr>
     <td>Sourceforge Report</td>
     <td>
     <?php
-    if($report['Report']['sourceforge_bug_id']) {
-      echo $this->Html->link('#' . $report['Report']['sourceforge_bug_id'],
+    if($report[0]['sourceforge_bug_id']) {
+      echo $this->Html->link('#' . $report[0]['sourceforge_bug_id'],
           "https://sourceforge.net/p/$project_name/bugs/".
-          $report['Report']['sourceforge_bug_id'] . "/");
+          $report[0]['sourceforge_bug_id'] . "/");
       echo '<form action="'
           . Router::url('/source_forge/unlink_ticket/', true)
-          . $report['Report']['id']
+          . $report[0]['id']
           .'" method="GET" class="form-horizontal" style="margin-bottom:5px;"'
           . ' onclick="return window.confirm(\'Are you sure you want to unlink??\');" >';
       echo $this->Form->input('UnLink with Ticket', array(
@@ -67,14 +68,14 @@
           . ' style="width:300px; margin-bottom:5px;">'
           . '<tr><td style="min-width:130px;">';
       echo $this->Html->link('Create New Ticket', '/source_forge/create_ticket/'
-          . $report['Report']['id']);
+          . $report[0]['id']);
 
       echo '</td><td style="min-width:130px;">';
 
       echo '<form action="'
           . Router::url('/', true)
           .'source_forge/link_ticket/'
-          . $report['Report']['id']
+          . $report[0]['id']
           .'" method="GET" class="form-horizontal" style="margin-bottom:5px;">';
       echo $this->Form->input('ticket_id', array(
         'placeholder' => 'Ticket Number',
@@ -104,7 +105,7 @@
     <td>PMA Versions</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $related_entries["pma_version"], $pma_version_distinct_count);
+          $related_entries["pma_version"], $pma_version_distinct_count, "pma_version");
       ?>
     </td>
   </tr>
@@ -112,7 +113,7 @@
     <td>PHP Versions</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $related_entries["php_version"], $php_version_distinct_count);
+          $related_entries["php_version"], $php_version_distinct_count, "php_version");
       ?>
     </td>
   </tr>
@@ -120,7 +121,7 @@
     <td>Browsers</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $related_entries["browser"], $browser_distinct_count);
+          $related_entries["browser"], $browser_distinct_count, "browser");
       ?>
     </td>
   </tr>
@@ -128,7 +129,7 @@
     <td>Script Name</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $related_entries["script_name"], $script_name_distinct_count);
+          $related_entries["script_name"], $script_name_distinct_count, "script_name");
       ?>
     </td>
   </tr>
@@ -136,7 +137,7 @@
     <td>Configuration Storage</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $related_entries["configuration_storage"], $configuration_storage_distinct_count);
+          $related_entries["configuration_storage"], $configuration_storage_distinct_count, "configuration_storage");
       ?>
     </td>
   </tr>
@@ -144,7 +145,7 @@
     <td>Server Software</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $related_entries["server_software"], $server_software_distinct_count);
+          $related_entries["server_software"], $server_software_distinct_count, "server_software");
       ?>
     </td>
   </tr>
@@ -152,7 +153,7 @@
     <td>User OS</td>
     <td>
       <?php echo $this->Reports->entriesFromIncidents(
-          $related_entries["user_os"], $user_os_distinct_count);
+          $related_entries["user_os"], $user_os_distinct_count, "user_os");
       ?>
     </td>
   </tr>
@@ -163,9 +164,9 @@
   <tr>
     <td>Submission Date</td>
     <td>
-      <?php echo $report["Report"]["created"]; ?>
+      <?php echo $report[0]["created"]; ?>
       and it was last seen on
-      <?php echo $incidents[0]["Incident"]["created"]; ?>
+      <?php echo $incidents[0]["created"]; ?>
     </td>
   </tr>
   <tr>
@@ -179,7 +180,7 @@
 <h4>Stacktraces:</h4>
 <?php echo $this->Reports->getStacktracesForIncidents($incidents_with_stacktrace); ?>
 
-<h4>Descriptions submited by users:</h4>
+<h4>Descriptions submitted by users:</h4>
 <?php echo $this->Incidents->incidentsDescriptions($incidents_with_description); ?>
 <h4>Stats and Graphs</h4>
 <span id="graphs"></span>

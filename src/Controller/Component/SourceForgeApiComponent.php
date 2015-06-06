@@ -5,6 +5,7 @@ namespace App\Controller\Component;
 use Cake\Controller\Component;
 use Cake\Core\App;
 use Cake\Core\Configure;
+use vendor\OAuth\OAuthClient;
 /**
  * Source forge api component handling comunication with source forge
  *
@@ -25,8 +26,7 @@ define('REQUEST_TOKEN_URL', 'https://sourceforge.net/rest/oauth/request_token');
 define('ACCESS_TOKEN_URL', 'https://sourceforge.net/rest/oauth/access_token');
 define('AUTHORIZE_URL', 'https://sourceforge.net/rest/oauth/authorize');
 
-App::import('Vendor', 'OAuth/OAuthClient');
-
+ require_once(ROOT . DS . 'vendor' . DS  . 'OAuth' . DS . 'OAuthClient.php');
 /**
  * SourceForge.net api component handling comunication with SourceForge.net
  *

@@ -6,7 +6,9 @@ use App\Controller\AppController;
 use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\Routing\Router;
-
+use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
+use Cake\Network\Exception\NotFoundException;
 /**
  * Sourceforge controller handling source forge ticket submission and creation
  *
@@ -48,32 +50,34 @@ class SourceForgeController extends AppController {
 		$requestToken =
 			$this->SourceForgeApi->getRequestToken('/' .BASE_DIR . 'source_forge/callback');
 		if ($requestToken) {
-			$this->Session->write('sourceforge_request_token', serialize($requestToken));
+			$this->request->session()->write('sourceforge_request_token', serialize($requestToken));
 			$this->redirect($this->SourceForgeApi->getRedirectUrl($requestToken));
 		}
 		$this->autoRender = false;
-		return json_encode($requestToken);
+        $this->response->body(json_encode($requestToken));
+        return $this->response;
 	}
 
 	public function callback() {
-		$requestToken = unserialize($this->Session->read('sourceforge_request_token'));
+		$requestToken = unserialize($this->request->session()->read('sourceforge_request_token'));
 		$accessToken = $this->SourceForgeApi->getAccessToken($requestToken);
 		$this->autoRender = false;
-		return json_encode($accessToken);
+        $this->response->body(json_encode($accessToken));
+        return $this->response;
 	}
 
 	public function create_ticket($reportId) {
 		if (!$reportId) {
-				throw new NotFoundException(__('Invalid report'));
+				throw new \NotFoundException(__('Invalid report'));
 		}
 
-		$report = $this->Report->findById($reportId);
+		$report = TableRegistry::get('Reports')->findById($reportId)->toArray();
 		if (!$report) {
 				throw new NotFoundException(__('Invalid report'));
 		}
 
 		if (empty($this->request->data)) {
-			$this->set('pma_version', $report['Report']['pma_version']);
+			$this->set('pma_version', $report[0]['pma_version']);
 			return;
 		}
 
@@ -96,7 +100,7 @@ class SourceForgeController extends AppController {
 				throw new NotFoundException(__('Invalid reportId'));
 		}
 
-		$report = $this->Report->findById($reportId);
+		$report = TableRegistry::get('Reports')->findById($reportId)->all()->first();
 		if (!$report) {
 				throw new NotFoundException(__('Invalid Report'));
 		}
@@ -106,14 +110,14 @@ class SourceForgeController extends AppController {
 				throw new NotFoundException(__('Invalid Ticket ID!!'));
 		}
 
-		$incident = $this->Report->Incident->findByReportId($reportId);
-		$exception_type = ($incident['Incident']['exception_type']) ? ('php') : ('js');
+		$incident = TableRegistry::get('Incidents')->findByReportId($reportId)->all()->first();
+		$exception_type = ($incident['exception_type']) ? ('php') : ('js');
 
 		// "formatted" text of the comment.
 		$commentText = "Param | Value "
 			. "\n -----------|--------------------"
-			. "\n Error Type | " . $report['Report']['error_name']
-			. "\n Error Message |" . $report['Report']['error_message']
+			. "\n Error Type | " . $report['error_name']
+			. "\n Error Message |" . $report['error_message']
 			. "\n Exception Type |" . $exception_type
 			. "\n Link | [Report#"
 				. $reportId
@@ -143,12 +147,12 @@ class SourceForgeController extends AppController {
 				throw new NotFoundException(__('Invalid reportId'));
 		}
 
-		$report = $this->Report->findById($reportId);
+		$report = TableRegistry::get('Reports')->findById($reportId)->all()->first();
 		if (!$report) {
 				throw new NotFoundException(__('Invalid Report'));
 		}
 
-		$ticket_id = $report['Report']['sourceforge_bug_id'];
+		$ticket_id = $report['sourceforge_bug_id'];
 		if(!$ticket_id) {
 				throw new NotFoundException(__('Invalid Ticket ID!!'));
 		}
@@ -175,12 +179,12 @@ class SourceForgeController extends AppController {
 
 	protected function _getTicketData($reportId) {
 		$data = array(
-			'ticket_form.summary' => $this->request->data['Ticket']['summary'],
+			'ticket_form.summary' => $this->request->data['summary'],
 			'ticket_form.description' => $this->_augmentDescription(
-					$this->request->data['Ticket']['description'], $reportId),
+					$this->request->data['description'], $reportId),
 			'ticket_form.status' => 'open',
-			'ticket_form.labels' => $this->request->data['Ticket']['labels'],
-			'ticket_form._milestone' => $this->request->data['Ticket']['milestone'],
+			'ticket_form.labels' => $this->request->data['labels'],
+			'ticket_form._milestone' => $this->request->data['milestone'],
 		);
 		if (!empty($data['ticket_form.labels'])) {
 			$data['ticket_form.labels'] .= ',';
@@ -221,9 +225,10 @@ class SourceForgeController extends AppController {
  * @return String augmented description
  */
 	protected function _augmentDescription($description, $reportId) {
-		$this->Report->read(null, $reportId);
+        $report = TableRegistry::get('Reports');
+		$report->id = $reportId;
 		return "$description\n\n\nThis report is related to user submitted report "
-				. "[#" . $this->Report->id . "](" . $this->Report->getUrl()
+				. "[#" . $report->id . "](" . $report->getUrl()
 				. ") on the phpmyadmin error reporting server.";
 	}
 
@@ -265,33 +270,34 @@ class SourceForgeController extends AppController {
 					$msg = 'Something went wrong!!';
 					break;
 			}
-
-			$this->Report->read(null, $report_id);
-			$this->Report->save(array('sourceforge_bug_id' => $ticket_id));
-			$this->Session->setFlash($msg, "default", array("class" => "alert alert-success"));
+            $report = TableRegistry::get('Reports')->get($report_id);
+            $report->sourceforge_bug_id = $ticket_id;
+			//$this->Report->read(null, $report_id);
+			TableRegistry::get('Reports')->save($report);
+			$this->Flash->default($msg, array("class" => "alert alert-success"));
 			return true;
 		} else if ($response->code === "403") {
-			$this->Session->setFlash(
+			$this->Flash->default(
 					"Unauthorised access to SourceForge ticketing system. SourceForge"
 					. " credentials may be out of date. Please check and try again"
-					. " later.", "default", array("class" => "alert alert-error"));
+					. " later.", array("class" => "alert alert-error"));
 			return false;
 		} else if ($response->code === "404"
 			&& $type == 2
 		) {
-			$this->Session->setFlash(
+			$this->Flash->default(
 					"Bug Ticket not found on SourceForge."
 					. " Are you sure the ticket number is correct?!! Please check and try again",
-					"default", array("class" => "alert alert-error"));
+					 array("class" => "alert alert-error"));
 			return false;
 		} else {
 			//fail
 			$response->body = json_decode($response->body, true);
-			Log::write('sourceforge', 'Submission for sourceforge ticket may have failed.',
-					'sourceforge');
-			Log::write('sourceforge', 'Response dump:', 'sourceforge');
-			Log::write('sourceforge', print_r($response["raw"], true), 'sourceforge');
-			$this->Session->setFlash($this->_getErrors( $response->body), "default",
+			//Log::write('sourceforge', 'Submission for sourceforge ticket may have failed.',
+				//	'sourceforge');
+			//Log::write('sourceforge', 'Response dump:', 'sourceforge');
+			//Log::write('sourceforge', print_r($response["raw"], true), 'sourceforge');
+			$this->Flash->default($this->_getErrors($response->body),
 					array("class" => "alert alert-error"));
 			return false;
 		}
@@ -308,7 +314,7 @@ class SourceForgeController extends AppController {
 			exit();
 		}
 
-		$reports = $this->Report->find(
+		$reports = TableRegistry::get('Reports')->find(
 			'all',
 			array(
 				'conditions' => array(
@@ -325,7 +331,7 @@ class SourceForgeController extends AppController {
 			do {
 				$new_status = $this->SourceForgeApi->getBugTicketStatus(
 					Configure::read('SourceForgeProjectName'),
-					$report['Report']['sourceforge_bug_id']
+					$report['sourceforge_bug_id']
 				);
 				$i++;
 			} while($new_status == false && $i <= 3);
@@ -336,17 +342,18 @@ class SourceForgeController extends AppController {
 				Log::write(
 					'cron_jobs',
 					'FAILED: Fetching status of BugTicket#'
-						. ($report['Report']['sourceforge_bug_id'])
+						. ($report['sourceforge_bug_id'])
 						. ' associated with Report#'
-						. ($report['Report']['id']),
+						. ($report['id']),
 					'cron_jobs'
 				);
 				continue;
 			}
 
-			if ($report['Report']['status'] != $new_status) {
-				$this->Report->read(null, $report['Report']['id']);
-				$this->Report->save(array('status' => $new_status));
+			if ($report['status'] != $new_status) {
+                $rep = TableRegistry::get('Reports')->get($report['id']);
+                $rep->status = $new_status;
+				TableRegistry::get('Reports')->save($rep);
 			}
 		}
 		$this->autoRender = false;
