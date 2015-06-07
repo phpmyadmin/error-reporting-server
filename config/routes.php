@@ -54,7 +54,7 @@ Router::scope('/', function ($routes) {
      */
     $routes->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
     
-    Router::connect('/stats', array('controller' => 'stats', 'action' => 'stats'));
+    Router::connect('/stats', array('controller' => 'Stats', 'action' => 'stats'));
 
 
     /**

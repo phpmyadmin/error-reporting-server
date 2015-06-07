@@ -90,7 +90,6 @@ class ReportsHelper extends AppHelper {
 	public function getLineChartData($arrayName, $entries) {
 		$html = "var $arrayName = [];";
 		foreach ($entries as $entry) {
-			$entry = $entry[0];
 			$html .= "$arrayName.push(['" . $entry["date"] . "', "
 					. $entry["count"] . "]);";
 		}

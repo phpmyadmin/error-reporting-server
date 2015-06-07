@@ -229,7 +229,6 @@ class ReportsTable extends Table {
         $groupedCount->select([
             'count' => $groupedCount->func()->count('*')
         ])->distinct(["$fieldName"])->order('count')->toArray();
-               // error_log($groupedCount);
 
 		if ($count) {
 			$queryDetails['limit'] = null;
@@ -248,11 +247,11 @@ class ReportsTable extends Table {
  */
 	protected function _relatedIncidentsConditions() {
 		$conditions = array(array('Incidents.report_id = '.$this->id));
-		/*if ($this->data["Report"]["related_to"]) { //TODO: fix when fix related reports
-			$conditions[] = array('Incident.report_id' =>
-					$this->data["Report"]["related_to"]);
-		}*/
-
+        $report = $this->get($this->id);
+		if ($report->related_to) { //TODO: fix when fix related reports
+			$conditions[] = array('Incidents.report_id = '.
+					$report->related_to);
+		}
 		return array('OR' => $conditions);
 	}
 
@@ -264,13 +263,13 @@ class ReportsTable extends Table {
  */
 	protected function _relatedReportsConditions() {
 		$conditions = array(array('related_to' => $this->id));
-
-		/*if ($this->related_to) { TODO: fix related to
+        $report = $this->get($this->id);
+		if ($report->related_to) { //TODO: fix related to
 			$conditions[] = array('related_to' =>
-					$this->related_to);
+					$report->related_to);
 			$conditions[] = array('id' =>
-					$this->data["Report"]["related_to"]);
-		}*/
+					$report->related_to);
+		}
 		$conditions = array(array('OR' => $conditions));
 		$conditions[] = array("Reports.id !=" => $this->id);
 		return $conditions;

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-use App\Utility\Sanitize;
+use Cake\ORM\TableRegistry;
 /**
  * Stats controller handling stats preview
  *
@@ -35,44 +35,45 @@ class StatsController extends AppController {
 	public function stats() {
 		$filter = $this->_getTimeFilter();
 		$relatedEntries = array();
-		foreach ($this->Incident->summarizableFields as $field) {
-			$entriesWithCount = $this->Report->
+		foreach (TableRegistry::get('Incidents')->summarizableFields as $field) {
+			$entriesWithCount = TableRegistry::get('Reports')->
 					getRelatedByField($field, 25, false, false, $filter["limit"]);
 			$relatedEntries[$field] = $entriesWithCount;
 		}
 		$this->set("related_entries", $relatedEntries);
-		$this->set('columns', $this->Incident->summarizableFields);
-		$this->set('filter_times', $this->Incident->filterTimes);
+		$this->set('columns', TableRegistry::get('Incidents')->summarizableFields);
+		$this->set('filter_times', TableRegistry::get('Incidents')->filterTimes);
 		$this->set('selected_filter', $this->request->query('filter'));
 
 		$query = array(
-			'fields' => array(
-				"DATE_FORMAT(Incident.created, '%a %b %d %Y %T') as date",
-				$filter["group"],
-				'count(*) as count'
-			),
 			'group' => 'grouped_by',
-			'order' => 'Incident.created',
+			'order' => 'Incidents.created',
 		);
 
 		if(isset($filter["limit"])) {
 			$query["conditions"] = array(
-				'Incident.created >=' => $filter["limit"]
+				'Incidents.created >=' => $filter["limit"]
 			);
 		}
 
-		$this->Incident->recursive = -1;
-		$downloadStats = $this->Incident->find('all', $query);
-
+		TableRegistry::get('Incidents')->recursive = -1;
+		$downloadStats = TableRegistry::get('Incidents')->find('all', $query);
+        $downloadStats->select([
+            'grouped_by' => $filter["group"],
+            'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
+            'count' => $downloadStats->func()->count('*')
+        ]);
 		$this->set('download_stats', $downloadStats);
 	}
 
 	protected function _getTimeFilter() {
-		$filter = $this->Incident->filterTimes[$this->request->query('filter')];
+        if ($this->request->query('filter')) {
+            $filter = TableRegistry::get('Incidents')->filterTimes[$this->request->query('filter')];
+        }
 		if (isset($filter)) {
 			return $filter;
 		} else {
-			return $this->Incident->filterTimes["all_time"];
+			return TableRegistry::get('Incidents')->filterTimes["all_time"];
 		}
 	}
 }

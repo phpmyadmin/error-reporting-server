@@ -108,30 +108,30 @@ class IncidentsTable extends Table {
 			'all_time' => array(
 				'label' => 'All Time',
 				'limit' => null,
-				'group' => "DATE_FORMAT(Incident.created, '%m %Y') as grouped_by",
+				'group' => "DATE_FORMAT(Incidents.created, '%m %Y')",
 			),
 			'day' => array(
 				'label' => 'Last Day',
 				'limit' => date('Y-m-d', strtotime('-1 day')),
 				'group' =>
-						"DATE_FORMAT(Incident.created, '%a %b %d %Y %H') as grouped_by",
+						"DATE_FORMAT(Incidents.created, '%a %b %d %Y %H')",
 			),
 			'week' => array(
 				'label' => 'Last Week',
 				'limit' => date('Y-m-d', strtotime('-1 week')),
 				'group' =>
-						"DATE_FORMAT(Incident.created, '%a %b %d %Y') as grouped_by",
+						"DATE_FORMAT(Incidents.created, '%a %b %d %Y')",
 			),
 			'month' => array(
 				'label' => 'Last Month',
 				'limit' => date('Y-m-d', strtotime('-1 month')),
 				'group' =>
-						"DATE_FORMAT(Incident.created, '%a %b %d %Y') as grouped_by",
+						"DATE_FORMAT(Incidents.created, '%a %b %d %Y')",
 			),
 			'year' => array(
 				'label' => 'Last Year',
 				'limit' => date('Y-m-d', strtotime('-1 year')),
-				'group' => "DATE_FORMAT(Incident.created, '%b %u %Y') as grouped_by",
+				'group' => "DATE_FORMAT(Incidents.created, '%b %u %Y')",
 			),
 		);
 	}
