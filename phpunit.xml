@@ -11,9 +11,9 @@
          >
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">app/Controller/</directory>
-            <directory suffix=".php">app/Model/</directory>
-            <directory suffix=".php">app/View/</directory>
+            <directory suffix=".php">src/Controller/</directory>
+            <directory suffix=".php">src/Model/</directory>
+            <directory suffix=".php">src/View/</directory>
         </whitelist>
     </filter>
 </phpunit>
