@@ -219,9 +219,9 @@ return [
              * the following line and set the port accordingly
              */
             //'port' => 'nonstandard_port_number',
-            'username' => 'root',
-            'password' => 'root',
-            'database' => 'pma_error_reporting',
+            'username' => 'my_app',
+            'password' => 'secret',
+            'database' => 'my_app',
             'encoding' => 'utf8',
             'timezone' => 'UTC',
             'cacheMetadata' => true,
@@ -255,8 +255,8 @@ return [
             'persistent' => false,
             'host' => 'localhost',
             //'port' => 'nonstandard_port_number',
-            'username' => 'root',
-            'password' => 'root',
+            'username' => 'my_app',
+            'password' => 'secret',
             'database' => 'test_myapp',
             'encoding' => 'utf8',
             'timezone' => 'UTC',
