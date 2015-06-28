@@ -20,7 +20,7 @@ In order to deploy the app in this repo you need to follow these steps:
 - Configure the web server (see below)
 - Create the database for the server
 - install mbstring (required for cake 3.0)
-- install intl extension: sudo apt-get install php5-intl //(required for cake 3.0)
+- install intl extension: `sudo apt-get install php5-intl` //(required for cake 3.0)
 - cd application_root_dir (directory under which subdirectory `src` resides)
 - mkdir tmp;
 - mkdir logs;
