@@ -45,7 +45,7 @@ class ReportsHelper extends AppHelper {
 	}
     
     public function linkToReportFromIncident($incident) {
-		$reportId = $incident["Incident"]["report_id"];
+		$reportId = $incident["report_id"];
 		$link = "<a href=/" . BASE_DIR . "reports/view/$reportId>#$reportId</a>";
 		return $link;
 	}

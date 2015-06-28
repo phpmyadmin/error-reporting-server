@@ -77,6 +77,10 @@ define('CACHE', TMP . 'cache' . DS);
  * CakePHP should always be installed with composer, so look there.
  */
 define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . 'vendor' . DS . 'cakephp' . DS . 'cakephp');
+
+/**
+ * base directory in which application reside if not webroot.
+ */
 define("BASE_DIR", "");
 
 /**

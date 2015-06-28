@@ -38,7 +38,6 @@ class DevelopersController extends AppController {
 	public function beforeFilter(Event $event) {
 		$this->GithubApi->githubConfig = Configure::read('GithubConfig');
 		$this->GithubApi->githubRepo = Configure::read('GithubRepoPath');
-        error_log(json_encode($this->GithubApi->githubConfig));
 	}
 
 	public function login() {

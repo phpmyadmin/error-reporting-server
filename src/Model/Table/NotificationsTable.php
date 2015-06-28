@@ -2,6 +2,8 @@
 /* vim: set noexpandtab sw=2 ts=2 sts=2: */
 namespace App\Model\Table;
 
+use Cake\ORM\TableRegistry;
+use Cake\Model\Model;
 use Cake\ORM\Table;
 /**
  * Notification model representing a notification for new report.
@@ -50,21 +52,12 @@ class NotificationsTable extends Table {
 	);
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
-
-/**
+    
+	/**
  * belongsTo associations
  *
  * @var array
  */
-/*	public $belongsTo = array(
-		'Reports' => array(
-			'className' => 'Reports',
-			'foreignKey' => 'report_id',
-			'conditions' => '',
-			'fields' => '',
-			'order' => ''
-		)
-	);*/
     public function initialize(array $config)
     {
         $this->belongsTo('Reports', [
@@ -84,21 +77,16 @@ class NotificationsTable extends Table {
 		if (!is_int($report_id)) {
 			throw new InvalidArgumentException('Invalid Argument "$report_id"! Integer Expected.');
 		}
-		$devs = new Developer();
-		$devs = $devs->find('all');
-		$notifications = array();
+		$devs = TableRegistry::get('Developers')->find('all');
+        $notoficationTable = TableRegistry::get('Notifications');
+        $res = true;
 		foreach ($devs as $dev) {
-			$notification = array(
-				'developer_id' => $dev['Developer']['id'],
-				'report_id' => $report_id
-			);
-			array_push($notifications,$notification);
-		}
-		$res = true;
-		// Following check is necessary in case there're no 'Developers' in the table
-		if ($notifications) {
-			$notificationObj = new Notification();
-			$res = $notificationObj->saveMany($notifications);
+            $notification = $notoficationTable->newEntity();
+			$notification->developer_id  = $dev['id'];
+			$notification->report_id = $report_id;
+            $notification->created = date('Y-m-d H:i:s', time());
+            $notification->modified = date('Y-m-d H:i:s', time());
+            $res = $notoficationTable->save($notification);
 		}
 		return($res);
 	}

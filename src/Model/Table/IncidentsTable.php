@@ -4,8 +4,7 @@ namespace App\Model\Table;
 
 use App\Model\AppModel;
 use Cake\ORM\Table;
-use App\Utility\Sanitize;
-use Cake\Core\App;
+use Cake\ORM\TableRegistry;
 use Cake\Log\Log;
 use Cake\Model\Model;
 /**
@@ -38,7 +37,7 @@ class IncidentsTable extends Table {
  */
 	public $actsAs = array('Summarizable');
 
-/**
+    /**
  * @var Array
  * @link http://book.cakephp.org/2.0/en/models/model-attributes.html#validate
  * @link http://book.cakephp.org/2.0/en/models/data-validation.html
@@ -153,19 +152,31 @@ class IncidentsTable extends Table {
 		}
 		$incident_ids = array();	// array to hold ids of all the inserted incidents
 		$schematizedIncidents = $this->_getSchematizedIncidents($bugReport);
-
+        $incidentsTable = TableRegistry::get('Incidents');
+        $reportsTable = TableRegistry::get('Reports');
 		foreach($schematizedIncidents as $index => $si){
-			$tmpIncident = new Incident();
+			//$tmpIncident = new IncidentsTable();
 			// find closest report. If not found, create a new report.
 			$closestReport = $this->_getClosestReport($bugReport, $index);
 			if($closestReport) {
-				$si["report_id"] = $closestReport["Report"]["id"];
-				$isSaved = $tmpIncident->save($si);
-
+				$si["report_id"] = $closestReport["id"];
+                $si = $incidentsTable->newEntity($si);
+                $si->created = date('Y-m-d H:i:s', time());
+                $si->modified = date('Y-m-d H:i:s', time());
+				$isSaved = $incidentsTable->save($si);
 			} else {
 				//no close report. Create a new report.
 				$report = $this->_getReportDetails($bugReport,$index);
-				$data = array(
+                $report = $reportsTable->newEntity($report);
+                $report->created = date('Y-m-d H:i:s', time());
+                $report->modified = date('Y-m-d H:i:s', time());
+                $reportsTable->save($report);
+                $si["report_id"] = $report->id;
+                $si = $incidentsTable->newEntity($si);
+                $si->created = date('Y-m-d H:i:s', time());
+                $si->modified = date('Y-m-d H:i:s', time());
+                $isSaved = $incidentsTable->save($si);
+				/*$data = array(
 					'Incident' => $si,
 					'Report' => $report
 				);
@@ -174,20 +185,20 @@ class IncidentsTable extends Table {
                             'Report'
                         )
                     )
-                );
-				$isSaved = $tmpIncident->saveAssociated($data);
+                );*/
+				//$isSaved = $tmpIncident->saveAssociated($data);
 			}
 
 			if($isSaved) {
-				array_push($incident_ids,$tmpIncident->id);
+				array_push($incident_ids,$si->id);
 				if (!$closestReport) {
 					// add notifications entry
-					$tmpIncident = $tmpIncident->findById($tmpIncident->id);
-					if (!Notification::addNotifications(intval($tmpIncident['Incident']['report_id']))) {
+					$tmpIncident = $incidentsTable->findById($si->id)->all()->first();
+					if (!TableRegistry::get('Notifications')->addNotifications(intval($tmpIncident['report_id']))) {
 						Log::write(
 							'error',
 							'ERRORED: Notification::addNotifications() failed on Report#'
-								. $tmpIncident['Incident']['report_id'],
+								. $tmpIncident['report_id'],
 							'alert'
 						);
 					}
@@ -220,14 +231,8 @@ class IncidentsTable extends Table {
 			List($location, $linenumber) =
 					$this->_getIdentifyingLocation($bugReport['exception']['stack']);
 		}
-        $this->bindModel(
-            array('belongsTo' => array(
-                    'Report'
-                )
-            )
-        );
-		$report = $this->Report->findByLocationAndLinenumberAndPmaVersion(
-					$location, $linenumber, $bugReport['pma_version']);
+		$report = TableRegistry::get('Reports')->findByLocationAndLinenumberAndPmaVersion(
+					$location, $linenumber, $bugReport['pma_version'])->all()->first();
 		return $report;
 	}
 
@@ -281,7 +286,7 @@ class IncidentsTable extends Table {
  *				Can be used with ِIncident->save
  */
 	protected function _getSchematizedIncidents($bugReport) {
-		$bugReport = Sanitize::clean($bugReport, array('escape' => false));
+		//$bugReport = Sanitize::clean($bugReport, array('escape' => false));
 		$schematizedReports = array();
 		$schematizedCommonReport = array(
 			'pma_version' => $bugReport['pma_version'],

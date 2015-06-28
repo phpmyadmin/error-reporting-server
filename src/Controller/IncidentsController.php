@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Network\Exception\NotFoundException;
 use App\Utility\Sanitize;
 /**
  * Incidents controller handling incident creation and rendering
@@ -30,7 +31,7 @@ class IncidentsController extends AppController {
 
 	public function create() {
 		$bugReport = $this->request->input('json_decode', true);
-		$result = $this->Incident->createIncidentFromBugReport($bugReport);
+		$result = $this->Incidents->createIncidentFromBugReport($bugReport);
 		if (count($result) > 0 
 			&& !in_array(false, $result)
 		) {
@@ -46,8 +47,8 @@ class IncidentsController extends AppController {
 			);
 		}
 		$this->autoRender = false;
-
-		return json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $this->response->body(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        return $this->response;
 	}
 
 	public function json($id) {
@@ -55,19 +56,20 @@ class IncidentsController extends AppController {
 			throw new NotFoundException(__('Invalid Incident'));
 		}
 
-		$this->Incident->recursive = -1;
-		$incident = $this->Incident->findById($id);
+		$this->Incidents->recursive = -1;
+		$incident = $this->Incidents->findById($id)->all()->first();
 		if (!$incident) {
 			throw new NotFoundException(__('Invalid Incident'));
 		}
 
-		$incident['Incident']['full_report'] =
-				json_decode($incident['Incident']['full_report'], true);
-		$incident['Incident']['stacktrace'] =
-				json_decode($incident['Incident']['stacktrace'], true);
+		$incident['full_report'] =
+				json_decode($incident['full_report'], true);
+		$incident['stacktrace'] =
+				json_decode($incident['stacktrace'], true);
 
 		$this->autoRender = false;
-		return json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $this->response->body(json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        return $this->response;
 	}
 
 	public function view($incidentId) {
@@ -75,15 +77,15 @@ class IncidentsController extends AppController {
 			throw new NotFoundException(__('Invalid Incident'));
 		}
 
-		$incident = $this->Incident->findById($incidentId);
+		$incident = $this->Incidents->findById($incidentId)->all()->first();
 		if (!$incident) {
 			throw new NotFoundException(__('Invalid Incident'));
 		}
 
-		$incident['Incident']['full_report'] =
-				json_decode($incident['Incident']['full_report'], true);
-		$incident['Incident']['stacktrace'] =
-				json_decode($incident['Incident']['stacktrace'], true);
+		$incident['full_report'] =
+				json_decode($incident['full_report'], true);
+		$incident['stacktrace'] =
+				json_decode($incident['stacktrace'], true);
 
 		$this->set('incident', $incident);
 	}

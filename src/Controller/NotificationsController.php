@@ -93,7 +93,8 @@ public $components = array('RequestHandler');
 		);
 		$this->autoRender = false;
         $this->response->body(json_encode($response));
-        return $this->response;	}
+        return $this->response;	
+     }
 
 	/**
 	 * To carry out mass actions on Notifications.
@@ -133,8 +134,8 @@ public $components = array('RequestHandler');
 		// X Time: All the notifications before this time are to be deleted.
 		// Currently it's set to 60 days from current time.
 		$XTime = time() - 60*24*3600;
-		$conditions = array('Notification.created <' => date('Y-m-d H:i:s', $XTime));
-		if (!$this->Notification->deleteAll($conditions)) {
+		$conditions = array('Notifications.created <' => date('Y-m-d H:i:s', $XTime));
+		if (!$this->Notifications->deleteAll($conditions)) {
 			Log::write(
 				'cron_jobs',
 				'FAILED: Deleting older Notifications!!',
