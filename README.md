@@ -39,12 +39,11 @@ In order to deploy the app in this repo you need to follow these steps:
 - Rename the `oauth_example.php` to `oauth.php` and follow the instructions below 
   to set the appropriate variables in the file.
 - Run the migrations that have been created so far to setup the database 
-    ......For existing systems: update and run migrations  .........
-    `sudo bin/cake migrations mark_migrated 20150607191654
-    sudo bin/cake migrations migrate`
-
-    .......For new system: just run migration........
-  `sudo bin/cake migrations migrate`
+ 	- For existing systems: update and run migrations
+    	`sudo bin/cake migrations mark_migrated 20150607191654`
+    	`sudo bin/cake migrations migrate`
+	- For new system: just run migration
+	 `sudo bin/cake migrations migrate`
 
 ## Requirements ##
  - php >= 5.4
