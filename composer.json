@@ -19,11 +19,10 @@
         "source": "https://github.com/phpmyadmin/error-reporting-server"
     },
     "require": {
-        "php": ">=5.4.16",
+        "php": ">=5.4.0",
         "cakephp/cakephp": "~3.0",
         "ext-intl": "*",
         "ext-mbstring": "*",
-        "mobiledetect/mobiledetectlib": "2.*",
         "cakephp/migrations": "~1.0",
         "cakephp/plugin-installer": "*",
         "phpunit/phpunit": "*"
