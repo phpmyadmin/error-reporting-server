@@ -20,17 +20,17 @@ In order to deploy the app in this repo you need to follow these steps:
 - Configure the web server (see below)
 - Create the database for the server
 - install mbstring (required for cake 3.0)
-- install intl extension: sudo apt-get install php5-intl //(required for cake 3.0)
+- install intl extension: `sudo apt-get install php5-intl` //(required for cake 3.0)
 - cd application_root_dir (directory under which subdirectory `src` resides)
 - mkdir tmp;
 - mkdir logs;
 - set permissions for tmp and logs directory
-``
-HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
-setfacl -R -m u:${HTTPDUSER}:rwx tmp
-setfacl -R -d -m u:${HTTPDUSER}:rwx tmp
-setfacl -R -m u:${HTTPDUSER}:rwx logs
-setfacl -R -d -m u:${HTTPDUSER}:rwx logs
+
+	- ``HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1```
+	- `setfacl -R -m u:${HTTPDUSER}:rwx tmp`
+	- `setfacl -R -d -m u:${HTTPDUSER}:rwx tmp`
+	- `setfacl -R -m u:${HTTPDUSER}:rwx logs`
+	- `setfacl -R -d -m u:${HTTPDUSER}:rwx logs`
 ``
 - Rename the example files `config/app_example.php` to
   `config/app.php` and fill out the required info.
@@ -39,12 +39,11 @@ setfacl -R -d -m u:${HTTPDUSER}:rwx logs
 - Rename the `oauth_example.php` to `oauth.php` and follow the instructions below 
   to set the appropriate variables in the file.
 - Run the migrations that have been created so far to setup the database 
-    ......For existing systems: update and run migrations  .........
-    `sudo bin/cake migrations mark_migrated 20150607191654
-    sudo bin/cake migrations migrate`
-
-    .......For new system: just run migration........
-  `sudo bin/cake migrations migrate`
+ 	- For existing systems: update and run migrations
+    	`sudo bin/cake migrations mark_migrated 20150607191654`
+    	`sudo bin/cake migrations migrate`
+	- For new system: just run migration
+	 `sudo bin/cake migrations migrate`
 
 ## Requirements ##
  - php >= 5.4
