@@ -3,7 +3,6 @@ tmp/*
 [Cc]onfig/database.php
 [Cc]onfig/oauth.php
 [Cc]onfig/app.php
-[Cc]onfig/paths.php
 app/tmp/*
 app/[Cc]onfig/core.php
 app/[Cc]onfig/database.php
