@@ -13,7 +13,7 @@ before_script:
   - setfacl -R -d -m u:${HTTPDUSER}:rwx tmp
   - setfacl -R -m u:${HTTPDUSER}:rwx logs
   - setfacl -R -d -m u:${HTTPDUSER}:rwx logs
-  - cp config/app_example.php config/app.php
+  - cp config/app_travis.php config/app.php
   - cp config/oauth_example.php config/oauth.php
   - mysql -e 'create database pmaerr;'
   - wget https://scrutinizer-ci.com/ocular.phar
