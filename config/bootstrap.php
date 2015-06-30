@@ -203,7 +203,6 @@ Log::config('cron_jobs', array(
  * Loads plugins
  */
 Plugin::load('Migrations');
-Plugin::load('Phpunit');
 
 // Only try to load DebugKit in development mode
 // Debug Kit should not be installed on a production system
