@@ -25,17 +25,13 @@
         "ext-mbstring": "*",
         "cakephp/migrations": "~1.0",
         "cakephp/plugin-installer": "*",
-        "phpunit/phpunit": "*"
     },
     "require-dev": {
         "psy/psysh": "@stable",
         "cakephp/debug_kit": "~3.0",
         "cakephp/bake": "~1.0",
+        "phpunit/phpunit": "*",
         "satooshi/php-coveralls": "dev-master"
-    },
-    "suggest": {
-        "phpunit/phpunit": "Allows automated tests to be run without system-wide install.",
-        "cakephp/cakephp-codesniffer": "Allows to check the code against the coding standards used in CakePHP."
     },
     "autoload": {
         "psr-4": {
