@@ -5,6 +5,6 @@ return [
         'Bake' => $baseDir . '/vendor/cakephp/bake/',
         'DebugKit' => $baseDir . '/vendor/cakephp/debug_kit/',
         'Migrations' => $baseDir . '/vendor/cakephp/migrations/',
-        'Phpunit' => $baseDir . '/plugins/Phpunit/'
+        'Phpunit' => $baseDir . '/vendor/phpunit/phpunit/'
     ]
 ];
