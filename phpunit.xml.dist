@@ -5,7 +5,6 @@
 	stopOnFailure="false"
 	syntaxCheck="false"
 	verbose="true"
-	strict="true"
 	timeoutForSmallTests="10"
 	timeoutForMediumTests="30"
 	bootstrap="./tests/bootstrap.php"
@@ -38,6 +37,9 @@
             		<directory suffix=".php">src/Controller/</directory>
             		<directory suffix=".php">src/Model/</directory>
             		<directory suffix=".php">src/View/</directory>
+            		<exclude>
+            			<directory suffix=".php">app/Controller/Component/</directory>
+			</exclude>
         	</whitelist>
     	</filter>
 </phpunit>
