@@ -26,7 +26,7 @@ In order to deploy the app in this repo you need to follow these steps:
 - mkdir logs;
 - set permissions for tmp and logs directory
 
-	- ``HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1```
+	- `HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\   -f1``
 	- `setfacl -R -m u:${HTTPDUSER}:rwx tmp`
 	- `setfacl -R -d -m u:${HTTPDUSER}:rwx tmp`
 	- `setfacl -R -m u:${HTTPDUSER}:rwx logs`
