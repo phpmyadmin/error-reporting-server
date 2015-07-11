@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\ORM\TableRegistry;
+use Cake\Cache\Cache;
 /**
  * Stats controller handling stats preview
  *
@@ -35,10 +36,20 @@ class StatsController extends AppController {
 	public function stats() {
 		$filter = $this->_getTimeFilter();
 		$relatedEntries = array();
+        $filter_string = $this->request->query('filter');
+        if (!$filter_string) {
+            $filter_string = "all_time";
+        }
+        $entriesWithCount = array();
+        //Cache::clear(false);
 		foreach (TableRegistry::get('Incidents')->summarizableFields as $field) {
-			$entriesWithCount = TableRegistry::get('Reports')->
-					getRelatedByField($field, 25, false, false, $filter["limit"]);
-			$relatedEntries[$field] = $entriesWithCount;
+            if (($entriesWithCount = Cache::read($field.'_'.$filter_string)) === false) {
+                $entriesWithCount = TableRegistry::get('Reports')->
+                        getRelatedByField($field, 25, false, false, $filter["limit"]);
+                $entriesWithCount = json_encode($entriesWithCount);
+                Cache::write($field.'_'.$filter_string, $entriesWithCount);
+            }
+            $relatedEntries[$field] = json_decode($entriesWithCount, TRUE);
 		}
 		$this->set("related_entries", $relatedEntries);
 		$this->set('columns', TableRegistry::get('Incidents')->summarizableFields);
@@ -57,13 +68,18 @@ class StatsController extends AppController {
 		}
 
 		TableRegistry::get('Incidents')->recursive = -1;
-		$downloadStats = TableRegistry::get('Incidents')->find('all', $query);
-        $downloadStats->select([
-            'grouped_by' => $filter["group"],
-            'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
-            'count' => $downloadStats->func()->count('*')
-        ]);
-		$this->set('download_stats', $downloadStats);
+        $downloadStats = array();
+        if (($downloadStats = Cache::read('downloadStats_'.$filter_string)) === false) {
+            $downloadStats = TableRegistry::get('Incidents')->find('all', $query);
+            $downloadStats->select([
+                'grouped_by' => $filter["group"],
+                'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
+                'count' => $downloadStats->func()->count('*')
+            ]);
+            $downloadStats = json_encode($downloadStats->toArray());
+            Cache::write('downloadStats_'.$filter_string, $downloadStats);
+        }
+		$this->set('download_stats', json_decode($downloadStats, TRUE));
 	}
 
 	protected function _getTimeFilter() {

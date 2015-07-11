@@ -84,6 +84,7 @@ return [
         'default' => [
             'className' => 'File',
             'path' => CACHE,
+            'duration' => '+1 days',
         ],
 
         /**
