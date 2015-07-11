@@ -21,8 +21,6 @@
     "require": {
         "php": ">=5.4.0",
         "cakephp/cakephp": "~3.0",
-        "ext-intl": "*",
-        "ext-mbstring": "*",
         "cakephp/migrations": "~1.0",
         "cakephp/plugin-installer": "*"
     },
