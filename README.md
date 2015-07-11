@@ -158,20 +158,14 @@ Console/cake custom addHashesToOldRecords
 ```
 
 # Cron Jobs #
-To Schedule & run cron jobs there's a separate script named `cron_dispatcher.php`. We can run cron job using this script. The script is designed to keep MVC of CakePHP as it is and still carry out the job.
-
+To Schedule & run cron jobs cakephp provides a console tool. We need to create shell for use in console. We can run the created shell as cron job.
 ### Execute an Action as Cron Job ###
-`cron_dispatcher.php` takes one argument, namely Relative URL of the action.
-Following is the command to execute any *action* of the application.
+For example, following is the command to execute the shell src/Shell/StatsShell.php which cache the error reporting statistics for later use.
 ```Shell
-<php parser> app/webroot/cron_dispatcher.php <Action URL relative>
+bin/cake stats
 ```
+stats cache will expire in one day so we need to schedule this command to run everyday as cron job.
 
-For example there's an action `/source_forge/sync_ticket_statuses` for updating statuses of all the Error Reports from their associated bug tickets on Sourceforge.net. To run it, following is the command.
-```Shell
-php app/webroot/cron_dispatcher.php /source_forge/sync_ticket_statuses
-```
-Run this command periodically and it'll carry out the respective actions.
-
+We need to create new shells to schedule and run different tasks.
 ### Cron Job Logging ###
 A separate log file named `cron_jobs` is maintained for all the cron jobs. All the logging is done via `CakeLog` interface. All the failures and other activity relating to cron jobs should be reported there only. That would make debugging easier in case of failure.
