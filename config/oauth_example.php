@@ -15,7 +15,7 @@ Configure::write('GithubConfig', array(
 /**
  * Configures the github repo to check commit access for
  */
-Configure::write('GithubRepoPath', 'phpmyadmin/smita786');
+Configure::write('GithubRepoPath', 'phpmyadmin/phpmyadmin');
 
 /**
  * Configures sourceforge application details for authentication
