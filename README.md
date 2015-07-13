@@ -58,7 +58,7 @@ In order to deploy the app in this repo you need to follow these steps:
 			ServerAdmin webmaster@localhost
 			ServerName reports.phpmyadmin.net
 
-			<Directory /path/to/repo/dir/app/webroot/>
+			<Directory /path/to/repo/dir/webroot/>
 				AddType application/x-httpd-php .html
 				Options Indexes FollowSymLinks MultiViews
 				AllowOverride All
@@ -73,7 +73,7 @@ In order to deploy the app in this repo you need to follow these steps:
 - Configuration for lighttpd:
 ```
 $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
-			server.document-root = "/srv/http/reports.phpmyadmin.net/app/webroot/"
+			server.document-root = "/srv/http/reports.phpmyadmin.net/webroot/"
 			url.rewrite-if-not-file =(
 				"^([^\?]*)(\?(.+))?$" => "/index.php?url=$1&$3"
 			)
@@ -85,7 +85,7 @@ server {
         listen [::]:80;
         listen [::]:443 ssl;
 
-        root /home/reports/error-reporting-server/app/webroot/;
+        root /home/reports/error-reporting-server/webroot/;
         index index.html index.htm index.php;
 
         server_name reports.phpmyadmin.net;
