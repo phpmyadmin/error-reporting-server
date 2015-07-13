@@ -29,7 +29,7 @@
         "cakephp/debug_kit": "~3.0",
         "cakephp/bake": "~1.0",
         "phpunit/phpunit": "*",
-        "satooshi/php-coveralls": "dev-master"
+        "satooshi/php-coveralls": ">=0.6"
     },
     "autoload": {
         "psr-4": {
