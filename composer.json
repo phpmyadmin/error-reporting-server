@@ -19,9 +19,33 @@
         "source": "https://github.com/phpmyadmin/error-reporting-server"
     },
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "cakephp/cakephp": "~3.0",
+        "cakephp/migrations": "~1.0",
+        "cakephp/plugin-installer": "*"
     },
     "require-dev": {
+        "psy/psysh": "@stable",
+        "cakephp/debug_kit": "~3.0",
+        "cakephp/bake": "~1.0",
+        "phpunit/phpunit": "*",
         "satooshi/php-coveralls": "dev-master"
-    }
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Test\\": "tests",
+            "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": "App\\Console\\Installer::postInstall",
+        "post-autoload-dump": "Cake\\Composer\\Installer\\PluginInstaller::postAutoloadDump"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

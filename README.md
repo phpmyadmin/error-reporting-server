@@ -19,17 +19,31 @@ In order to deploy the app in this repo you need to follow these steps:
   document root. 
 - Configure the web server (see below)
 - Create the database for the server
-- Rename the example files `database.example.php` and `core.example.php` to
-  `database.php` and `core.php` respectively and fill out the required info.
-  Make sure to change the salts and the debug level in the core.php file and
-  the database credentials in the `database.php` file.
-- Rename the `oauth.example.php` to `oauth.php` and follow the instructions below 
+- install mbstring (required for cake 3.0)
+- install intl extension: `sudo apt-get install php5-intl` //(required for cake 3.0)
+- cd application_root_dir (directory under which subdirectory `src` resides)
+- mkdir tmp;
+- mkdir logs;
+- set permissions for tmp and logs directory
+          ``
+	- ```HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1````
+	- `setfacl -R -m u:${HTTPDUSER}:rwx tmp`
+	- `setfacl -R -d -m u:${HTTPDUSER}:rwx tmp`
+	- `setfacl -R -m u:${HTTPDUSER}:rwx logs`
+	- `setfacl -R -d -m u:${HTTPDUSER}:rwx logs`
+``
+- Rename the example files `config/app_example.php` to
+  `config/app.php` and fill out the required info.
+  Make sure to change the salts, debug level and
+  the database credentials in the `app.php` file.
+- Rename the `oauth_example.php` to `oauth.php` and follow the instructions below 
   to set the appropriate variables in the file.
-- Run the migrations to generate the migrations table in the `app` directory
-  `Console/cake Migrations.migration run all -p Migrations`
 - Run the migrations that have been created so far to setup the database 
-  in the `app` directory
-  `Console/cake Migrations.migration run all --precheck Migrations.PrecheckCondition`
+ 	- For existing systems: update and run migrations
+    	`sudo bin/cake migrations mark_migrated 20150607191654`
+    	`sudo bin/cake migrations migrate`
+	- For new system: just run migration
+	 `sudo bin/cake migrations migrate`
 
 ## Requirements ##
  - php >= 5.4
@@ -108,7 +122,7 @@ register an application there.
 
 The callback for the github app should be ``/developers/callback``.
 
-The obtained cliend ID and secret should be stored in the ``app/Config/oauth.php``.
+The obtained cliend ID and secret should be stored in the ``config/oauth.php``.
 
 [gh-oauth]: https://github.com/settings/applications
 
@@ -117,12 +131,12 @@ The obtained cliend ID and secret should be stored in the ``app/Config/oauth.php
 The reporting bugs to SourceForge.net requires an application registered on
 SourceForge.net. You can do this on [OAuth tab of your account][sf-oauth]. The
 generated consumer key and secrets  need to be stored in
-``app/Config/oauth.php``.
+``config/oauth.php``.
 
 Once you have this, an account which will post bug reports to SourceForge.net
 needs to be authorized to do so. For doing this, you can obtain credentias, you
 need to visit ``/source_forge/authorize`` URL and store resulting key and
-secret in app/Config/oauth.php.
+secret in config/oauth.php.
 
 [sf-oauth]: https://sourceforge.net/auth/oauth/
 
@@ -131,7 +145,7 @@ secret in app/Config/oauth.php.
 If you are on a development machine you can use the webrunner at `/test.php`
 However if you need a command line runner. You can use:
 ```
-app/Console/cake test app AllTests
+sudo vendor/bin/phpunit -c phpunit.xml.dist
 ```
 
 # Running the stackhash update shell #
@@ -144,20 +158,14 @@ Console/cake custom addHashesToOldRecords
 ```
 
 # Cron Jobs #
-To Schedule & run cron jobs there's a separate script named `cron_dispatcher.php`. We can run cron job using this script. The script is designed to keep MVC of CakePHP as it is and still carry out the job.
-
+To Schedule & run cron jobs cakephp provides a console tool. We need to create shell for use in console. We can run the created shell as cron job.
 ### Execute an Action as Cron Job ###
-`cron_dispatcher.php` takes one argument, namely Relative URL of the action.
-Following is the command to execute any *action* of the application.
+For example, following is the command to execute the shell src/Shell/StatsShell.php which cache the error reporting statistics for later use.
 ```Shell
-<php parser> app/webroot/cron_dispatcher.php <Action URL relative>
+bin/cake stats
 ```
+stats cache will expire in one day so we need to schedule this command to run everyday as cron job.
 
-For example there's an action `/source_forge/sync_ticket_statuses` for updating statuses of all the Error Reports from their associated bug tickets on Sourceforge.net. To run it, following is the command.
-```Shell
-php app/webroot/cron_dispatcher.php /source_forge/sync_ticket_statuses
-```
-Run this command periodically and it'll carry out the respective actions.
-
+We need to create new shells to schedule and run different tasks.
 ### Cron Job Logging ###
 A separate log file named `cron_jobs` is maintained for all the cron jobs. All the logging is done via `CakeLog` interface. All the failures and other activity relating to cron jobs should be reported there only. That would make debugging easier in case of failure.
