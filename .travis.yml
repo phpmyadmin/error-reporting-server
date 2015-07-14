@@ -7,6 +7,7 @@ sudo: false
 before_script:
   # Set the GitHub OAuth token to make use of the 6000 per hour rate limit
   - cat ~/.composer/config.json
+  - echo '{"config":{"github-oauth":{"github.com":"%s"}}}' "$COMPOSER_GITHUB_API"
   - printf '{"config":{"github-oauth":{"github.com":"%s"}}}' "$COMPOSER_GITHUB_API"
   - printf '{"config":{"github-oauth":{"github.com":"%s"}}}' "$COMPOSER_GITHUB_API" >  ~/.composer/config.json
   - cat ~/.composer/config.json
