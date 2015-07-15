@@ -41,9 +41,14 @@ $(document).ready(function () {
 		},
 		"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
 			// click on the row anywhere to go to the report.
-			$(nRow).click(function () {
-				// extract the href from the anchor string
-				document.location.href = $($.parseHTML(aData[1])).attr('href');
+			$(nRow).click(function (event) {
+				if (event.ctrlKey || event.which == 2) {
+					event.stopPropagation();
+				} else {
+					// extract the href from the anchor string
+					var url = $($.parseHTML(aData[1])).attr('href');
+					document.location.href = url;
+				}
 			});
 		}
 	});
