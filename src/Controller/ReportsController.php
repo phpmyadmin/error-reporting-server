@@ -281,19 +281,15 @@ class ReportsController extends AppController {
 	}
 
 	/**
-	 * Indexes are +1'ed because first column is of checkboxes
-	 * and hence it should be ingnored.
 	 * @param string[] $aColumns
 	 */
 	protected function _getOrder($aColumns) {
 		if ( $this->request->query('iSortCol_0') != null ) {
 			$order = [];
 			for ( $i = 0; $i < intval($this->request->query('iSortingCols')); $i++ ) {
-				if ( $this->request->query('bSortable_'
-						. intval($this->request->query('iSortCol_' . ($i+1)))) == "true" ) {
-					$order[$aColumns[intval($this->request->query('iSortCol_' . ($i+1)))]]
-							= $this->request->query('sSortDir_' . $i);
-					
+				$sortColumn = intval($this->request->query('iSortCol_' . $i));
+				if ( $sortColumn !== 0 && $this->request->query('bSortable_' . $sortColumn) == "true" ) {
+					$order[$aColumns[$sortColumn]] = $this->request->query('sSortDir_' . $i);
 				}
 			}
 			return $order;
