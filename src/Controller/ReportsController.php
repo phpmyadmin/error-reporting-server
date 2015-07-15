@@ -288,7 +288,7 @@ class ReportsController extends AppController {
 			$order = [];
 			//Seems like we need to sort with only one column each time, so no need to loop
 			$sort_column_index = intval($this->request->query('iSortCol_0'));
-			if ($this->request->query('bSortable_' . $sort_column_index) == "true") {
+			if ($sort_column_index > 0 && $this->request->query('bSortable_' . $sort_column_index) == "true") {
 				$order[$aColumns[$sort_column_index - 1]] = $this->request->query('sSortDir_0');
 			}
 			return $order;
