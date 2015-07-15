@@ -42,27 +42,4 @@ class NotificationsControllerTest extends IntegrationTestCase {
         );
 		$this->assertEquals($actual, $expected);
 	}
-
-	public function testCleanOldNotifs() {
-		// Mark one Notification as "not older". Setting 'created' to current time.
-		$notification = $this->Notifications->get(3);
-		$notification->created= date('Y-m-d H:i:s', time());
-		$this->Notifications->save($notification);
-
-		// define constant for Cron Jobs
-		if (!defined('CRON_DISPATCHER')) {
-			define('CRON_DISPATCHER', true);
-		}
-		$this->get('/notifications/clean_old_notifs');
-		$notifications = $this->Notifications->find('all', array('fields' => array('Notifications.id')));
-        $this->assertInstanceOf('Cake\ORM\Query', $notifications);
-        $actual = $notifications->hydrate(false)->toArray();
-		$expected = array(
-			array(
-				'id' => "3"
-            )
-		);
-
-		$this->assertEquals($actual, $expected);
-	}
 }
