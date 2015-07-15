@@ -3,6 +3,7 @@ $(document).ready(function () {
 		"bSortCellsTop": true,
 		"bProcessing": true,
 		"bServerSide": true,
+		"bStateSave": true,
 		"sAjaxSource": $('#reports_table').data('ajax-url'),
 		"aoColumnDefs": [
 			{ "bSearchable": false, "aTargets": [ 1, 6 ] },
