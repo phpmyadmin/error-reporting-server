@@ -5,6 +5,7 @@ php:
   - "hhvm"
 sudo: false
 before_script:
+  - composer config --global github-oauth.github.com "$GITHUB_TOKEN"
   - composer install --no-interaction
   - cp config/app_travis.php config/app.php
   - cp config/oauth_example.php config/oauth.php
