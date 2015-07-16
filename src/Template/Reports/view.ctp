@@ -125,14 +125,25 @@
       ?>
     </td>
   </tr>
-  <tr>
-    <td>Script Name</td>
-    <td>
-      <?php echo $this->Reports->entriesFromIncidents(
-          $related_entries["script_name"], $script_name_distinct_count, "script_name");
-      ?>
-    </td>
-  </tr>
+  <?php if ($incidents[0]["exception_type"] == 1) { // php ?>
+    <tr>
+      <td>Location</td>
+      <td><?php echo $report[0]["location"]; ?></td>
+    </tr>
+    <tr>
+      <td>Line Number</td>
+      <td><?php echo $report[0]["linenumber"]; ?></td>
+    </tr>
+  <?php } else { ?>
+    <tr>
+      <td>Script Name</td>
+      <td>
+        <?php echo $this->Reports->entriesFromIncidents(
+            $related_entries["script_name"], $script_name_distinct_count, "script_name");
+        ?>
+      </td>
+    </tr>
+  <?php } ?>
   <tr>
     <td>Configuration Storage</td>
     <td>
