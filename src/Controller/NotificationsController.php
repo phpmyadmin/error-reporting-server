@@ -93,7 +93,7 @@ public $components = array('RequestHandler');
 		);
 		$this->autoRender = false;
         $this->response->body(json_encode($response));
-        return $this->response;	
+        return $this->response;
      }
 
 	/**
@@ -119,29 +119,5 @@ public $components = array('RequestHandler');
 		}
 		$this->Flash->default($msg, array("class" => $flash_class));
 		$this->redirect("/notifications/");
-	}
-
-	/**
-	 * Cron Action to clean older Notifications.
-	 * Can not (& should not) be directly accessed via Web.
-	 */
-	public function clean_old_notifs()
-	{
-		if (!defined('CRON_DISPATCHER')) {
-			$this->redirect('/');
-			exit();
-		}
-		// X Time: All the notifications before this time are to be deleted.
-		// Currently it's set to 60 days from current time.
-		$XTime = time() - 60*24*3600;
-		$conditions = array('Notifications.created <' => date('Y-m-d H:i:s', $XTime));
-		if (!$this->Notifications->deleteAll($conditions)) {
-			Log::write(
-				'cron_jobs',
-				'FAILED: Deleting older Notifications!!',
-				'cron_jobs'
-			);
-		}
-		$this->autoRender = false;
 	}
 }
