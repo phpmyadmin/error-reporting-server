@@ -50,6 +50,17 @@ $(document).ready(function () {
 					document.location.href = url;
 				}
 			});
+		},
+		"fnInitComplete": function(oSettings) {
+			$(this.find("select")).each( function(index) {
+				if (index == 0 && oSettings.aoPreSearchCols[index+2].sSearch.length>0) {
+					// Exception Name selector
+					$(this).val(oSettings.aoPreSearchCols[index+2].sSearch);
+				} else if (oSettings.aoPreSearchCols[index+3].sSearch.length>0) {
+					//Other selectors
+					$(this).val(oSettings.aoPreSearchCols[index+3].sSearch);
+				}
+			});
 		}
 	});
 
