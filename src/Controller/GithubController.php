@@ -26,47 +26,32 @@ use Cake\Network\Exception\NotFoundException;
  */
 
 /**
- * Sourceforge controller handling source forge ticket submission and creation
+ * Github controller handling github issue submission and creation
  *
  * @package       Server.Controller
  */
-class SourceForgeController extends AppController {
+class GithubController extends AppController {
 
 	public $helpers = array('Html', 'Form');
 
-	public $components = array('SourceForgeApi');
+	public $components = array('GithubApi');
 
 	public $uses = array('Report');
 
 	public function beforeFilter(Event $event) {
-		$this->SourceForgeApi->accessToken =
-				Configure::read('SourceForgeCredentials');
-		if ($this->action != 'sync_ticket_statuses') {
-			parent::beforeFilter($event);
-		}
+		parent::beforeFilter($event);
+		$this->GithubApi->githubConfig = Configure::read('GithubConfig');
+		$this->GithubApi->githubRepo = Configure::read('GithubRepoPath');
 	}
 
-	public function authorize() {
-		$requestToken =
-			$this->SourceForgeApi->getRequestToken('/' .BASE_DIR . 'source_forge/callback');
-		if ($requestToken) {
-			$this->request->session()->write('sourceforge_request_token', serialize($requestToken));
-			$this->redirect($this->SourceForgeApi->getRedirectUrl($requestToken));
-		}
-		$this->autoRender = false;
-        $this->response->body(json_encode($requestToken));
-        return $this->response;
-	}
-
-	public function callback() {
-		$requestToken = unserialize($this->request->session()->read('sourceforge_request_token'));
-		$accessToken = $this->SourceForgeApi->getAccessToken($requestToken);
-		$this->autoRender = false;
-        $this->response->body(json_encode($accessToken));
-        return $this->response;
-	}
-
-	public function create_ticket($reportId) {
+    /**
+     * create Github Issue
+     *
+     * @param Integer $reportId
+     * @throws \NotFoundException
+     * @throws NotFoundException
+     */
+	public function create_issue($reportId) {
 		if (!$reportId) {
 				throw new \NotFoundException(__('Invalid report'));
 		}
@@ -78,24 +63,37 @@ class SourceForgeController extends AppController {
 
 		if (empty($this->request->data)) {
 			$this->set('pma_version', $report[0]['pma_version']);
+            $this->set('error_name', $report[0]['error_name']);
+            $this->set('error_message', $report[0]['error_message']);
 			return;
 		}
+        $data = array(
+			'title' => $this->request->data['summary'],
+            'body'  => $this->_augmentDescription(
+					$this->request->data['description'], $reportId),
+            'labels' => $this->request->data['labels']?split(",", $this->request->data['labels']):Array()
+		);
+        $data['labels'][] = 'automated-error-report';
+        list($issueDetails, $status) = $this->GithubApi->createIssue(
+            Configure::read('GithubRepoPath'),
+            $data,
+            $this->request->session()->read("access_token")
+        );
 
-		$data = $this->_getTicketData($reportId);
-		$response = $this->SourceForgeApi->createTicket(
-				Configure::read('SourceForgeProjectName'), $data);
-
-		if ($this->_handleSFResponse($response, 1, $reportId)) {
+		if ($this->_handleGithubResponse($status, 1, $reportId, $issueDetails['number'])) {
 			$this->redirect(array('controller' => 'reports', 'action' => 'view',
 					$reportId));
-		}
+        } else {
+            $this->Flash->default(_getErrors($issueDetails, $status),
+					array("class" => "alert alert-error"));
+        }
 	}
 
 	/**
-	 * Links error report to existing bug ticket on SF.net
+	 * Links error report to existing issue on Github
 	 *
 	 */
-	public function link_ticket($reportId) {
+	public function link_issue($reportId) {
 		if (!$reportId) {
 				throw new NotFoundException(__('Invalid reportId'));
 		}
@@ -127,22 +125,26 @@ class SourceForgeController extends AppController {
 			. "\n\n*This comment is posted automatically by phpMyAdmin's "
 			. "[error-reporting-server](http://reports.phpmyadmin.net).*";
 
-		$response = $this->SourceForgeApi->createComment(
-			Configure::read('SourceForgeProjectName'),
-			$ticket_id,
-			array('text' => $commentText)
-		);
-
-		$this->_handleSFResponse($response, 2, $reportId, $ticket_id);
+        list($commentDetails, $status) = $this->GithubApi->createComment(
+            Configure::read('GithubRepoPath'),
+            array('body' => $commentText),
+            $ticket_id,
+            $this->request->session()->read("access_token")
+        );
+		if (!$this->_handleGithubResponse($status, 2, $reportId, $ticket_id))
+        {
+            $this->Flash->default(_getErrors($commentDetails, $status),
+					array("class" => "alert alert-error"));
+        }
 		$this->redirect(array('controller' => 'reports', 'action' => 'view',
 						$reportId));
 	}
 
 	/**
-	 * Un-links error report to associated bug ticket on SF.net
+	 * Un-links error report to associated issue on Github
 	 *
 	 */
-	public function unlink_ticket($reportId) {
+	public function unlink_issue($reportId) {
 		if (!$reportId) {
 				throw new NotFoundException(__('Invalid reportId'));
 		}
@@ -158,7 +160,7 @@ class SourceForgeController extends AppController {
 		}
 
 		// "formatted" text of the comment.
-		$commentText = "This Bug Ticket is no longer associated with [Report#"
+		$commentText = "This Issue is no longer associated with [Report#"
 			. $reportId
 			. "]("
 			. Router::url('/reports/view/'.$reportId,true)
@@ -166,54 +168,38 @@ class SourceForgeController extends AppController {
 			. "\n\n*This comment is posted automatically by phpMyAdmin's "
 			. "[error-reporting-server](http://reports.phpmyadmin.net).*";
 
-		$response = $this->SourceForgeApi->createComment(
-			Configure::read('SourceForgeProjectName'),
-			$ticket_id,
-			array('text' => $commentText)
-		);
+        list($commentDetails, $status) = $this->GithubApi->createComment(
+            Configure::read('GithubRepoPath'),
+            array('body' => $commentText),
+            $ticket_id,
+            $this->request->session()->read("access_token")
+        );
 
-		$this->_handleSFResponse($response, 3, $reportId);
-		$this->redirect(array('controller' => 'reports', 'action' => 'view',
+		if (!$this->_handleGithubResponse($status, 3, $reportId))
+        {
+            $this->Flash->default(_getErrors($commentDetails, $status),
+					array("class" => "alert alert-error"));
+        }
+        $this->redirect(array('controller' => 'reports', 'action' => 'view',
 						$reportId));
 	}
 
-	protected function _getTicketData($reportId) {
-		$data = array(
-			'ticket_form.summary' => $this->request->data['summary'],
-			'ticket_form.description' => $this->_augmentDescription(
-					$this->request->data['description'], $reportId),
-			'ticket_form.status' => 'open',
-			'ticket_form.labels' => $this->request->data['labels'],
-			'ticket_form._milestone' => $this->request->data['milestone'],
-		);
-		if (!empty($data['ticket_form.labels'])) {
-			$data['ticket_form.labels'] .= ',';
-		}
-		$data['ticket_form.labels'] .= 'automated-error-report';
-		return $data;
-	}
-
-	protected function _getErrors($body) {
-		$errorString = "There were some problems with the ticket submission."
-				." Returned status is (" . $body["status"] . ")";
-
-		$errors = $body["errors"];
-		if ($body["status"] === "Validation Error") {
-			$errorString .= '<ul>';
-			foreach ($errors['ticket_form'] as $field => $message) {
-				$errorString .= "<li>";
-				$errorString .= "$field: $message";
-				$errorString .= "</li>";
-			}
-			$errorString .= '</ul>';
-		} else {
-			$errorString .= "<br/> Here is the dump for the errors field provided by"
-					. " sourceforge: <br/>"
-					. "<pre>"
-					. print_r($errors, true)
-					. "</pre>";
-		}
-
+    /**
+     * Returns pretty error message string
+     *
+     * @param Object $response the response returned by Github api
+     * @param Integer $status status returned by Github API
+     *
+     * @return error string
+     */
+	protected function _getErrors($response, $status) {
+		$errorString = "There were some problems with the issue submission."
+				." Returned status is (" . $status . ")";
+		$errorString .= "<br/> Here is the dump for the errors field provided by"
+			. " github: <br/>"
+			. "<pre>"
+			. print_r($response, true)
+			. "</pre>";
 		return $errorString;
 	}
 
@@ -233,37 +219,35 @@ class SourceForgeController extends AppController {
 	}
 
 /**
- * Sourceforge Response Handler
- * @param Object $response the response returned by sourceforge API
+ * Github Response Handler
+ * @param Integer $response the status returned by Github API
  * @param Integer $type type of response.
- *			1 for create_ticket,
- *			2 for link_ticket,
- *			3 for unlink_ticket,
+ *			1 for create_issue,
+ *			2 for link_issue,
+ *			3 for unlink_issue,
  * @param Integer $report_id report id.
  * @param Integer $ticket_id ticket id, required for link tivket only.
  *
  * @return Boolean value. True on success. False on any type of failure.
  */
-	protected function _handleSFResponse($response, $type, $report_id,  $ticket_id = 1)
+	protected function _handleGithubResponse($response, $type, $report_id,  $ticket_id = 1)
 	{
 		if (!in_array($type, array(1,2,3))) {
 			throw new InvalidArgumentException('Invalid Argument "$type".');
 		}
 
-		if ($response->code[0] === "3") {
+		if ($response == 201) {
+            echo $response;
 			// success
 			switch ($type) {
 				case 1:
-					$msg = 'Source forge ticket has been created for this report.';
-					preg_match("<rest/p/.*/bugs/(\d+)/>",
-					$response->headers['Location'], $matches);
-					$ticket_id = $matches[1];
+					$msg = 'Github issue has been created for this report.';
 					break;
 				case 2:
-					$msg = 'Source forge ticket has been linked with this report.';
+					$msg = 'Github issue has been linked with this report.';
 					break;
 				case 3:
-					$msg = 'Source forge ticket has been unlinked with this report.';
+					$msg = 'Github issue has been unlinked with this report.';
 					$ticket_id = null;
 					break;
 				default:
@@ -272,43 +256,38 @@ class SourceForgeController extends AppController {
 			}
             $report = TableRegistry::get('Reports')->get($report_id);
             $report->sourceforge_bug_id = $ticket_id;
-			//$this->Report->read(null, $report_id);
 			TableRegistry::get('Reports')->save($report);
 			$this->Flash->default($msg, array("class" => "alert alert-success"));
 			return true;
-		} else if ($response->code === "403") {
+		} else if ($response === 403) {
 			$this->Flash->default(
-					"Unauthorised access to SourceForge ticketing system. SourceForge"
+					"Unauthorised access to Github. github"
 					. " credentials may be out of date. Please check and try again"
 					. " later.", array("class" => "alert alert-error"));
 			return false;
-		} else if ($response->code === "404"
+		} else if ($response === 404
 			&& $type == 2
 		) {
 			$this->Flash->default(
-					"Bug Ticket not found on SourceForge."
-					. " Are you sure the ticket number is correct?!! Please check and try again",
+					"Bug Issue not found on Github."
+					. " Are you sure the issue number is correct?!! Please check and try again",
 					 array("class" => "alert alert-error"));
 			return false;
 		} else {
 			//fail
-			$response->body = json_decode($response->body, true);
-			//Log::write('sourceforge', 'Submission for sourceforge ticket may have failed.',
-				//	'sourceforge');
-			//Log::write('sourceforge', 'Response dump:', 'sourceforge');
-			//Log::write('sourceforge', print_r($response["raw"], true), 'sourceforge');
-			$this->Flash->default($this->_getErrors($response->body),
+			$this->Flash->default(json_encode($response),
 					array("class" => "alert alert-error"));
 			return false;
 		}
 	}
 
 	/**
-	 * Synchronize Report Statuses from SF Bug Tickets
+	 * Synchronize Report Statuses from Github issue
 	 * To be used as a cron job.
 	 * Can not (& should not) be directly accessed via Web.
+     * TODO
 	 */
-	public function sync_ticket_statuses(){
+	/* public function sync_issue_statuses(){
 		if (!defined('CRON_DISPATCHER')) {
 			$this->redirect('/');
 			exit();
@@ -357,5 +336,5 @@ class SourceForgeController extends AppController {
 			}
 		}
 		$this->autoRender = false;
-	}
+	} */
 }

@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Core\Configure;
 use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
+use Cake\Network\Exception\NotFoundException;
 
 /**
  * Developer controller handling developer login/logout/register
@@ -36,12 +38,13 @@ class DevelopersController extends AppController {
 	);
 
 	public function beforeFilter(Event $event) {
+        parent::beforeFilter($event);
 		$this->GithubApi->githubConfig = Configure::read('GithubConfig');
 		$this->GithubApi->githubRepo = Configure::read('GithubRepoPath');
 	}
 
 	public function login() {
-		$url = $this->GithubApi->getRedirectUrl('user:email');
+		$url = $this->GithubApi->getRedirectUrl('user:email,public_repo,repo,gist');
 		$this->redirect($url);
 	}
 
@@ -87,6 +90,39 @@ class DevelopersController extends AppController {
 				"smita786/phpmyadmin"));
 	}
 
+    public function create_issue($reportId) {
+        if (!$reportId) {
+				throw new \NotFoundException(__('Invalid report'));
+		}
+
+		$report = TableRegistry::get('Reports')->findById($reportId)->toArray();
+		if (!$report) {
+				throw new NotFoundException(__('Invalid report'));
+		}
+
+		if (empty($this->request->data)) {
+			$this->set('pma_version', $report[0]['pma_version']);
+            $this->set('error_name', $report[0]['error_name']);
+            $this->set('error_message', $report[0]['error_message']);
+			return;
+		}
+        $data = array(
+			'title' => $this->request->data['summary'],
+            'body'  => $this->_augmentDescription(
+					$this->request->data['description'], $reportId),
+            'labels' => $this->request->data['labels']?split(",", $this->request->data['labels']):Array()
+		);
+        $data['labels'][] = 'automated-error-report';
+        list($issueDetails, $status) = $this->GithubApi->create_issue(
+            "smita786/tic-tac-toe-php",
+            $data,
+            $this->request->session()->read("access_token")
+        );
+
+        $this->redirect(array('controller' => 'reports', 'action' => 'view',
+					$reportId));
+    }
+
 	protected function _authenticateDeveloper($userInfo, $accessToken) {
 		$developers = $this->Developers->findByGithubId($userInfo['id']);
         $developer = $developers->all()->first();
@@ -97,5 +133,20 @@ class DevelopersController extends AppController {
         }
 		$this->Developers->id = $this->Developers->saveFromGithub($userInfo, $accessToken, $developer);
 		$this->request->session()->write("Developer.id", $this->Developers->id);
+        $this->request->session()->write("access_token", $accessToken);
+	}
+    /**
+     * Returns the description with the added string to link to the report
+     * @param String $description the original description submitted by the dev
+     * @param String $reportId the report id relating to the ticket
+     *
+     * @return String augmented description
+     */
+	protected function _augmentDescription($description, $reportId) {
+        $report = TableRegistry::get('Reports');
+		$report->id = $reportId;
+		return "$description\n\n\nThis report is related to user submitted report "
+				. "[#" . $report->id . "](" . $report->getUrl()
+				. ") on the phpmyadmin error reporting server.";
 	}
 }

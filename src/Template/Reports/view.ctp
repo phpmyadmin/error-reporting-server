@@ -49,14 +49,14 @@
     <?php
     if($report[0]['sourceforge_bug_id']) {
       echo $this->Html->link('#' . $report[0]['sourceforge_bug_id'],
-          "https://sourceforge.net/p/$project_name/bugs/".
-          $report[0]['sourceforge_bug_id'] . "/");
+          "https://github.com/$project_name/issues/".
+          $report[0]['sourceforge_bug_id'] . "/", ['target' => '_blank']);
       echo '<form action="'
-          . Router::url('/source_forge/unlink_ticket/', true)
+          . Router::url('/github/unlink_issue/', true)
           . $report[0]['id']
           .'" method="GET" class="form-horizontal" style="margin-bottom:5px;"'
           . ' onclick="return window.confirm(\'Are you sure you want to unlink??\');" >';
-      echo $this->Form->input('UnLink with Ticket', array(
+      echo $this->Form->input('UnLink with Issue', array(
         'type' => 'submit',
         'label' => false,
         'class'=>'btn btn-primary'
@@ -67,18 +67,18 @@
       echo '<table cellspacing="0" class="table table-bordered error-report"'
           . ' style="width:300px; margin-bottom:5px;">'
           . '<tr><td style="min-width:130px;">';
-      echo $this->Html->link('Create New Ticket', '/source_forge/create_ticket/'
+      echo $this->Html->link('Create New Issue', '/github/create_issue/'
           . $report[0]['id']);
 
       echo '</td><td style="min-width:130px;">';
 
       echo '<form action="'
           . Router::url('/', true)
-          .'source_forge/link_ticket/'
+          .'github/link_issue/'
           . $report[0]['id']
           .'" method="GET" class="form-horizontal" style="margin-bottom:5px;">';
       echo $this->Form->input('ticket_id', array(
-        'placeholder' => 'Ticket Number',
+        'placeholder' => 'Issue Number',
         'type' => 'text',
         'label' => false,
         'div' => true,
@@ -87,7 +87,7 @@
         )
       );
       echo '<br/>';
-      echo $this->Form->input('Link with existing Ticket', array(
+      echo $this->Form->input('Link with existing Issue', array(
         'placeholder' => 'Ticket Number',
         'type' => 'submit',
         'label' => false,
