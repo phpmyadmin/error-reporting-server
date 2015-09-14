@@ -44,7 +44,7 @@
     <td><?php echo $report[0]["error_message"]; ?></td>
   </tr>
   <tr>
-    <td>Sourceforge Report</td>
+    <td>GitHub Issue</td>
     <td>
     <?php
     if($report[0]['sourceforge_bug_id']) {
@@ -56,7 +56,7 @@
           . $report[0]['id']
           .'" method="GET" class="form-horizontal" style="margin-bottom:5px;"'
           . ' onclick="return window.confirm(\'Are you sure you want to unlink??\');" >';
-      echo $this->Form->input('UnLink with Issue', array(
+      echo $this->Form->input('UnLink from Issue', array(
         'type' => 'submit',
         'label' => false,
         'class'=>'btn btn-primary'
