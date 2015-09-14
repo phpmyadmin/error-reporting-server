@@ -106,7 +106,7 @@ class GithubApiComponent extends Component {
             $header[] = 'Authorization: token '.$access_token;
         }
 		curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $header);
-		curl_setopt($curlHandle, CURLOPT_USERAGENT, 'PHP My Admin - Error Reporting Server');
+		curl_setopt($curlHandle, CURLOPT_USERAGENT, 'phpMyAdmin - Error Reporting Server');
 		curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data);
 		curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
 		$response = curl_exec($curlHandle);
