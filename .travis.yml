@@ -21,7 +21,3 @@ matrix:
   allow_failures:
     - php: "hhvm"
     - php: "nightly"
-cache:
-  directories:
-    - vendor
-    - $HOME/.composer/cache
