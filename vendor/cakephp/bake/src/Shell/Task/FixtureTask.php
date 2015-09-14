@@ -72,7 +72,7 @@ class FixtureTask extends BakeTask
         ])->addOption('count', [
             'help' => 'When using generated data, the number of records to include in the fixture(s).',
             'short' => 'n',
-            'default' => 10
+            'default' => 1
         ])->addOption('schema', [
             'help' => 'Create a fixture that imports schema, instead of dumping a schema snapshot into the fixture.',
             'short' => 's',
@@ -109,7 +109,7 @@ class FixtureTask extends BakeTask
 
         if (empty($name)) {
             $this->out('Choose a fixture to bake from the following:');
-            foreach ($this->Model->listAll() as $table) {
+            foreach ($this->Model->listUnskipped() as $table) {
                 $this->out('- ' . $this->_camelize($table));
             }
             return true;
@@ -130,7 +130,7 @@ class FixtureTask extends BakeTask
      */
     public function all()
     {
-        $tables = $this->Model->listAll($this->connection, false);
+        $tables = $this->Model->listUnskipped($this->connection, false);
 
         foreach ($tables as $table) {
             $this->main($table);
@@ -151,7 +151,7 @@ class FixtureTask extends BakeTask
 
         if (!$useTable) {
             $useTable = Inflector::tableize($model);
-        } elseif ($useTable != Inflector::tableize($model)) {
+        } elseif ($useTable !== Inflector::tableize($model)) {
             $table = $useTable;
         }
 
@@ -366,6 +366,9 @@ class FixtureTask extends BakeTask
                         $insert .= " vestibulum massa neque ut et, id hendrerit sit,";
                         $insert .= " feugiat in taciti enim proin nibh, tempor dignissim, rhoncus";
                         $insert .= " duis vestibulum nunc mattis convallis.";
+                        break;
+                    case 'uuid':
+                        $insert = Text::uuid();
                         break;
                 }
                 $record[$field] = $insert;

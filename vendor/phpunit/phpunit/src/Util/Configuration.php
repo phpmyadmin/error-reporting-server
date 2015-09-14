@@ -104,13 +104,13 @@
  *   <logging>
  *     <log type="coverage-html" target="/tmp/report" lowUpperBound="50" highLowerBound="90"/>
  *     <log type="coverage-clover" target="/tmp/clover.xml"/>
+ *     <log type="coverage-crap4j" target="/tmp/crap.xml" threshold="30"/>
  *     <log type="json" target="/tmp/logfile.json"/>
  *     <log type="plain" target="/tmp/logfile.txt"/>
  *     <log type="tap" target="/tmp/logfile.tap"/>
  *     <log type="junit" target="/tmp/logfile.xml" logIncompleteSkipped="false"/>
  *     <log type="testdox-html" target="/tmp/testdox.html"/>
  *     <log type="testdox-text" target="/tmp/testdox.txt"/>
- *     <log type="coverage-crap4j" target="/tmp/crap.xml"/>
  *   </logging>
  *
  *   <php>
@@ -137,11 +137,7 @@
  * </phpunit>
  * </code>
  *
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      Class available since Release 3.2.0
+ * @since Class available since Release 3.2.0
  */
 class PHPUnit_Util_Configuration
 {
@@ -375,11 +371,24 @@ class PHPUnit_Util_Configuration
 
             if ($type == 'coverage-html') {
                 if ($log->hasAttribute('lowUpperBound')) {
-                    $result['lowUpperBound'] = (string) $log->getAttribute('lowUpperBound');
+                    $result['lowUpperBound'] = $this->getInteger(
+                        (string) $log->getAttribute('lowUpperBound'),
+                        50
+                    );
                 }
 
                 if ($log->hasAttribute('highLowerBound')) {
-                    $result['highLowerBound'] = (string) $log->getAttribute('highLowerBound');
+                    $result['highLowerBound'] = $this->getInteger(
+                        (string) $log->getAttribute('highLowerBound'),
+                        90
+                    );
+                }
+            } elseif ($type == 'coverage-crap4j') {
+                if ($log->hasAttribute('threshold')) {
+                    $result['crap4jThreshold'] = $this->getInteger(
+                        (string) $log->getAttribute('threshold'),
+                        30
+                    );
                 }
             } elseif ($type == 'junit') {
                 if ($log->hasAttribute('logIncompleteSkipped')) {

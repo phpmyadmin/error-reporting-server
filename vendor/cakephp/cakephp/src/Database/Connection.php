@@ -237,7 +237,7 @@ class Connection
      */
     public function execute($query, array $params = [], array $types = [])
     {
-        if ($params) {
+        if (!empty($params)) {
             $statement = $this->prepare($query);
             $statement->bind($params, $types);
             $statement->execute();
@@ -325,7 +325,7 @@ class Connection
     /**
      * Executes an INSERT query on the specified table.
      *
-     * @param string $table the table to update values in
+     * @param string $table the table to insert values in
      * @param array $data values to be inserted
      * @param array $types list of associative array containing the types to be used for casting
      * @return \Cake\Database\StatementInterface
@@ -342,7 +342,7 @@ class Connection
     /**
      * Executes an UPDATE statement on the specified table.
      *
-     * @param string $table the table to delete rows from
+     * @param string $table the table to update rows from
      * @param array $data values to be updated
      * @param array $conditions conditions to be set for update statement
      * @param array $types list of associative array containing the types to be used for casting
@@ -576,7 +576,7 @@ class Connection
     /**
      * Checks if a transaction is running.
      *
-     * @return bool True if a transaction is runnning else false.
+     * @return bool True if a transaction is running else false.
      */
     public function inTransaction()
     {

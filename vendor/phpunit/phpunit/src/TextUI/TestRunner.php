@@ -14,11 +14,7 @@ use SebastianBergmann\Environment\Runtime;
  * A TestRunner for the Command Line Interface (CLI)
  * PHP SAPI Module.
  *
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      Class available since Release 2.0.0
+ * @since Class available since Release 2.0.0
  */
 class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 {
@@ -333,6 +329,10 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             $codeCoverageReports++;
         }
 
+        if (isset($arguments['noCoverage'])) {
+            $codeCoverageReports = 0;
+        }
+
         if ($codeCoverageReports > 0 && (!extension_loaded('tokenizer') || !$this->runtime->canCollectCodeCoverage())) {
             if (!extension_loaded('tokenizer')) {
                 $this->showExtensionNotLoadedWarning(
@@ -456,7 +456,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                     "\nGenerating Crap4J report XML file ..."
                 );
 
-                $writer = new PHP_CodeCoverage_Report_Crap4j;
+                $writer = new PHP_CodeCoverage_Report_Crap4j($arguments['crap4jThreshold']);
                 $writer->process($codeCoverage, $arguments['coverageCrap4J']);
 
                 $this->printer->write(" done\n");
@@ -741,6 +741,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             }
 
             $groupCliArgs = array();
+
             if (!empty($arguments['groups'])) {
                 $groupCliArgs = $arguments['groups'];
             }
@@ -791,6 +792,11 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             if (isset($loggingConfiguration['coverage-crap4j']) &&
                 !isset($arguments['coverageCrap4J'])) {
                 $arguments['coverageCrap4J'] = $loggingConfiguration['coverage-crap4j'];
+
+                if (isset($loggingConfiguration['crap4jThreshold']) &&
+                    !isset($arguments['crap4jThreshold'])) {
+                    $arguments['crap4jThreshold'] = $loggingConfiguration['crap4jThreshold'];
+                }
             }
 
             if (isset($loggingConfiguration['coverage-html']) &&
@@ -954,6 +960,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         $arguments['repeat']                             = isset($arguments['repeat'])                             ? $arguments['repeat']                             : false;
         $arguments['reportHighLowerBound']               = isset($arguments['reportHighLowerBound'])               ? $arguments['reportHighLowerBound']               : 90;
         $arguments['reportLowUpperBound']                = isset($arguments['reportLowUpperBound'])                ? $arguments['reportLowUpperBound']                : 50;
+        $arguments['crap4jThreshold']                    = isset($arguments['crap4jThreshold'])                    ? $arguments['crap4jThreshold']                    : 30;
         $arguments['stopOnError']                        = isset($arguments['stopOnError'])                        ? $arguments['stopOnError']                        : false;
         $arguments['stopOnFailure']                      = isset($arguments['stopOnFailure'])                      ? $arguments['stopOnFailure']                      : false;
         $arguments['stopOnIncomplete']                   = isset($arguments['stopOnIncomplete'])                   ? $arguments['stopOnIncomplete']                   : false;

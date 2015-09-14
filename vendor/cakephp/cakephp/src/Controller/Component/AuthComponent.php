@@ -19,7 +19,7 @@ use Cake\Controller\Controller;
 use Cake\Core\App;
 use Cake\Core\Exception\Exception;
 use Cake\Event\Event;
-use Cake\Event\EventManagerTrait;
+use Cake\Event\EventDispatcherTrait;
 use Cake\Network\Exception\ForbiddenException;
 use Cake\Network\Request;
 use Cake\Network\Response;
@@ -36,7 +36,7 @@ use Cake\Utility\Hash;
 class AuthComponent extends Component
 {
 
-    use EventManagerTrait;
+    use EventDispatcherTrait;
 
     /**
      * Constant for 'all'
@@ -364,7 +364,8 @@ class AuthComponent extends Component
             $response->statusCode(403);
             return $response;
         }
-        return $controller->redirect(null, 403);
+        $this->response->statusCode(403);
+        return $this->response;
     }
 
     /**
@@ -403,6 +404,9 @@ class AuthComponent extends Component
             $default = '/';
             if (!empty($this->_config['loginRedirect'])) {
                 $default = $this->_config['loginRedirect'];
+            }
+            if (is_array($default)) {
+                $default['_base'] = false;
             }
             $url = $controller->referer($default, true);
         } else {

@@ -36,11 +36,7 @@
  * This constructor creates a suite with all the methods starting with
  * "test" that take no arguments.
  *
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      Class available since Release 2.0.0
+ * @since Class available since Release 2.0.0
  */
 class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing, IteratorAggregate
 {
@@ -242,7 +238,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             }
 
             if (empty($groups)) {
-                $groups = array('__nogroup__');
+                $groups = array('default');
             }
 
             foreach ($groups as $group) {
@@ -312,14 +308,10 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      * leaving the current test run untouched.
      *
      * @param  string                      $filename
-     * @param  array                       $phptOptions Array with ini settings for the php instance
-     *                                                  run, key being the name if the setting,
-     *                                                  value the ini value.
      * @throws PHPUnit_Framework_Exception
      * @since  Method available since Release 2.3.0
-     * @author Stefano F. Rausch <stefano@rausch-e.net>
      */
-    public function addTestFile($filename, $phptOptions = array())
+    public function addTestFile($filename)
     {
         if (!is_string($filename)) {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
@@ -327,7 +319,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
         if (file_exists($filename) && substr($filename, -5) == '.phpt') {
             $this->addTest(
-                new PHPUnit_Extensions_PhptTestCase($filename, $phptOptions)
+                new PHPUnit_Extensions_PhptTestCase($filename)
             );
 
             return;

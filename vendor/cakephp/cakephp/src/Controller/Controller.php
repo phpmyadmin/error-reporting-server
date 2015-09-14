@@ -17,8 +17,9 @@ namespace Cake\Controller;
 use Cake\Controller\Exception\MissingActionException;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\Event\Event;
+use Cake\Event\EventDispatcherInterface;
+use Cake\Event\EventDispatcherTrait;
 use Cake\Event\EventListenerInterface;
-use Cake\Event\EventManagerTrait;
 use Cake\Log\LogTrait;
 use Cake\Network\Request;
 use Cake\Network\Response;
@@ -27,6 +28,7 @@ use Cake\Routing\Router;
 use Cake\Utility\MergeVariablesTrait;
 use Cake\View\ViewVarsTrait;
 use LogicException;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use RuntimeException;
@@ -80,10 +82,10 @@ use RuntimeException;
  * @property      \Cake\Controller\Component\SecurityComponent $Security
  * @link          http://book.cakephp.org/3.0/en/controllers.html
  */
-class Controller implements EventListenerInterface
+class Controller implements EventListenerInterface, EventDispatcherInterface
 {
 
-    use EventManagerTrait;
+    use EventDispatcherTrait;
     use LogTrait;
     use MergeVariablesTrait;
     use ModelAwareTrait;
@@ -373,7 +375,7 @@ class Controller implements EventListenerInterface
 
         if (!$this->viewPath) {
             $viewPath = $this->name;
-            if (isset($request->params['prefix'])) {
+            if (!empty($request->params['prefix'])) {
                 $prefixes = array_map(
                     'Cake\Utility\Inflector::camelize',
                     explode('/', $request->params['prefix'])
@@ -523,7 +525,7 @@ class Controller implements EventListenerInterface
             return;
         }
 
-        if ($url !== null && !$response->location()) {
+        if (!$response->location()) {
             $response->location(Router::url($url, true));
         }
 
@@ -652,15 +654,16 @@ class Controller implements EventListenerInterface
      */
     public function isAction($action)
     {
+        $baseClass = new ReflectionClass('Cake\Controller\Controller');
+        if ($baseClass->hasMethod($action)) {
+            return false;
+        }
         try {
             $method = new ReflectionMethod($this, $action);
         } catch (ReflectionException $e) {
             return false;
         }
         if (!$method->isPublic()) {
-            return false;
-        }
-        if ($method->getDeclaringClass()->name === 'Cake\Controller\Controller') {
             return false;
         }
         return true;

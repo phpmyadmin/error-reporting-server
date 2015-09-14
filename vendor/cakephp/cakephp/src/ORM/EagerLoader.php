@@ -281,7 +281,10 @@ class EagerLoader
                 $options = isset($options['config']) ?
                     $options['config'] + $options['associations'] :
                     $options;
-                $options = $this->_reformatContain($options, []);
+                $options = $this->_reformatContain(
+                    $options,
+                    isset($pointer[$table]) ? $pointer[$table] : []
+                );
             }
 
             if ($options instanceof Closure) {
@@ -381,6 +384,13 @@ class EagerLoader
             throw new InvalidArgumentException(
                 sprintf('%s is not associated with %s', $parent->alias(), $alias)
             );
+        }
+        if ($instance->alias() !== $alias) {
+            throw new InvalidArgumentException(sprintf(
+                "You have contained '%s' but that association was bound as '%s'.",
+                $alias,
+                $instance->alias()
+            ));
         }
 
         $paths += ['aliasPath' => '', 'propertyPath' => '', 'root' => $alias];
@@ -633,7 +643,7 @@ class EagerLoader
             $source = $instance->source();
             $keys = $instance->type() === Association::MANY_TO_ONE ?
                 (array)$instance->foreignKey() :
-                (array)$source->primaryKey();
+                (array)$instance->bindingKey();
 
             $alias = $source->alias();
             $pkFields = [];

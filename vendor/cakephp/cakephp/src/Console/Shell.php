@@ -503,6 +503,30 @@ class Shell
     }
 
     /**
+     * Output at the verbose level.
+     *
+     * @param string|array $message A string or an array of strings to output
+     * @param int $newlines Number of newlines to append
+     * @return int|bool Returns the number of bytes returned from writing to stdout.
+     */
+    public function verbose($message, $newlines = 1)
+    {
+        return $this->_io->verbose($message, $newlines);
+    }
+
+    /**
+     * Output at all levels.
+     *
+     * @param string|array $message A string or an array of strings to output
+     * @param int $newlines Number of newlines to append
+     * @return int|bool Returns the number of bytes returned from writing to stdout.
+     */
+    public function quiet($message, $newlines = 1)
+    {
+        return $this->_io->quiet($message, $newlines);
+    }
+
+    /**
      * Outputs a single or multiple messages to stdout. If no parameters
      * are passed outputs just a newline.
      *
@@ -614,11 +638,15 @@ class Shell
 
         if (is_file($path) && empty($this->params['force']) && $this->interactive) {
             $this->_io->out(sprintf('<warning>File `%s` exists</warning>', $path));
-            $key = $this->_io->askChoice('Do you want to overwrite?', ['y', 'n', 'q'], 'n');
+            $key = $this->_io->askChoice('Do you want to overwrite?', ['y', 'n', 'a', 'q'], 'n');
 
             if (strtolower($key) === 'q') {
                 $this->_io->out('<error>Quitting</error>.', 2);
                 return $this->_stop();
+            }
+            if (strtolower($key) === 'a') {
+                $this->params['force'] = true;
+                $key = 'y';
             }
             if (strtolower($key) !== 'y') {
                 $this->_io->out(sprintf('Skip `%s`', $path), 2);

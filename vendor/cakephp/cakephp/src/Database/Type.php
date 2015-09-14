@@ -109,7 +109,7 @@ class Type
      * Returns a Type object capable of converting a type identified by $name
      *
      * @param string $name The type identifier you want to set.
-     * @param \Cake\Databse\Type $instance The type instance you want to set.
+     * @param \Cake\Database\Type $instance The type instance you want to set.
      * @return void
      */
     public static function set($name, Type $instance)
@@ -159,6 +159,19 @@ class Type
      * @return string
      */
     public function getName()
+    {
+        return $this->_name;
+    }
+
+    /**
+     * Returns the base type name that this class is inheriting.
+     * This is useful when extending base type for adding extra functionality
+     * but still want the rest of the framework to use the same assumptions it would
+     * do about the base type it inherits from.
+     *
+     * @return string
+     */
+    public function getBaseType()
     {
         return $this->_name;
     }

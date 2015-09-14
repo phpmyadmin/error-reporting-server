@@ -106,15 +106,13 @@
         <copy todir="${basedir}/build/phar/php-file-iterator">
             <fileset dir="${basedir}/vendor/phpunit/php-file-iterator/src">
                 <include name="**/*.php" />
-                <exclude name="**/Autoload.*" />
             </fileset>
         </copy>
 
         <copy file="${basedir}/vendor/phpunit/php-text-template/LICENSE" tofile="${basedir}/build/phar/php-text-template/LICENSE"/>
         <copy todir="${basedir}/build/phar/php-text-template">
-            <fileset dir="${basedir}/vendor/phpunit/php-text-template/Text">
+            <fileset dir="${basedir}/vendor/phpunit/php-text-template/src">
                 <include name="**/*.php" />
-                <exclude name="**/Autoload.*" />
             </fileset>
         </copy>
 
@@ -150,7 +148,6 @@
         <copy todir="${basedir}/build/phar/sebastian-diff">
             <fileset dir="${basedir}/vendor/sebastian/diff/src">
                 <include name="**/*.php" />
-                <exclude name="**/autoload.php" />
             </fileset>
         </copy>
 
@@ -165,7 +162,6 @@
         <copy todir="${basedir}/build/phar/sebastian-exporter">
             <fileset dir="${basedir}/vendor/sebastian/exporter/src">
                 <include name="**/*.php" />
-                <exclude name="**/autoload.php" />
             </fileset>
         </copy>
 
@@ -173,7 +169,6 @@
         <copy todir="${basedir}/build/phar/sebastian-recursion-context">
             <fileset dir="${basedir}/vendor/sebastian/recursion-context/src">
                 <include name="**/*.php" />
-                <exclude name="**/autoload.php" />
             </fileset>
         </copy>
 
@@ -188,7 +183,6 @@
         <copy todir="${basedir}/build/phar/sebastian-version">
             <fileset dir="${basedir}/vendor/sebastian/version/src">
                 <include name="**/*.php" />
-                <exclude name="**/autoload.php" />
             </fileset>
         </copy>
 
@@ -215,9 +209,8 @@
         </copy>
 
         <copy todir="${basedir}/build/phar/php-invoker">
-            <fileset dir="${basedir}/vendor/phpunit/php-invoker/PHP">
+            <fileset dir="${basedir}/vendor/phpunit/php-invoker/src">
                 <include name="**/*.php" />
-                <exclude name="**/Autoload.*" />
             </fileset>
         </copy>
 

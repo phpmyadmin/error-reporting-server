@@ -231,8 +231,11 @@ class Validation
         if (is_array($check1)) {
             extract($check1, EXTR_OVERWRITE);
         }
-        $operator = str_replace([' ', "\t", "\n", "\r", "\0", "\x0B"], '', strtolower($operator));
+        if ((float)$check1 != $check1) {
+            return false;
+        }
 
+        $operator = str_replace([' ', "\t", "\n", "\r", "\0", "\x0B"], '', strtolower($operator));
         switch ($operator) {
             case 'isgreater':
             case '>':
@@ -415,8 +418,8 @@ class Validation
         }
         $parts = explode(' ', $check);
         if (!empty($parts) && count($parts) > 1) {
-            $time = array_pop($parts);
-            $date = implode(' ', $parts);
+            $date = array_shift($parts);
+            $time = implode(' ', $parts);
             $valid = static::date($date, $dateFormat, $regex) && static::time($time);
         }
         return $valid;
@@ -654,7 +657,9 @@ class Validation
         $defaults = ['in' => null, 'max' => null, 'min' => null];
         $options += $defaults;
 
-        $check = array_filter((array)$check);
+        $check = array_filter((array)$check, function ($value) {
+            return ($value || is_numeric($value));
+        });
         if (empty($check)) {
             return false;
         }
@@ -721,6 +726,9 @@ class Validation
     public static function range($check, $lower = null, $upper = null)
     {
         if (!is_numeric($check)) {
+            return false;
+        }
+        if ((float)$check != $check) {
             return false;
         }
         if (isset($lower) && isset($upper)) {
@@ -1037,6 +1045,9 @@ class Validation
 
         if (isset($value['hour'])) {
             if (isset($value['meridian'])) {
+                if ($value['hour'] === 12) {
+                    $value['hour'] = 0;
+                }
                 $value['hour'] = strtolower($value['meridian']) === 'am' ? $value['hour'] : $value['hour'] + 12;
             }
             $value += ['minute' => 0, 'second' => 0];

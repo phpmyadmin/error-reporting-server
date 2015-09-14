@@ -42,7 +42,8 @@ use Traversable;
  *
  * Automatic generation of HTML FORMs from given data.
  *
- * @property      HtmlHelper $Html
+ * @property HtmlHelper $Html
+ * @property UrlHelper $Url
  * @link http://book.cakephp.org/3.0/en/views/helpers/form.html
  */
 class FormHelper extends Helper
@@ -510,7 +511,7 @@ class FormHelper extends Helper
      * Closes an HTML form, cleans up values set by FormHelper::create(), and writes hidden
      * input fields where appropriate.
      *
-     * @param array $secureAttributes Secure attibutes which will be passed as HTML attributes
+     * @param array $secureAttributes Secure attributes which will be passed as HTML attributes
      *   into the hidden input elements generated for the Security Component.
      * @return string A closing FORM tag.
      * @link http://book.cakephp.org/3.0/en/views/helpers/form.html#closing-the-form
@@ -557,6 +558,9 @@ class FormHelper extends Helper
         $unlockedFields = $this->_unlockedFields;
 
         foreach ($fields as $key => $value) {
+            if (is_numeric($value)) {
+                $value = (string)$value;
+            }
             if (!is_int($key)) {
                 $locked[$key] = $value;
                 unset($fields[$key]);
@@ -649,6 +653,8 @@ class FormHelper extends Helper
             if (!in_array($field, $this->fields)) {
                 if ($value !== null) {
                     return $this->fields[$field] = $value;
+                } elseif (isset($this->fields[$field]) && $value === null) {
+                    unset($this->fields[$field]);
                 }
                 $this->fields[] = $field;
             }
@@ -978,6 +984,9 @@ class FormHelper extends Helper
      * - `nestedInput` - Used with checkbox and radio inputs. Set to false to render inputs outside of label
      *   elements. Can be set to true on any input to force the input inside the label. If you
      *   enable this option for radio buttons you will also need to modify the default `radioWrapper` template.
+     * - `templates` - The templates you want to use for this input. Any templates will be merged on top of
+     *   the already loaded templates. This option can either be a filename in /config that contains
+     *   the templates you want to load, or an array of templates to use.
      *
      * @param string $fieldName This should be "modelname.fieldname"
      * @param array $options Each type of input takes different options.
@@ -1447,7 +1456,7 @@ class FormHelper extends Helper
         $radio = $this->widget('radio', $attributes);
 
         $hidden = '';
-        if ($hiddenField && (!isset($value) || $value === '')) {
+        if ($hiddenField) {
             $hidden = $this->hidden($fieldName, [
                 'value' => '',
                 'form' => isset($attributes['form']) ? $attributes['form'] : null,
@@ -2200,7 +2209,10 @@ class FormHelper extends Helper
     protected function _datetimeOptions($options)
     {
         foreach ($this->_datetimeParts as $type) {
-            if (!isset($options[$type])) {
+            if (!array_key_exists($type, $options)) {
+                $options[$type] = [];
+            }
+            if ($options[$type] === true) {
                 $options[$type] = [];
             }
 

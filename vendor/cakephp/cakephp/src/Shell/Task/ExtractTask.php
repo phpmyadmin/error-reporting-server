@@ -337,6 +337,10 @@ class ExtractTask extends Shell
         ])->addOption('extract-core', [
             'help' => 'Extract messages from the CakePHP core libs.',
             'choices' => ['yes', 'no']
+        ])->addOption('no-location', [
+            'boolean' => true,
+            'default' => false,
+            'help' => 'Do not write file locations for each extracted message.',
         ]);
 
         return $parser;
@@ -454,7 +458,10 @@ class ExtractTask extends Shell
                         $occurrences[] = $file . ':' . implode(';', $lines);
                     }
                     $occurrences = implode("\n#: ", $occurrences);
-                    $header = '#: ' . str_replace(DS, '/', str_replace($paths, '', $occurrences)) . "\n";
+                    $header = "";
+                    if (!$this->param('no-location')) {
+                        $header = '#: ' . str_replace(DS, '/', str_replace($paths, '', $occurrences)) . "\n";
+                    }
 
                     $sentence = '';
                     if ($context !== "") {
@@ -704,6 +711,9 @@ class ExtractTask extends Shell
      */
     protected function _isPathUsable($path)
     {
+        if (!is_dir($path)) {
+            mkdir($path, 0770, true);
+        }
         return is_dir($path) && is_writable($path);
     }
 }

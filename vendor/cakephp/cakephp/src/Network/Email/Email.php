@@ -213,7 +213,7 @@ class Email implements JsonSerializable, Serializable
     /**
      * Theme for the View
      *
-     * @var array
+     * @var string
      */
     protected $_theme = null;
 
@@ -1013,8 +1013,14 @@ class Email implements JsonSerializable, Serializable
      */
     protected function _constructTransport($name)
     {
-        if (!isset(static::$_transportConfig[$name]['className'])) {
+        if (!isset(static::$_transportConfig[$name])) {
             throw new InvalidArgumentException(sprintf('Transport config "%s" is missing.', $name));
+        }
+
+        if (!isset(static::$_transportConfig[$name]['className'])) {
+            throw new InvalidArgumentException(
+                sprintf('Transport config "%s" is invalid, the required `className` option is missing', $name)
+            );
         }
 
         $config = static::$_transportConfig[$name];
@@ -1238,6 +1244,16 @@ class Email implements JsonSerializable, Serializable
         }
 
         static::$_transportConfig[$key] = $config;
+    }
+
+    /**
+     * Returns an array containing the named transport configurations
+     *
+     * @return array Array of configurations.
+     */
+    public static function configuredTransport()
+    {
+        return array_keys(static::$_transportConfig);
     }
 
     /**

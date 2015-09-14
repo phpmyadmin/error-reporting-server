@@ -60,11 +60,7 @@ use Prophecy\Prophet;
  * ?>
  * </code>
  *
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      Class available since Release 2.0.0
+ * @since Class available since Release 2.0.0
  */
 abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing
 {
@@ -542,7 +538,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             $this->name
         );
 
-        if ($missingRequirements) {
+        if (!empty($missingRequirements)) {
             $this->markTestSkipped(implode(PHP_EOL, $missingRequirements));
         }
     }
@@ -655,37 +651,46 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                 $phar = '\'\'';
             }
 
-            $data            = var_export(serialize($this->data), true);
-            $dataName        = var_export($this->dataName, true);
-            $dependencyInput = var_export(serialize($this->dependencyInput), true);
-            $includePath     = var_export(get_include_path(), true);
+            if ($result->getCodeCoverage()) {
+                $codeCoverageFilter = $result->getCodeCoverage()->filter();
+            } else {
+                $codeCoverageFilter = null;
+            }
+
+            $data               = var_export(serialize($this->data), true);
+            $dataName           = var_export($this->dataName, true);
+            $dependencyInput    = var_export(serialize($this->dependencyInput), true);
+            $includePath        = var_export(get_include_path(), true);
+            $codeCoverageFilter = var_export(serialize($codeCoverageFilter), true);
             // must do these fixes because TestCaseMethod.tpl has unserialize('{data}') in it, and we can't break BC
             // the lines above used to use addcslashes() rather than var_export(), which breaks null byte escape sequences
-            $data            = "'." . $data . ".'";
-            $dataName        = "'.(" . $dataName . ").'";
-            $dependencyInput = "'." . $dependencyInput . ".'";
-            $includePath     = "'." . $includePath . ".'";
+            $data               = "'." . $data . ".'";
+            $dataName           = "'.(" . $dataName . ").'";
+            $dependencyInput    = "'." . $dependencyInput . ".'";
+            $includePath        = "'." . $includePath . ".'";
+            $codeCoverageFilter = "'." . $codeCoverageFilter . ".'";
 
             $template->setVar(
                 array(
-                'composerAutoload'                        => $composerAutoload,
-                'phar'                                    => $phar,
-                'filename'                                => $class->getFileName(),
-                'className'                               => $class->getName(),
-                'methodName'                              => $this->name,
-                'collectCodeCoverageInformation'          => $coverage,
-                'data'                                    => $data,
-                'dataName'                                => $dataName,
-                'dependencyInput'                         => $dependencyInput,
-                'constants'                               => $constants,
-                'globals'                                 => $globals,
-                'include_path'                            => $includePath,
-                'included_files'                          => $includedFiles,
-                'iniSettings'                             => $iniSettings,
-                'isStrictAboutTestsThatDoNotTestAnything' => $isStrictAboutTestsThatDoNotTestAnything,
-                'isStrictAboutOutputDuringTests'          => $isStrictAboutOutputDuringTests,
-                'isStrictAboutTestSize'                   => $isStrictAboutTestSize,
-                'isStrictAboutTodoAnnotatedTests'         => $isStrictAboutTodoAnnotatedTests
+                    'composerAutoload'                        => $composerAutoload,
+                    'phar'                                    => $phar,
+                    'filename'                                => $class->getFileName(),
+                    'className'                               => $class->getName(),
+                    'methodName'                              => $this->name,
+                    'collectCodeCoverageInformation'          => $coverage,
+                    'data'                                    => $data,
+                    'dataName'                                => $dataName,
+                    'dependencyInput'                         => $dependencyInput,
+                    'constants'                               => $constants,
+                    'globals'                                 => $globals,
+                    'include_path'                            => $includePath,
+                    'included_files'                          => $includedFiles,
+                    'iniSettings'                             => $iniSettings,
+                    'isStrictAboutTestsThatDoNotTestAnything' => $isStrictAboutTestsThatDoNotTestAnything,
+                    'isStrictAboutOutputDuringTests'          => $isStrictAboutOutputDuringTests,
+                    'isStrictAboutTestSize'                   => $isStrictAboutTestSize,
+                    'isStrictAboutTodoAnnotatedTests'         => $isStrictAboutTodoAnnotatedTests,
+                    'codeCoverageFilter'                      => $codeCoverageFilter
                 )
             );
 
@@ -761,9 +766,9 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             $e = $_e;
         }
 
-        if (isset($e)) {
+        if (isset($_e)) {
             $this->status        = PHPUnit_Runner_BaseTestRunner::STATUS_ERROR;
-            $this->statusMessage = $e->getMessage();
+            $this->statusMessage = $_e->getMessage();
         }
 
         // Clean up the mock objects.
@@ -1225,7 +1230,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
         $locale   = $args[1];
 
         $categories = array(
-          LC_ALL, LC_COLLATE, LC_CTYPE, LC_MONETARY, LC_NUMERIC, LC_TIME
+            LC_ALL, LC_COLLATE, LC_CTYPE, LC_MONETARY, LC_NUMERIC, LC_TIME
         );
 
         if (defined('LC_MESSAGES')) {

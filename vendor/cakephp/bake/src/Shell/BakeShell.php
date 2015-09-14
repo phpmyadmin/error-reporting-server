@@ -78,7 +78,7 @@ class BakeShell extends Shell
             $args = $this->args;
             array_shift($args);
             $args = implode($args, ' ');
-            $this->out(sprintf('    bin/cake bake template %s', $args), 2);
+            $this->out(sprintf('    <info>`bin/cake bake template %s`</info>', $args), 2);
             return false;
         }
 
@@ -222,25 +222,35 @@ class BakeShell extends Shell
             $this->connection = $this->params['connection'];
         }
 
-        if (empty($name)) {
+        if (empty($name) && !$this->param('everything')) {
             $this->Model->connection = $this->connection;
             $this->out('Possible model names based on your database:');
-            foreach ($this->Model->listAll() as $table) {
+            foreach ($this->Model->listUnskipped() as $table) {
                 $this->out('- ' . $table);
             }
             $this->out('Run <info>`cake bake all [name]`</info> to generate skeleton files.');
             return false;
         }
 
-        foreach (['Model', 'Controller', 'Template'] as $task) {
-            $this->{$task}->connection = $this->connection;
+        $allTables = collection([$name]);
+        $filteredTables = $allTables;
+
+        if ($this->param('everything')) {
+            $this->Model->connection = $this->connection;
+            $filteredTables = collection($this->Model->listUnskipped());
         }
 
-        $name = $this->_camelize($name);
+        $filteredTables->each(function ($tableName) {
+            foreach (['Model', 'Controller', 'Template'] as $task) {
+                $this->{$task}->connection = $this->connection;
+            }
 
-        $this->Model->main($name);
-        $this->Controller->main($name);
-        $this->Template->main($name);
+            $tableName = $this->_camelize($tableName);
+
+            $this->Model->main($tableName);
+            $this->Controller->main($tableName);
+            $this->Template->main($tableName);
+        });
 
         $this->out('<success>Bake All complete.</success>', 1, Shell::QUIET);
         return true;
@@ -270,13 +280,24 @@ class BakeShell extends Shell
             ' are using command line arguments.'
         )->addSubcommand('all', [
             'help' => 'Bake a complete MVC skeleton.',
+        ])->addOption('everything', [
+            'help' => 'Bake a complete MVC skeleton, using all the available tables. ' .
+            'Usage: "bake all --everything"',
+            'default' => false,
+            'boolean' => true,
         ])->addOption('connection', [
             'help' => 'Database connection to use in conjunction with `bake all`.',
             'short' => 'c',
             'default' => 'default'
+        ])->addOption('force', [
+            'short' => 'f',
+            'boolean' => true,
+            'help' => 'Force overwriting existing files without prompting.'
         ])->addOption('plugin', [
             'short' => 'p',
             'help' => 'Plugin to bake into.'
+        ])->addOption('prefix', [
+            'help' => 'Prefix to bake controllers and templates into.'
         ])->addOption('theme', [
             'short' => 't',
             'help' => 'The theme to use when baking code.',

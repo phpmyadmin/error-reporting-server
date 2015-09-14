@@ -300,12 +300,10 @@ class Hash
 
         foreach ($data as $k => $v) {
             if (static::_matchToken($k, $token)) {
-                if ($conditions && static::_matches($v, $conditions)) {
-                    $data[$k] = array_merge($v, $values);
-                    continue;
-                }
-                if (!$conditions) {
-                    $data[$k] = static::insert($v, $nextPath, $values);
+                if (!$conditions || static::_matches($v, $conditions)) {
+                    $data[$k] = $nextPath
+                        ? static::insert($v, $nextPath, $values)
+                        : array_merge($v, (array)$values);
                 }
             }
         }
@@ -392,11 +390,17 @@ class Hash
         foreach ($data as $k => $v) {
             $match = static::_matchToken($k, $token);
             if ($match && is_array($v)) {
-                if ($conditions && static::_matches($v, $conditions)) {
-                    unset($data[$k]);
-                    continue;
+                if ($conditions) {
+                    if (static::_matches($v, $conditions)) {
+                        if ($nextPath) {
+                            $data[$k] = static::remove($v, $nextPath);
+                        } else {
+                            unset($data[$k]);
+                        }
+                    }
+                } else {
+                    $data[$k] = static::remove($v, $nextPath);
                 }
-                $data[$k] = static::remove($v, $nextPath);
                 if (empty($data[$k])) {
                     unset($data[$k]);
                 }
@@ -781,7 +785,7 @@ class Hash
         while ($elem = array_shift($data)) {
             if (is_array($elem)) {
                 $depth += 1;
-                $data =& $elem;
+                $data = $elem;
             } else {
                 break;
             }
@@ -803,7 +807,7 @@ class Hash
         if (is_array($data) && reset($data) !== false) {
             foreach ($data as $value) {
                 if (is_array($value)) {
-                    $depth[] = static::dimensions($value) + 1;
+                    $depth[] = static::maxDimensions($value) + 1;
                 } else {
                     $depth[] = 1;
                 }

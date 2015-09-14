@@ -54,7 +54,7 @@ class QueryExpression implements ExpressionInterface, Countable
      * expression objects. Optionally, you can set the conjunction keyword to be used
      * for joining each part of this level of the expression tree.
      *
-     * @param array $conditions tree-like array structure containing all the conditions
+     * @param string|array|QueryExpression $conditions tree-like array structure containing all the conditions
      * to be added or nested inside this expression object.
      * @param array|\Cake\Database\TypeMap $types associative array of types to be associated with the values
      * passed in $conditions.
@@ -101,7 +101,7 @@ class QueryExpression implements ExpressionInterface, Countable
      * value is an array, it will create as many placeholders as values are in it.
      *
      * @param string|array|QueryExpression $conditions single or multiple conditions to
-     * be added. When using and array and the key is 'OR' or 'AND' a new expression
+     * be added. When using an array and the key is 'OR' or 'AND' a new expression
      * object will be created with that conjunction and internal array value passed
      * as conditions.
      * @param array $types associative array of fields pointing to the type of the
@@ -128,7 +128,7 @@ class QueryExpression implements ExpressionInterface, Countable
     /**
      * Adds a new condition to the expression object in the form "field = value".
      *
-     * @param string $field database field to be compared against value
+     * @param string $field Database field to be compared against value
      * @param mixed $value The value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * If it is suffixed with "[]" and the value is an array then multiple placeholders
@@ -143,7 +143,7 @@ class QueryExpression implements ExpressionInterface, Countable
     /**
      * Adds a new condition to the expression object in the form "field != value".
      *
-     * @param string $field database field to be compared against value
+     * @param string $field Database field to be compared against value
      * @param mixed $value The value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * If it is suffixed with "[]" and the value is an array then multiple placeholders
@@ -158,7 +158,7 @@ class QueryExpression implements ExpressionInterface, Countable
     /**
      * Adds a new condition to the expression object in the form "field > value".
      *
-     * @param string $field database field to be compared against value
+     * @param string $field Database field to be compared against value
      * @param mixed $value The value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * @return $this
@@ -171,7 +171,7 @@ class QueryExpression implements ExpressionInterface, Countable
     /**
      * Adds a new condition to the expression object in the form "field < value".
      *
-     * @param string $field database field to be compared against value
+     * @param string $field Database field to be compared against value
      * @param mixed $value The value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * @return $this
@@ -184,7 +184,7 @@ class QueryExpression implements ExpressionInterface, Countable
     /**
      * Adds a new condition to the expression object in the form "field >= value".
      *
-     * @param string $field database field to be compared against value
+     * @param string $field Database field to be compared against value
      * @param mixed $value The value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * @return $this
@@ -197,7 +197,7 @@ class QueryExpression implements ExpressionInterface, Countable
     /**
      * Adds a new condition to the expression object in the form "field <= value".
      *
-     * @param string $field database field to be compared against value
+     * @param string $field Database field to be compared against value
      * @param mixed $value The value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * @return $this
@@ -240,7 +240,7 @@ class QueryExpression implements ExpressionInterface, Countable
     /**
      * Adds a new condition to the expression object in the form "field LIKE value".
      *
-     * @param string $field database field to be compared against value
+     * @param string $field Database field to be compared against value
      * @param mixed $value The value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * @return $this
@@ -253,7 +253,7 @@ class QueryExpression implements ExpressionInterface, Countable
     /**
      * Adds a new condition to the expression object in the form "field NOT LIKE value".
      *
-     * @param string $field database field to be compared against value
+     * @param string $field Database field to be compared against value
      * @param mixed $value The value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * @return $this
@@ -267,8 +267,8 @@ class QueryExpression implements ExpressionInterface, Countable
      * Adds a new condition to the expression object in the form
      * "field IN (value1, value2)".
      *
-     * @param string $field database field to be compared against value
-     * @param array $values the value to be bound to $field for comparison
+     * @param string $field Database field to be compared against value
+     * @param string|array $values the value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * @return $this
      */
@@ -300,7 +300,7 @@ class QueryExpression implements ExpressionInterface, Countable
      * Adds a new condition to the expression object in the form
      * "field NOT IN (value1, value2)".
      *
-     * @param string $field database field to be compared against value
+     * @param string $field Database field to be compared against value
      * @param array $values the value to be bound to $field for comparison
      * @param string $type the type name for $value as configured using the Type map.
      * @return $this
@@ -340,7 +340,7 @@ class QueryExpression implements ExpressionInterface, Countable
      */
     public function and_($conditions, $types = [])
     {
-        if (!is_string($conditions) && is_callable($conditions)) {
+        if ($this->isCallable($conditions)) {
             return $conditions(new self([], $this->typeMap()->types($types)));
         }
         return new self($conditions, $this->typeMap()->types($types));
@@ -357,7 +357,7 @@ class QueryExpression implements ExpressionInterface, Countable
      */
     public function or_($conditions, $types = [])
     {
-        if (!is_string($conditions) && is_callable($conditions)) {
+        if ($this->isCallable($conditions)) {
             return $conditions(new self([], $this->typeMap()->types($types), 'OR'));
         }
         return new self($conditions, $this->typeMap()->types($types), 'OR');
@@ -478,7 +478,7 @@ class QueryExpression implements ExpressionInterface, Countable
      * Helps calling the `and()` and `or()` methods transparently.
      *
      * @param string $method The method name.
-     * @param array $args The argumemts to pass to the method.
+     * @param array $args The arguments to pass to the method.
      * @return \Cake\Database\Expression\QueryExpression
      * @throws \BadMethodCallException
      */
@@ -488,6 +488,30 @@ class QueryExpression implements ExpressionInterface, Countable
             return call_user_func_array([$this, $method . '_'], $args);
         }
         throw new \BadMethodCallException(sprintf('Method %s does not exist', $method));
+    }
+
+    /**
+     * Check whether or not a callable is acceptable.
+     *
+     * We don't accept ['class', 'method'] style callbacks,
+     * as they often contain user input and arrays of strings
+     * are easy to sneak in.
+     *
+     * @param callable $c The callable to check.
+     * @return bool Valid callable.
+     */
+    public function isCallable($c)
+    {
+        if (is_string($c)) {
+            return false;
+        }
+        if (is_object($c) && is_callable($c)) {
+            return true;
+        }
+        if (is_array($c) && isset($c[0]) && is_object($c[0]) && is_callable($c)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -513,7 +537,7 @@ class QueryExpression implements ExpressionInterface, Countable
                 continue;
             }
 
-            if (!is_string($c) && is_callable($c)) {
+            if ($this->isCallable($c)) {
                 $expr = new QueryExpression([], $typeMap);
                 $c = $c($expr, $this);
             }
@@ -587,11 +611,19 @@ class QueryExpression implements ExpressionInterface, Countable
         }
 
         if ($operator === 'is' && $value === null) {
-            return new UnaryExpression('IS NULL', $expression, UnaryExpression::POSTFIX);
+            return new UnaryExpression(
+                'IS NULL',
+                new IdentifierExpression($expression),
+                UnaryExpression::POSTFIX
+            );
         }
 
         if ($operator === 'is not' && $value === null) {
-            return new UnaryExpression('IS NOT NULL', $expression, UnaryExpression::POSTFIX);
+            return new UnaryExpression(
+                'IS NOT NULL',
+                new IdentifierExpression($expression),
+                UnaryExpression::POSTFIX
+            );
         }
 
         if ($operator === 'is' && $value !== null) {
@@ -609,7 +641,7 @@ class QueryExpression implements ExpressionInterface, Countable
      * Returns an array of placeholders that will have a bound value corresponding
      * to each value in the first argument.
      *
-     * @param string $field database field to be used to bind values
+     * @param string $field Database field to be used to bind values
      * @param array $values The values to bind
      * @param string $type the type to be used to bind the values
      * @return array
