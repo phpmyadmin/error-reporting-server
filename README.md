@@ -16,7 +16,7 @@ In order to deploy the app in this repo you need to follow these steps:
 - Clone this repo or extract the zip file
 - Add a virtual hosts entry pointing at the directory where you extracted the
   files in the previous step. Make sure that the installation is in the
-  document root. 
+  document root.
 - Configure the web server (see below)
 - Create the database for the server
 - install mbstring (required for cake 3.0)
@@ -36,9 +36,9 @@ In order to deploy the app in this repo you need to follow these steps:
   `config/app.php` and fill out the required info.
   Make sure to change the salts, debug level and
   the database credentials in the `app.php` file.
-- Rename the `oauth_example.php` to `oauth.php` and follow the instructions below 
+- Rename the `oauth_example.php` to `oauth.php` and follow the instructions below
   to set the appropriate variables in the file.
-- Run the migrations that have been created so far to setup the database 
+- Run the migrations that have been created so far to setup the database
  	- For existing systems: update and run migrations
     	`sudo bin/cake migrations mark_migrated 20150607191654`
     	`sudo bin/cake migrations migrate`
@@ -47,8 +47,8 @@ In order to deploy the app in this repo you need to follow these steps:
 
 ## Requirements ##
  - php >= 5.4
- - MySQL 
- 
+ - MySQL
+
 
 ## Web server setup ##
 
@@ -125,20 +125,6 @@ The callback for the github app should be ``/developers/callback``.
 The obtained cliend ID and secret should be stored in the ``config/oauth.php``.
 
 [gh-oauth]: https://github.com/settings/applications
-
-### Creating the SourceForge.net app ###
-
-The reporting bugs to SourceForge.net requires an application registered on
-SourceForge.net. You can do this on [OAuth tab of your account][sf-oauth]. The
-generated consumer key and secrets  need to be stored in
-``config/oauth.php``.
-
-Once you have this, an account which will post bug reports to SourceForge.net
-needs to be authorized to do so. For doing this, you can obtain credentias, you
-need to visit ``/source_forge/authorize`` URL and store resulting key and
-secret in config/oauth.php.
-
-[sf-oauth]: https://sourceforge.net/auth/oauth/
 
 # How to run the test suite #
 

@@ -8,11 +8,11 @@
     'class' => 'input-xxlarge',
     'between' => '<div class="controls">',
     'after' => '</div>',
-  
+
   'class' => 'form-horizontal',
 ))?>
   <fieldset>
-    <legend>Sourceforge ticket</legend>
+    <legend>Github Issue</legend>
     <?php
       if (substr($pma_version, -4) == '-dev') {
         $milestone_default_val = 'Latest_Git';
@@ -26,10 +26,10 @@
         $arr = array_splice($arr, 0, 3);
         $milestone_default_val = implode('.', $arr);
       }
-      echo $this->Form->input('summary', array('placeholder' => 'Summary'));
+      echo $this->Form->input('summary', array('placeholder' => 'Summary', "value" => $error_name));
       echo $this->Form->input('milestone', array('placeholder' => 'Milestone', 'value'=> $milestone_default_val));
       echo $this->Form->input('description',
-          array('placeholder' => 'Description', 'rows' => 10));
+          array('placeholder' => 'Description', 'rows' => 10, "value" => $error_message));
       echo $this->Form->input('labels', array('placeholder' => 'Labels'));
     ?>
     <div class="control-group">

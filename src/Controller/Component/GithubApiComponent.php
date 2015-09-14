@@ -43,13 +43,13 @@ class GithubApiComponent extends Component {
  * @see GithubApiComponent::sendRequest()
  */
 	public function apiRequest($path = "", $data = array(), $method = "GET",
-			$returnStatus=false) {
+			$returnStatus=false, $access_token="") {
 		$path = "https://api.github.com/" . $path;
 		if (strtoupper($method) === "GET") {
-			$path .= "?" . http_build_query($data);
+			$path .= "?" . $data;
 			$data = array();
 		}
-		return $this->sendRequest($path, $data, $method, $returnStatus);
+		return $this->sendRequest($path, $data, $method, $returnStatus, $access_token);
 	}
 
 /**
@@ -66,7 +66,7 @@ class GithubApiComponent extends Component {
 				'code' => $code,
 			)
 		);
-		$decodedResponse = $this->sendRequest($url, $data, "POST");
+		$decodedResponse = $this->sendRequest($url, http_build_query($data), "POST");
 		return $decodedResponse['access_token'];
 	}
 
@@ -81,7 +81,7 @@ class GithubApiComponent extends Component {
 		$data = array(
 			'access_token' => $accessToken,
 		);
-		return $this->apiRequest("user", $data, "GET", true);
+		return $this->apiRequest("user", http_build_query($data), "GET", true);
 	}
 
 /**
@@ -98,12 +98,16 @@ class GithubApiComponent extends Component {
  * @return Array the returned response decoded and optionally the status code,
  *               eg: array($decodedResponse, $statusCode) or just $decodedResponse
  */
-	public function sendRequest($url, $data, $method, $returnCode=false) {
+	public function sendRequest($url, $data, $method, $returnCode=false, $access_token="") {
 		$curlHandle = curl_init($url);
 		curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $method);
-		curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+        $header = array('Accept: application/json');
+        if (isset($access_token) && $access_token != "") {
+            $header[] = 'Authorization: token '.$access_token;
+        }
+		curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $header);
 		curl_setopt($curlHandle, CURLOPT_USERAGENT, 'PHP My Admin - Error Reporting Server');
-		curl_setopt($curlHandle, CURLOPT_POSTFIELDS, http_build_query($data));
+		curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data);
 		curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
 		$response = curl_exec($curlHandle);
 		$decodedResponse = json_decode($response, true);
@@ -149,7 +153,32 @@ class GithubApiComponent extends Component {
 	public function canCommitTo($username, $repoPath) {
 		list(, $status) = $this->
 				apiRequest("repos/$repoPath/collaborators/$username",
-				array(), "GET", true);
+				http_build_query(array()), "GET", true);
 		return $status === 204;
 	}
+
+    /**
+     * make api request for github issue creation
+     *
+     * @param string $repoPath
+     * @param Array $data issue details
+     * @param string $access_token
+     *
+     */
+    public function createIssue($repoPath, $data, $access_token) {
+        return $this->apiRequest("repos/$repoPath/issues", json_encode($data), "POST", true, $access_token);
+    }
+
+    /**
+     * make api request for github comment creation
+     *
+     * @param string $repoPath
+     * @param Array $data
+     * @param Integer $issueNumber
+     * @param string $access_token
+     *
+     */
+    public function createComment($repoPath, $data, $issueNumber, $access_token) {
+        return $this->apiRequest("repos/$repoPath/issues/$issueNumber/comments", json_encode($data), "POST", true, $access_token);
+    }
 }

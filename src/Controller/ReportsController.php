@@ -64,9 +64,9 @@ class ReportsController extends AppController {
 		if (!$report) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
-        
+
 		$this->set('report', $report);
-		$this->set('project_name', Configure::read('SourceForgeProjectName'));
+		$this->set('project_name', Configure::read('GithubRepoPath'));
 		$this->Reports->id = $reportId;
 		$this->set('incidents', $this->Reports->getIncidents()->toArray());
 		$this->set('incidents_with_description',
@@ -111,7 +111,7 @@ class ReportsController extends AppController {
 		$rows = $this->_findAllDataTable($this->Reports->find('all', $pagedParams));
 		//$rows = Sanitize::clean($rows);
 		$totalFiltered = $this->Reports->find('all', $params)->count();
-        
+
 		// change exception_type from boolean values to strings
 		$dispRows = array();
 		foreach($rows as $row) {
