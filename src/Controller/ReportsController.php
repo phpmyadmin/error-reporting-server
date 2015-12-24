@@ -92,10 +92,29 @@ class ReportsController extends AppController {
 	}
 
 	public function data_tables() {
-		$aColumns = ['id', 'error_name', 'error_message', 'pma_version',
-					'status','exception_type'];
+		$subquery_params = [
+			'fields' => [
+				'report_id' => 'report_id',
+				'inci_count' => 'COUNT(id)'
+				],
+			'group' => 'report_id'
+		];
+		$subquery = TableRegistry::get('incidents')->find('all', $subquery_params);
+
+		// override automatic aliasing, for proper usage in joins
+		$aColumns = [
+			'id' => 'id',
+			'error_name' => 'error_name',
+			'error_message' => 'error_message',
+			'pma_version' => 'pma_version',
+			'status' => 'status',
+			'exception_type' => 'exception_type',
+			'inci_count' => 'inci_count'
+		];
+
 		$searchConditions = $this->_getSearchConditions($aColumns);
 		$orderConditions = $this->_getOrder($aColumns);
+
 		$params = [
 			'fields' => $aColumns,
 			'conditions' => [
@@ -108,7 +127,12 @@ class ReportsController extends AppController {
 		$pagedParams = $params;
 		$pagedParams['limit'] = intval($this->request->query('iDisplayLength'));
 		$pagedParams['offset'] = intval($this->request->query('iDisplayStart'));
-		$rows = $this->_findAllDataTable($this->Reports->find('all', $pagedParams));
+
+		$rows = $this->_findAllDataTable(
+			$this->Reports->find('all', $pagedParams)->innerJoin(
+				['incidents' => $subquery], ['incidents.report_id = Reports.id']
+			)
+		);
 		//$rows = Sanitize::clean($rows);
 		$totalFiltered = $this->Reports->find('all', $params)->count();
 
@@ -261,10 +285,12 @@ class ReportsController extends AppController {
 	 */
 	protected function _getSearchConditions($aColumns) {
 		$searchConditions = array('OR' => array());
+		$keys = array_keys($aColumns);
+
 		if ( $this->request->query('sSearch') != "" ) {
 			for ( $i = 0; $i < count($aColumns); $i++ ) {
 				if ($this->request->query('bSearchable_' . ($i+1)) == "true") {
-					$searchConditions['OR'][] = array($aColumns[$i] . " LIKE" =>
+					$searchConditions['OR'][] = array($aColumns[$keys[$i]] . " LIKE" =>
 							"%" . $this->request->query('sSearch') . "%");
 				}
 			}
@@ -273,7 +299,7 @@ class ReportsController extends AppController {
 		/* Individual column filtering */
 		for ( $i = 0; $i < count($aColumns); $i++ ) {
 			if ($this->request->query('sSearch_' . ($i+1)) != '') {
-				$searchConditions[] = array($aColumns[$i] . " LIKE" =>
+				$searchConditions[] = array($aColumns[$keys[$i]] . " LIKE" =>
 						$this->request->query('sSearch_' . ($i+1)));
 			}
 		}
@@ -288,8 +314,11 @@ class ReportsController extends AppController {
 			$order = [];
 			//Seems like we need to sort with only one column each time, so no need to loop
 			$sort_column_index = intval($this->request->query('iSortCol_0'));
+
+			$keys = array_keys($aColumns);
+
 			if ($sort_column_index > 0 && $this->request->query('bSortable_' . $sort_column_index) == "true") {
-				$order[$aColumns[$sort_column_index - 1]] = $this->request->query('sSortDir_0');
+				$order[$aColumns[$keys[$sort_column_index - 1]]] = $this->request->query('sSortDir_0');
 			}
 			return $order;
 		} else {

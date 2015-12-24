@@ -17,6 +17,7 @@
       <th>PMA Version</th>
       <th>Status</th>
       <th>Exception Type</th>
+      <th>Incident count</th>
     </tr>
     <tr>
       <th></th>
@@ -59,6 +60,8 @@
           <option value='1'>php</option>
         </select>
       </th>
+      <th>
+      </th>
     </tr>
   </thead>
 
@@ -66,6 +69,7 @@
   </tbody>
   <tfoot>
     <tr>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
