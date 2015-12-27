@@ -83,8 +83,8 @@ class ReportsControllerTest extends IntegrationTestCase {
 			'iTotalDisplayRecords' => 2,
 			'sEcho' => 1,
 			'aaData' => array(
-				array("<input type='checkbox' name='reports[]' value='1'/>", '1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js'),
-				array("<input type='checkbox' name='reports[]' value='2'/>", '2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js'),
+				array("<input type='checkbox' name='reports[]' value='1'/>", 1, 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js', '1'),
+				array("<input type='checkbox' name='reports[]' value='2'/>", 2, 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js', '1'),
 			)
 		);
 		$result = json_decode($this->_response->body(), true);
