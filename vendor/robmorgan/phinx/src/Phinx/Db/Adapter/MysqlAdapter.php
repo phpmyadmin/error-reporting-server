@@ -514,9 +514,24 @@ class MysqlAdapter extends PdoAdapter implements AdapterInterface
         $indexes = $this->getIndexes($tableName);
 
         foreach ($indexes as $index) {
-            $a = array_diff($columns, $index['columns']);
-            if (empty($a)) {
+            if ($columns == $index['columns']) {
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasIndexByName($tableName, $indexName)
+    {
+        $indexes = $this->getIndexes($tableName);
+
+        foreach ($indexes as $name => $index) {
+            if ($name === $indexName) {
+                 return true;
             }
         }
 
@@ -555,8 +570,7 @@ class MysqlAdapter extends PdoAdapter implements AdapterInterface
         $columns = array_map('strtolower', $columns);
 
         foreach ($indexes as $indexName => $index) {
-            $a = array_diff($columns, $index['columns']);
-            if (empty($a)) {
+            if ($columns == $index['columns']) {
                 $this->execute(
                     sprintf(
                         'ALTER TABLE %s DROP INDEX %s',
@@ -612,7 +626,7 @@ class MysqlAdapter extends PdoAdapter implements AdapterInterface
         } else {
             foreach ($foreignKeys as $key) {
                 $a = array_diff($columns, $key['columns']);
-                if (empty($a)) {
+                if ($columns == $key['columns']) {
                     return true;
                 }
             }
@@ -743,6 +757,9 @@ class MysqlAdapter extends PdoAdapter implements AdapterInterface
                 return array('name' => 'text');
                 break;
             case static::PHINX_TYPE_BINARY:
+                return array('name' => 'binary', 'limit' => $limit ? $limit : 255);
+                break;
+            case static::PHINX_TYPE_BLOB:
                 if ($limit) {
                     $sizes = array(
                         // Order matters! Size must always be tested from longest to shortest!

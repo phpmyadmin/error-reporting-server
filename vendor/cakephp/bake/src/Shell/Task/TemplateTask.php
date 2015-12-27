@@ -23,7 +23,7 @@ use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
 
 /**
- * Task class for creating and updating view files.
+ * Task class for creating and updating view template files.
  *
  */
 class TemplateTask extends BakeTask
@@ -108,7 +108,7 @@ class TemplateTask extends BakeTask
     /**
      * Execution method always used for tasks
      *
-     * @param string|null $name The name of the controller to bake views for.
+     * @param string|null $name The name of the controller to bake view templates for.
      * @param string|null $template The template to bake with.
      * @param string|null $action The action to bake with.
      * @return mixed
@@ -118,7 +118,7 @@ class TemplateTask extends BakeTask
         parent::main();
 
         if (empty($name)) {
-            $this->out('Possible tables to bake views for based on your current database:');
+            $this->out('Possible tables to bake view templates for based on your current database:');
             $this->Model->connection = $this->connection;
             foreach ($this->Model->listUnskipped() as $table) {
                 $this->out('- ' . $this->_camelize($table));
@@ -186,33 +186,31 @@ class TemplateTask extends BakeTask
         }
         $this->controllerName = $controller;
 
-        $plugin = $prefix = null;
-        if (!empty($this->params['plugin'])) {
-            $plugin = $this->params['plugin'] . '.';
+        $plugin = $this->param('plugin');
+        if ($plugin) {
+            $plugin .= '.';
         }
-        if (!empty($this->params['prefix'])) {
-            $prefix = $this->params['prefix'] . '/';
+        $prefix = $this->_getPrefix();
+        if ($prefix) {
+            $prefix .= '/';
         }
         $this->controllerClass = App::className($plugin . $prefix . $controller, 'Controller', 'Controller');
     }
 
     /**
-     * Get the path base for views.
+     * Get the path base for view templates.
      *
      * @return string
      */
     public function getPath()
     {
         $path = parent::getPath();
-        if (!empty($this->params['prefix'])) {
-            $path .= $this->_camelize($this->params['prefix']) . DS;
-        }
         $path .= $this->controllerName . DS;
         return $path;
     }
 
     /**
-     * Get a list of actions that can / should have views baked for them.
+     * Get a list of actions that can / should have view templates baked for them.
      *
      * @return array Array of action names that should be baked
      */
@@ -245,7 +243,7 @@ class TemplateTask extends BakeTask
     }
 
     /**
-     * Bake All views for All controllers.
+     * Bake All view templates for all controller actions.
      *
      * @return void
      */
@@ -379,7 +377,7 @@ class TemplateTask extends BakeTask
             $this->err("<warning>No generated content for '{$action}.ctp', not generating template.</warning>");
             return false;
         }
-        $this->out("\n" . sprintf('Baking `%s` view file...', $action), 1, Shell::QUIET);
+        $this->out("\n" . sprintf('Baking `%s` view template file...', $action), 1, Shell::QUIET);
         $path = $this->getPath();
         $filename = $path . Inflector::underscore($action) . '.ctp';
         $this->createFile($filename, $content);

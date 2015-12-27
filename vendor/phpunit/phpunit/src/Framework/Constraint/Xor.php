@@ -18,14 +18,14 @@ class PHPUnit_Framework_Constraint_Xor extends PHPUnit_Framework_Constraint
     /**
      * @var PHPUnit_Framework_Constraint[]
      */
-    protected $constraints = array();
+    protected $constraints = [];
 
     /**
      * @param PHPUnit_Framework_Constraint[] $constraints
      */
     public function setConstraints(array $constraints)
     {
-        $this->constraints = array();
+        $this->constraints = [];
 
         foreach ($constraints as $constraint) {
             if (!($constraint instanceof PHPUnit_Framework_Constraint)) {
@@ -48,10 +48,12 @@ class PHPUnit_Framework_Constraint_Xor extends PHPUnit_Framework_Constraint
      * a boolean value instead: true in case of success, false in case of a
      * failure.
      *
-     * @param  mixed                                        $other        Value or object to evaluate.
-     * @param  string                                       $description  Additional information about the test
-     * @param  bool                                         $returnResult Whether to return a result or throw an exception
+     * @param mixed  $other        Value or object to evaluate.
+     * @param string $description  Additional information about the test
+     * @param bool   $returnResult Whether to return a result or throw an exception
+     *
      * @return mixed
+     *
      * @throws PHPUnit_Framework_ExpectationFailedException
      */
     public function evaluate($other, $description = '', $returnResult = false)
@@ -104,6 +106,7 @@ class PHPUnit_Framework_Constraint_Xor extends PHPUnit_Framework_Constraint
      * Counts the number of constraint elements.
      *
      * @return int
+     *
      * @since  Method available since Release 3.4.0
      */
     public function count()

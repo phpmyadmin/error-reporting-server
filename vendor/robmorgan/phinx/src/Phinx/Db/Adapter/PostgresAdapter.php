@@ -36,8 +36,8 @@ use Phinx\Migration\MigrationInterface;
 
 class PostgresAdapter extends PdoAdapter implements AdapterInterface
 {
+    const INT_SMALL = 65535;
 
-    const INT_SMALL   = 65535;
     /**
      * Columns with comments
      *
@@ -541,6 +541,20 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
         return false;
     }
 
+     /**
+      * {@inheritdoc}
+      */
+     public function hasIndexByName($tableName, $indexName)
+     {
+         $indexes = $this->getIndexes($tableName);
+         foreach ($indexes as $name => $index) {
+             if ($name == $indexName) {
+                 return true;
+             }
+         }
+         return false;
+     }
+
     /**
      * {@inheritdoc}
      */
@@ -746,6 +760,7 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
             case static::PHINX_TYPE_DATETIME:
             case static::PHINX_TYPE_TIMESTAMP:
                 return array('name' => 'timestamp');
+            case static::PHINX_TYPE_BLOB:
             case static::PHINX_TYPE_BINARY:
                 return array('name' => 'bytea');
             // Geospatial database types

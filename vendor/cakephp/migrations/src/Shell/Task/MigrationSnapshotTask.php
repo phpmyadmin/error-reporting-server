@@ -31,7 +31,7 @@ class MigrationSnapshotTask extends SimpleMigrationTask
      *
      * @var array
      */
-    public $skipTables = ['i18n', 'phinxlog'];
+    public $skipTables = ['phinxlog'];
 
     /**
      * Regex of Table name to skip
@@ -85,7 +85,7 @@ class MigrationSnapshotTask extends SimpleMigrationTask
         list($version, ) = explode('_', $fileName, 2);
 
 
-        $dispatchCommand = 'migrations mark_migrated ' . $version;
+        $dispatchCommand = 'migrations mark_migrated -t ' . $version . ' -o';
         if (!empty($this->params['connection'])) {
             $dispatchCommand .= ' -c ' . $this->params['connection'];
         }
@@ -121,7 +121,7 @@ class MigrationSnapshotTask extends SimpleMigrationTask
         $collection = $this->getCollection($this->connection);
         $tables = $collection->listTables();
 
-        if ($this->params['require-table'] === true) {
+        if ($this->params['require-table'] === true || $this->plugin) {
             $tableNamesInModel = $this->getTableNames($this->plugin);
 
             foreach ($tableNamesInModel as $num => $table) {
@@ -133,10 +133,6 @@ class MigrationSnapshotTask extends SimpleMigrationTask
         } else {
             foreach ($tables as $num => $table) {
                 if ((in_array($table, $this->skipTables)) || (strpos($table, $this->skipTablesRegex) !== false)) {
-                    unset($tables[$num]);
-                    continue;
-                }
-                if (!$this->tableToAdd($table, $this->plugin)) {
                     unset($tables[$num]);
                     continue;
                 }
@@ -176,41 +172,33 @@ class MigrationSnapshotTask extends SimpleMigrationTask
      * To check if a Table Model is to be added in the migration file
      *
      * @param string $tableName Table name in underscore case.
-     * @param string $pluginName Plugin name if exists.
-     * @return bool true if the model is to be added.
+     * @param string|null $pluginName Plugin name if exists.
+     * @deprecated Will be removed in the next version
+     * @return bool True if the model is to be added.
      */
     public function tableToAdd($tableName, $pluginName = null)
     {
-        if (is_null($pluginName)) {
-            return true;
-        }
-
-        $pluginName = strtolower(str_replace('/', '_', $pluginName)) . '_';
-        if (strpos($tableName, $pluginName) !== false) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
      * Gets list Tables Names
      *
-     * @param string $pluginName Plugin name if exists.
+     * @param string|null $pluginName Plugin name if exists.
      * @return array
      */
     public function getTableNames($pluginName = null)
     {
-        if (!is_null($pluginName) && !Plugin::loaded($pluginName)) {
-            return false;
+        if ($pluginName !== null && !Plugin::loaded($pluginName)) {
+            return [];
         }
         $list = [];
         $tables = $this->findTables($pluginName);
         foreach ($tables as $num => $table) {
-            $list = $list + $this->fetchTableName($table, $pluginName);
+            $list = array_merge($list, $this->fetchTableName($table, $pluginName));
         }
 
-        return $list;
+        return array_unique($list);
     }
 
     /**
@@ -241,14 +229,14 @@ class MigrationSnapshotTask extends SimpleMigrationTask
      * fetch TableName From Table Object
      *
      * @param string $className Name of Table Class.
-     * @param string $pluginName Plugin name if exists.
-     * @return string
+     * @param string|null $pluginName Plugin name if exists.
+     * @return array
      */
     public function fetchTableName($className, $pluginName = null)
     {
         $tables = [];
         $className = str_replace('Table.php', '', $className);
-        if (!is_null($pluginName)) {
+        if ($pluginName !== null) {
             $className = $pluginName . '.' . $className;
         }
 

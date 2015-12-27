@@ -7,15 +7,12 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'phpDocumentor' => array($vendorDir . '/phpdocumentor/reflection-docblock/src'),
-    'Psy\\' => array($vendorDir . '/psy/psysh/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'Prophecy\\' => array($vendorDir . '/phpspec/prophecy/src'),
     'JakubOnderka\\PhpConsoleHighlighter' => array($vendorDir . '/jakub-onderka/php-console-highlighter/src'),
     'JakubOnderka\\PhpConsoleColor' => array($vendorDir . '/jakub-onderka/php-console-color/src'),
     'Guzzle\\Tests' => array($vendorDir . '/guzzle/guzzle/tests'),
     'Guzzle' => array($vendorDir . '/guzzle/guzzle/src'),
-    'Contrib\\Component' => array($vendorDir . '/satooshi/php-coveralls/src'),
-    'Contrib\\Bundle' => array($vendorDir . '/satooshi/php-coveralls/src'),
     'Carbon' => array($vendorDir . '/nesbot/carbon/src'),
     'Aura\\Intl' => array($vendorDir . '/aura/intl/src'),
     'Aura\\Composer\\' => array($vendorDir . '/aura/installer-default/src'),

@@ -40,7 +40,8 @@ class PHPUnit_Util_Printer
     /**
      * Constructor.
      *
-     * @param  mixed                       $out
+     * @param mixed $out
+     *
      * @throws PHPUnit_Framework_Exception
      */
     public function __construct($out = null)
@@ -89,7 +90,7 @@ class PHPUnit_Util_Printer
                 $this->outTarget,
                 tidy_repair_file(
                     $this->outTarget,
-                    array('indent' => true, 'wrap' => 0),
+                    ['indent' => true, 'wrap' => 0],
                     'utf8'
                 )
             );
@@ -142,6 +143,7 @@ class PHPUnit_Util_Printer
      * Check auto-flush mode.
      *
      * @return bool
+     *
      * @since  Method available since Release 3.3.0
      */
     public function getAutoFlush()
@@ -156,6 +158,7 @@ class PHPUnit_Util_Printer
      * not be confused with the different effects of this class' flush() method.
      *
      * @param bool $autoFlush
+     *
      * @since  Method available since Release 3.3.0
      */
     public function setAutoFlush($autoFlush)

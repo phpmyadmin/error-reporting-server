@@ -15,7 +15,6 @@
 namespace Cake\Datasource;
 
 use Cake\Core\StaticConfigTrait;
-use Cake\Datasource\ConnectionRegistry;
 use Cake\Datasource\Exception\MissingDatasourceConfigException;
 
 /**
@@ -102,7 +101,7 @@ class ConnectionManager
      *
      * Note that querystring arguments are also parsed and set as values in the returned configuration.
      *
-     * @param array $config An array with a `url` key mapping to a string DSN
+     * @param string $config The DSN string to convert to a configuration array
      * @return array The configuration array to be stored after parsing the DSN
      */
     public static function parseDsn($config = null)
@@ -175,7 +174,7 @@ class ConnectionManager
      *
      * @param string $name The connection name.
      * @param bool $useAliases Set to false to not use aliased connections.
-     * @return \Cake\Database\Connection A connection object.
+     * @return \Cake\Datasource\ConnectionInterface A connection object.
      * @throws \Cake\Datasource\Exception\MissingDatasourceConfigException When config
      * data is missing.
      */

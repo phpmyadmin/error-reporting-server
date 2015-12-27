@@ -14,13 +14,11 @@
  */
 namespace Cake\Database;
 
-use Cake\Database\Exception;
 use Cake\Database\Expression\OrderByExpression;
 use Cake\Database\Expression\OrderClauseExpression;
 use Cake\Database\Expression\QueryExpression;
 use Cake\Database\Expression\ValuesExpression;
 use Cake\Database\Statement\CallbackStatement;
-use Cake\Database\ValueBinder;
 use IteratorAggregate;
 use RuntimeException;
 
@@ -38,7 +36,7 @@ class Query implements ExpressionInterface, IteratorAggregate
     /**
      * Connection instance to be used to execute this query.
      *
-     * @var \Cake\Database\Connection
+     * @var \Cake\Datasource\ConnectionInterface
      */
     protected $_connection;
 
@@ -126,7 +124,7 @@ class Query implements ExpressionInterface, IteratorAggregate
     /**
      * Constructor.
      *
-     * @param \Cake\Database\Connection $connection The connection
+     * @param \Cake\Datasource\ConnectionInterface $connection The connection
      * object to be used for transforming and executing this query
      */
     public function __construct($connection)
@@ -138,8 +136,8 @@ class Query implements ExpressionInterface, IteratorAggregate
      * Sets the connection instance to be used for executing and transforming this query
      * When called with a null argument, it will return the current connection instance.
      *
-     * @param \Cake\Database\Connection $connection instance
-     * @return $this|\Cake\Database\Connection
+     * @param \Cake\Datasource\ConnectionInterface $connection instance
+     * @return $this|\Cake\Datasource\ConnectionInterface
      */
     public function connection($connection = null)
     {
@@ -174,7 +172,9 @@ class Query implements ExpressionInterface, IteratorAggregate
     public function execute()
     {
         $statement = $this->_connection->run($this);
-        return $this->_iterator = $this->_decorateStatement($statement);
+        $this->_iterator = $this->_decorateStatement($statement);
+        $this->_dirty = false;
+        return $this->_iterator;
     }
 
     /**
@@ -243,6 +243,9 @@ class Query implements ExpressionInterface, IteratorAggregate
      * real field to be aliased. It is possible to alias strings, Expression objects or
      * even other Query objects.
      *
+     * If a callable function is passed, the returning array of the function will
+     * be used as the list of fields.
+     *
      * By default this function will append any passed argument to the list of fields
      * to be selected, unless the second argument is set to true.
      *
@@ -253,13 +256,16 @@ class Query implements ExpressionInterface, IteratorAggregate
      * $query->select(['author' => 'author_id']); // Appends author: SELECT id, title, author_id as author
      * $query->select('id', true); // Resets the list: SELECT id
      * $query->select(['total' => $countQuery]); // SELECT id, (SELECT ...) AS total
+     * $query->select(function ($query) {
+     *     return ['article_id', 'total' => $query->count('*')];
+     * })
      * ```
      *
      * By default no fields are selected, if you have an instance of `Cake\ORM\Query` and try to append
      * fields you should also call `Cake\ORM\Query::autoFields()` to select the default fields
      * from the table.
      *
-     * @param array|ExpressionInterface|string $fields fields to be added to the list
+     * @param array|ExpressionInterface|string|callable $fields fields to be added to the list.
      * @param bool $overwrite whether to reset fields with passed list or not
      * @return $this
      */
@@ -300,12 +306,15 @@ class Query implements ExpressionInterface, IteratorAggregate
      *
      * // Filters products in the same city
      * $query->distinct(['city']);
+     * $query->distinct('city');
      *
      * // Filter products with the same name
      * $query->distinct(['name'], true);
+     * $query->distinct('name', true);
      * ```
      *
-     * @param array|ExpressionInterface $on fields to be filtered on
+     * @param array|ExpressionInterface|string|bool $on Enable/disable distinct class
+     * or list of fields to be filtered on
      * @param bool $overwrite whether to reset fields with passed list or not
      * @return $this
      */
@@ -313,6 +322,8 @@ class Query implements ExpressionInterface, IteratorAggregate
     {
         if ($on === []) {
             $on = true;
+        } elseif (is_string($on)) {
+            $on = [$on];
         }
 
         if (is_array($on)) {
@@ -527,6 +538,22 @@ class Query implements ExpressionInterface, IteratorAggregate
             $this->_parts['join'] = array_merge($this->_parts['join'], $joins);
         }
 
+        $this->_dirty();
+        return $this;
+    }
+
+    /**
+     * Remove a join if it has been defined.
+     *
+     * Useful when you are redefining joins or want to re-order
+     * the join clauses.
+     *
+     * @param string $name The alias/name of the join to remove.
+     * @return $this
+     */
+    public function removeJoin($name)
+    {
+        unset($this->_parts['join'][$name]);
         $this->_dirty();
         return $this;
     }
@@ -1173,6 +1200,7 @@ class Query implements ExpressionInterface, IteratorAggregate
      */
     public function offset($num)
     {
+        $this->_dirty();
         if ($num !== null && !is_object($num)) {
             $num = (int)$num;
         }
@@ -1578,7 +1606,7 @@ class Query implements ExpressionInterface, IteratorAggregate
      *
      * @param callable $callback the function to be executed for each ExpressionInterface
      *   found inside this query.
-     * @return void|$this
+     * @return $this|null
      */
     public function traverseExpressions(callable $callback)
     {
@@ -1587,7 +1615,7 @@ class Query implements ExpressionInterface, IteratorAggregate
                 foreach ($expression as $e) {
                     $visitor($e);
                 }
-                return;
+                return null;
             }
 
             if ($expression instanceof ExpressionInterface) {
@@ -1692,7 +1720,7 @@ class Query implements ExpressionInterface, IteratorAggregate
      * Helper function used to build conditions by composing QueryExpression objects.
      *
      * @param string $part Name of the query part to append the new part to
-     * @param string|array|ExpressionInterface|callback $append Expression or builder function to append.
+     * @param string|null|array|ExpressionInterface|callback $append Expression or builder function to append.
      * @param string $conjunction type of conjunction to be used to operate part
      * @param array $types associative array of type names used to bind values to query
      * @return void
@@ -1734,6 +1762,37 @@ class Query implements ExpressionInterface, IteratorAggregate
 
         if ($this->_iterator && $this->_valueBinder) {
             $this->valueBinder()->reset();
+        }
+    }
+
+    /**
+     * Do a deep clone on this object.
+     *
+     * Will clone all of the expression objects used in
+     * each of the clauses, as well as the valueBinder.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->_iterator = null;
+        if ($this->_valueBinder) {
+            $this->_valueBinder = clone $this->_valueBinder;
+        }
+        foreach ($this->_parts as $name => $part) {
+            if (empty($part)) {
+                continue;
+            }
+            if (is_array($part)) {
+                foreach ($part as $i => $piece) {
+                    if ($piece instanceof ExpressionInterface) {
+                        $this->_parts[$name][$i] = clone $piece;
+                    }
+                }
+            }
+            if ($part instanceof ExpressionInterface) {
+                $this->_parts[$name] = clone $part;
+            }
         }
     }
 

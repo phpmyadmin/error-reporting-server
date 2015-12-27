@@ -16,6 +16,7 @@ namespace Cake\Database\Type;
 
 use Cake\Database\Driver;
 use Cake\Database\Type;
+use InvalidArgumentException;
 use PDO;
 
 /**
@@ -38,9 +39,11 @@ class IntegerType extends Type
         if ($value === null || $value === '') {
             return null;
         }
-        if (is_array($value)) {
-            return 1;
+
+        if (!is_scalar($value)) {
+            throw new InvalidArgumentException('Cannot convert value to integer');
         }
+
         return (int)$value;
     }
 
@@ -55,9 +58,6 @@ class IntegerType extends Type
     {
         if ($value === null) {
             return null;
-        }
-        if (is_array($value)) {
-            return 1;
         }
         return (int)$value;
     }
@@ -85,15 +85,12 @@ class IntegerType extends Type
         if ($value === null || $value === '') {
             return null;
         }
-        if (is_int($value)) {
-            return $value;
-        }
-        if (ctype_digit($value)) {
+        if (is_numeric($value) || ctype_digit($value)) {
             return (int)$value;
         }
         if (is_array($value)) {
             return 1;
         }
-        return $value;
+        return null;
     }
 }

@@ -15,8 +15,6 @@
 namespace Cake\Database\Expression;
 
 use Cake\Database\ExpressionInterface;
-use Cake\Database\Expression\FieldInterface;
-use Cake\Database\Expression\FieldTrait;
 use Cake\Database\ValueBinder;
 
 /**
@@ -67,6 +65,18 @@ class OrderClauseExpression implements ExpressionInterface, FieldInterface
         if ($this->_field instanceof ExpressionInterface) {
             $visitor($this->_field);
             $this->_field->traverse($visitor);
+        }
+    }
+
+    /**
+     * Create a deep clone of the order clause.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        if ($this->_field instanceof ExpressionInterface) {
+            $this->_field = clone $this->_field;
         }
     }
 }

@@ -12,6 +12,7 @@
 namespace Migrations;
 
 use Cake\Collection\Collection;
+use Cake\ORM\TableRegistry;
 use Phinx\Db\Adapter\SQLiteAdapter;
 use Phinx\Db\Table as BaseTable;
 
@@ -70,6 +71,19 @@ class Table extends BaseTable
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * After a table update, the TableRegistry should be cleared in order to prevent issues with
+     * table schema stored in Table objects having columns that might have been renamed or removed during
+     * the update process.
+     */
+    public function update()
+    {
+        parent::update();
+        TableRegistry::clear();
+    }
+
+    /**
      * This method is called in case a primary key was defined using the addPrimaryKey() method.
      * It currently does something only if using SQLite.
      * If a column is an auto-increment key in SQLite, it has to be a primary key and it has to defined
@@ -80,7 +94,7 @@ class Table extends BaseTable
      */
     protected function filterPrimaryKey()
     {
-        if (!($this->getAdapter() instanceof SQLiteAdapter) || empty($this->options['primary_key'])) {
+        if ($this->getAdapter()->getAdapterType() !== 'sqlite' || empty($this->options['primary_key'])) {
             return;
         }
 

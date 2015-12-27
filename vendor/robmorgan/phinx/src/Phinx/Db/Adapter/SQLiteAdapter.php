@@ -554,6 +554,22 @@ class SQLiteAdapter extends PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
+    public function hasIndexByName($tableName, $indexName)
+    {
+        $indexes = $this->getIndexes($tableName);
+
+        foreach ($indexes as $index) {
+            if ($indexName == $index['index']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addIndex(Table $table, Index $index)
     {
         $this->startCommandTimer();
@@ -770,7 +786,11 @@ class SQLiteAdapter extends PdoAdapter implements AdapterInterface
         $this->execute(sprintf('ALTER TABLE %s RENAME TO %s', $this->quoteTableName($tableName), $tmpTableName));
 
         foreach ($columns as $columnName) {
-            $sql = preg_replace(sprintf("/,[^,]*\(%s\) REFERENCES[^,]*\([^\)]*\)/", $this->quoteColumnName($columnName)), '', $sql, 1);
+            $search = sprintf(
+                "/,[^,]*\(%s(?:,`?(.*)`?)?\) REFERENCES[^,]*\([^\)]*\)[^,)]*/",
+                $this->quoteColumnName($columnName)
+            );
+            $sql = preg_replace($search, '', $sql, 1);
         }
 
         $this->execute($sql);
@@ -791,29 +811,28 @@ class SQLiteAdapter extends PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function insert(Table $table, $columns, $data)
+    public function insert(Table $table, $row)
     {
         $this->startCommandTimer();
+        $this->writeCommand('insert', array($table->getName()));
 
-        foreach($data as $row) {
-            $sql = sprintf(
-                "INSERT INTO %s ",
-                $this->quoteTableName($table->getName())
-            );
+        $sql = sprintf(
+            "INSERT INTO %s ",
+            $this->quoteTableName($table->getName())
+        );
 
-            $sql .= "(". implode(', ', array_map(array($this, 'quoteColumnName'), $columns)) . ")";
-            $sql .= " VALUES ";
+        $columns = array_keys($row);
+        $sql .= "(". implode(', ', array_map(array($this, 'quoteColumnName'), $columns)) . ")";
+        $sql .= " VALUES ";
 
-            $sql .= "(" . implode(', ', array_map(function ($value) {
-                    if (is_numeric($value)) {
-                        return $value;
-                    }
-                    return "'{$value}'";
-                }, $row)) . ")";
+        $sql .= "(" . implode(', ', array_map(function ($value) {
+                if (is_numeric($value)) {
+                    return $value;
+                }
+                return "'{$value}'";
+            }, $row)) . ")";
 
-            $this->execute($sql);
-        }
-
+        $this->execute($sql);
         $this->endCommandTimer();
     }
 
@@ -856,6 +875,7 @@ class SQLiteAdapter extends PdoAdapter implements AdapterInterface
             case static::PHINX_TYPE_DATE:
                 return array('name' => 'date');
                 break;
+            case static::PHINX_TYPE_BLOB:
             case static::PHINX_TYPE_BINARY:
                 return array('name' => 'blob');
                 break;

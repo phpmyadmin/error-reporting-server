@@ -9,19 +9,17 @@ This is a Database Migrations system for CakePHP 3.0.
 
 The plugin consists of a wrapper for the [phinx](http://phinx.org) migrations library.
 
+Full documentation of the plugin can be found on the [CakePHP Cookbook](http://book.cakephp.org/3.0/en/migrations.html).
+
 ## Installation
 
 You can install this plugin into your CakePHP application using
-[composer](http://getcomposer.org). For existing applications you can add the
-following to your `composer.json` file:
+[composer](http://getcomposer.org).
 
-```javascript
-"require": {
-	"cakephp/migrations": "~1.0"
-}
-```
-
-And run `php composer.phar update`
+Run the following command
+```sh
+composer require cakephp/migrations
+ ```
 
 ## Configuration
 
@@ -54,9 +52,23 @@ bin/cake migrations status -p PluginName
 # You can also scope a command to a connection via the `--connection` or `-c` option
 bin/cake migrations status -c my_datasource
 
-# The following will mark targeted migration as marked without actually running it.
-# The expected argument is the migration version number
-bin/cake migrations mark_migrated 20150417223600
+# The following will mark migrations as marked without actually running it.
+bin/cake migrations mark_migrated
+
+# DEPRECATED: The use of the argument `all` will have the same effect as above
+bin/cake migrations mark_migrated all
+
+# Using the option `--target` it will try to mark every migration from beginning up to the given VERSION
+bin/cake migrations mark_migrated --target=VERSION
+
+# When using the `--target` option you can also use `--exclude` or `--only`:
+# `--exclude` will try to mark every migration from beginning until the given VERSION (excluding it from marking)
+# `--only` will try to mark only the given VERSION
+bin/cake migrations mark_migrated --target=VERSION --exclude
+bin/cake migrations mark_migrated --target=VERSION --only
+
+# DEPRECATED: Using the VERSION argument will try to mark only the given VERSION
+bin/cake migrations mark_migrated VERSION
 ```
 
 ### Creating Migrations
@@ -111,6 +123,11 @@ automatically reversible migrations.
 
 Once again, please make sure you read [the official phinx documentation](http://docs.phinx.org/en/latest/migrations.html) to understand how migrations are created and executed in your database.
 
+Be aware that when baking a snapshot for a plugin, your plugin must implement
+model Table classes matching the database tables you want to be in the snapshot :
+only those tables will be exported. This is the only way to filter your plugin's
+tables from you app tables if you are using the same database for both.
+
 #### Usage for custom primary key id in tables
 
 To create a table called `statuses` and use a CHAR (36) for the `id` field, this requires you to turn off the id.
@@ -134,7 +151,7 @@ $table->addColumn('id', 'char', ['limit' => 36])
 #### Collations
 
 If you need to create a table with a different collation than the database default one, you can define it
-with the ``table`` method, as an option : 
+with the ``table`` method, as an option :
 
 ```php
 $table = $this
@@ -153,6 +170,13 @@ Note however this can only be done on table creation : there is currently
 no way of adding a column to an existing table with a different collation than the table or
 the database.
 Only MySQL and SqlServer supports this configuration key for the time being.
+
+#### Updating columns name and using Table objects
+
+If you use a CakePHP ORM Table object to manipulate values from your database along with renaming or removing a
+column, make sure you create a new instance of your Table object after the ``update()`` call. The Table object registry
+is cleared after an ``update()`` call in order to refresh the schema that is reflected and stored in the Table object
+upon instantiation.
 
 #### Generating Migrations from the CLI
 
@@ -205,12 +229,14 @@ name you are specifying.
 
 Fields are verified via the following the following regular expression:
 
-    /^(\w*)(?::(\w*))?(?::(\w*))?(?::(\w*))?/
+    /^(\w*)(?::(\w*\[?\d*\]?))?(?::(\w*))?(?::(\w*))?/
 
 They follow the format:
 
-    field:fieldType:indexType:indexName
+    field:fieldType[length]:indexType:indexName
 
+The length parameter for the ``fieldType`` is optional and should always be
+written between bracket.
 For instance, the following are all valid ways of specifying the primary key `id`:
 
 - `id:primary_key`
@@ -226,7 +252,11 @@ There are some heuristics to choosing fieldtypes when left unspecified or set to
 - `created`, `modified`, `updated`: *datetime*
 - Default *string*
 
-Lengths for certain columns are also defaulted:
+You can specify the wanted length for a field type by writing it between bracket:
+
+    username:string[128]
+
+If no length is specified, lengths for certain columns are defaulted:
 
 - *string*: `255`
 - *integer*: `11`

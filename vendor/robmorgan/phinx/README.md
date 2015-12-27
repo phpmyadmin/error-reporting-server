@@ -17,6 +17,7 @@ Phinx makes it ridiculously easy to manage the database migrations for your PHP 
 * Write database migrations using database agnostic PHP code.
 * Migrate up and down.
 * Migrate on deployment.
+* Seed data after database creation.
 * Get going in less than 5 minutes.
 * Stop worrying about the state of your database.
 * Take advantage of SCM features such as branching.
@@ -40,7 +41,7 @@ The fastest way to install Phinx is to add it to your project using Composer (ht
 1. Install Composer:
 
     ```
-    curl -s https://getcomposer.org/installer | php
+    curl -sS https://getcomposer.org/installer | php
     ```
 
 1. Require Phinx as a dependency using Composer:
@@ -111,6 +112,19 @@ Follow Rob (@\_rjm\_) on Twitter to stay up to date (http://twitter.com/_rjm_)
 ## Misc
 
 ### Version History
+
+**0.5.0** (Monday, 30th November 2015)
+
+* Support for seeding data after database creation
+* The migration and seed directories are now nested under `db` by default
+* Moved `Phinx\Migration\Util` to `Phinx\Util\Util`
+* All `insert()` methods now have a slightly different method signature
+* Fixed key/insert operations for MySQL
+* Introduced `AdapterInterface::hasIndexByName()`
+* Improved `dropForeignKey()` handling for SQLite
+* Added support for the MySQL `binary` datatype. BLOBs now use the proper type.
+* The status command shows a count of pending migrations in JSON output
+* We are now testing against PHP 7
 
 **0.4.6** (Friday, 11th September 2015)
 

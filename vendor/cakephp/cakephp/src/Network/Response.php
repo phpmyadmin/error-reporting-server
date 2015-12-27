@@ -17,6 +17,8 @@ namespace Cake\Network;
 use Cake\Core\Configure;
 use Cake\Filesystem\File;
 use Cake\Network\Exception\NotFoundException;
+use DateTime;
+use DateTimeZone;
 use InvalidArgumentException;
 
 /**
@@ -123,6 +125,7 @@ class Response
         'ips' => 'application/x-ipscript',
         'ipx' => 'application/x-ipix',
         'js' => 'application/javascript',
+        'jsonapi' => 'application/vnd.api+json',
         'latex' => 'application/x-latex',
         'lha' => 'application/octet-stream',
         'lsp' => 'application/x-lisp',
@@ -880,7 +883,7 @@ class Response
             if (!$public && !$private && !$noCache) {
                 return null;
             }
-            $sharable = $public || ! ($private || $noCache);
+            $sharable = $public || !($private || $noCache);
             return $sharable;
         }
         if ($public) {
@@ -1119,14 +1122,14 @@ class Response
      */
     protected function _getUTCDate($time = null)
     {
-        if ($time instanceof \DateTime) {
+        if ($time instanceof DateTime) {
             $result = clone $time;
         } elseif (is_int($time)) {
-            $result = new \DateTime(date('Y-m-d H:i:s', $time));
+            $result = new DateTime(date('Y-m-d H:i:s', $time));
         } else {
-            $result = new \DateTime($time);
+            $result = new DateTime($time);
         }
-        $result->setTimeZone(new \DateTimeZone('UTC'));
+        $result->setTimeZone(new DateTimeZone('UTC'));
         return $result;
     }
 
@@ -1387,9 +1390,9 @@ class Response
 
             $original = $preg = $domain;
             if (strpos($domain, '://') === false) {
-                $preg = ($requestIsSSL ? 'https://' : 'http://') . $domain;
+                $domain = ($requestIsSSL ? 'https://' : 'http://') . $domain;
             }
-            $preg = '@' . str_replace('*', '.*', $domain) . '@';
+            $preg = '@^' . str_replace('\*', '.*', preg_quote($domain, '@')) . '$@';
             $result[] = compact('original', 'preg');
         }
         return $result;
@@ -1419,7 +1422,7 @@ class Response
             'download' => null
         ];
 
-        if (strpos(dirname($path), '..') !== false) {
+        if (strpos($path, '../') !== false || strpos($path, '..\\') !== false) {
             throw new NotFoundException('The requested file contains `..` and will not be read.');
         }
 

@@ -18,7 +18,6 @@ use ArrayAccess;
 use BadMethodCallException;
 use Cake\Core\Configure;
 use Cake\Network\Exception\MethodNotAllowedException;
-use Cake\Network\Session;
 use Cake\Utility\Hash;
 
 /**
@@ -333,7 +332,7 @@ class Request implements ArrayAccess
             } else {
                 $uri = substr($_SERVER['REQUEST_URI'], strlen(Configure::read('App.fullBaseUrl')));
             }
-        } elseif (isset($_SERVER['PHP_SELF']) && isset($_SERVER['SCRIPT_NAME'])) {
+        } elseif (isset($_SERVER['PHP_SELF'], $_SERVER['SCRIPT_NAME'])) {
             $uri = str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['PHP_SELF']);
         } elseif (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
             $uri = $_SERVER['HTTP_X_REWRITE_URL'];
@@ -829,7 +828,7 @@ class Request implements ArrayAccess
             static::$_detectors[$name] = $callable;
             return;
         }
-        if (isset(static::$_detectors[$name]) && isset($callable['options'])) {
+        if (isset(static::$_detectors[$name], $callable['options'])) {
             $callable = Hash::merge(static::$_detectors[$name], $callable);
         }
         static::$_detectors[$name] = $callable;
@@ -1228,10 +1227,12 @@ class Request implements ArrayAccess
      *
      * @param string $key The key you want to read/write from/to.
      * @param string|null $value Value to set. Default null.
+     * @param string|null $default Default value when trying to retrieve an environment
+     *   variable's value that does not exist. The value parameter must be null.
      * @return $this|string|null This instance if used as setter,
      *   if used as getter either the environment value, or null if the value doesn't exist.
      */
-    public function env($key, $value = null)
+    public function env($key, $value = null, $default = null)
     {
         if ($value !== null) {
             $this->_environment[$key] = $value;
@@ -1243,7 +1244,7 @@ class Request implements ArrayAccess
         if (!array_key_exists($key, $this->_environment)) {
             $this->_environment[$key] = env($key);
         }
-        return $this->_environment[$key];
+        return $this->_environment[$key] !== null ? $this->_environment[$key] : $default;
     }
 
     /**

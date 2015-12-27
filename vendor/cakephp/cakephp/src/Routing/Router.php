@@ -16,8 +16,6 @@ namespace Cake\Routing;
 
 use Cake\Core\Configure;
 use Cake\Network\Request;
-use Cake\Routing\RouteBuilder;
-use Cake\Routing\RouteCollection;
 use Cake\Utility\Inflector;
 
 /**
@@ -163,7 +161,7 @@ class Router
      * Get or set default route class.
      *
      * @param string|null $routeClass Class name.
-     * @return string|void
+     * @return string|null
      */
     public static function defaultRouteClass($routeClass = null)
     {
@@ -447,7 +445,7 @@ class Router
             return;
         }
         foreach (static::$_initialState as $key => $val) {
-            if ($key != '_initialState') {
+            if ($key !== '_initialState') {
                 static::${$key} = $val;
             }
         }
@@ -881,7 +879,7 @@ class Router
     {
         $builder = new RouteBuilder(static::$_collection, '/', [], [
             'routeClass' => static::defaultRouteClass(),
-            'extensions' => static::$_defaultExtensions
+            'extensions' => static::$_defaultExtensions,
         ]);
         $builder->scope($path, $params, $callback);
     }
@@ -946,6 +944,9 @@ class Router
         if (empty($options['path'])) {
             $options['path'] = '/' . Inflector::underscore($name);
         }
+        if (isset($options['_namePrefix'])) {
+            $params['_namePrefix'] = $options['_namePrefix'];
+        }
         static::scope($options['path'], $params, $callback);
     }
 
@@ -956,6 +957,9 @@ class Router
      */
     public static function routes()
     {
+        if (!static::$initialized) {
+            static::_loadRoutes();
+        }
         return static::$_collection->routes();
     }
 

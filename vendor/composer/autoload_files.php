@@ -6,12 +6,12 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    $vendorDir . '/symfony/polyfill-mbstring/bootstrap.php',
     $vendorDir . '/ircmaxell/password-compat/lib/password.php',
     $vendorDir . '/cakephp/cakephp/src/Core/functions.php',
     $vendorDir . '/cakephp/cakephp/src/Collection/functions.php',
     $vendorDir . '/cakephp/cakephp/src/I18n/functions.php',
     $vendorDir . '/cakephp/cakephp/src/Utility/bootstrap.php',
-    $vendorDir . '/nikic/php-parser/lib/bootstrap.php',
     $vendorDir . '/symfony/var-dumper/Resources/functions/dump.php',
     $vendorDir . '/psy/psysh/src/Psy/functions.php',
 );

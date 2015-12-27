@@ -11,11 +11,12 @@
  */
 namespace Migrations\Command;
 
-use Cake\Event\EventManagerTrait;
+use Cake\Event\EventDispatcherTrait;
 use Migrations\ConfigurationTrait;
 use Phinx\Console\Command\Migrate as MigrateCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrate extends MigrateCommand
@@ -24,7 +25,7 @@ class Migrate extends MigrateCommand
     use ConfigurationTrait {
         execute as parentExecute;
     }
-    use EventManagerTrait;
+    use EventDispatcherTrait;
 
     /**
      * {@inheritdoc}
@@ -34,11 +35,11 @@ class Migrate extends MigrateCommand
         $this->setName('migrate')
             ->setDescription('Migrate the database')
             ->setHelp('runs all available migrations, optionally up to a specific version')
-            ->addOption('--target', '-t', InputArgument::OPTIONAL, 'The version number to migrate to')
-            ->addOption('--date', '-d', InputArgument::OPTIONAL, 'The date to migrate to')
-            ->addOption('--plugin', '-p', InputArgument::OPTIONAL, 'The plugin containing the migrations')
-            ->addOption('--connection', '-c', InputArgument::OPTIONAL, 'The datasource connection to use')
-            ->addOption('--source', '-s', InputArgument::OPTIONAL, 'The folder where migrations are in');
+            ->addOption('--target', '-t', InputOption::VALUE_REQUIRED, 'The version number to migrate to')
+            ->addOption('--date', '-d', InputOption::VALUE_REQUIRED, 'The date to migrate to')
+            ->addOption('--plugin', '-p', InputOption::VALUE_REQUIRED, 'The plugin containing the migrations')
+            ->addOption('--connection', '-c', InputOption::VALUE_REQUIRED, 'The datasource connection to use')
+            ->addOption('--source', '-s', InputOption::VALUE_REQUIRED, 'The folder where migrations are in');
     }
 
     /**
@@ -47,7 +48,7 @@ class Migrate extends MigrateCommand
      *
      * @param \Symfony\Component\Console\Input\InputInterface $input the input object
      * @param \Symfony\Component\Console\Output\OutputInterface $output the output object
-     * @return void
+     * @return mixed
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

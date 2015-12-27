@@ -14,8 +14,6 @@
  */
 namespace Cake\Routing\Route;
 
-use Cake\Routing\Route\InflectedRoute;
-
 /**
  * Plugin short route, that copies the plugin param to the controller parameters
  * It is used for supporting /:plugin routes.
@@ -53,7 +51,7 @@ class PluginShortRoute extends InflectedRoute
      */
     public function match(array $url, array $context = [])
     {
-        if (isset($url['controller']) && isset($url['plugin']) && $url['plugin'] !== $url['controller']) {
+        if (isset($url['controller'], $url['plugin']) && $url['plugin'] !== $url['controller']) {
             return false;
         }
         $this->defaults['controller'] = $url['controller'];

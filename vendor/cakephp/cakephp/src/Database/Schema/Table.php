@@ -14,9 +14,9 @@
  */
 namespace Cake\Database\Schema;
 
-use Cake\Database\Connection;
 use Cake\Database\Exception;
 use Cake\Database\Type;
+use Cake\Datasource\ConnectionInterface;
 
 /**
  * Represents a single table in a database schema.
@@ -45,6 +45,13 @@ class Table
      * @var array
      */
     protected $_columns = [];
+
+    /**
+     * A map with columns to types
+     *
+     * @var array
+     */
+    protected $_typeMap = [];
 
     /**
      * Indexes in the table.
@@ -297,6 +304,7 @@ class Table
         }
         $attrs = array_intersect_key($attrs, $valid);
         $this->_columns[$name] = $attrs + $valid;
+        $this->_typeMap[$name] = $this->_columns[$name]['type'];
         return $this;
     }
 
@@ -341,6 +349,7 @@ class Table
         }
         if ($type !== null) {
             $this->_columns[$name]['type'] = $type;
+            $this->_typeMap[$name] = $type;
         }
         return $this->_columns[$name]['type'];
     }
@@ -369,6 +378,17 @@ class Table
             $type = Type::build($type)->getBaseType();
         }
         return $this->_columns[$column]['baseType'] = $type;
+    }
+
+    /**
+     * Returns an array where the keys are the column names in the schema
+     * and the values the database type they have.
+     *
+     * @return array
+     */
+    public function typeMap()
+    {
+        return $this->_typeMap;
     }
 
     /**
@@ -433,17 +453,19 @@ class Table
         unset($attrs['references'], $attrs['update'], $attrs['delete']);
 
         if (!in_array($attrs['type'], static::$_validIndexTypes, true)) {
-            throw new Exception(sprintf('Invalid index type "%s"', $attrs['type']));
+            throw new Exception(sprintf('Invalid index type "%s" in index "%s" in table "%s".', $attrs['type'], $name, $this->_table));
         }
         if (empty($attrs['columns'])) {
-            throw new Exception('Indexes must have at least one column.');
+            throw new Exception(sprintf('Index "%s" in table "%s" must have at least one column.', $name, $this->_table));
         }
         $attrs['columns'] = (array)$attrs['columns'];
         foreach ($attrs['columns'] as $field) {
             if (empty($this->_columns[$field])) {
                 $msg = sprintf(
-                    'Columns used in indexes must be added to the Table schema first. ' .
+                    'Columns used in index "%s" in table "%s" must be added to the Table schema first. ' .
                     'The column "%s" was not found.',
+                    $name,
+                    $this->_table,
                     $field
                 );
                 throw new Exception($msg);
@@ -522,18 +544,19 @@ class Table
         $attrs = array_intersect_key($attrs, static::$_indexKeys);
         $attrs = $attrs + static::$_indexKeys;
         if (!in_array($attrs['type'], static::$_validConstraintTypes, true)) {
-            throw new Exception(sprintf('Invalid constraint type "%s"', $attrs['type']));
+            throw new Exception(sprintf('Invalid constraint type "%s" in table "%s".', $attrs['type'], $this->_table));
         }
         if (empty($attrs['columns'])) {
-            throw new Exception('Constraints must have at least one column.');
+            throw new Exception(sprintf('Constraints in table "%s" must have at least one column.', $this->_table));
         }
         $attrs['columns'] = (array)$attrs['columns'];
         foreach ($attrs['columns'] as $field) {
             if (empty($this->_columns[$field])) {
                 $msg = sprintf(
                     'Columns used in constraints must be added to the Table schema first. ' .
-                    'The column "%s" was not found.',
-                    $field
+                    'The column "%s" was not found in table "%s".',
+                    $field,
+                    $this->_table
                 );
                 throw new Exception($msg);
             }
@@ -560,6 +583,19 @@ class Table
 
         $this->_constraints[$name] = $attrs;
         return $this;
+    }
+
+    /**
+     * Remove a constraint.
+     *
+     * @param string $name Name of the constraint to remove
+     * @return void
+     */
+    public function dropConstraint($name)
+    {
+        if (isset($this->_constraints[$name])) {
+            unset($this->_constraints[$name]);
+        }
     }
 
     /**
@@ -661,11 +697,11 @@ class Table
      * Uses the connection to access the schema dialect
      * to generate platform specific SQL.
      *
-     * @param Connection $connection The connection to generate SQL for
+     * @param \Cake\Datasource\ConnectionInterface $connection The connection to generate SQL for
      * @return array List of SQL statements to create the table and the
      *    required indexes.
      */
-    public function createSql(Connection $connection)
+    public function createSql(ConnectionInterface $connection)
     {
         $dialect = $connection->driver()->schemaDialect();
         $columns = $constraints = $indexes = [];
@@ -687,10 +723,10 @@ class Table
      * Uses the connection to access the schema dialect to generate platform
      * specific SQL.
      *
-     * @param Connection $connection The connection to generate SQL for.
+     * @param \Cake\Datasource\ConnectionInterface $connection The connection to generate SQL for.
      * @return array SQL to drop a table.
      */
-    public function dropSql(Connection $connection)
+    public function dropSql(ConnectionInterface $connection)
     {
         $dialect = $connection->driver()->schemaDialect();
         return $dialect->dropTableSql($this);
@@ -699,12 +735,36 @@ class Table
     /**
      * Generate the SQL statements to truncate a table
      *
-     * @param Connection $connection The connection to generate SQL for.
-     * @return array SQL to drop a table.
+     * @param \Cake\Datasource\ConnectionInterface $connection The connection to generate SQL for.
+     * @return array SQL to truncate a table.
      */
-    public function truncateSql(Connection $connection)
+    public function truncateSql(ConnectionInterface $connection)
     {
         $dialect = $connection->driver()->schemaDialect();
         return $dialect->truncateTableSql($this);
+    }
+
+    /**
+     * Generate the SQL statements to add the constraints to the table
+     *
+     * @param \Cake\Datasource\ConnectionInterface $connection The connection to generate SQL for.
+     * @return array SQL to drop a table.
+     */
+    public function addConstraintSql(ConnectionInterface $connection)
+    {
+        $dialect = $connection->driver()->schemaDialect();
+        return $dialect->addConstraintSql($this);
+    }
+
+    /**
+     * Generate the SQL statements to drop the constraints to the table
+     *
+     * @param \Cake\Datasource\ConnectionInterface $connection The connection to generate SQL for.
+     * @return array SQL to drop a table.
+     */
+    public function dropConstraintSql(ConnectionInterface $connection)
+    {
+        $dialect = $connection->driver()->schemaDialect();
+        return $dialect->dropConstraintSql($this);
     }
 }

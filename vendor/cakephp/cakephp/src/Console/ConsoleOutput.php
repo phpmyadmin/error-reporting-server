@@ -94,7 +94,7 @@ class ConsoleOutput
      */
     protected static $_foregroundColors = [
         'black' => 30,
-        'red' => 31,
+        'red' => 91,
         'green' => 32,
         'yellow' => 33,
         'blue' => 34,
@@ -138,10 +138,10 @@ class ConsoleOutput
      * @var array
      */
     protected static $_styles = [
-        'emergency' => ['text' => 'red', 'underline' => true],
-        'alert' => ['text' => 'red', 'underline' => true],
-        'critical' => ['text' => 'red', 'underline' => true],
-        'error' => ['text' => 'red', 'underline' => true],
+        'emergency' => ['text' => 'red'],
+        'alert' => ['text' => 'red'],
+        'critical' => ['text' => 'red'],
+        'error' => ['text' => 'red'],
         'warning' => ['text' => 'yellow'],
         'info' => ['text' => 'cyan'],
         'debug' => ['text' => 'yellow'],
@@ -301,7 +301,7 @@ class ConsoleOutput
      * Get/Set the output type to use. The output type how formatting tags are treated.
      *
      * @param int|null $type The output type to use. Should be one of the class constants.
-     * @return int|void  Either null or the value if getting.
+     * @return int|null  Either null or the value if getting.
      */
     public function outputAs($type = null)
     {

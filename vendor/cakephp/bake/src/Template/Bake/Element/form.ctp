@@ -18,10 +18,16 @@ $fields = collection($fields)
     ->filter(function($field) use ($schema) {
         return $schema->columnType($field) !== 'binary';
     });
+
+if (isset($modelObject) && $modelObject->behaviors()->has('Tree')) {
+    $fields = $fields->reject(function ($field) {
+        return $field === 'lft' || $field === 'rght';
+    });
+}
 %>
-<div class="actions columns large-2 medium-3">
-    <h3><?= __('Actions') ?></h3>
+<nav class="large-3 medium-4 columns" id="actions-sidebar">
     <ul class="side-nav">
+        <li class="heading"><?= __('Actions') ?></li>
 <% if (strpos($action, 'add') === false): %>
         <li><?= $this->Form->postLink(
                 __('Delete'),
@@ -46,8 +52,8 @@ $fields = collection($fields)
         }
 %>
     </ul>
-</div>
-<div class="<%= $pluralVar %> form large-10 medium-9 columns">
+</nav>
+<div class="<%= $pluralVar %> form large-9 medium-8 columns content">
     <?= $this->Form->create($<%= $singularVar %>) ?>
     <fieldset>
         <legend><?= __('<%= Inflector::humanize($action) %> <%= $singularHumanName %>') ?></legend>
@@ -74,7 +80,7 @@ $fields = collection($fields)
                 $fieldData = $schema->column($field);
                 if (($fieldData['type'] === 'date') && (!empty($fieldData['null']))) {
 %>
-            echo $this->Form->input('<%= $field %>', ['empty' => true, 'default' => '']);
+            echo $this->Form->input('<%= $field %>', ['empty' => true]);
 <%
                 } else {
 %>

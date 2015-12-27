@@ -17,8 +17,8 @@ namespace Cake\View\Helper;
 use Cake\Collection\Collection;
 use Cake\Core\Configure;
 use Cake\Core\Exception\Exception;
+use Cake\Datasource\EntityInterface;
 use Cake\Form\Form;
-use Cake\ORM\Entity;
 use Cake\Routing\Router;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
@@ -29,7 +29,7 @@ use Cake\View\Form\EntityContext;
 use Cake\View\Form\FormContext;
 use Cake\View\Form\NullContext;
 use Cake\View\Helper;
-use Cake\View\Helper\IdGeneratorTrait;
+use Cake\View\Helper\SecureFieldTokenTrait;
 use Cake\View\StringTemplateTrait;
 use Cake\View\View;
 use Cake\View\Widget\WidgetRegistry;
@@ -50,6 +50,7 @@ class FormHelper extends Helper
 {
 
     use IdGeneratorTrait;
+    use SecureFieldTokenTrait;
     use StringTemplateTrait;
 
     /**
@@ -105,8 +106,8 @@ class FormHelper extends Helper
             'formEnd' => '</form>',
             'formGroup' => '{{label}}{{input}}',
             'hiddenBlock' => '<div style="display:none;">{{content}}</div>',
-            'input' => '<input type="{{type}}" name="{{name}}"{{attrs}}>',
-            'inputSubmit' => '<input type="{{type}}"{{attrs}}>',
+            'input' => '<input type="{{type}}" name="{{name}}"{{attrs}}/>',
+            'inputSubmit' => '<input type="{{type}}"{{attrs}}/>',
             'inputContainer' => '<div class="input {{type}}{{required}}">{{content}}</div>',
             'inputContainerError' => '<div class="input {{type}}{{required}} error">{{content}}{{error}}</div>',
             'label' => '<label{{attrs}}>{{text}}</label>',
@@ -266,7 +267,7 @@ class FormHelper extends Helper
                     return new EntityContext($request, $data);
                 }
             }
-            if ($data['entity'] instanceof Entity) {
+            if ($data['entity'] instanceof EntityInterface) {
                 return new EntityContext($request, $data);
             }
             if (is_array($data['entity']) && empty($data['entity']['schema'])) {
@@ -547,47 +548,25 @@ class FormHelper extends Helper
      *    generating the hash, else $this->fields is being used.
      * @param array $secureAttributes will be passed as HTML attributes into the hidden
      *    input elements generated for the Security Component.
-     * @return void|string A hidden input field with a security hash
+     * @return string|null A hidden input field with a security hash
      */
     public function secure(array $fields = [], array $secureAttributes = [])
     {
         if (empty($this->request['_Token'])) {
-            return;
-        }
-        $locked = [];
-        $unlockedFields = $this->_unlockedFields;
-
-        foreach ($fields as $key => $value) {
-            if (is_numeric($value)) {
-                $value = (string)$value;
-            }
-            if (!is_int($key)) {
-                $locked[$key] = $value;
-                unset($fields[$key]);
-            }
+            return null;
         }
 
-        sort($unlockedFields, SORT_STRING);
-        sort($fields, SORT_STRING);
-        ksort($locked, SORT_STRING);
-        $fields += $locked;
-
-        $locked = implode(array_keys($locked), '|');
-        $unlocked = implode($unlockedFields, '|');
-        $hashParts = [
+        $tokenData = $this->_buildFieldToken(
             $this->_lastAction,
-            serialize($fields),
-            $unlocked,
-            Security::salt()
-        ];
-        $fields = Security::hash(implode('', $hashParts), 'sha1');
-
+            $fields,
+            $this->_unlockedFields
+        );
         $tokenFields = array_merge($secureAttributes, [
-            'value' => urlencode($fields . ':' . $locked),
+            'value' => $tokenData['fields'],
         ]);
         $out = $this->hidden('_Token.fields', $tokenFields);
         $tokenUnlocked = array_merge($secureAttributes, [
-            'value' => urlencode($unlocked),
+            'value' => $tokenData['unlocked'],
         ]);
         $out .= $this->hidden('_Token.unlocked', $tokenUnlocked);
         return $this->formatTemplate('hiddenBlock', ['content' => $out]);
@@ -1002,6 +981,7 @@ class FormHelper extends Helper
             'required' => null,
             'options' => null,
             'templates' => [],
+            'templateVars' => []
         ];
         $options = $this->_parseOptions($fieldName, $options);
         $options += ['id' => $this->_domId($fieldName)];
@@ -1076,7 +1056,8 @@ class FormHelper extends Helper
         return $this->templater()->format($groupTemplate, [
             'input' => $options['input'],
             'label' => $options['label'],
-            'error' => $options['error']
+            'error' => $options['error'],
+            'templateVars' => isset($options['options']['templateVars']) ? $options['options']['templateVars'] : []
         ]);
     }
 
@@ -1097,7 +1078,8 @@ class FormHelper extends Helper
             'content' => $options['content'],
             'error' => $options['error'],
             'required' => $options['options']['required'] ? ' required' : '',
-            'type' => $options['options']['type']
+            'type' => $options['options']['type'],
+            'templateVars' => isset($options['options']['templateVars']) ? $options['options']['templateVars'] : []
         ]);
     }
 
@@ -1349,7 +1331,8 @@ class FormHelper extends Helper
      */
     protected function _inputLabel($fieldName, $label, $options)
     {
-        $labelAttributes = [];
+        $options += ['id' => null, 'input' => null, 'nestedInput' => false, 'templateVars' => []];
+        $labelAttributes = ['templateVars' => $options['templateVars']];
         if (is_array($label)) {
             $labelText = null;
             if (isset($label['text'])) {
@@ -1360,7 +1343,6 @@ class FormHelper extends Helper
         } else {
             $labelText = $label;
         }
-        $options += ['id' => null, 'input' => null, 'nestedInput' => false];
 
         $labelAttributes['for'] = $options['id'];
         $groupTypes = ['radio', 'multicheckbox', 'date', 'time', 'datetime'];
@@ -1449,7 +1431,6 @@ class FormHelper extends Helper
         $attributes['idPrefix'] = $this->_idPrefix;
         $attributes = $this->_initInputField($fieldName, $attributes);
 
-        $value = $attributes['val'];
         $hiddenField = isset($attributes['hiddenField']) ? $attributes['hiddenField'] : true;
         unset($attributes['hiddenField']);
 
@@ -1832,8 +1813,8 @@ class FormHelper extends Helper
      *
      * ```
      * $options = [
-     *     ['name' => 'United states', 'value' => 'USA'],
-     *     ['name' => 'USA', 'value' => 'USA'],
+     *     ['text' => 'United states', 'value' => 'USA'],
+     *     ['text' => 'USA', 'value' => 'USA'],
      * ];
      * ```
      *
@@ -2367,9 +2348,14 @@ class FormHelper extends Helper
         }
 
         if (!isset($options['name'])) {
+            $endsWithBrackets = '';
+            if (substr($field, -2) === '[]') {
+                $field = substr($field, 0, -2);
+                $endsWithBrackets = '[]';
+            }
             $parts = explode('.', $field);
             $first = array_shift($parts);
-            $options['name'] = $first . ($parts ? '[' . implode('][', $parts) . ']' : '');
+            $options['name'] = $first . (!empty($parts) ? '[' . implode('][', $parts) . ']' : '') . $endsWithBrackets;
         }
 
         if (isset($options['value']) && !isset($options['val'])) {

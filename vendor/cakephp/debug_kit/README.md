@@ -13,18 +13,18 @@ The `master` branch has the following requirements:
 
 ## DebugKit for CakePHP 2.x
 
-If you want DebugKit for your 2.x application, you can use the latest `2.2.y` tag or the 2.2 branch.
+If you want DebugKit for your 2.x application, you can use the latest `2.2.y` tag or the [2.2 branch](https://github.com/cakephp/debug_kit/tree/2.2).
 
 ## Installation
 
-* Install the plugin with composer from your CakePHP Project's ROOT directory (where composer.json file is located)
+* Install the plugin with [Composer](https://getcomposer.org/) from your CakePHP Project's ROOT directory (where the **composer.json** file is located)
 ```sh
 php composer.phar require --dev cakephp/debug_kit "~3.0"
 ```
 
-* Load the plugin
+* [Load the plugin](http://book.cakephp.org/3.0/en/plugins.html#loading-a-plugin)
 ```php
-Plugin::load('DebugKit', ['bootstrap' => true]);
+Plugin::load('DebugKit', ['bootstrap' => true, 'routes' => true]);
 ```
 * Set `'debug' => true,` in `config/app.php`.
 

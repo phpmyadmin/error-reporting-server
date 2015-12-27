@@ -677,6 +677,22 @@ ORDER BY T.[name], I.[index_id];";
     /**
      * {@inheritdoc}
      */
+    public function hasIndexByName($tableName, $indexName)
+    {
+        $indexes = $this->getIndexes($tableName);
+
+        foreach ($indexes as $name => $index) {
+            if ($name === $indexName) {
+                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addIndex(Table $table, Index $index)
     {
         $this->startCommandTimer();
@@ -900,6 +916,7 @@ ORDER BY T.[name], I.[index_id];";
             case static::PHINX_TYPE_DATE:
                 return array('name' => 'date');
                 break;
+            case static::PHINX_TYPE_BLOB:
             case static::PHINX_TYPE_BINARY:
                 return array('name' => 'varbinary');
                 break;

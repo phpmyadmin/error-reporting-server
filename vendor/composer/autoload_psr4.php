@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'XdgBaseDir\\' => array($vendorDir . '/dnoegel/php-xdg-base-dir/src'),
+    'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
     'Symfony\\Component\\VarDumper\\' => array($vendorDir . '/symfony/var-dumper'),
     'Symfony\\Component\\Stopwatch\\' => array($vendorDir . '/symfony/stopwatch'),
@@ -14,9 +15,13 @@ return array(
     'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
     'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'Symfony\\Component\\Config\\' => array($vendorDir . '/symfony/config'),
+    'Satooshi\\' => array($vendorDir . '/satooshi/php-coveralls/src/Satooshi'),
+    'Psy\\' => array($vendorDir . '/psy/psysh/src/Psy'),
+    'PhpParser\\' => array($vendorDir . '/nikic/php-parser/lib/PhpParser'),
     'Phinx\\' => array($vendorDir . '/robmorgan/phinx/src/Phinx'),
     'Migrations\\' => array($vendorDir . '/cakephp/migrations/src'),
     'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
+    'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
     'DebugKit\\Test\\Fixture\\' => array($vendorDir . '/cakephp/debug_kit/tests/Fixture'),
     'DebugKit\\' => array($vendorDir . '/cakephp/debug_kit/src'),
     'Cake\\Test\\' => array($vendorDir . '/cakephp/cakephp/tests'),

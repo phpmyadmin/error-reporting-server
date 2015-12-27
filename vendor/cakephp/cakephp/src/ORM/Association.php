@@ -18,9 +18,7 @@ use Cake\Core\ConventionsTrait;
 use Cake\Database\Expression\IdentifierExpression;
 use Cake\Datasource\EntityInterface;
 use Cake\Datasource\ResultSetDecorator;
-use Cake\ORM\Query;
-use Cake\ORM\Table;
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Utility\Inflector;
 use InvalidArgumentException;
 use RuntimeException;
@@ -34,6 +32,7 @@ abstract class Association
 {
 
     use ConventionsTrait;
+    use LocatorAwareTrait;
 
     /**
      * Strategy name to use joins for fetching associated records
@@ -206,6 +205,7 @@ abstract class Association
             'bindingKey',
             'foreignKey',
             'joinType',
+            'tableLocator',
             'propertyName',
             'sourceTable',
             'targetTable'
@@ -299,11 +299,13 @@ abstract class Association
             $registryAlias = $this->_name;
         }
 
+        $tableLocator = $this->tableLocator();
+
         $config = [];
-        if (!TableRegistry::exists($registryAlias)) {
+        if (!$tableLocator->exists($registryAlias)) {
             $config = ['className' => $this->_className];
         }
-        $this->_targetTable = TableRegistry::get($registryAlias, $config);
+        $this->_targetTable = $tableLocator->get($registryAlias, $config);
 
         return $this->_targetTable;
     }
@@ -492,14 +494,15 @@ abstract class Association
      *   will be merged with any conditions originally configured for this association
      * - fields: a list of fields in the target table to include in the result
      * - type: The type of join to be used (e.g. INNER)
-     * - matching: Indicates whether the query records should be filtered based on
-     *   the records found on this association. This will force a 'INNER JOIN'
+     *   the records found on this association
      * - aliasPath: A dot separated string representing the path of association names
      *   followed from the passed query main table to this association.
      * - propertyPath: A dot separated string representing the path of association
      *   properties to be followed from the passed query main entity to this
      *   association
      * - joinType: The SQL join type to use in the query.
+     * - negateMatch: Will append a condition to the passed query for excluding matches.
+     *   with this association.
      *
      * @param Query $query the query to be altered to include the target table data
      * @param array $options Any extra options or overrides to be taken in account
@@ -516,7 +519,7 @@ abstract class Association
             'foreignKey' => $this->foreignKey(),
             'conditions' => [],
             'fields' => [],
-            'type' => empty($options['matching']) ? $joinType : 'INNER',
+            'type' => $joinType,
             'table' => $target->table(),
             'finder' => $this->finder()
         ];
@@ -547,11 +550,32 @@ abstract class Association
 
         $joinOptions = ['table' => 1, 'conditions' => 1, 'type' => 1];
         $options['conditions'] = $dummy->clause('where');
-        $query->join([$target->alias() => array_intersect_key($options, $joinOptions)]);
+        $query->join([$this->_name => array_intersect_key($options, $joinOptions)]);
 
         $this->_appendFields($query, $dummy, $options);
         $this->_formatAssociationResults($query, $dummy, $options);
         $this->_bindNewAssociations($query, $dummy, $options);
+        $this->_appendNotMatching($query, $options);
+    }
+
+    /**
+     * Conditionally adds a condition to the passed Query that will make it find
+     * records where there is no match with this association.
+     *
+     * @param \Cake\Database\Query $query The query to modify
+     * @param array $options Options array containing the `negateMatch` key.
+     * @return void
+     */
+    protected function _appendNotMatching($query, $options)
+    {
+        $target = $this->_targetTable;
+        if (!empty($options['negateMatch'])) {
+            $primaryKey = $query->aliasFields((array)$target->primaryKey(), $this->_name);
+            $query->andWhere(function ($exp) use ($primaryKey) {
+                array_map([$exp, 'isNull'], $primaryKey);
+                return $exp;
+            });
+        }
     }
 
     /**
@@ -747,22 +771,25 @@ abstract class Association
         $loader = $surrogate->eagerLoader();
         $contain = $loader->contain();
         $matching = $loader->matching();
-        $target = $this->_targetTable;
 
         if (!$contain && !$matching) {
             return;
         }
 
-        $loader->attachAssociations($query, $target, $options['includeFields']);
         $newContain = [];
         foreach ($contain as $alias => $value) {
             $newContain[$options['aliasPath'] . '.' . $alias] = $value;
         }
 
-        $query->contain($newContain);
+        $eagerLoader = $query->eagerLoader();
+        $eagerLoader->contain($newContain);
 
         foreach ($matching as $alias => $value) {
-            $query->matching($options['aliasPath'] . '.' . $alias, $value['queryBuilder']);
+            $eagerLoader->matching(
+                $options['aliasPath'] . '.' . $alias,
+                $value['queryBuilder'],
+                $value
+            );
         }
     }
 
