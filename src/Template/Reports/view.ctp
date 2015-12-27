@@ -14,9 +14,9 @@
 			$report[0]["status"], 'empty' => false)); ?>
 	<input type="submit" value="Change" class="btn btn-primary" />
 </form>
-<?php if (empty($related_reports)) { ?>
+<?php if ($related_reports->isEmpty()) { ?>
 <form class="form-inline" action="/<?php echo BASE_DIR ?>reports/mark_related_to/<?php
-      echo $report["Report"]["id"]; ?>">
+      echo $report[0]["id"]; ?>">
     <span>Mark the same as:</span>
     <input type="number" min="1" name="related_to" />
     <input type="submit" value="Submit" class="btn btn-primary" />
