@@ -6,8 +6,8 @@ $(document).ready(function () {
 		"bStateSave": true,
 		"sAjaxSource": $('#reports_table').data('ajax-url'),
 		"aoColumnDefs": [
-			{ "bSearchable": false, "aTargets": [ 1, 6 ] },
-			{ "sClass": "center", "aTargets": [ 0, 1, 4, 5, 6] },
+			{ "bSearchable": false, "aTargets": [ 1, 6, 7 ] },
+			{ "sClass": "center", "aTargets": [ 0, 1, 4, 5, 6, 7] },
 			{ "fnRender": function (oObj) {
 					return '<a class="block" href="/reports/view/' + oObj.aData[1] +
 						'">' + oObj.aData[1] + '</a>';
@@ -22,7 +22,8 @@ $(document).ready(function () {
 			{ "sWidth": "40%" },
 			{ "sWidth": "15%" },
 			{ "sWidth": "10%" },
-			{ "sWidth": "10%" }
+			{ "sWidth": "10%" },
+			{ "sWidth": "5%" }
 		],
 		"fnServerData": function (sSource, aoData, fnCallback) {
 			$.getJSON(sSource, aoData, function (json) {
@@ -102,6 +103,7 @@ $(document).ready(function () {
 			$(nRow).click(function () {
 				// extract the href from the anchor string
 				document.location.href = $($.parseHTML(aData[1])).attr('href');
+
 			});
 		}
 	});
