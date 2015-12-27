@@ -160,17 +160,20 @@ class ReportsController extends AppController {
 
 	public function mark_related_to($reportId) {
 		$relatedTo = $this->request->query("related_to");
-		if (!$reportId || !$relatedTo) {
+		if (!$reportId
+			|| !$relatedTo
+			|| $reportId == $relatedTo
+		) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
 
-		$report = $this->Report->read(null, $reportId);
+		$report = $this->Reports->get($reportId);
 		if (!$report) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
 
-		$this->Report->addToRelatedGroup($relatedTo);
-		$this->Session->setFlash("This report has been marked the same as #"
+		$this->Reports->addToRelatedGroup($report, $relatedTo);
+		$this->Flash->success("This report has been marked the same as #"
 				. $relatedTo, "default", array("class" => "alert alert-success"));
 		$this->redirect("/reports/view/$reportId");
 	}
@@ -180,13 +183,13 @@ class ReportsController extends AppController {
 			throw new NotFoundException(__('Invalid Report'));
 		}
 
-		$report = $this->Report->read(null, $reportId);
+		$report = $this->Reports->get($reportId);
 		if (!$report) {
 			throw new NotFoundException(__('Invalid Report'));
 		}
 
-		$this->Report->removeFromRelatedGroup();
-		$this->Session->setFlash("This report has been marked as different."
+		$this->Reports->removeFromRelatedGroup($report);
+		$this->Flash->success("This report has been marked as different."
 				, "default", array("class" => "alert alert-success"));
 		$this->redirect("/reports/view/$reportId");
 	}
