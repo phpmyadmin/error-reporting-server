@@ -69,9 +69,9 @@ class ReportsControllerTest extends IntegrationTestCase {
 			'iTotalDisplayRecords' => 3,
 			'sEcho' => 1,
 			'aaData' => array(
-				array("<input type='checkbox' name='reports[]' value='1'/>", '1', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js'),
-				array("<input type='checkbox' name='reports[]' value='2'/>", '2', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js'),
-                array("<input type='checkbox' name='reports[]' value='4'/>", '4', 'error1', 'Lorem ipsum dolor sit amet', '3.8', 'New', 'js')
+				array("<input type='checkbox' name='reports[]' value='1'/>", 1, 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js', '1'),
+				array("<input type='checkbox' name='reports[]' value='2'/>", 2, 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'New', 'js', '1'),
+                array("<input type='checkbox' name='reports[]' value='4'/>", 4, 'error1', 'Lorem ipsum dolor sit amet', '3.8', 'New', 'js', '2')
 
 			)
 		);
@@ -113,7 +113,7 @@ class ReportsControllerTest extends IntegrationTestCase {
 		$result = json_decode($this->_response->body(), true);
 		$this->assertEquals($expected, $result);
 	}
-    
+
 /*
  * TODO: Will do after fix related to feature.
 	public function testMarkRelatedTo() {
