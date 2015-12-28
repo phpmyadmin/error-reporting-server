@@ -108,6 +108,6 @@ class AppController extends Controller {
 
 		$this->Flash->default("You need to be signed in to do this");
 		$this->request->session()->write("last_page", $this->here);
-		return $this->redirect($this->referer());
+		return $this->redirect("/");
 	}
 }
