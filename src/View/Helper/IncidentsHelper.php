@@ -54,7 +54,15 @@ class IncidentsHelper extends AppHelper {
 			$html .= $this->_getStackLevelInfo($level, $exception_type);
 			$html .= "<pre class='brush: "
 				. $exception_type
-				. "; tab-size: 2'>";
+				. "; tab-size: 2";
+			if ($incident['exception_type']
+				&& isset($level['line'])
+				&& $level['line']
+			) {
+				$html .= "; first-line: " . $level['line'];
+			}
+
+			$html .= "'>";
 			if($exception_type == 'js') {
 				$html .= join("\n", $level["context"]);
 			} else {
