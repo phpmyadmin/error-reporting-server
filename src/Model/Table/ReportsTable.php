@@ -153,15 +153,23 @@ class ReportsTable extends Table {
  *
  * @return void
  */
-	public function removeFromRelatedGroup() {
-		$this->saveField("related_to", null);
-		$report = $this->findByRelatedTo($this->id);
-		if ($report) {
+	public function removeFromRelatedGroup($report) {
+		$report->related_to = null;
+		$this->save($report);
+
+		$rel_report = $this->findByRelatedTo($report->id)->first();
+		if ($rel_report) {
 			$this->updateAll(
-				array("related_to" => $report["Report"]["id"]),
-				array("related_to" => $this->id)
+				array("related_to" => $rel_report->id),
+				array("related_to" => $report->id)
 			);
 		}
+
+		// remove all redundant self-groupings
+		$this->updateAll(
+			array("related_to" => null),
+			array("reports.related_to = reports.id")
+		);
 	}
 
 /**
@@ -169,13 +177,15 @@ class ReportsTable extends Table {
  *
  * @return void
  */
-	public function addToRelatedGroup($related_to) {
-		$report = $this->findById($related_to);
-		if ($report && $report["Report"]["related_to"]) {
-			$this->saveField("related_to", $report["Report"]["related_to"]);
+	public function addToRelatedGroup($report, $related_to) {
+		$dup_report = $this->get($related_to);
+
+		if ($dup_report && $dup_report->related_to) {
+			$report->related_to = $dup_report->related_to;
 		} else {
-			$this->saveField("related_to", $related_to);
+			$report->related_to = $related_to;
 		}
+		$this->save($report);
 	}
 
 /**
