@@ -55,14 +55,16 @@ class IncidentsHelper extends AppHelper {
 			$html .= "<pre class='brush: "
 				. $exception_type
 				. "; tab-size: 2";
-			if ($incident['exception_type']
-				&& isset($level['line'])
-				&& $level['line']
-			) {
-				$html .= "; first-line: " . $level['line'];
+			if (isset($level['line']) && $level['line']) {
+				if ($incident['exception_type']) {
+					$html .= "; first-line: " . (int)$level['line'];
+				} elseif ((int)$level['line'] > 5) {
+					$html .= "; first-line: " . ((int)$level['line'] - 5);
+				}
+				$html .= "; highlight: [" . (int)$level['line'] . "]";
 			}
-
 			$html .= "'>";
+
 			if($exception_type == 'js') {
 				$html .= join("\n", $level["context"]);
 			} else {
