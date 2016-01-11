@@ -41,6 +41,7 @@ class IncidentsControllerTest extends IntegrationTestCase {
 				'php_version' => '5.5',
 				'browser' => 'Lorem ipsum dolor sit amet',
 				'user_os' => 'Lorem ipsum dolor sit amet',
+				'locale' => 'Lorem ipsum dolor sit amet',
 				'server_software' => 'Lorem ipsum dolor sit amet',
 				'stackhash' => 'hash1',
 				'configuration_storage' => 'Lorem ipsum dolor sit amet',

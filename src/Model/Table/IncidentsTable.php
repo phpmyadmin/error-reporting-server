@@ -72,6 +72,10 @@ class IncidentsTable extends Table {
 			'rule' => 'notEmpty',
 			'required' => true,
 		),
+		'locale' => array(
+			'rule' => 'notEmpty',
+			'required' => true,
+		),
 		'script_name' => array(
 			'rule' => 'notEmpty',
 			'required' => true,
@@ -98,7 +102,8 @@ class IncidentsTable extends Table {
  * @var Array
  */
 	public $summarizableFields = array('browser', 'pma_version', 'php_version',
-			'server_software', 'user_os', 'script_name', 'configuration_storage');
+			'locale', 'server_software', 'user_os', 'script_name',
+			'configuration_storage');
 
 	public function __construct($id = false, $table = null, $ds = null) {
 		parent::__construct($id, $table, $ds);
@@ -294,6 +299,7 @@ class IncidentsTable extends Table {
 			'browser' => $bugReport['browser_name'] . " "
 					. $this->_getSimpleVersion($bugReport['browser_version'], 1),
 			'user_os' => $bugReport['user_os'],
+			'locale' => $bugReport['locale'],
 			'configuration_storage' => $bugReport['configuration_storage'],
 			'server_software' => $this->_getServer($bugReport['server_software']),
 			'full_report' => json_encode($bugReport)
