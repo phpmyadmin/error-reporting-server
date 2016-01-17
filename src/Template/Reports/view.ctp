@@ -169,6 +169,14 @@
     </td>
   </tr>
   <tr>
+    <td>Locale</td>
+    <td>
+      <?php echo $this->Reports->entriesFromIncidents(
+          $related_entries["locale"], $locale_distinct_count, "locale");
+      ?>
+    </td>
+  </tr>
+  <tr>
     <td>Incident Count</td>
     <td><?php echo count($incidents) . " incidents of this bug"; ?></td>
   </tr>
