@@ -66,9 +66,9 @@ class IncidentsHelper extends AppHelper {
 			$html .= "'>";
 
 			if($exception_type == 'js') {
-				$html .= join("\n", $level["context"]);
+				$html .= htmlspecialchars(join("\n", $level["context"]));
 			} else {
-				$html .= $level["function"];
+				$html .= htmlspecialchars($level["function"]);
 				$html .= "(";
 				$argList = "";
 				if (count($level["args"]) > 0) {
@@ -82,7 +82,7 @@ class IncidentsHelper extends AppHelper {
 					$argList = substr($argList, 0, (strlen($argList)-1));
 					$argList .= "\n";
 				}
-				$html .= $argList;
+				$html .= htmlspecialchars($argList);
 				$html .= ")";
 			}
 			$html .= "</pre>";
