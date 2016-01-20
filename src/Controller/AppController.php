@@ -6,6 +6,7 @@ use App\Utility\Sanitize;
 use Cake\Controller\Controller;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
+use Cake\Routing\Router;
 /**
  * Application level Controller
  *
@@ -105,9 +106,12 @@ class AppController extends Controller {
 				in_array($action, $this->whitelist[$controller])) {
 			return;
 		}
-
 		$this->Flash->default("You need to be signed in to do this");
-		$this->request->session()->write("last_page", $this->here);
+
+		// save the return url
+		$ret_url = Router::url($this->here, true);
+		$this->request->session()->write("last_page", $ret_url);
+
 		return $this->redirect("/");
 	}
 }
