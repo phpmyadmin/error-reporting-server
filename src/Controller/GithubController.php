@@ -84,8 +84,9 @@ class GithubController extends AppController {
 			$this->redirect(array('controller' => 'reports', 'action' => 'view',
 					$reportId));
         } else {
+            $flash_class = "alert alert-error";
             $this->Flash->default(_getErrors($issueDetails, $status),
-					array("class" => "alert alert-error"));
+					array("params" => array("class" => $flash_class)));
         }
 	}
 
@@ -133,8 +134,9 @@ class GithubController extends AppController {
         );
 		if (!$this->_handleGithubResponse($status, 2, $reportId, $ticket_id))
         {
-            $this->Flash->default(_getErrors($commentDetails, $status),
-					array("class" => "alert alert-error"));
+			$flash_class = "alert alert-error";
+			$this->Flash->default(_getErrors($commentDetails, $status),
+					array("params" => array("class" => $flash_class)));
         }
 		$this->redirect(array('controller' => 'reports', 'action' => 'view',
 						$reportId));
@@ -177,8 +179,9 @@ class GithubController extends AppController {
 
 		if (!$this->_handleGithubResponse($status, 3, $reportId))
         {
-            $this->Flash->default(_getErrors($commentDetails, $status),
-					array("class" => "alert alert-error"));
+			$flash_class = "alert alert-error";
+			$this->Flash->default(_getErrors($commentDetails, $status),
+					array("params" => array("class" => $flash_class)));
         }
         $this->redirect(array('controller' => 'reports', 'action' => 'view',
 						$reportId));
@@ -257,26 +260,32 @@ class GithubController extends AppController {
             $report = TableRegistry::get('Reports')->get($report_id);
             $report->sourceforge_bug_id = $ticket_id;
 			TableRegistry::get('Reports')->save($report);
-			$this->Flash->default($msg, array("class" => "alert alert-success"));
+            $flash_class = "alert alert-success";
+            $this->Flash->default($msg,
+				array("params" => array("class" => $flash_class)));
 			return true;
 		} else if ($response === 403) {
+			$flash_class = "alert alert-error";
 			$this->Flash->default(
 					"Unauthorised access to Github. github"
 					. " credentials may be out of date. Please check and try again"
-					. " later.", array("class" => "alert alert-error"));
+					. " later.",
+					array("params" => array("class" => $flash_class)));
 			return false;
 		} else if ($response === 404
 			&& $type == 2
 		) {
+			$flash_class = "alert alert-error";
 			$this->Flash->default(
 					"Bug Issue not found on Github."
 					. " Are you sure the issue number is correct?!! Please check and try again",
-					 array("class" => "alert alert-error"));
+					 array("params" => array("class" => $flash_class)));
 			return false;
 		} else {
 			//fail
+			$flash_class = "alert alert-error";
 			$this->Flash->default(json_encode($response),
-					array("class" => "alert alert-error"));
+					array("params" => array("class" => $flash_class)));
 			return false;
 		}
 	}

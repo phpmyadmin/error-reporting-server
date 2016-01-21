@@ -173,8 +173,11 @@ class ReportsController extends AppController {
 		}
 
 		$this->Reports->addToRelatedGroup($report, $relatedTo);
-		$this->Flash->success("This report has been marked the same as #"
-				. $relatedTo, "default", array("class" => "alert alert-success"));
+
+		$flash_class = "alert alert-success";
+		$this->Flash->default("This report has been marked the same as #"
+				. $relatedTo,
+				array("params" => array("class" => $flash_class)));
 		$this->redirect("/reports/view/$reportId");
 	}
 
@@ -189,8 +192,10 @@ class ReportsController extends AppController {
 		}
 
 		$this->Reports->removeFromRelatedGroup($report);
-		$this->Flash->success("This report has been marked as different."
-				, "default", array("class" => "alert alert-success"));
+
+		$flash_class = "alert alert-success";
+		$this->Flash->default("This report has been marked as different.",
+			array("params" => array("class" => $flash_class)));
 		$this->redirect("/reports/view/$reportId");
 	}
 
@@ -211,8 +216,10 @@ class ReportsController extends AppController {
 		}
         $report->status = $state;
 		$this->Reports->save($report);
-		$this->Flash->default("The state has been successfully changed."
-				, array("class" => "alert alert-success"));
+
+		$flash_class = "alert alert-success";
+		$this->Flash->default("The state has been successfully changed.",
+			array("params" => array("class" => $flash_class)));
 		$this->redirect("/reports/view/$reportId");
 	}
 
@@ -260,7 +267,8 @@ class ReportsController extends AppController {
 			}
 		}
 
-		$this->Flash->default($msg, array("class" => $flash_class));
+		$this->Flash->default($msg,
+			array("params" => array("class" => $flash_class)));
 		$this->redirect("/reports/");
 	}
 

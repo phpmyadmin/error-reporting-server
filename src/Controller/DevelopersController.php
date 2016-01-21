@@ -62,13 +62,15 @@ class DevelopersController extends AppController {
 
 				$this->_authenticateDeveloper($userInfo, $accessToken);
 
+				$flash_class = "alert alert-success";
 				$this->Flash->default("You have been logged in successfully",
-						array("class" => "alert alert-success"));
+						array("params" => array("class" => $flash_class)));
 			}
 		} else {
+			$flash_class = "alert alert-error";
 			$this->Flash->default("We were not able to authenticate you."
 					. "Please try again later",
-					array("class" => "alert alert-error"));
+					array("params" => array("class" => $flash_class)));
 		}
 		$last_page = $this->request->session()->read("last_page");
 		if(empty($last_page)) {
@@ -79,8 +81,10 @@ class DevelopersController extends AppController {
 
 	public function logout() {
 		$this->request->session()->destroy();
+
+		$flash_class = "alert alert-success";
 		$this->Flash->default("You have been logged out successfully",
-				array("class" => "alert alert-success"));
+				array("params" => array("class" => $flash_class)));
 		$this->redirect("/");
 	}
 
