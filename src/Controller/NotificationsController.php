@@ -117,7 +117,8 @@ public $components = array('RequestHandler');
 				break;
 			}
 		}
-		$this->Flash->default($msg, array("class" => $flash_class));
+		$this->Flash->default($msg,
+			array("params" => array("class" => $flash_class)));
 		$this->redirect("/notifications/");
 	}
 }

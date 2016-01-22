@@ -106,7 +106,9 @@ class AppController extends Controller {
 				in_array($action, $this->whitelist[$controller])) {
 			return;
 		}
-		$this->Flash->default("You need to be signed in to do this");
+		$flash_class = "alert";
+		$this->Flash->default("You need to be signed in to do this",
+			array("params" => array("class" => $flash_class)));
 
 		// save the return url
 		$ret_url = Router::url($this->here, true);
