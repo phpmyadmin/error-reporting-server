@@ -96,8 +96,8 @@
  </target>
 
  <target name="jshint" description="Javascript checks">
-  <apply executable="jshint" output="${basedir}/build/logs/jslint.xml"  parallel="true">
-   <arg line="--config ./.jshintrc --jslint-reporter" />
+  <apply executable="jshint" output="${basedir}/build/logs/jshint.xml"  parallel="true">
+   <arg line="--config ./.jshintrc --reporter=checkstyle" />
    <fileset dir="${basedir}">
     <include name="app/webroot/js/custom.js" />
    </fileset>
