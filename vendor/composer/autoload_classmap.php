@@ -178,6 +178,7 @@ return array(
     'PHPUnit_Util_Type' => $vendorDir . '/phpunit/phpunit/src/Util/Type.php',
     'PHPUnit_Util_XML' => $vendorDir . '/phpunit/phpunit/src/Util/XML.php',
     'PHP_CodeCoverage' => $vendorDir . '/phpunit/php-code-coverage/src/CodeCoverage.php',
+    'PHP_CodeCoverage_CoveredCodeNotExecutedException' => $vendorDir . '/phpunit/php-code-coverage/src/CodeCoverage/Exception/CoveredCodeNotExecutedException.php',
     'PHP_CodeCoverage_Driver' => $vendorDir . '/phpunit/php-code-coverage/src/CodeCoverage/Driver.php',
     'PHP_CodeCoverage_Driver_HHVM' => $vendorDir . '/phpunit/php-code-coverage/src/CodeCoverage/Driver/HHVM.php',
     'PHP_CodeCoverage_Driver_PHPDBG' => $vendorDir . '/phpunit/php-code-coverage/src/CodeCoverage/Driver/PHPDBG.php',

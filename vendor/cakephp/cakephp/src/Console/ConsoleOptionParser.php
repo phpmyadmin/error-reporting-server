@@ -169,7 +169,7 @@ class ConsoleOptionParser
      *
      * @param string|null $command The command name this parser is for. The command name is used for generating help.
      * @param bool $defaultOptions Whether you want the verbose and quiet options set.
-     * @return ConsoleOptionParser
+     * @return $this
      */
     public static function create($command, $defaultOptions = true)
     {
@@ -197,7 +197,7 @@ class ConsoleOptionParser
      *
      * @param array $spec The spec to build the OptionParser with.
      * @param bool $defaultOptions Whether you want the verbose and quiet options set.
-     * @return ConsoleOptionParser
+     * @return $this
      */
     public static function buildFromArray($spec, $defaultOptions = true)
     {
@@ -338,7 +338,7 @@ class ConsoleOptionParser
      * - `choices` A list of valid choices for this option. If left empty all values are valid..
      *   An exception will be raised when parse() encounters an invalid value.
      *
-     * @param ConsoleInputOption|string $name The long name you want to the value to be parsed out as when options are parsed.
+     * @param \Cake\Console\ConsoleInputOption|string $name The long name you want to the value to be parsed out as when options are parsed.
      *   Will also accept an instance of ConsoleInputOption
      * @param array $options An array of parameters that define the behavior of the option
      * @return $this
@@ -371,7 +371,7 @@ class ConsoleOptionParser
      * Remove an option from the option parser.
      *
      * @param string $name The option name to remove.
-     * @return ConsoleOptionParser this
+     * @return $this
      */
     public function removeOption($name)
     {
@@ -476,7 +476,7 @@ class ConsoleOptionParser
      *    specific option parsers. When help is generated for a subcommand, if a parser is present
      *    it will be used.
      *
-     * @param ConsoleInputSubcommand|string $name Name of the subcommand. Will also accept an instance of ConsoleInputSubcommand
+     * @param \Cake\Console\ConsoleInputSubcommand|string $name Name of the subcommand. Will also accept an instance of ConsoleInputSubcommand
      * @param array $options Array of params, see above.
      * @return $this
      */

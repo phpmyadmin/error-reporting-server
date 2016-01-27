@@ -797,7 +797,7 @@ class Response
      * e.g `mapType('application/pdf'); // returns 'pdf'`
      *
      * @param string|array $ctype Either a string content type to map, or an array of types.
-     * @return mixed Aliases for the types provided.
+     * @return string|array|null Aliases for the types provided.
      */
     public function mapType($ctype)
     {
@@ -1484,7 +1484,7 @@ class Response
      * If an invalid range is requested a 416 Status code will be used
      * in the response.
      *
-     * @param File $file The file to set a range on.
+     * @param \Cake\Filesystem\File $file The file to set a range on.
      * @param string $httpRange The range to use.
      * @return void
      */
@@ -1524,7 +1524,7 @@ class Response
     /**
      * Reads out a file, and echos the content to the client.
      *
-     * @param File $file File object
+     * @param \Cake\Filesystem\File $file File object
      * @param array $range The range to read out of the file.
      * @return bool True is whole file is echoed successfully or false if client connection is lost in between
      */

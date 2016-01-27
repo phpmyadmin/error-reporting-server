@@ -275,6 +275,8 @@ class Request implements ArrayAccess
     protected function _processPost($data)
     {
         $method = $this->env('REQUEST_METHOD');
+        $override = false;
+
         if (in_array($method, ['PUT', 'DELETE', 'PATCH']) &&
             strpos($this->contentType(), 'application/x-www-form-urlencoded') === 0
         ) {
@@ -283,12 +285,19 @@ class Request implements ArrayAccess
         }
         if ($this->env('HTTP_X_HTTP_METHOD_OVERRIDE')) {
             $data['_method'] = $this->env('HTTP_X_HTTP_METHOD_OVERRIDE');
+            $override = true;
         }
         $this->_environment['ORIGINAL_REQUEST_METHOD'] = $method;
         if (isset($data['_method'])) {
             $this->_environment['REQUEST_METHOD'] = $data['_method'];
             unset($data['_method']);
+            $override = true;
         }
+
+        if ($override && !in_array($this->_environment['REQUEST_METHOD'], ['PUT', 'POST', 'DELETE', 'PATCH'])) {
+            $data = [];
+        }
+
         return $data;
     }
 
@@ -886,7 +895,7 @@ class Request implements ArrayAccess
      * Read an HTTP header from the Request information.
      *
      * @param string $name Name of the header you want.
-     * @return mixed Either null on no header being set or the value of the header.
+     * @return string|null Either null on no header being set or the value of the header.
      */
     public function header($name)
     {
@@ -1000,7 +1009,7 @@ class Request implements ArrayAccess
      * by the client.
      *
      * @param string|null $type The content type to check for. Leave null to get all types a client accepts.
-     * @return mixed Either an array of all the types the client accepts or a boolean if they accept the
+     * @return array|bool Either an array of all the types the client accepts or a boolean if they accept the
      *   provided type.
      */
     public function accepts($type = null)
@@ -1042,7 +1051,7 @@ class Request implements ArrayAccess
      * ``` \Cake\Network\Request::acceptLanguage('es-es'); ```
      *
      * @param string|null $language The language to test.
-     * @return mixed If a $language is provided, a boolean. Otherwise the array of accepted languages.
+     * @return array|bool If a $language is provided, a boolean. Otherwise the array of accepted languages.
      */
     public function acceptLanguage($language = null)
     {
@@ -1156,7 +1165,7 @@ class Request implements ArrayAccess
      * Safely access the values in $this->params.
      *
      * @param string $name The name of the parameter to get.
-     * @return mixed The value of the provided parameter. Will
+     * @return mixed|$this The value of the provided parameter. Will
      *   return false if the parameter doesn't exist or is falsey.
      */
     public function param($name)

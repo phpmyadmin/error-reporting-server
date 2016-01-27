@@ -40,9 +40,17 @@ use RuntimeException;
  * layout using `$this->set()`
  *
  * View class supports using plugins as themes. You can set
- * `$this->theme = 'SuperHot'` in your Controller to use plugin `SuperHot` as a
- * theme. Eg. If current action is Posts::index() then View class will look for
- * template file `plugins/SuperHot/Template/Posts/index.ctp`. If a theme template
+ *
+ * ```
+ * public function beforeRender(\Cake\Event\Event $event)
+ * {
+ *      $this->viewBuilder()->theme('SuperHot');
+ * }
+ * ```
+ *
+ * in your Controller to use plugin `SuperHot` as a theme. Eg. If current action
+ * is PostsController::index() then View class will look for template file
+ * `plugins/SuperHot/Template/Posts/index.ctp`. If a theme template
  * is not found for the current action the default app template file is used.
  *
  * @property \Cake\View\Helper\FlashHelper $Flash
@@ -105,7 +113,7 @@ class View implements EventDispatcherInterface
     /**
      * An array of names of built-in helpers to include.
      *
-     * @var mixed
+     * @var array
      */
     public $helpers = [];
 
@@ -118,7 +126,7 @@ class View implements EventDispatcherInterface
 
     /**
      * The name of the template file to render. The name specified
-     * is the filename in /app/Template/<SubFolder> without the .ctp extension.
+     * is the filename in /src/Template/<SubFolder> without the .ctp extension.
      *
      * @var string
      */
@@ -126,7 +134,7 @@ class View implements EventDispatcherInterface
 
     /**
      * The name of the layout file to render the template inside of. The name specified
-     * is the filename of the layout in /app/Template/Layout without the .ctp
+     * is the filename of the layout in /src/Template/Layout without the .ctp
      * extension.
      *
      * @var string
@@ -415,7 +423,7 @@ class View implements EventDispatcherInterface
 
     /**
      * Get/set the name of the template file to render. The name specified is the
-     * filename in /app/Template/<SubFolder> without the .ctp extension.
+     * filename in /src/Template/<SubFolder> without the .ctp extension.
      *
      * @param string $name Template file name to set. If null returns current name.
      * @return string|null
@@ -431,7 +439,7 @@ class View implements EventDispatcherInterface
 
     /**
      * Get/set the name of the layout file to render the template inside of.
-     * The name specified is the filename of the layout in /app/Template/Layout
+     * The name specified is the filename of the layout in /src/Template/Layout
      * without the .ctp extension.
      *
      * @param string $name Layout file name to set. If null returns current name.
@@ -452,7 +460,7 @@ class View implements EventDispatcherInterface
      * This realizes the concept of Elements, (or "partial layouts") and the $params array is used to send
      * data to be used in the element. Elements can be cached improving performance by using the `cache` option.
      *
-     * @param string $name Name of template file in the/app/Template/Element/ folder,
+     * @param string $name Name of template file in the /src/Template/Element/ folder,
      *   or `MyPlugin.template` to use the template element from MyPlugin. If the element
      *   is not found in the plugin, the normal view path cascade will be searched.
      * @param array $data Array of data to be made available to the rendered view (i.e. the Element)
@@ -528,7 +536,7 @@ class View implements EventDispatcherInterface
     /**
      * Checks if an element exists
      *
-     * @param string $name Name of template file in the /app/Template/Element/ folder,
+     * @param string $name Name of template file in the /src/Template/Element/ folder,
      *   or `MyPlugin.template` to check the template element from MyPlugin. If the element
      *   is not found in the plugin, the normal view path cascade will be searched.
      * @return bool Success
@@ -1162,7 +1170,7 @@ class View implements EventDispatcherInterface
      * Finds an element filename, returns false on failure.
      *
      * @param string $name The name of the element to find.
-     * @return mixed Either a string to the element filename or false when one can't be found.
+     * @return string|false Either a string to the element filename or false when one can't be found.
      */
     protected function _getElementFileName($name)
     {

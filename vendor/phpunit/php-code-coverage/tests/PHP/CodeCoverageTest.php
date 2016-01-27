@@ -8,17 +8,7 @@
  * file that was distributed with this source code.
  */
 
-if (!defined('TEST_FILES_PATH')) {
-    define(
-        'TEST_FILES_PATH',
-        dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR .
-        '_files' . DIRECTORY_SEPARATOR
-    );
-}
-
-require_once TEST_FILES_PATH . '../TestCase.php';
-require_once TEST_FILES_PATH . 'BankAccount.php';
-require_once TEST_FILES_PATH . 'BankAccountTest.php';
+require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'TestCase.php';
 
 /**
  * Tests for the PHP_CodeCoverage class.
@@ -173,6 +163,28 @@ class PHP_CodeCoverageTest extends PHP_CodeCoverage_TestCase
     }
 
     /**
+     * @covers            PHP_CodeCoverage::setCheckForUnexecutedCoveredCode
+     * @expectedException PHP_CodeCoverage_Exception
+     */
+    public function testSetCheckForUnexecutedCoveredCodeThrowsExceptionForInvalidArgument()
+    {
+        $this->coverage->setCheckForUnexecutedCoveredCode(null);
+    }
+
+    /**
+     * @covers PHP_CodeCoverage::setCheckForUnexecutedCoveredCode
+     */
+    public function testSetCheckForUnexecutedCoveredCode()
+    {
+        $this->coverage->setCheckForUnexecutedCoveredCode(true);
+        $this->assertAttributeEquals(
+            true,
+            'checkForUnexecutedCoveredCode',
+            $this->coverage
+        );
+    }
+
+    /**
      * @covers            PHP_CodeCoverage::setAddUncoveredFilesFromWhitelist
      * @expectedException PHP_CodeCoverage_Exception
      */
@@ -217,28 +229,6 @@ class PHP_CodeCoverageTest extends PHP_CodeCoverage_TestCase
     }
 
     /**
-     * @covers PHP_CodeCoverage::setMapTestClassNameToCoveredClassName
-     */
-    public function testSetMapTestClassNameToCoveredClassName()
-    {
-        $this->coverage->setMapTestClassNameToCoveredClassName(true);
-        $this->assertAttributeEquals(
-            true,
-            'mapTestClassNameToCoveredClassName',
-            $this->coverage
-        );
-    }
-
-    /**
-     * @covers            PHP_CodeCoverage::setMapTestClassNameToCoveredClassName
-     * @expectedException PHP_CodeCoverage_Exception
-     */
-    public function testSetMapTestClassNameToCoveredClassNameThrowsExceptionForInvalidArgument()
-    {
-        $this->coverage->setMapTestClassNameToCoveredClassName(null);
-    }
-
-    /**
      * @covers PHP_CodeCoverage::setIgnoreDeprecatedCode
      */
     public function testSetIgnoreDeprecatedCode()
@@ -252,7 +242,7 @@ class PHP_CodeCoverageTest extends PHP_CodeCoverage_TestCase
     }
 
     /**
-     * @covers             PHP_CodeCoverage::setIgnoreDeprecatedCode
+     * @covers            PHP_CodeCoverage::setIgnoreDeprecatedCode
      * @expectedException PHP_CodeCoverage_Exception
      */
     public function testSetIgnoreDeprecatedCodeThrowsExceptionForInvalidArgument()
@@ -505,5 +495,60 @@ class PHP_CodeCoverageTest extends PHP_CodeCoverage_TestCase
                 TEST_FILES_PATH . 'source_with_ignore.php'
             )
         );
+    }
+
+    /**
+     * @covers PHP_CodeCoverage::performUnexecutedCoveredCodeCheck
+     * @expectedException PHP_CodeCoverage_CoveredCodeNotExecutedException
+     */
+    public function testAppendThrowsExceptionIfCoveredCodeWasNotExecuted()
+    {
+        $this->coverage->filter()->addDirectoryToWhitelist(TEST_FILES_PATH);
+        $this->coverage->setCheckForUnexecutedCoveredCode(true);
+        $data = [
+            TEST_FILES_PATH . 'BankAccount.php' => [
+                29 => -1,
+                31 => -1
+            ]
+        ];
+        $linesToBeCovered = [
+            TEST_FILES_PATH . 'BankAccount.php' => [
+                22,
+                24
+            ]
+        ];
+        $linesToBeUsed = [];
+
+        $this->coverage->append($data, 'File1.php', true, $linesToBeCovered, $linesToBeUsed);
+    }
+
+    /**
+     * @covers PHP_CodeCoverage::performUnexecutedCoveredCodeCheck
+     * @expectedException PHP_CodeCoverage_CoveredCodeNotExecutedException
+     */
+    public function testAppendThrowsExceptionIfUsedCodeWasNotExecuted()
+    {
+        $this->coverage->filter()->addDirectoryToWhitelist(TEST_FILES_PATH);
+        $this->coverage->setCheckForUnexecutedCoveredCode(true);
+        $data = [
+            TEST_FILES_PATH . 'BankAccount.php' => [
+                29 => -1,
+                31 => -1
+            ]
+        ];
+        $linesToBeCovered = [
+            TEST_FILES_PATH . 'BankAccount.php' => [
+                29,
+                31
+            ]
+        ];
+        $linesToBeUsed = [
+            TEST_FILES_PATH . 'BankAccount.php' => [
+                22,
+                24
+            ]
+        ];
+
+        $this->coverage->append($data, 'File1.php', true, $linesToBeCovered, $linesToBeUsed);
     }
 }

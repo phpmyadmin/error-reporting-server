@@ -1,6 +1,6 @@
 # [Phinx](https://phinx.org): Simple PHP Database Migrations
 
-[![Build Status](https://travis-ci.org/robmorgan/phinx.png?branch=0.2.x-dev)](https://travis-ci.org/robmorgan/phinx)
+[![Build Status](https://travis-ci.org/robmorgan/phinx.png?branch=0.5.x-dev)](https://travis-ci.org/robmorgan/phinx)
 [![Build status](https://ci.appveyor.com/api/projects/status/9vag4892hfq6effr)](https://ci.appveyor.com/project/robmorgan/phinx)
 [![Code Coverage](https://scrutinizer-ci.com/g/robmorgan/phinx/badges/coverage.png?s=9776e35b967f5adb0f4958bd72b617e0a9519f7d)](https://scrutinizer-ci.com/g/robmorgan/phinx/)
 [![Latest Stable Version](https://poser.pugx.org/robmorgan/phinx/version.png)](https://packagist.org/packages/robmorgan/phinx)
@@ -64,7 +64,7 @@ The fastest way to install Phinx is to add it to your project using Composer (ht
 
 ### As a Phar
 
-You can also use the Box application to build Phinx as a Phar archive (http://box-project.org/).
+You can also use the Box application to build Phinx as a Phar archive (https://box-project.github.io/box2/).
 
 1. Clone Phinx from GitHub
 
@@ -112,6 +112,15 @@ Follow Rob (@\_rjm\_) on Twitter to stay up to date (http://twitter.com/_rjm_)
 ## Misc
 
 ### Version History
+
+**0.5.1** (Wednesday, 30th December 2015)
+
+* **PHP 5.3 is no longer supported!**
+* Add support for Symfony 3.0 components
+* Ensure that the `status` command returns the correct exit code
+* Allow `$version` to be passed into templates
+* Support for MySQL `YEAR` column type
+* Multiple documentation updates and corrections
 
 **0.5.0** (Monday, 30th November 2015)
 

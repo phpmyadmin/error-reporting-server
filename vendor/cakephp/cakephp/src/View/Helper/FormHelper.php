@@ -579,7 +579,7 @@ class FormHelper extends Helper
      * it from the list of fields.
      *
      * @param string|null $name The dot separated name for the field.
-     * @return mixed Either null, or the list of fields.
+     * @return array|null Either null, or the list of fields.
      * @link http://book.cakephp.org/3.0/en/views/helpers/form.html#working-with-securitycomponent
      */
     public function unlockField($name = null)
@@ -1707,6 +1707,7 @@ class FormHelper extends Helper
      * ### Options
      *
      * - `type` - Set to 'reset' for reset inputs. Defaults to 'submit'
+     * - `templateVars` - Additional template variables for the input element and its container.
      * - Other attributes will be assigned to the input element.
      *
      * @param string $caption The label appearing on the button OR if string contains :// or the
@@ -1722,7 +1723,11 @@ class FormHelper extends Helper
         if (!is_string($caption) && empty($caption)) {
             $caption = __d('cake', 'Submit');
         }
-        $options += ['type' => 'submit', 'secure' => false];
+        $options += [
+            'type' => 'submit',
+            'secure' => false,
+            'templateVars' => []
+        ];
 
         if (isset($options['name'])) {
             $this->_secure($options['secure'], $this->_secureFieldName($options['name']));
@@ -1766,10 +1771,12 @@ class FormHelper extends Helper
         $input = $this->formatTemplate('inputSubmit', [
             'type' => $type,
             'attrs' => $this->templater()->formatAttributes($options),
+            'templateVars' => $options['templateVars']
         ]);
 
         return $this->formatTemplate('submitContainer', [
-            'content' => $input
+            'content' => $input,
+            'templateVars' => $options['templateVars']
         ]);
     }
 

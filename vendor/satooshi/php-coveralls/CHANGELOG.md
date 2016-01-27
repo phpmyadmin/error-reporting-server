@@ -1,14 +1,15 @@
 CHANGELOG
 =============
 
-## 0.8.0 (WIP)
+## 1.0.1
 
-This version corresponds to dev-master and is not tagged yet.
+### Misc
+- [#183](https://github.com/satooshi/php-coveralls/pull/183) Lower required version of symfony/*
 
-## 0.7.1
+## 1.0.0
 
 ### miscellaneous
-
+- [#136](https://github.com/satooshi/php-coveralls/pull/136) Removed src_dir from CoverallsConfiguration
 - [#154](https://github.com/satooshi/php-coveralls/issues/154) Show a deprecation notice when src_dir is set in the config
 
 ## 0.7.0

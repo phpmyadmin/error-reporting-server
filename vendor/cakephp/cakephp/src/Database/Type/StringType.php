@@ -31,7 +31,7 @@ class StringType extends Type
      * Convert string data into the database format.
      *
      * @param mixed $value The value to convert.
-     * @param Driver $driver The driver instance to convert with.
+     * @param \Cake\Database\Driver $driver The driver instance to convert with.
      * @return string|null
      */
     public function toDatabase($value, Driver $driver)
@@ -52,10 +52,10 @@ class StringType extends Type
     }
 
     /**
-     * Convert string values to PHP integers
+     * Convert string values to PHP strings.
      *
      * @param mixed $value The value to convert.
-     * @param Driver $driver The driver instance to convert with.
+     * @param \Cake\Database\Driver $driver The driver instance to convert with.
      * @return string|null
      */
     public function toPHP($value, Driver $driver)
@@ -70,7 +70,7 @@ class StringType extends Type
      * Get the correct PDO binding type for string data.
      *
      * @param mixed $value The value being bound.
-     * @param Driver $driver The driver.
+     * @param \Cake\Database\Driver $driver The driver.
      * @return int
      */
     public function toStatement($value, Driver $driver)
@@ -82,7 +82,7 @@ class StringType extends Type
      * Marshalls request data into PHP strings.
      *
      * @param mixed $value The value to convert.
-     * @return mixed Converted value.
+     * @return string|null Converted value.
      */
     public function marshal($value)
     {

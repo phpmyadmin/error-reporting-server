@@ -8,7 +8,7 @@ php-coveralls
 [![Latest Stable Version](https://poser.pugx.org/satooshi/php-coveralls/v/stable.png)](https://packagist.org/packages/satooshi/php-coveralls)
 [![Total Downloads](https://poser.pugx.org/satooshi/php-coveralls/downloads.png)](https://packagist.org/packages/satooshi/php-coveralls)
 
-PHP client library for [Coveralls](https://coveralls.io). 
+PHP client library for [Coveralls](https://coveralls.io).
 
 # Prerequisites
 
@@ -25,13 +25,13 @@ We started to create a phar file, starting from the version 0.7.0
 release. It is available at the URLs like:
 
 ```
-https://github.com/satooshi/php-coveralls/releases/download/v0.7.0/coveralls.phar
+https://github.com/satooshi/php-coveralls/releases/download/v1.0.0/coveralls.phar
 ```
 
 Download the file and add exec permissions:
 
 ```sh
-$ wget https://github.com/satooshi/php-coveralls/releases/download/v0.7.0/coveralls.phar
+$ wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.0/coveralls.phar
 $ chmod +x coveralls.phar
 ```
 
@@ -307,7 +307,7 @@ coverage_clover: build/logs/clover-*.xml
 
 # array
 # specify files
-coverage_clover: 
+coverage_clover:
   - build/logs/clover-Auth.xml
   - build/logs/clover-Db.xml
   - build/logs/clover-Validator.xml
