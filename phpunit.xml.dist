@@ -22,6 +22,11 @@
 		<!-- Add plugin test suites here. -->
 	</testsuites>
 
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+        <log type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false"/>
+    </logging>
+
 	<!-- Setup a listener for fixtures -->
 	<listeners>
 		<listener
