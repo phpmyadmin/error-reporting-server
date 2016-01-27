@@ -26,6 +26,12 @@
       <arg line="--configuration ${env.PHPUNIT_XML} ${env.PHPUNIT_ARGS}"/>
   </exec>
  </target>
+ <target name="migrate" description="Migrate the database">
+  <exec executable="${basedir}/bin/cake">
+    <arg line="migrations migrate" />
+  </exec>
+ </target>
+  
  <target name="pdepend" description="Generate jdepend.xml and software metrics charts using PHP_Depend">
   <exec executable="pdepend">
    <arg line="'--jdepend-xml=${basedir}/build/logs/jdepend.xml'
@@ -109,5 +115,5 @@
   </apply>
  </target>
 
- <target name="build" depends="clean,phpunit,phpmd,phpcpd,phpcs,phploc,lint,jshint"/>
+ <target name="build" depends="clean,migrate,phpunit,phpmd,phpcpd,phpcs,phploc,lint,jshint"/>
 </project>
