@@ -3,6 +3,9 @@
 <project name="phpMyAdmin" default="build" basedir=".">
  <property name="source" value="."/>
  <property name="source_comma_sep" value="."/>
+ <property environment="env"/>
+ <property name="env.PHPUNIT_XML" value="phpunit.xml.dist"/>
+ <property name="env.PHPUNIT_ARGS" value=""/>
 
  <target name="clean" description="Clean up and create artifact directories">
   <delete dir="${basedir}/build/api"/>
@@ -18,6 +21,11 @@
   <mkdir dir="${basedir}/build/pdepend"/>
  </target>
 
+ <target name="phpunit" description="Run unit tests using PHPUnit and generates junit.xml and clover.xml">
+  <exec executable="${basedir}/vendor/bin/phpunit" failonerror="true">
+      <arg line="--configuration ${env.PHPUNIT_XML} ${env.PHPUNIT_ARGS}"/>
+  </exec>
+ </target>
  <target name="pdepend" description="Generate jdepend.xml and software metrics charts using PHP_Depend">
   <exec executable="pdepend">
    <arg line="'--jdepend-xml=${basedir}/build/logs/jdepend.xml'
@@ -101,5 +109,5 @@
   </apply>
  </target>
 
- <target name="build" depends="clean,phpmd,phpcpd,phpcs,phploc,lint,jshint"/>
+ <target name="build" depends="clean,phpunit,phpmd,phpcpd,phpcs,phploc,lint,jshint"/>
 </project>
