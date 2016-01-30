@@ -32,7 +32,7 @@ use Cake\Network\Exception\NotFoundException;
  */
 class ReportsController extends AppController {
 
-	public $components = array('RequestHandler');
+	public $components = array('RequestHandler', 'OrderSearch');
 
 	public $helpers = array('Html', 'Form', 'Reports', 'Incidents');
 	public $uses = array('Incidents', 'Reports', 'Notifications', 'Developers');
@@ -112,8 +112,8 @@ class ReportsController extends AppController {
 			'inci_count' => 'inci_count'
 		];
 
-		$searchConditions = $this->_getSearchConditions($aColumns);
-		$orderConditions = $this->_getOrder($aColumns);
+		$searchConditions = $this->OrderSearch->getSearchConditions($aColumns);
+		$orderConditions = $this->OrderSearch->getOrder($aColumns);
 
 		$params = [
 			'fields' => $aColumns,
@@ -289,53 +289,6 @@ class ReportsController extends AppController {
 		$this->set("related_entries", $relatedEntries);
 	}
 
-	/**
-	 * Indexes are +1'ed because first column is of checkboxes
-	 * and hence it should be ingnored.
-	 * @param string[] $aColumns
-	 */
-	protected function _getSearchConditions($aColumns) {
-		$searchConditions = array('OR' => array());
-		$keys = array_keys($aColumns);
-
-		if ( $this->request->query('sSearch') != "" ) {
-			for ( $i = 0; $i < count($aColumns); $i++ ) {
-				if ($this->request->query('bSearchable_' . ($i+1)) == "true") {
-					$searchConditions['OR'][] = array($aColumns[$keys[$i]] . " LIKE" =>
-							"%" . $this->request->query('sSearch') . "%");
-				}
-			}
-		}
-
-		/* Individual column filtering */
-		for ( $i = 0; $i < count($aColumns); $i++ ) {
-			if ($this->request->query('sSearch_' . ($i+1)) != '') {
-				$searchConditions[] = array($aColumns[$keys[$i]] . " LIKE" =>
-						$this->request->query('sSearch_' . ($i+1)));
-			}
-		}
-		return $searchConditions;
-	}
-
-	/**
-	 * @param string[] $aColumns
-	 */
-	protected function _getOrder($aColumns) {
-		if ( $this->request->query('iSortCol_0') != null ) {
-			$order = [];
-			//Seems like we need to sort with only one column each time, so no need to loop
-			$sort_column_index = intval($this->request->query('iSortCol_0'));
-
-			$keys = array_keys($aColumns);
-
-			if ($sort_column_index > 0 && $this->request->query('bSortable_' . $sort_column_index) == "true") {
-				$order[$aColumns[$keys[$sort_column_index - 1]]] = $this->request->query('sSortDir_0');
-			}
-			return $order;
-		} else {
-			return null;
-		}
-	}
     protected function _findArrayList($results, $key) {
         $output = array();
 		foreach ($results as $row) {
@@ -343,6 +296,7 @@ class ReportsController extends AppController {
 		}
 		return $output;
     }
+
     protected function _findAllDataTable($results) {
 		$output = array();
 		foreach ($results as $row) {
