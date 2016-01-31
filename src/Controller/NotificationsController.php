@@ -29,7 +29,7 @@ use Cake\ORM\TableRegistry;
  */
 class NotificationsController extends AppController {
 
-public $components = array('RequestHandler');
+public $components = array('RequestHandler', 'OrderSearch');
 
 	public $helpers = array('Html', 'Form', 'Reports');
 
@@ -50,14 +50,38 @@ public $components = array('RequestHandler');
 	{
 		$current_developer = TableRegistry::get('Developers')->
 					findById($this->request->session()->read('Developer.id'))->all()->first();
-		//$current_developer = Sanitize::clean($current_developer
-		$params = ['conditions' => ['Notifications.developer_id = ' . $current_developer['id']]];
+
+		$aColumns = [
+			'report_id' => 'Reports.id',
+			'error_message' => 'Reports.error_message',
+			'error_name' => 'Reports.error_name',
+			'pma_version' => 'Reports.pma_version',
+			'exception_type' => 'Reports.exception_type',
+			'created_time' => 'Notifications.created'
+		];
+
+		$orderConditions = $this->OrderSearch->getOrder($aColumns);
+		$searchConditions = $this->OrderSearch->getSearchConditions($aColumns);
+
+		$aColumns['id'] = 'Notifications.id';
+		$params = [
+			'contain' => 'Reports',
+			'fields' => $aColumns,
+			'conditions' => [
+				'AND' => [
+					array('Notifications.developer_id ' => $current_developer['id']),
+					$searchConditions
+				]
+			],
+			'order' => $orderConditions
+		];
+		//$current_developer = Sanitize::clean($current_developer);
 
 		$pagedParams = $params;
 		$pagedParams['limit'] = intval($this->request->query('iDisplayLength'));
 		$pagedParams['offset'] = intval($this->request->query('iDisplayStart'));
 
-		$rows = $this->Notifications->find('all', $pagedParams)->contain(['Reports']);
+		$rows = $this->Notifications->find('all', $pagedParams);
 		//$rows = Sanitize::clean($rows);
 
 		// Make the display rows array
@@ -78,13 +102,14 @@ public $components = array('RequestHandler');
 				. '">'
 				. $row['report_id']
 				. '</a>';
-			$tmp_row[2] = $row['report']['error_name'];
-			$tmp_row[3] = $row['report']['error_message'];
-			$tmp_row[4] = $row['report']['pma_version'];
-			$tmp_row[5] = ($row['report']['exception_type'])?('php'):('js');
-			$tmp_row[6] = $row['created'];
+			$tmp_row[2] = $row['error_name'];
+			$tmp_row[3] = $row['error_message'];
+			$tmp_row[4] = $row['pma_version'];
+			$tmp_row[5] = ($row['exception_type'])?('php'):('js');
+			$tmp_row[6] = $row['created_time'];
 			array_push($dispRows, $tmp_row);
 		}
+
 		$response = array(
 			'iTotalDisplayRecords' => count($dispRows),
 			'iTotalRecords' => $this->Notifications->find('all', $params)->count(),
