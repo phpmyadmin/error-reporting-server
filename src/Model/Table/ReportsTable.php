@@ -214,15 +214,14 @@ class ReportsTable extends Table {
  */
 	public function getRelatedByField($fieldName, $limit = 10, $count = false,
 		$related = true, $timeLimit = null) {
+		$fieldAlias = "Incidents__$fieldName";
 		$queryDetails = [
-			'fields' => ["$fieldName"],
 			'conditions' => [
 				'NOT' => [
 					"Incidents.$fieldName is null"
 				]
 			],
-			'limit' => $limit,
-			'group' => "Incidents.$fieldName"
+			'limit' => $limit
 		];
 
 		if ($related) {
@@ -236,12 +235,47 @@ class ReportsTable extends Table {
 		}
 
 		$groupedCount = TableRegistry::get('Incidents')->find("all", $queryDetails);
-        $groupedCount->select([
-            'count' => $groupedCount->func()->count('*')
-        ])->distinct(["$fieldName"])->order('count')->toArray();
+
+		/* Ommit version number in case of browser and server_software fields.
+		 * In case of browser field, version number is seperated by space,
+		 * for example,'FIREFOX 47', hence split the value using space.
+		 * In case of server_software field, version number is seperated by /
+		 * for example, 'nginx/1.7', hence split the value using /.
+		 * See http://book.cakephp.org/3.0/en/orm/query-builder.html#using-sql-functionsp://book.cakephp.org/3.0/en/orm/query-builder.html#using-sql-functions
+		 * for how to use Sql functions with cake
+		 */
+		switch ($fieldName) {
+			case 'browser':
+				// SUBSTRING(browser, 1, LOCATE(' ', Incidents.browser)-1))
+				$field = $groupedCount->func()->substring([
+					$fieldName=>'literal',
+					"1" => 'literal',
+					"Locate(' ', Incidents.browser)-1" => 'literal'
+					]);
+				break;
+			case 'server_software':
+				// SUBSTRING(server_software, 1, LOCATE('/', Incidents.server_software)-1))
+				$field = $groupedCount->func()->substring([
+					$fieldName=>'literal', "1" => 'literal',
+					"Locate('/', Incidents.server_software)-1" => 'literal'
+					]);
+				break;
+			default:
+				$field = $fieldName;
+		}
+		$groupedCount->select([
+			'count' => $groupedCount->func()->count('*'),
+			$fieldAlias => $field
+		])
+		->group($fieldAlias)
+		->distinct(["$fieldAlias"])
+		->order('count')
+		->toArray();		
 
 		if ($count) {
+			$queryDetails['fields'] = ["$fieldName"];
 			$queryDetails['limit'] = null;
+			$queryDetails['group'] = "Incidents.$fieldName";
 			$totalCount = TableRegistry::get('Incidents')->find("all", $queryDetails)->count();
 			return array($groupedCount, $totalCount);
 		} else {
