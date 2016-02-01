@@ -275,6 +275,7 @@ class ReportsTable extends Table {
 		if ($count) {
 			$queryDetails['fields'] = ["$fieldName"];
 			$queryDetails['limit'] = null;
+			$queryDetails['group'] = "Incidents.$fieldName";
 			$totalCount = TableRegistry::get('Incidents')->find("all", $queryDetails)->count();
 			return array($groupedCount, $totalCount);
 		} else {
