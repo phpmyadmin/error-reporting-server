@@ -136,7 +136,9 @@ class ReportsController extends AppController {
 		//$rows = Sanitize::clean($rows);
 		$totalFiltered = $this->Reports->find('all', $params)->count();
 
+
 		// change exception_type from boolean values to strings
+		// add incident count for related reports
 		$dispRows = array();
 		foreach($rows as $row) {
 			$row[4] = $this->Reports->status[$row[4]];
@@ -144,9 +146,34 @@ class ReportsController extends AppController {
 			$input_elem = "<input type='checkbox' name='reports[]' value='"
 				. $row[0]
 				. "'/>";
+
+			$subquery_params_count = [
+				'fields' => [
+					'report_id' => 'report_id',
+				]
+			];
+			$subquery_count = TableRegistry::get('incidents')->find(
+				'all', $subquery_params_count
+			);
+
+			$params_count = [
+				'fields' => ['inci_count' => 'inci_count'],
+				'conditions' => [
+				        'related_to = ' . $row[0]
+				]
+			];
+
+			$inci_count_related = $this->Reports->find('all', $params_count)->innerJoin(
+				['incidents' => $subquery_count],
+				['incidents.report_id = Reports.related_to']
+			)->count();
+
+			$row[6] += $inci_count_related;
+
 			array_unshift($row, $input_elem);
 			array_push($dispRows, $row);
 		}
+
 		$response = array(
 			'iTotalRecords' => $this->Reports->find('all')->count(),
 			'iTotalDisplayRecords' => $totalFiltered,
