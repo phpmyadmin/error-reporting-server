@@ -56,7 +56,7 @@
           . $report[0]['id']
           .'" method="GET" class="form-horizontal" style="margin-bottom:5px;"'
           . ' onclick="return window.confirm(\'Are you sure you want to unlink??\');" >';
-      echo $this->Form->input('UnLink from Issue', array(
+      echo $this->Form->input('Unlink from issue', array(
         'type' => 'submit',
         'label' => false,
         'class'=>'btn btn-primary'
@@ -67,8 +67,12 @@
       echo '<table cellspacing="0" class="table table-bordered error-report"'
           . ' style="width:300px; margin-bottom:5px;">'
           . '<tr><td style="min-width:130px;">';
-      echo $this->Html->link('Create New Issue', '/github/create_issue/'
-          . $report[0]['id']);
+      echo $this->Html->link('Create new issue', '/github/create_issue/'
+          . $report[0]['id'],
+          array(
+            'class'=>'btn btn-primary'
+            )
+          );
 
       echo '</td><td style="min-width:130px;">';
 
