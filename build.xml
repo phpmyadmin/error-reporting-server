@@ -99,7 +99,7 @@
   <apply executable="jshint" output="${basedir}/build/logs/jshint.xml"  parallel="true">
    <arg line="--config ./.jshintrc --reporter=checkstyle" />
    <fileset dir="${basedir}">
-    <include name="app/webroot/js/custom.js" />
+    <include name="webroot/js/custom.js" />
    </fileset>
   </apply>
  </target>
@@ -108,7 +108,7 @@
   <apply executable="php" failonerror="true">
    <arg value="-l" />
 
-   <fileset dir="${basedir}">
+   <fileset dir="${basedir}/src">
     <include name="**/*.php" />
     <modified />
    </fileset>
