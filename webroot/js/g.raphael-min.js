@@ -2,7 +2,7 @@
  * g.Raphael 0.51 - Charting library, based on Raphaël
  *
  * Copyright (c) 2009-2012 Dmitry Baranovskiy (http://g.raphaeljs.com)
- * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ * Licensed under the MIT (https://opensource.org/licenses/mit-license.php) license.
  */
 Raphael.el.popup=function(d,a,b,f){var e=this.paper||this[0].paper,c,g,i,h;if(e){switch(this.type){case "text":case "circle":case "ellipse":g=!0;break;default:g=!1}d=null==d?"up":d;a=a||5;c=this.getBBox();b="number"==typeof b?b:g?c.x+c.width/2:c.x;f="number"==typeof f?f:g?c.y+c.height/2:c.y;i=Math.max(c.width/2-a,0);h=Math.max(c.height/2-a,0);this.translate(b-c.x-(g?c.width/2:0),f-c.y-(g?c.height/2:0));c=this.getBBox();b={up:["M",b,f,"l",-a,-a,-i,0,"a",a,a,0,0,1,-a,-a,"l",0,-c.height,"a",a,a,0,0,
 1,a,-a,"l",2*a+2*i,0,"a",a,a,0,0,1,a,a,"l",0,c.height,"a",a,a,0,0,1,-a,a,"l",-i,0,"z"].join(),down:["M",b,f,"l",a,a,i,0,"a",a,a,0,0,1,a,a,"l",0,c.height,"a",a,a,0,0,1,-a,a,"l",-(2*a+2*i),0,"a",a,a,0,0,1,-a,-a,"l",0,-c.height,"a",a,a,0,0,1,a,-a,"l",i,0,"z"].join(),left:["M",b,f,"l",-a,a,0,h,"a",a,a,0,0,1,-a,a,"l",-c.width,0,"a",a,a,0,0,1,-a,-a,"l",0,-(2*a+2*h),"a",a,a,0,0,1,a,-a,"l",c.width,0,"a",a,a,0,0,1,a,a,"l",0,h,"z"].join(),right:["M",b,f,"l",a,-a,0,-h,"a",a,a,0,0,1,a,-a,"l",c.width,0,"a",a,

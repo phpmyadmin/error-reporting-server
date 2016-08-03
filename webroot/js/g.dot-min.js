@@ -2,7 +2,7 @@
  * g.Raphael 0.51 - Charting library, based on Raphaël
  *
  * Copyright (c) 2009-2012 Dmitry Baranovskiy (http://g.raphaeljs.com)
- * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ * Licensed under the MIT (https://opensource.org/licenses/mit-license.php) license.
  */
 (function(){function s(e,n,o,p,g,k,h,r,c){function s(a){+a[0]&&(a[0]=j.axis(n+b,o+b,p-2*b,t,C,c.axisxstep||Math.floor((p-2*b)/20),2,c.axisxlabels||null,c.axisxtype||"t",null,e));+a[1]&&(a[1]=j.axis(n+p-b,o+g-b,g-2*b,u,D,c.axisystep||Math.floor((g-2*b)/20),3,c.axisylabels||null,c.axisytype||"t",null,e));+a[2]&&(a[2]=j.axis(n+b,o+g-b+x,p-2*b,t,C,c.axisxstep||Math.floor((p-2*b)/20),0,c.axisxlabels||null,c.axisxtype||"t",null,e));+a[3]&&(a[3]=j.axis(n+b-x,o+g-b,g-2*b,u,D,c.axisystep||Math.floor((g-2*
 b)/20),1,c.axisylabels||null,c.axisytype||"t",null,e))}for(var c=c||{},j=this,l=j.snapEnds(Math.min.apply(Math,k),Math.max.apply(Math,k),k.length-1),t=l.from,C=l.to,b=c.gutter||10,l=j.snapEnds(Math.min.apply(Math,h),Math.max.apply(Math,h),h.length-1),u=l.from,D=l.to,v=Math.max(k.length,h.length,r.length),l=e[c.symbol]||"circle",m=e.set(),y=e.set(),E=c.max||100,a=Math.max.apply(Math,r),q=[],i=2*Math.sqrt(a/Math.PI)/E,a=0;a<v;a++)q[a]=Math.min(2*Math.sqrt(r[a]/Math.PI)/i,E);var b=Math.max.apply(Math,

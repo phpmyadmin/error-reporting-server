@@ -23,7 +23,7 @@ use Cake\Routing\Router;
  * @copyright     Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @package       Server.Controller
  * @link          https://www.phpmyadmin.net/
- * @license       http://www.opensource.org/licenses/mit-license.php MIT License
+ * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
 

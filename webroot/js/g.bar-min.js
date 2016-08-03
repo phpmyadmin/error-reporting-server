@@ -2,7 +2,7 @@
  * g.Raphael 0.51 - Charting library, based on Raphaël
  *
  * Copyright (c) 2009-2012 Dmitry Baranovskiy (http://g.raphaeljs.com)
- * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ * Licensed under the MIT (https://opensource.org/licenses/mit-license.php) license.
  */
 (function(){function B(f,m,i,b,a,h,n,A){var c;if(a&&!b||!a&&!i)return n?"":A.path();h={round:"round",sharp:"sharp",soft:"soft",square:"square"}[h]||"square";b=Math.round(b);i=Math.round(i);f=Math.round(f);m=Math.round(m);switch(h){case "round":a?(a=~~(i/2),c=b<a?["M",f-~~(i/2),m,"l",0,0,"a",~~(i/2),b,0,0,1,i,0,"l",0,0,"z"]:["M",f-a,m,"l",0,a-b,"a",a,a,0,1,1,i,0,"l",0,b-a,"z"]):(a=~~(b/2),c=i<a?["M",f+0.5,m+0.5-~~(b/2),"l",0,0,"a",i,~~(b/2),0,0,1,0,b,"l",0,0,"z"]:["M",f+0.5,m+0.5-a,"l",i-a,0,"a",a,
 a,0,1,1,0,b,"l",a-i,0,"z"]);break;case "sharp":a?(a=~~(i/2),c=["M",f+a,m,"l",-i,0,0,-C(b-a,0),a,-y(a,b),a,y(a,b),a,"z"]):(a=~~(b/2),c=["M",f,m+a,"l",0,-b,C(i-a,0),0,y(a,i),a,-y(a,i),a+(2*a<b),"z"]);break;case "square":c=a?["M",f+~~(i/2),m,"l",1-i,0,0,-b,i-1,0,"z"]:["M",f,m+~~(b/2),"l",0,-b,i,0,0,b,"z"];break;case "soft":a?(a=y(Math.round(i/5),b),c=["M",f-~~(i/2),m,"l",0,a-b,"a",a,a,0,0,1,a,-a,"l",i-2*a,0,"a",a,a,0,0,1,a,a,"l",0,b-a,"z"]):(a=y(i,Math.round(b/5)),c=["M",f+0.5,m+0.5-~~(b/2),"l",i-a,

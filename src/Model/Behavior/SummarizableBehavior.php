@@ -19,7 +19,7 @@ use Cake\Model\Model;
  * @copyright     Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @package       Server.Model.Behavior
  * @link          https://www.phpmyadmin.net/
- * @license       http://www.opensource.org/licenses/mit-license.php MIT License
+ * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 /**
  * Summarizable behaviour

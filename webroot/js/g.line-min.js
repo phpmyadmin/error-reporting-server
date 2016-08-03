@@ -2,7 +2,7 @@
  * g.Raphael 0.51 - Charting library, based on Raphaël
  *
  * Copyright (c) 2009-2012 Dmitry Baranovskiy (http://g.raphaeljs.com)
- * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ * Licensed under the MIT (https://opensource.org/licenses/mit-license.php) license.
  */
 (function(){function S(h,o){for(var p=h.length/o,m=0,k=p,b=0,i=[];m<h.length;)k--,0>k?(b+=h[m]*(1+k),i.push(b/p),b=h[m++]*-k,k+=p):b+=1*h[m++];return i}function E(h,o,p,m,k,b,i,c){var F,f,u,w;function J(a){for(var s=[],e=0,G=b.length;e<G;e++)s=s.concat(b[e]);s.sort(function(a,e){return a-e});for(var c=[],g=[],e=0,G=s.length;e<G;e++)s[e]!=s[e-1]&&c.push(s[e])&&g.push(o+d+(s[e]-v)*A);for(var s=c,G=s.length,l=a||h.set(),e=0;e<G;e++){var c=g[e]-(g[e]-(g[e-1]||o))/2,f=((g[e+1]||o+m)-g[e])/2+(g[e]-(g[e-
 1]||o))/2,j;a?j={}:l.push(j=h.rect(c-1,p,Math.max(f+1,1),k).attr({stroke:"none",fill:"#000",opacity:0}));j.values=[];j.symbols=h.set();j.y=[];j.x=g[e];j.axis=s[e];for(var f=0,r=i.length;f<r;f++)for(var c=b[f]||b[0],n=0,u=c.length;n<u;n++)c[n]==s[e]&&(j.values.push(i[f][n]),j.y.push(p+k-d-(i[f][n]-y)*H),j.symbols.push(q.symbols[f][n]));a&&a.call(j)}!a&&(t=l)}function N(a){for(var g=a||h.set(),e,c=0,j=i.length;c<j;c++)for(var f=0,m=i[c].length;f<m;f++){var l=o+d+((b[c]||b[0])[f]-v)*A,n=o+d+((b[c]||
