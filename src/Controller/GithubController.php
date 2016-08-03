@@ -104,7 +104,7 @@ class GithubController extends AppController {
 				throw new NotFoundException(__('Invalid Report'));
 		}
 
-		$ticket_id = $this->request->query['ticket_id'];
+		$ticket_id = intval($this->request->query['ticket_id']);
 		if(!$ticket_id) {
 				throw new NotFoundException(__('Invalid Ticket ID!!'));
 		}
