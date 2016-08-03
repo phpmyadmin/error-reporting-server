@@ -43,7 +43,7 @@ class ReportsHelper extends AppHelper {
 		$link = "<a href=/" . BASE_DIR . "reports/view/$reportId>#$reportId</a>";
 		return $link;
 	}
-    
+
     public function linkToReportFromIncident($incident) {
 		$reportId = $incident["report_id"];
 		$link = "<a href=/" . BASE_DIR . "reports/view/$reportId>#$reportId</a>";
@@ -72,7 +72,7 @@ class ReportsHelper extends AppHelper {
 	public function getChartArray($arrayName, $columns, $relatedEntries) {
 		$html = "var $arrayName = [], chart = {};";
 		foreach ($columns as $column) {
-			$column = htmlspecialchars($column);
+			$column = htmlspecialchars($column, ENT_QUOTES | ENT_HTML5);
 			$html .= "chart = {};";
 			$html .= "chart.name = '$column';";
 			$html .= "chart.title = '" . Inflector::humanize($column) . "';";
