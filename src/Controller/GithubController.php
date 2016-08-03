@@ -13,15 +13,15 @@ use Cake\Network\Exception\NotFoundException;
  * Sourceforge controller handling source forge ticket submission and creation
  *
  * phpMyAdmin Error reporting server
- * Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
+ * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  *
  * Licensed under The MIT License
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) phpMyAdmin project (http://www.phpmyadmin.net)
+ * @copyright     Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @package       Server.Controller
- * @link          http://www.phpmyadmin.net
+ * @link          https://www.phpmyadmin.net/
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -124,7 +124,7 @@ class GithubController extends AppController {
 				. Router::url('/reports/view/'.$reportId,true)
 				.")"
 			. "\n\n*This comment is posted automatically by phpMyAdmin's "
-			. "[error-reporting-server](http://reports.phpmyadmin.net).*";
+			. "[error-reporting-server](https://reports.phpmyadmin.net).*";
 
         list($commentDetails, $status) = $this->GithubApi->createComment(
             Configure::read('GithubRepoPath'),
@@ -168,7 +168,7 @@ class GithubController extends AppController {
 			. Router::url('/reports/view/'.$reportId,true)
 			. ")"
 			. "\n\n*This comment is posted automatically by phpMyAdmin's "
-			. "[error-reporting-server](http://reports.phpmyadmin.net).*";
+			. "[error-reporting-server](https://reports.phpmyadmin.net).*";
 
         list($commentDetails, $status) = $this->GithubApi->createComment(
             Configure::read('GithubRepoPath'),
