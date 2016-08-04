@@ -14,3 +14,5 @@ script:
 after_script:
   - php vendor/bin/coveralls -v
   - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
