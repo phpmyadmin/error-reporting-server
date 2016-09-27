@@ -66,7 +66,7 @@ class IncidentsControllerTest extends IntegrationTestCase {
 				'exception_type' => null
 		);
 
-		$this->assertEquals($incident, $expected);
+		$this->assertEquals($expected, $incident);
 	}
 
 	public function testCreate() {
