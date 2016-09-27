@@ -61,8 +61,8 @@ class IncidentsControllerTest extends IntegrationTestCase {
           'microhistory' => '',
 				),
 				'report_id' => 1,
-				'created' => '2013-08-29T18:10:01',
-				'modified' => '2013-08-29T18:10:01',
+				'created' => '2013-08-29T18:10:01+0000',
+				'modified' => '2013-08-29T18:10:01+0000',
 				'exception_type' => null
 		);
 
