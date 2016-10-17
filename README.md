@@ -93,7 +93,7 @@ server {
         location / {
                 # First attempt to serve request as file, then
                 # as directory, then fall back to displaying a 404.
-                try_files $uri $uri/ /index.html;
+                try_files $uri $uri/ /index.php?$args;
         }
 
         location ~ \.php$ {
@@ -102,12 +102,6 @@ server {
                 fastcgi_pass unix:/var/run/php5-fpm-reports.sock;
                 fastcgi_index index.php;
                 include fastcgi_params;
-        }
-
-        # CakePHP
-        if (!-e $request_filename) {
-                rewrite ^/(.+)$ /index.php?url=$1 last;
-                break;
         }
 }
 ```
