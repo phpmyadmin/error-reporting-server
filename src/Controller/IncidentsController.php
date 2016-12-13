@@ -47,6 +47,10 @@ class IncidentsController extends AppController {
 			);
 		}
 		$this->autoRender = false;
+		$this->response->header([
+			'Content-Type' => 'application/json',
+			'X-Content-Type-Options' => 'nosniff'
+		]);
         $this->response->body(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         return $this->response;
 	}
