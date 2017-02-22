@@ -71,7 +71,7 @@ class GithubController extends AppController {
 			'title' => $this->request->data['summary'],
             'body'  => $this->_augmentDescription(
 					$this->request->data['description'], $reportId),
-            'labels' => $this->request->data['labels']?split(",", $this->request->data['labels']):Array()
+            'labels' => $this->request->data['labels']?explode(",", $this->request->data['labels']):Array()
 		);
         $data['labels'][] = 'automated-error-report';
         list($issueDetails, $status) = $this->GithubApi->createIssue(
