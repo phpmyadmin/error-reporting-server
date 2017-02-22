@@ -34,7 +34,7 @@ class IncidentsHelper extends AppHelper {
 			$descriptions .= $this->linkToIncident($incident);
 			$descriptions .= ":</span>";
 			$descriptions .= "<pre>";
-			$descriptions .= $incident["steps"];
+			$descriptions .= htmlspecialchars($incident["steps"]);
 			$descriptions .= "</pre>";
 		}
 		return $descriptions;
