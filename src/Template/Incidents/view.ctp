@@ -95,10 +95,12 @@
   </tr>
 </table>
 
-<h4>Description submited by user:</h4>
-<pre>
-<?php echo nl2br($incident["steps"]); ?>
-</pre>
+<?php if (! empty($incident["steps"])) : ?>
+  <h4>Description submited by user:</h4>
+  <pre>
+  <?php echo nl2br($incident["steps"]); ?>
+  </pre>
+<?php endif; ?>
 
 <h4>Stacktrace:</h4>
 <?php echo $this->Incidents->getStacktrace($incident, "well"); ?>

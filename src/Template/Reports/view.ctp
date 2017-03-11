@@ -202,9 +202,10 @@
 
 <h4>Stacktraces:</h4>
 <?php echo $this->Reports->getStacktracesForIncidents($incidents_with_stacktrace); ?>
-
-<h4>Descriptions submitted by users:</h4>
-<?php echo $this->Incidents->incidentsDescriptions($incidents_with_description); ?>
+<?php if ($incidents_with_description->count() > 0) : ?>
+  <h4>Descriptions submitted by users:</h4>
+  <?php echo $this->Incidents->incidentsDescriptions($incidents_with_description); ?>
+<?php endif; ?>
 <h4>Stats and Graphs</h4>
 <span id="graphs"></span>
 <script type="text/javascript">
