@@ -365,7 +365,7 @@ class IncidentsTable extends Table {
 		foreach ($stacktrace as $level) {
 			if (isset($level["filename"])) {
 				// ignore unrelated files that sometimes appear in the error report
-				if ($level["filename"] === "tracekit.js") {
+				if ($level["filename"] === "tracekit/tracekit.js") {
 					continue;
 				} elseif($level["filename"] === "error_report.js") {
 					// in case the error really is in the error_report.js file save it for
