@@ -141,7 +141,7 @@ class IncidentsTableTest extends TestCase {
 				$stacktrace);
 		$this->assertEquals(array('file1', 300), $result);
 
-		$stacktrace[0]['filename'] = 'tracekit.js';
+		$stacktrace[0]['filename'] = 'tracekit/tracekit.js';
 		$result = $method->invoke($this->Incidents,
 				$stacktrace);
 		$this->assertEquals(array('file2', 200), $result);
