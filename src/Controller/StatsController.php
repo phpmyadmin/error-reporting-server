@@ -1,7 +1,8 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
- * Stats controller handling stats preview
+ * Stats controller handling stats preview.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -10,24 +11,22 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @package   Server.Controller
  * @copyright Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      https://www.phpmyadmin.net/
+ *
+ * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Controller;
 
-use App\Controller\AppController;
-use Cake\ORM\TableRegistry;
 use Cake\Cache\Cache;
+use Cake\ORM\TableRegistry;
 
 /**
- * Stats controller handling stats preview
- *
- * @package Server.Controller
+ * Stats controller handling stats preview.
  */
-class StatsController extends AppController {
-
+class StatsController extends AppController
+{
     public $uses = array('Report', 'Incident', 'Notification');
 
     public $helper = array('Reports');
@@ -49,7 +48,7 @@ class StatsController extends AppController {
                 $entriesWithCount = json_encode($entriesWithCount);
                 Cache::write($field . '_' . $filter_string, $entriesWithCount);
             }
-            $relatedEntries[$field] = json_decode($entriesWithCount, TRUE);
+            $relatedEntries[$field] = json_decode($entriesWithCount, true);
         }
         $this->set('related_entries', $relatedEntries);
         $this->set('columns', TableRegistry::get('Incidents')->summarizableFields);
@@ -61,9 +60,9 @@ class StatsController extends AppController {
             'order' => 'Incidents.created',
         );
 
-        if(isset($filter["limit"])) {
-            $query["conditions"] = array(
-                'Incidents.created >=' => $filter["limit"]
+        if (isset($filter['limit'])) {
+            $query['conditions'] = array(
+                'Incidents.created >=' => $filter['limit'],
             );
         }
 
@@ -71,15 +70,15 @@ class StatsController extends AppController {
         $downloadStats = array();
         if (($downloadStats = Cache::read('downloadStats_' . $filter_string)) === false) {
             $downloadStats = TableRegistry::get('Incidents')->find('all', $query);
-            $downloadStats->select([
-                'grouped_by' => $filter["group"],
+            $downloadStats->select(array(
+                'grouped_by' => $filter['group'],
                 'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
-                'count' => $downloadStats->func()->count('*')
-            ]);
+                'count' => $downloadStats->func()->count('*'),
+            ));
             $downloadStats = json_encode($downloadStats->toArray());
             Cache::write('downloadStats_' . $filter_string, $downloadStats);
         }
-        $this->set('download_stats', json_decode($downloadStats, TRUE));
+        $this->set('download_stats', json_decode($downloadStats, true));
     }
 
     protected function _getTimeFilter()
@@ -89,8 +88,8 @@ class StatsController extends AppController {
         }
         if (isset($filter)) {
             return $filter;
-        } else {
-            return TableRegistry::get('Incidents')->filterTimes['all_time'];
         }
+
+        return TableRegistry::get('Incidents')->filterTimes['all_time'];
     }
 }

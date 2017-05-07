@@ -1,7 +1,8 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
- * Reports controller handling reports creation and rendering
+ * Reports controller handling reports creation and rendering.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -10,28 +11,25 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @package   Server.Controller
  * @copyright Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      https://www.phpmyadmin.net/
+ *
+ * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Controller;
 
-use App\Controller\AppController;
 use App\Utility\Sanitize;
 use Cake\Core\Configure;
 use Cake\Log\Log;
-use Cake\ORM\Table;
-use Cake\ORM\TableRegistry;
 use Cake\Network\Exception\NotFoundException;
+use Cake\ORM\TableRegistry;
 
 /**
- * Reports controller handling reports modification and rendering
- *
- * @package Server.Controller
+ * Reports controller handling reports modification and rendering.
  */
-class ReportsController extends AppController {
-
+class ReportsController extends AppController
+{
     public $components = array('RequestHandler', 'OrderSearch');
 
     public $helpers = array('Html', 'Form', 'Reports', 'Incidents');
@@ -41,17 +39,17 @@ class ReportsController extends AppController {
     {
         $this->Reports->recursive = -1;
         $this->set('distinct_statuses',
-            $this->_findArrayList($this->Reports->find()->select(['status'])->distinct(['status']),
+            $this->_findArrayList($this->Reports->find()->select(array('status'))->distinct(array('status')),
             'status')
         );
         $this->set('distinct_versions',
-            $this->_findArrayList($this->Reports->find()->select(['pma_version'])->distinct(['pma_version']), 'pma_version')
+            $this->_findArrayList($this->Reports->find()->select(array('pma_version'))->distinct(array('pma_version')), 'pma_version')
         );
         $this->set('distinct_error_names',
             $this->_findArrayList($this->Reports->find('all', array(
                 'fields' => array('error_name'),
                 'conditions' => array('error_name !=' => ''),
-            ))->distinct(['error_name']), 'error_name')
+            ))->distinct(array('error_name')), 'error_name')
         );
         $this->set('statuses', $this->Reports->status);
         $this->autoRender = true;
@@ -86,7 +84,7 @@ class ReportsController extends AppController {
         if ($current_developer) {
             TableRegistry::get('Notifications')->deleteAll(
                 array('developer_id' => $current_developer['Developer']['id'],
-                    'report_id' => $reportId
+                    'report_id' => $reportId,
                 ),
                 false
             );
@@ -95,37 +93,37 @@ class ReportsController extends AppController {
 
     public function data_tables()
     {
-        $subquery_params = [
-            'fields' => [
+        $subquery_params = array(
+            'fields' => array(
                 'report_id' => 'report_id',
-                'inci_count' => 'COUNT(id)'
-                ],
-            'group' => 'report_id'
-        ];
+                'inci_count' => 'COUNT(id)',
+                ),
+            'group' => 'report_id',
+        );
         $subquery = TableRegistry::get('incidents')->find('all', $subquery_params);
 
         // override automatic aliasing, for proper usage in joins
-        $aColumns = [
+        $aColumns = array(
             'id' => 'id',
             'error_name' => 'error_name',
             'error_message' => 'error_message',
             'pma_version' => 'pma_version',
             'status' => 'status',
             'exception_type' => 'exception_type',
-            'inci_count' => 'inci_count'
-        ];
+            'inci_count' => 'inci_count',
+        );
 
         $searchConditions = $this->OrderSearch->getSearchConditions($aColumns);
         $orderConditions = $this->OrderSearch->getOrder($aColumns);
 
-        $params = [
+        $params = array(
             'fields' => $aColumns,
-            'conditions' => [
+            'conditions' => array(
                     $searchConditions,
-                    'related_to is NULL'
-                ],
+                    'related_to is NULL',
+                ),
             'order' => $orderConditions,
-        ];
+        );
 
         $pagedParams = $params;
         $pagedParams['limit'] = intval($this->request->query('iDisplayLength'));
@@ -133,7 +131,7 @@ class ReportsController extends AppController {
 
         $rows = $this->_findAllDataTable(
             $this->Reports->find('all', $pagedParams)->innerJoin(
-                ['incidents' => $subquery], ['incidents.report_id = Reports.id']
+                array('incidents' => $subquery), array('incidents.report_id = Reports.id')
             )
         );
         //$rows = Sanitize::clean($rows);
@@ -142,32 +140,32 @@ class ReportsController extends AppController {
         // change exception_type from boolean values to strings
         // add incident count for related reports
         $dispRows = array();
-        foreach($rows as $row) {
+        foreach ($rows as $row) {
             $row[4] = $this->Reports->status[$row[4]];
-            $row[5] = (intval($row[5]))?('php'):('js');
+            $row[5] = (intval($row[5])) ? ('php') : ('js');
             $input_elem = "<input type='checkbox' name='reports[]' value='"
                 . $row[0]
                 . "'/>";
 
-            $subquery_params_count = [
-                'fields' => [
+            $subquery_params_count = array(
+                'fields' => array(
                     'report_id' => 'report_id',
-                ]
-            ];
+                ),
+            );
             $subquery_count = TableRegistry::get('incidents')->find(
                 'all', $subquery_params_count
             );
 
-            $params_count = [
-                'fields' => ['inci_count' => 'inci_count'],
-                'conditions' => [
-                        'related_to = ' . $row[0]
-                ]
-            ];
+            $params_count = array(
+                'fields' => array('inci_count' => 'inci_count'),
+                'conditions' => array(
+                        'related_to = ' . $row[0],
+                ),
+            );
 
             $inci_count_related = $this->Reports->find('all', $params_count)->innerJoin(
-                ['incidents' => $subquery_count],
-                ['incidents.report_id = Reports.related_to']
+                array('incidents' => $subquery_count),
+                array('incidents.report_id = Reports.related_to')
             )->count();
 
             $row[6] += $inci_count_related;
@@ -180,10 +178,11 @@ class ReportsController extends AppController {
             'iTotalRecords' => $this->Reports->find('all')->count(),
             'iTotalDisplayRecords' => $totalFiltered,
             'sEcho' => intval($this->request->query('sEcho')),
-            'aaData' => $dispRows
+            'aaData' => $dispRows,
         );
         $this->autoRender = false;
         $this->response->body(json_encode($response));
+
         return $this->response;
     }
 
@@ -251,7 +250,7 @@ class ReportsController extends AppController {
 
         $flash_class = 'alert alert-success';
         $this->Flash->default('The state has been successfully changed.',
-            array("params" => array("class" => $flash_class)));
+            array('params' => array('class' => $flash_class)));
         $this->redirect("/reports/view/$reportId");
     }
 
@@ -260,7 +259,6 @@ class ReportsController extends AppController {
      * Currently only to change their statuses.
      * Can be Extended for other mass operations as well.
      * Expects an array of Report Ids as a POST parameter.
-     *
      */
     public function mass_action()
     {
@@ -274,15 +272,14 @@ class ReportsController extends AppController {
                 'alert'
             );
             $msg = 'ERROR: Invalid State!!';
-        } else if (count($this->request->data['reports']) == 0) {
+        } elseif (count($this->request->data['reports']) == 0) {
             $msg = 'No Reports Selected!! Please Select Reports and try again.';
         } else {
             $msg = "Status has been changed to '"
                 . $this->request->data['state']
                 . "' for selected Reports!";
-            $flash_class = "alert alert-success";
-            foreach($this->request->data['reports'] as $report_id)
-            {
+            $flash_class = 'alert alert-success';
+            foreach ($this->request->data['reports'] as $report_id) {
                 $report = $this->Reports->get($report_id);
                 if (!$report) {
                     Log::write(
@@ -304,7 +301,7 @@ class ReportsController extends AppController {
         $this->redirect('/reports/');
     }
 
-    ## HELPERS
+    //# HELPERS
 
     protected function _setSimilarFields($id)
     {
@@ -320,7 +317,7 @@ class ReportsController extends AppController {
             $this->set("${field}_distinct_count", $totalEntries);
         }
         //error_log(json_encode($relatedEntries));
-        $this->set("related_entries", $relatedEntries);
+        $this->set('related_entries', $relatedEntries);
     }
 
     protected function _findArrayList($results, $key)
@@ -329,6 +326,7 @@ class ReportsController extends AppController {
         foreach ($results as $row) {
             $output[] = $row[$key];
         }
+
         return $output;
     }
 
@@ -343,6 +341,7 @@ class ReportsController extends AppController {
             }
             $output[] = $output_row;
         }
+
         return $output;
     }
 }

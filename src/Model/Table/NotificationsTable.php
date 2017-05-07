@@ -1,4 +1,5 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * Notification model representing a notification for new report.
@@ -10,29 +11,28 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @package   Server.Model
  * @copyright Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      https://www.phpmyadmin.net/
+ *
+ * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Model\Table;
 
-use Cake\ORM\TableRegistry;
 use Cake\Model\Model;
 use Cake\ORM\Table;
+use Cake\ORM\TableRegistry;
 
 /**
- * Notification Model
+ * Notification Model.
  *
  * @property Developer $Developer
  * @property Report    $Report
- *
- * @package Server.Model
  */
-class NotificationsTable extends Table {
-
+class NotificationsTable extends Table
+{
     /**
-     * Validation rules
+     * Validation rules.
      *
      * @var array
      */
@@ -55,28 +55,28 @@ class NotificationsTable extends Table {
 
     /**
      * The Associations below have been created with all possible keys,
-     * those that are not needed can be removed
+     * those that are not needed can be removed.
      */
 
     /**
-     * belongsTo associations
+     * belongsTo associations.
      *
      * @var array
      */
     public function initialize(array $config)
     {
-        $this->belongsTo('Reports', [
+        $this->belongsTo('Reports', array(
             'className' => 'Reports',
-            'foreignKey' => 'report_id'
-        ]);
+            'foreignKey' => 'report_id',
+        ));
     }
 
     /**
      * To Add Multiple Notifications for New report.
      *
-     * @param integer $report_id id of the new Report
+     * @param int $report_id id of the new Report
      *
-     * @return Boolean value. True on success. False on any type of failure.
+     * @return bool value. True on success. False on any type of failure.
      */
     public static function addNotifications($report_id)
     {
@@ -88,12 +88,13 @@ class NotificationsTable extends Table {
         $res = true;
         foreach ($devs as $dev) {
             $notification = $notoficationTable->newEntity();
-            $notification->developer_id  = $dev['id'];
+            $notification->developer_id = $dev['id'];
             $notification->report_id = $report_id;
             $notification->created = date('Y-m-d H:i:s', time());
             $notification->modified = date('Y-m-d H:i:s', time());
             $res = $notoficationTable->save($notification);
         }
-        return($res);
+
+        return $res;
     }
 }

@@ -1,7 +1,8 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
- * Clean Old Notifications Shell
+ * Clean Old Notifications Shell.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -10,20 +11,19 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @package   Server.Shell
  * @copyright Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      https://www.phpmyadmin.net/
+ *
+ * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Shell;
 
 use Cake\Console\Shell;
 use Cake\Log\Log;
 
 /**
- * Clean old Notifications shell
- *
- * @package Server.Shell
+ * Clean old Notifications shell.
  */
 class CleanOldNotifsShell extends Shell
 {
@@ -35,7 +35,7 @@ class CleanOldNotifsShell extends Shell
 
     public function main()
     {
-        $XTime = time() - 60*24*3600;
+        $XTime = time() - 60 * 24 * 3600;
         $conditions = array('Notifications.created <' => date('Y-m-d H:i:s', $XTime));
         if (!$this->Notifications->deleteAll($conditions)) {
             Log::write(

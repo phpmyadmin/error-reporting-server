@@ -1,7 +1,8 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
- * Stats Shell
+ * Stats Shell.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -10,20 +11,19 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @package   Server.Shell
  * @copyright Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      https://www.phpmyadmin.net/
+ *
+ * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Shell;
 
-use Cake\Console\Shell;
 use Cake\Cache\Cache;
+use Cake\Console\Shell;
 
 /**
- * Stats shell
- *
- * @package Server.Shell
+ * Stats shell.
  */
 class StatsShell extends Shell
 {
@@ -37,11 +37,11 @@ class StatsShell extends Shell
     public function main()
     {
         //Cache::clear(false);
-        foreach ($this->Incidents->filterTimes as $filter_string=>$filter) {
+        foreach ($this->Incidents->filterTimes as $filter_string => $filter) {
             foreach ($this->Incidents->summarizableFields as $field) {
-                $this->out("processing " . $filter_string . ":" . $field);
+                $this->out('processing ' . $filter_string . ':' . $field);
                 $entriesWithCount = $this->Reports->
-                        getRelatedByField($field, 25, false, false, $filter["limit"]);
+                        getRelatedByField($field, 25, false, false, $filter['limit']);
                 $entriesWithCount = json_encode($entriesWithCount);
                 Cache::write($field . '_' . $filter_string, $entriesWithCount);
             }
@@ -49,20 +49,19 @@ class StatsShell extends Shell
                 'group' => 'grouped_by',
                 'order' => 'Incidents.created',
             );
-            if(isset($filter["limit"])) {
-                $query["conditions"] = array(
-                    'Incidents.created >=' => $filter["limit"]
+            if (isset($filter['limit'])) {
+                $query['conditions'] = array(
+                    'Incidents.created >=' => $filter['limit'],
                 );
             }
             $downloadStats = $this->Incidents->find('all', $query);
-            $downloadStats->select([
-                'grouped_by' => $filter["group"],
+            $downloadStats->select(array(
+                'grouped_by' => $filter['group'],
                 'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
-                'count' => $downloadStats->func()->count('*')
-            ]);
+                'count' => $downloadStats->func()->count('*'),
+            ));
             $downloadStats = json_encode($downloadStats->toArray());
             Cache::write('downloadStats_' . $filter_string, $downloadStats);
         }
     }
 }
-

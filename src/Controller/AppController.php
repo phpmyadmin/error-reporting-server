@@ -1,7 +1,8 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
- * Application level Controller
+ * Application level Controller.
  *
  * This file is application-wide controller file. You can put all
  * application-wide controller-related methods here.
@@ -13,31 +14,29 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @package   Server.Controller.Component
  * @copyright Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      https://www.phpmyadmin.net/
+ *
+ * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Controller;
 
-use App\Utility\Sanitize;
 use Cake\Controller\Controller;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 
 /**
- * Application Controller
+ * Application Controller.
  *
  * Add your application-wide methods in the class below, your controllers
  * will inherit them.
  *
- * @package Server.Controller
- * @link    http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
+ * @see    http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller
 {
-
     public $uses = array('Developer', 'Notification');
 
     public $whitelist = array(
@@ -47,12 +46,11 @@ class AppController extends Controller
             'create',
         ),
     );
+
     /**
      * Initialization hook method.
      *
      * Use this method to add common initialization code like loading components.
-     *
-     * @return void
      */
     public function initialize()
     {
@@ -88,7 +86,7 @@ class AppController extends Controller
             $notif_count = TableRegistry::get('Notifications')->find(
                 'all',
                 array(
-                    'conditions' => array('developer_id' => intval($current_developer['id']))
+                    'conditions' => array('developer_id' => intval($current_developer['id'])),
                 )
             )->count();
             $this->set('current_developer', $current_developer);
