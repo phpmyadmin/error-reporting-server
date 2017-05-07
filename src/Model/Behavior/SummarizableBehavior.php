@@ -1,8 +1,9 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * Summarizable behaviour
- * A behavior allowing models to be summarized by a field
+ * A behavior allowing models to be summarized by a field.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -11,11 +12,12 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @package   Server.Model.Behaviour
  * @copyright Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      https://www.phpmyadmin.net/
+ *
+ * @see      https://www.phpmyadmin.net/
  */
+
 namespace app\Model\Behavior;
 
 use Cake\Model\Behavior;
@@ -23,11 +25,10 @@ use Cake\Model\Model;
 
 /**
  * Summarizable behaviour
- * A behavior allowing models to be summarized by a field
- * @package Server.Model.Behavior
+ * A behavior allowing models to be summarized by a field.
  */
-class SummarizableBehavior extends ModelBehavior {
-
+class SummarizableBehavior extends ModelBehavior
+{
     public $mapMethods = array('/\b_findGroupedCount\b/' => 'findGroupedCount');
 
     public function setup(Model $model, $config = array())
@@ -35,7 +36,7 @@ class SummarizableBehavior extends ModelBehavior {
         $model->findMethods['groupedCount'] = true;
     }
 
-    function findGroupedCount(
+    public function findGroupedCount(
         Model $model,
         $method,
         $state,
@@ -51,6 +52,7 @@ class SummarizableBehavior extends ModelBehavior {
                 $output[$value] = $row[0]['count'];
             }
         }
+
         return $output;
     }
 }

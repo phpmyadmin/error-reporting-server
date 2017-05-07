@@ -1,8 +1,9 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
- * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org).
  *
  * Licensed under The MIT License
  * For full copyright and license information, please see the LICENSE.txt
@@ -10,9 +11,11 @@
  *
  * @copyright Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      http://cakephp.org CakePHP(tm) Project
+ *
+ * @see      http://cakephp.org CakePHP(tm) Project
  * @since     3.0.0
  */
+
 namespace App\Shell;
 
 use Cake\Console\ConsoleOptionParser;
@@ -25,7 +28,6 @@ use Psy\Shell as PsyShell;
  */
 class ConsoleShell extends Shell
 {
-
     /**
      * Start the shell and interactive console.
      *
@@ -43,10 +45,11 @@ class ConsoleShell extends Shell
             $this->err('');
             $this->err('<info>$ php composer.phar require --dev psy/psysh</info>');
             $this->err('');
+
             return 1;
         }
 
-        $this->out("You can exit with <info>`CTRL-C`</info> or <info>`exit`</info>");
+        $this->out('You can exit with <info>`CTRL-C`</info> or <info>`exit`</info>');
         $this->out('');
 
         Log::drop('debug');
@@ -75,6 +78,7 @@ class ConsoleShell extends Shell
             "\n\n" .
             'You will need to have psysh installed for this Shell to work.'
         );
+
         return $parser;
     }
 }

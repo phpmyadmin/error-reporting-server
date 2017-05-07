@@ -1,7 +1,8 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
- * Incidents controller handling incident creation and rendering
+ * Incidents controller handling incident creation and rendering.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -10,24 +11,22 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @package   Server.Controller
  * @copyright Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      https://www.phpmyadmin.net/
+ *
+ * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Controller;
 
-use App\Controller\AppController;
 use Cake\Network\Exception\NotFoundException;
-use App\Utility\Sanitize;
 
 /**
- * Incidents controller handling incident creation and rendering
- *
- * @package Server.Controller
+ * Incidents controller handling incident creation and rendering.
  */
-class IncidentsController extends AppController {
-    public $uses = array("Incident", "Notification");
+class IncidentsController extends AppController
+{
+    public $uses = array('Incident', 'Notification');
 
     public function create()
     {
@@ -37,22 +36,23 @@ class IncidentsController extends AppController {
             && !in_array(false, $result)
         ) {
             $response = array(
-                "success" => true,
-                "message" => "Thank you for your submission",
-                "incident_id" => $result,        // Return a list of incident ids.
+                'success' => true,
+                'message' => 'Thank you for your submission',
+                'incident_id' => $result,        // Return a list of incident ids.
             );
         } else {
             $response = array(
-                "success" => false,
-                "message" => "There was a problem with your submission.",
+                'success' => false,
+                'message' => 'There was a problem with your submission.',
             );
         }
         $this->autoRender = false;
-        $this->response->header([
+        $this->response->header(array(
             'Content-Type' => 'application/json',
-            'X-Content-Type-Options' => 'nosniff'
-        ]);
+            'X-Content-Type-Options' => 'nosniff',
+        ));
         $this->response->body(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
         return $this->response;
     }
 
@@ -75,6 +75,7 @@ class IncidentsController extends AppController {
 
         $this->autoRender = false;
         $this->response->body(json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
         return $this->response;
     }
 

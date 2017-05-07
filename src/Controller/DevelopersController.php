@@ -1,7 +1,8 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
- * Developer controller handling developer login/logout/register
+ * Developer controller handling developer login/logout/register.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -10,30 +11,28 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @package   Server.Controller.Component
  * @copyright Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  * @license   https://opensource.org/licenses/mit-license.php MIT License
- * @link      https://www.phpmyadmin.net/
+ *
+ * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Controller;
 
-use App\Controller\AppController;
 use Cake\Core\Configure;
 use Cake\Event\Event;
-use Cake\ORM\TableRegistry;
 use Cake\Network\Exception\NotFoundException;
+use Cake\ORM\TableRegistry;
 
 /**
- * Developer controller handling developer login/logout/register
- *
- * @package Server.Controller
+ * Developer controller handling developer login/logout/register.
  */
-class DevelopersController extends AppController {
-
+class DevelopersController extends AppController
+{
     public $helpers = array('Html', 'Form');
 
     public $components = array(
-        'GithubApi'
+        'GithubApi',
     );
 
     public function beforeFilter(Event $event)
@@ -75,8 +74,8 @@ class DevelopersController extends AppController {
                     array('params' => array('class' => $flash_class)));
         }
         $last_page = $this->request->session()->read('last_page');
-        if(empty($last_page)) {
-            $last_page = array('controller' => 'reports','action' => 'index');
+        if (empty($last_page)) {
+            $last_page = array('controller' => 'reports', 'action' => 'index');
         }
         $this->redirect($last_page);
     }
@@ -94,6 +93,7 @@ class DevelopersController extends AppController {
     public function currentDeveloper()
     {
         $this->autoRender = false;
+
         return json_encode($this->GithubApi->canCommitTo('smita786',
                 'smita786/phpmyadmin'));
     }
@@ -101,25 +101,26 @@ class DevelopersController extends AppController {
     public function create_issue($reportId)
     {
         if (!$reportId) {
-                throw new \NotFoundException(__('Invalid report'));
+            throw new \NotFoundException(__('Invalid report'));
         }
 
         $report = TableRegistry::get('Reports')->findById($reportId)->toArray();
         if (!$report) {
-                throw new NotFoundException(__('Invalid report'));
+            throw new NotFoundException(__('Invalid report'));
         }
 
         if (empty($this->request->data)) {
             $this->set('pma_version', $report[0]['pma_version']);
             $this->set('error_name', $report[0]['error_name']);
             $this->set('error_message', $report[0]['error_message']);
+
             return;
         }
         $data = array(
             'title' => $this->request->data['summary'],
-            'body'  => $this->_augmentDescription(
+            'body' => $this->_augmentDescription(
                     $this->request->data['description'], $reportId),
-            'labels' => $this->request->data['labels']?explode(',', $this->request->data['labels']):Array()
+            'labels' => $this->request->data['labels'] ? explode(',', $this->request->data['labels']) : array(),
         );
         $data['labels'][] = 'automated-error-report';
         list($issueDetails, $status) = $this->GithubApi->create_issue(
@@ -129,7 +130,7 @@ class DevelopersController extends AppController {
         );
 
         $this->redirect(array('controller' => 'reports', 'action' => 'view',
-                    $reportId));
+                    $reportId, ));
     }
 
     protected function _authenticateDeveloper($userInfo, $accessToken)
@@ -147,16 +148,18 @@ class DevelopersController extends AppController {
     }
 
     /**
-     * Returns the description with the added string to link to the report
-     * @param String $description the original description submitted by the dev
-     * @param String $reportId    the report id relating to the ticket
+     * Returns the description with the added string to link to the report.
      *
-     * @return String augmented description
+     * @param string $description the original description submitted by the dev
+     * @param string $reportId    the report id relating to the ticket
+     *
+     * @return string augmented description
      */
     protected function _augmentDescription($description, $reportId)
     {
         $report = TableRegistry::get('Reports');
         $report->id = $reportId;
+
         return '$description\n\n\nThis report is related to user submitted report '
                 . '[#' . $report->id . '](' . $report->getUrl()
                 . ') on the phpmyadmin error reporting server.';
