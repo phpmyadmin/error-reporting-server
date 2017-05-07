@@ -1,4 +1,5 @@
 <?php
+/* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -8,9 +9,9 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @license   https://opensource.org/licenses/mit-license.php MIT License
  * @link      http://cakephp.org CakePHP(tm) Project
  * @since     3.0.0
- * @license   https://opensource.org/licenses/mit-license.php MIT License
  */
 namespace App\Shell;
 

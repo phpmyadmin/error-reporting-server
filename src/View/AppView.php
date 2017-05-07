@@ -7,9 +7,9 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link      http://cakephp.org CakePHP(tm) Project
  * @since     3.0.0
  * @license   https://opensource.org/licenses/mit-license.php MIT License
+ * @link      http://cakephp.org CakePHP(tm) Project
  */
 namespace App\View;
 
