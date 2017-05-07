@@ -1,4 +1,5 @@
 <?php
+/* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * Application model for CakePHP.
  *
@@ -12,16 +13,15 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://cakephp.org CakePHP(tm) Project
- * @package       app.Model
- * @since         CakePHP(tm) v 0.2.9
- * @license       https://opensource.org/licenses/mit-license.php MIT License
+ * @package   app.Model
+ * @copyright Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @license   https://opensource.org/licenses/mit-license.php MIT License
+ * @link      http://cakephp.org CakePHP(tm) Project
+ * @since     CakePHP(tm) v 0.2.9
  */
 namespace App\Model;
 
 use App\Model\Model;
-
 
 /**
  * Application model for Cake.
@@ -29,7 +29,7 @@ use App\Model\Model;
  * Add your application-wide methods in the class below, your models
  * will inherit them.
  *
- * @package       app.Model
+ * @package app.Model
  */
 class AppModel extends Model {
 }

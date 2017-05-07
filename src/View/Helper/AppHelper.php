@@ -1,4 +1,5 @@
 <?php
+/* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * Application level View Helper
  *
@@ -12,16 +13,15 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://cakephp.org CakePHP(tm) Project
- * @package       app.View.Helper
- * @since         CakePHP(tm) v 0.2.9
- * @license       https://opensource.org/licenses/mit-license.php MIT License
+ * @package   app.View.Helper
+ * @copyright Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @license   https://opensource.org/licenses/mit-license.php MIT License
+ * @link      http://cakephp.org CakePHP(tm) Project
+ * @since     CakePHP(tm) v 0.2.9
  */
 namespace app\View\Helper;
 
 use Cake\View\Helper;
-
 
 /**
  * Application helper
@@ -29,7 +29,7 @@ use Cake\View\Helper;
  * Add your application-wide methods in the class below, your helpers
  * will inherit them.
  *
- * @package       app.View.Helper
+ * @package app.View.Helper
  */
 class AppHelper extends Helper {
 }
