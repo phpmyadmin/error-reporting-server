@@ -37,10 +37,26 @@ class CleanOldNotifsShell extends Shell
     {
         $XTime = time() - 60 * 24 * 3600;
         $conditions = array('Notifications.created <' => date('Y-m-d H:i:s', $XTime));
-        if (!$this->Notifications->deleteAll($conditions)) {
+
+        if ($this->Notifications->find('all', array('conditions' => $conditions))->count() === 0) {
+            // Check if there are any notifications to delete
+            Log::write(
+                'warning',
+                'No notifications found for deleting!',
+                'cron_jobs'
+            );
+        } elseif (!$this->Notifications->deleteAll($conditions)) {
+            // Try deleting the matched records
+            Log::write(
+                'info',
+                'Old notifications deleted successfully!',
+                'cron_jobs'
+            );
+        } else {
+            // If NOT successful, print out an error message
             Log::write(
                 'error',
-                'FAILED: Deleting older Notifications!!',
+                'Deleting old notifications failed!',
                 'cron_jobs'
             );
         }
