@@ -41,7 +41,7 @@ class CleanOldNotifsShell extends Shell
         if ($this->Notifications->find('all', array('conditions' => $conditions))->count() === 0) {
             // Check if there are any notifications to delete
             Log::write(
-                'warning',
+                'info',
                 'No notifications found for deleting!',
                 'cron_jobs'
             );
