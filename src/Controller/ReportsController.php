@@ -188,7 +188,10 @@ class ReportsController extends AppController
 
     public function mark_related_to($reportId)
     {
-        $relatedTo = $this->request->query('related_to');
+        // Only allow POST requests
+        $this->request->allowMethod(['post']);
+
+        $relatedTo = $this->request->getData('related_to');
         if (!$reportId
             || !$relatedTo
             || $reportId == $relatedTo
@@ -212,6 +215,9 @@ class ReportsController extends AppController
 
     public function unmark_related_to($reportId)
     {
+        // Only allow POST requests
+        $this->request->allowMethod(['post']);
+
         if (!$reportId) {
             throw new NotFoundException(__('Invalid Report'));
         }

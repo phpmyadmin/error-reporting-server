@@ -25,7 +25,7 @@
 
 <?php if ($related_reports->isEmpty()): ?>
     <form class="form-inline" action="/<?= BASE_DIR ?>reports/mark_related_to/<?=
-        $report[0]['id']; ?>">
+        $report[0]['id']; ?>" method="post">
         <span>Mark the same as:</span>
         <input type="number" min="1" name="related_to" />
         <input type="submit" value="Submit" class="btn btn-primary" />
@@ -34,16 +34,16 @@
     <p>
         This report has been marked the same as the following reports:
         (<?= $this->Reports->createReportsLinks($related_reports); ?>).
-        <a href="/<?= BASE_DIR ?>reports/unmark_related_to/<?= $report[0]['id']; ?>">
-                Remove from this group
-        </a>
+        <form class="form-inline" action="/<?= BASE_DIR ?>reports/unmark_related_to/<?= $report[0]['id']; ?>" method="post">
+                <input type="submit" value="Remove from this group" class="btn btn-primary" />
+        </form>
     </p>
 <?php endif; ?>
 
 <table cellspacing="0" class="table table-bordered error-report">
     <tr>
         <td>Error Type</td>
-        <td><?= $incident['exception_type'] ? 'php' : 'js'; ?></td>
+        <td><?= $report[0]['exception_type'] ? 'php' : 'js'; ?></td>
     </tr>
     <tr>
         <td>Error Name</td>
