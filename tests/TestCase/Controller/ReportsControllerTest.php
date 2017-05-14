@@ -118,40 +118,40 @@ class ReportsControllerTest extends IntegrationTestCase
         $this->assertEquals($expected, $result);
     }
 
-/*
- * TODO: Will do after fix related to feature.
     public function testMarkRelatedTo() {
-        $this->Reports->Report->read(null, 2);
-        $incidents = $this->Reports->Report->getIncidents();
-        $this->assertEquals(0, count($incidents));
+        $this->Reports->id = 2;
+        $incidents = $this->Reports->getIncidents();
+        $this->assertEquals(1, $incidents->count());
 
-        $this->testAction('/reports/mark_related_to/2', array(
-            'data' => array(
-                'related_to' => 4,
-            ),
-            'method' => 'get',
-            'return' => 'view'
-        ));
+        $this->post(
+            '/reports/mark_related_to/2',
+            ['related_to' => 4]
+        );
 
-        $this->Reports->Report->read(null, 2);
-        $incidents = $this->Reports->Report->getIncidents();
-        $this->assertEquals(3, count($incidents));
+        $this->Reports->id = 2;
+        $incidents = $this->Reports->getIncidents();
+        $this->assertEquals(3, $incidents->count());
+
+        $this->_testUnmarkRelatedTo();
     }
 
-    public function testUnmarkRelatedTo() {
-        $this->Reports->Report->read(null, 1);
-        $incidents = $this->Reports->Report->getIncidents();
-        $this->assertEquals(3, count($incidents));
 
-        $this->testAction('/reports/unmark_related_to/1', array(
-            'data' => array(
-            ),
-            'method' => 'get',
-            'return' => 'view'
-        ));
+    /**
+     * Don't run this as a separate test,
+     * as the fixture tables are re-created and
+     * we lose the previous related_to updations.
+     *
+     * So, call at the end of testMarkRelatedTo()
+     */
+    private function _testUnmarkRelatedTo() {
+        $this->Reports->id = 2;
+        $incidents = $this->Reports->getIncidents();
+        $this->assertEquals(3, $incidents->count());
 
-        $this->Reports->Report->read(null, 1);
-        $incidents = $this->Reports->Report->getIncidents();
-        $this->assertEquals(1, count($incidents));
-    }*/
+        $this->post('/reports/unmark_related_to/2');
+
+        $this->Reports->id = 2;
+        $incidents = $this->Reports->getIncidents();
+        $this->assertEquals(1, $incidents->count());
+    }
 }
