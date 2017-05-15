@@ -247,7 +247,7 @@ class IncidentsTable extends Table
         }
         $report = TableRegistry::get('Reports')->findByLocationAndLinenumberAndPmaVersion(
                     $location, $linenumber,
-                    $this->_getStrippedPmaVersion($bugReport['pma_version'])
+                    $this->getStrippedPmaVersion($bugReport['pma_version'])
                 )->all()->first();
 
         return $report;
@@ -312,7 +312,7 @@ class IncidentsTable extends Table
         //$bugReport = Sanitize::clean($bugReport, array('escape' => false));
         $schematizedReports = array();
         $schematizedCommonReport = array(
-            'pma_version' => $this->_getStrippedPmaVersion($bugReport['pma_version']),
+            'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
             'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
             'browser' => $bugReport['browser_name'] . ' '
                     . $this->_getSimpleVersion($bugReport['browser_version'], 1),
@@ -449,7 +449,7 @@ class IncidentsTable extends Table
      *
      * @return string stripped phpMyAdmin version
      */
-    protected function _getStrippedPmaVersion($versionString)
+    public function getStrippedPmaVersion($versionString)
     {
         $allowedRegexp = '/^(\d+)(\.\d+){0,3}(\-.*)?/';
         $matches = array();

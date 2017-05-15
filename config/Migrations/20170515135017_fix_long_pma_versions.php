@@ -1,6 +1,8 @@
 <?php
 
 use Phinx\Migration\AbstractMigration;
+use Cake\ORM\TableRegistry;
+use Cake\Log\Log;
 
 class FixLongPmaVersions extends AbstractMigration
 {
@@ -14,33 +16,17 @@ class FixLongPmaVersions extends AbstractMigration
     {
         // Strip phpMyAdmin versions in `reports` table
         $count = $this->_sanitizeVersionsInTable('reports');
-        \Cake\Log\Log::debug($count . ' reports updated');
+        Log::debug($count . ' reports updated');
 
         // Strip phpMyAdmin versions in `incidents` table
         $count = $this->_sanitizeVersionsInTable('incidents');
-        \Cake\Log\Log::debug($count . ' incidents updated');
+        Log::debug($count . ' incidents updated');
     }
 
     public function down()
     {
         // Once applied, this migration can't be reversed
         // but the migration itself is idempotent
-    }
-
-    private function _sanitizeVersions($versionString)
-    {
-        $allowedRegexp = '/^(\d+)(\.\d+){0,3}(\-.*)?/';
-        $matches = array();
-
-        // Check if $versionString matches the regexp
-        // and store the matched strings
-        if (preg_match($allowedRegexp, $versionString, $matches)) {
-            return $matches[0];
-        }
-
-        // If $versionString does not match the regexp at all,
-        // leave it as it is
-        return $versionString;
     }
 
     private function _sanitizeVersionsInTable($table)
@@ -51,7 +37,7 @@ class FixLongPmaVersions extends AbstractMigration
         );
         $count = 0;
         foreach ($rows as $row) {
-            $strippedVersionString = $this->_sanitizeVersions(
+            $strippedVersionString = TableRegistry::get('Incidents')->getStrippedPmaVersion(
                 $row['pma_version']
             );
 
