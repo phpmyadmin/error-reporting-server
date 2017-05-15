@@ -13,5 +13,6 @@ app/[Cc]onfig/oauth.php
 nbproject/
 vendor/
 logs/
+composer.phar
 composer.lock
 .php_cs.cache
