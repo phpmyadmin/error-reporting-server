@@ -1,6 +1,6 @@
 <?php
-
 /* vim: set expandtab sw=4 ts=4 sts=4: */
+
 /**
  * Reports controller handling reports creation and rendering.
  *
@@ -41,6 +41,14 @@ class ReportsController extends AppController
         $this->set('distinct_statuses',
             $this->_findArrayList($this->Reports->find()->select(array('status'))->distinct(array('status')),
             'status')
+        );
+        $this->set(
+            'distinct_locations',
+            $this->_findArrayList(
+                $this->Reports->find()->select(array('location'))
+                    ->distinct(array('location')),
+                'location'
+            )
         );
         $this->set('distinct_versions',
             $this->_findArrayList($this->Reports->find()->select(array('pma_version'))->distinct(array('pma_version')), 'pma_version')
@@ -107,6 +115,7 @@ class ReportsController extends AppController
             'id' => 'id',
             'error_name' => 'error_name',
             'error_message' => 'error_message',
+            'location' => 'location',
             'pma_version' => 'pma_version',
             'status' => 'status',
             'exception_type' => 'exception_type',
@@ -141,8 +150,8 @@ class ReportsController extends AppController
         // add incident count for related reports
         $dispRows = array();
         foreach ($rows as $row) {
-            $row[4] = $this->Reports->status[$row[4]];
-            $row[5] = (intval($row[5])) ? ('php') : ('js');
+            $row[5] = $this->Reports->status[$row[5]];
+            $row[6] = (intval($row[6])) ? ('php') : ('js');
             $input_elem = "<input type='checkbox' name='reports[]' value='"
                 . $row[0]
                 . "'/>";
@@ -168,7 +177,7 @@ class ReportsController extends AppController
                 array('incidents.report_id = Reports.related_to')
             )->count();
 
-            $row[6] += $inci_count_related;
+            $row[7] += $inci_count_related;
 
             array_unshift($row, $input_elem);
             array_push($dispRows, $row);

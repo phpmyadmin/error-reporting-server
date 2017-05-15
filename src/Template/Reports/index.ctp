@@ -17,6 +17,7 @@
                 <th>ID</th>
                 <th>Exception Name</th>
                 <th>Message</th>
+                <th>Location</th>
                 <th>PMA Version</th>
                 <th>Status</th>
                 <th>Exception Type</th>
@@ -37,6 +38,14 @@
                     </select>
                 </th>
                 <th></th>
+                <th>
+                    <select id="location_filter" style="width:100%">
+                        <option></option>
+                        <?php foreach ($distinct_locations as $id => $location): ?>
+                            <?= "<option value='$location'>$location</option>"; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </th>
                 <th>
                     <select id="pma_version_filter" style="width:100%">
                         <option></option>
@@ -69,6 +78,7 @@
         </tbody>
         <tfoot>
             <tr>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
