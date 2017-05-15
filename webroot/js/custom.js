@@ -6,8 +6,8 @@ $(document).ready(function () {
 		"bStateSave": true,
 		"sAjaxSource": $('#reports_table').data('ajax-url'),
 		"aoColumnDefs": [
-			{ "bSearchable": false, "aTargets": [ 1, 6, 7 ] },
-			{ "sClass": "center", "aTargets": [ 0, 1, 4, 5, 6, 7] },
+			{ "bSearchable": false, "aTargets": [ 1, 7, 8 ] },
+			{ "sClass": "center", "aTargets": [ 0, 1, 5, 6, 7, 8] },
 			{ "fnRender": function (oObj) {
 					return '<a class="block" href="/reports/view/' + oObj.aData[1] +
 						'">' + oObj.aData[1] + '</a>';
@@ -18,8 +18,9 @@ $(document).ready(function () {
 		"aoColumns": [
 			{ "sWidth": "1%" },
 			{ "sWidth": "10%" },
-			{ "sWidth": "20%" },
+			{ "sWidth": "15%" },
 			{ "sWidth": "40%" },
+			{ "sWidth": "5%" },
 			{ "sWidth": "15%" },
 			{ "sWidth": "10%" },
 			{ "sWidth": "10%" },
