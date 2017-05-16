@@ -360,4 +360,24 @@ class IncidentsTableTest extends TestCase
         $result = $result->hydrate(false)->toArray();
         $this->assertEquals(2, count($result));
     }
+
+    /**
+     * @dataProvider versionsStripping
+     */
+    public function testStripversion($version, $expected)
+    {
+        $this->assertEquals($expected, $this->Incidents->getStrippedPmaVersion($version));
+    }
+
+    public function versionsStripping()
+    {
+        return array(
+            array('1.2.3', '1.2.3'),
+            array('1.2.3-rc1', '1.2.3-rc1'),
+            array('4.1-dev', '4.1-dev'),
+            array('4.1.6deb0ubuntu1ppa1', '4.1.6'),
+            array('4.2.3deb1.trusty~ppa.1', '4.2.3'),
+            array('4.2.9deb0.1', '4.2.9'),
+        );
+    }
 }
