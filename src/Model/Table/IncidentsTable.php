@@ -1,6 +1,6 @@
 <?php
-
 /* vim: set expandtab sw=4 ts=4 sts=4: */
+
 /**
  * An incident a representing a single incident of a submited bug.
  *
@@ -161,6 +161,8 @@ class IncidentsTable extends Table
             return array(false);
         }
         $incident_ids = array();    // array to hold ids of all the inserted incidents
+
+        // Also sanitizes the bug report
         $schematizedIncidents = $this->_getSchematizedIncidents($bugReport);
         $incidentsTable = TableRegistry::get('Incidents');
         $reportsTable = TableRegistry::get('Reports');
@@ -244,7 +246,9 @@ class IncidentsTable extends Table
                     $this->_getIdentifyingLocation($bugReport['exception']['stack']);
         }
         $report = TableRegistry::get('Reports')->findByLocationAndLinenumberAndPmaVersion(
-                    $location, $linenumber, $bugReport['pma_version'])->all()->first();
+                    $location, $linenumber,
+                    $this->getStrippedPmaVersion($bugReport['pma_version'])
+                )->all()->first();
 
         return $report;
     }
@@ -308,7 +312,7 @@ class IncidentsTable extends Table
         //$bugReport = Sanitize::clean($bugReport, array('escape' => false));
         $schematizedReports = array();
         $schematizedCommonReport = array(
-            'pma_version' => $bugReport['pma_version'],
+            'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
             'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
             'browser' => $bugReport['browser_name'] . ' '
                     . $this->_getSimpleVersion($bugReport['browser_version'], 1),
@@ -434,6 +438,30 @@ class IncidentsTable extends Table
             return $simpleVersion;
         }
 
+        return $versionString;
+    }
+
+    /**
+     * Returns the version string stripped of
+     * 'deb', 'ubuntu' and other suffixes
+     *
+     * @param string $versionString phpMyAdmin version
+     *
+     * @return string stripped phpMyAdmin version
+     */
+    public function getStrippedPmaVersion($versionString)
+    {
+        $allowedRegexp = '/^(\d+)(\.\d+){0,3}(\-.*)?/';
+        $matches = array();
+
+        // Check if $versionString matches the regexp
+        // and store the matched strings
+        if (preg_match($allowedRegexp, $versionString, $matches)) {
+            return $matches[0];
+        }
+
+        // If $versionString does not match the regexp at all,
+        // leave it as it is
         return $versionString;
     }
 
