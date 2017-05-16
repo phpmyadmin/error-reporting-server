@@ -31,21 +31,23 @@ class FixLongPmaVersions extends AbstractMigration
 
     private function _sanitizeVersionsInTable($table)
     {
-        $rows = $this->fetchAll(
-            'SELECT `id`, `pma_version` FROM `' . $table . '`',
-            PDO::FETCH_ASSOC
-        );
+        $sql = 'SELECT `id`, `pma_version` FROM `' . $table . '`';
         $count = 0;
-        foreach ($rows as $row) {
-            $strippedVersionString = TableRegistry::get('Incidents')->getStrippedPmaVersion(
-                $row['pma_version']
-            );
+        $incidentsTable = TableRegistry::get('Incidents');
+        $result = $this->query($sql);
 
-            $this->execute('UPDATE ' . $table . ' SET `pma_version` = \''
-                . $strippedVersionString . '\' WHERE `id` = \''
-                . $row['id'] . '\''
-            );
+        while ($row = $result->fetch()) {
+            $strippedVersionString
+                = $incidentsTable->getStrippedPmaVersion(
+                        $row['pma_version']
+                    );
+
             if ($strippedVersionString !== $row['pma_version']) {
+                $this->execute('UPDATE ' . $table . ' SET `pma_version` = \''
+                    . $strippedVersionString . '\' WHERE `id` = \''
+                    . $row['id'] . '\''
+                );
+
                 ++$count;
             }
         }
