@@ -167,6 +167,7 @@ class IncidentsTable extends Table
         $incidentsTable = TableRegistry::get('Incidents');
         $reportsTable = TableRegistry::get('Reports');
         foreach ($schematizedIncidents as $index => $si) {
+
             // find closest report. If not found, create a new report.
             $closestReport = $this->_getClosestReport($bugReport, $index);
             if ($closestReport) {
@@ -174,10 +175,20 @@ class IncidentsTable extends Table
                 $si = $incidentsTable->newEntity($si);
                 $si->created = date('Y-m-d H:i:s', time());
                 $si->modified = date('Y-m-d H:i:s', time());
-                $isSaved = $incidentsTable->save($si);
+
+                $this->_logLongIncidentSubmissions($si, $incident_ids);
+                if (in_array(false, $incident_ids)) {
+                    break;
+                }
             } else {
-                //no close report. Create a new report.
+                // no close report. Create a new report.
                 $report = $this->_getReportDetails($bugReport, $index);
+
+                $this->_logLongIncidentSubmissions($si, $incident_ids);
+                if (in_array(false, $incident_ids)) {
+                    break;
+                }
+
                 $report = $reportsTable->newEntity($report);
                 $report->created = date('Y-m-d H:i:s', time());
                 $report->modified = date('Y-m-d H:i:s', time());
@@ -186,20 +197,9 @@ class IncidentsTable extends Table
                 $si = $incidentsTable->newEntity($si);
                 $si->created = date('Y-m-d H:i:s', time());
                 $si->modified = date('Y-m-d H:i:s', time());
-                $isSaved = $incidentsTable->save($si);
-                /*$data = array(
-                    'Incident' => $si,
-                    'Report' => $report
-                );
-                $tmpIncident->bindModel(
-                    array('belongsTo' => array(
-                            'Report'
-                        )
-                    )
-                );*/
-                //$isSaved = $tmpIncident->saveAssociated($data);
             }
 
+            $isSaved = $incidentsTable->save($si);
             if ($isSaved) {
                 array_push($incident_ids, $si->id);
                 if (!$closestReport) {
@@ -504,5 +504,35 @@ class IncidentsTable extends Table
         }
 
         return hash_final($handle);
+    }
+
+    /**
+     * Checks the length of stacktrace and full_report
+     * and logs if it is greater than what it can hold
+     *
+     * @param array $si           submitted incident
+     * @param array $incident_ids incident IDs
+     *
+     * @return array $incident_ids
+     */
+    private function _logLongIncidentSubmissions($si, &$incident_ids) {
+
+        $stacktraceLength = mb_strlen($si['stacktrace']);
+        $fullReportLength = mb_strlen($si['full_report']);
+
+        if ($stacktraceLength > 65535 || $fullReportLength > 65535) {
+            // If length of report is longer than
+            // what can fit in the table field,
+            // we log it and don't save it in the database
+            Log::error(
+                'Too long data submitted in the incident. The length of stacktrace: '
+                . $stacktraceLength . ', while length of bug report: '
+                . $fullReportLength . '. The full incident reported was as follows: '
+                . json_encode($si)
+            );
+
+            // add a 'false' to the return array
+            array_push($incident_ids, false);
+        }
     }
 }

@@ -359,6 +359,32 @@ class IncidentsTableTest extends TestCase
         $result = TableRegistry::get('Incidents')->find('all', array('conditions' => array('report_id = ' . $incident->report_id)));
         $result = $result->hydrate(false)->toArray();
         $this->assertEquals(2, count($result));
+
+
+        // Case 3.1: Long PHP report submission
+        $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_php.json');
+        $bugReport = json_decode($bugReport, true);
+
+        // Forcefully inflate the report by inflating $bugReport['errors']
+        for ($i = 0; $i < 2000; $i++) {
+            $bugReport['errors'] = array_push($bugReport['errors'], $bugReport['errors'][0]);
+        }
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertEquals(true, in_array(false, $result));
+
+
+        // Case 3.2: Long JS report submission
+        $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
+        $bugReport = json_decode($bugReport, true);
+
+        // Forcefully inflate the report by inflating $bugReport['errors']
+        for ($i = 0; $i < 1500; $i++) {
+            $bugReport['exception']['stack'] .= array_push($bugReport['exception']['stack'][0]);
+        }
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertEquals(true, in_array(false, $result));
     }
 
     /**
