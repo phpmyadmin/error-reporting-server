@@ -367,7 +367,7 @@ class IncidentsTableTest extends TestCase
 
         // Forcefully inflate the report by inflating $bugReport['errors']
         for ($i = 0; $i < 2000; $i++) {
-            $bugReport['errors'] = array_push($bugReport['errors'], $bugReport['errors'][0]);
+            $bugReport['errors'][] = $bugReport['errors'][0];
         }
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
 
@@ -378,9 +378,9 @@ class IncidentsTableTest extends TestCase
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
         $bugReport = json_decode($bugReport, true);
 
-        // Forcefully inflate the report by inflating $bugReport['errors']
+        // Forcefully inflate the report by inflating $bugReport['exception']['stack']
         for ($i = 0; $i < 1500; $i++) {
-            $bugReport['exception']['stack'] .= array_push($bugReport['exception']['stack'][0]);
+            $bugReport['exception']['stack'][] = $bugReport['exception']['stack'][0];
         }
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
 
