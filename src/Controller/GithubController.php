@@ -35,8 +35,6 @@ class GithubController extends AppController
 
     public $components = array('GithubApi');
 
-    public $uses = array('Report');
-
     public function beforeFilter(Event $event)
     {
         parent::beforeFilter($event);
@@ -114,8 +112,12 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid Ticket ID!!'));
         }
 
-        $incident = TableRegistry::get('Incidents')->findByReportId($reportId)->all()->first();
-        $exception_type = ($incident['exception_type']) ? ('php') : ('js');
+        $incidents_query = TableRegistry::get('Incidents')
+            ->findByReportId($reportId)->all();
+        $incident = $incidents_query->first();
+
+        $exception_type = $incident['exception_type'] ? 'php' : 'js';
+        $incident_count = $this->_getTotalIncidentCount($reportId);
 
         // "formatted" text of the comment.
         $commentText = 'Param | Value '
@@ -123,6 +125,8 @@ class GithubController extends AppController
             . "\n Error Type | " . $report['error_name']
             . "\n Error Message |" . $report['error_message']
             . "\n Exception Type |" . $exception_type
+            . "\n phpMyAdmin version |" . $report['pma_version']
+            . "\n Incident count | " . $incident_count
             . "\n Link | [Report#"
                 . $reportId
                 . ']('
@@ -227,10 +231,13 @@ class GithubController extends AppController
     {
         $report = TableRegistry::get('Reports');
         $report->id = $reportId;
+        $incident_count = $this->_getTotalIncidentCount($reportId);
 
         return "$description\n\n\nThis report is related to user submitted report "
             . '[#' . $report->id . '](' . $report->getUrl()
-            . ') on the phpmyadmin error reporting server.';
+            . ') on the phpmyadmin error reporting server.'
+            . 'It, along with its related reports, has been reported **'
+            . $incident_count . '** times.';
     }
 
     /**
@@ -265,6 +272,7 @@ class GithubController extends AppController
                 case 3:
                     $msg = 'Github issue has been unlinked with this report.';
                     $ticket_id = null;
+
                     break;
                 default:
                     $msg = 'Something went wrong!!';
@@ -293,7 +301,7 @@ class GithubController extends AppController
             $flash_class = 'alert alert-error';
             $this->Flash->default(
                     'Bug Issue not found on Github.'
-                    . ' Are you sure the issue number is correct?!! Please check and try again',
+                    . ' Are you sure the issue number is correct? Please check and try again!',
                      array('params' => array('class' => $flash_class)));
 
             return false;
@@ -304,6 +312,41 @@ class GithubController extends AppController
                     array('params' => array('class' => $flash_class)));
 
         return false;
+    }
+
+    /**
+     * Get Incident counts for a report and
+     * all its related reports
+     *
+     * @param $reportId Report ID
+     *
+     * @return $total_incident_count Total Incident count for a report
+     */
+    protected function _getTotalIncidentCount($reportId)
+    {
+        $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
+        $incident_count = $incidents_query->count();
+
+        $params_count = array(
+            'fields' => array('inci_count' => 'inci_count'),
+            'conditions' => array(
+                    'related_to = ' . $reportId,
+            ),
+        );
+        $subquery_params_count = array(
+            'fields' => array(
+                'report_id' => 'report_id',
+            ),
+        );
+        $subquery_count = TableRegistry::get('Incidents')->find(
+            'all', $subquery_params_count
+        );
+        $inci_count_related = TableRegistry::get('Reports')->find('all', $params_count)->innerJoin(
+                array('incidents' => $subquery_count),
+                array('incidents.report_id = Reports.related_to')
+            )->count();
+
+        return $incident_count + $inci_count_related;
     }
 
     /*
