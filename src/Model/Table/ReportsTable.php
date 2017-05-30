@@ -74,15 +74,8 @@ class ReportsTable extends Table
      */
     public $status = array(
         'new' => 'New',
-        'fixed' => 'Fixed',
-        'wontfix' => "Won't Fix",
-        'open' => 'Open',
-        'pending' => 'Pending',
-        'resolved' => 'Resolved',
         'invalid' => 'Invalid',
-        'duplicate' => 'Duplicate',
-        'works-for-me' => 'Works for me',
-        'out-of-date' => 'Out of Date',
+        'resolved' => 'Resolved'
     );
 
     public function initialize(array $config)
@@ -195,6 +188,8 @@ class ReportsTable extends Table
         } else {
             $report->related_to = $related_to;
         }
+        $report->status = $dup_report->status;
+
         $this->save($report);
     }
 
