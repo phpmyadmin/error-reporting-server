@@ -56,25 +56,31 @@ class GithubController extends AppController
             throw new \NotFoundException(__('Invalid report'));
         }
 
-        $report = TableRegistry::get('Reports')->findById($reportId)->toArray();
+        $report = TableRegistry::get('Reports')->findById($reportId)->first()->toArray();
         if (!$report) {
             throw new NotFoundException(__('Invalid report'));
         }
 
         if (empty($this->request->data)) {
-            $this->set('pma_version', $report[0]['pma_version']);
-            $this->set('error_name', $report[0]['error_name']);
-            $this->set('error_message', $report[0]['error_message']);
+            $this->set('pma_version', $report['pma_version']);
+            $this->set('error_name', $report['error_name']);
+            $this->set('error_message', $report['error_message']);
 
             return;
         }
         $data = array(
             'title' => $this->request->data['summary'],
-            'body' => $this->_augmentDescription(
-                    $this->request->data['description'], $reportId),
             'labels' => $this->request->data['labels'] ? explode(',', $this->request->data['labels']) : array(),
         );
+        $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
+        $incident = $incidents_query->first();
+        $report['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
+        $report['description'] = $this->request->data['description'];
+
+        $data['body']
+            = $this->_getReportDescriptionText($reportId, $report);
         $data['labels'][] = 'automated-error-report';
+
         list($issueDetails, $status) = $this->GithubApi->createIssue(
             Configure::read('GithubRepoPath'),
             $data,
@@ -102,7 +108,7 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid reportId'));
         }
 
-        $report = TableRegistry::get('Reports')->findById($reportId)->all()->first();
+        $report = TableRegistry::get('Reports')->findById($reportId)->all()->first()->toArray();
         if (!$report) {
             throw new NotFoundException(__('Invalid Report'));
         }
@@ -112,29 +118,13 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid Ticket ID!!'));
         }
 
-        $incidents_query = TableRegistry::get('Incidents')
-            ->findByReportId($reportId)->all();
+        $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
         $incident = $incidents_query->first();
+        $report['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
 
-        $exception_type = $incident['exception_type'] ? 'php' : 'js';
-        $incident_count = $this->_getTotalIncidentCount($reportId);
-
-        // "formatted" text of the comment.
-        $commentText = 'Param | Value '
-            . "\n -----------|--------------------"
-            . "\n Error Type | " . $report['error_name']
-            . "\n Error Message |" . $report['error_message']
-            . "\n Exception Type |" . $exception_type
-            . "\n phpMyAdmin version |" . $report['pma_version']
-            . "\n Incident count | " . $incident_count
-            . "\n Link | [Report#"
-                . $reportId
-                . ']('
-                . Router::url('/reports/view/' . $reportId, true)
-                . ')'
-            . "\n\n*This comment is posted automatically by phpMyAdmin's "
-            . '[error-reporting-server](https://reports.phpmyadmin.net).*';
-
+        $commentText = $this->_getReportDescriptionText(
+            $reportId, $report
+        );
         list($commentDetails, $status) = $this->GithubApi->createComment(
             Configure::read('GithubRepoPath'),
             array('body' => $commentText),
@@ -162,7 +152,7 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid reportId'));
         }
 
-        $report = TableRegistry::get('Reports')->findById($reportId)->all()->first();
+        $report = TableRegistry::get('Reports')->findById($reportId)->all()->first()->toArray();
         if (!$report) {
             throw new NotFoundException(__('Invalid Report'));
         }
@@ -220,24 +210,37 @@ class GithubController extends AppController
     }
 
     /**
-     * Returns the description with the added string to link to the report.
+     * Returns the text to be added while creating an issue
      *
-     * @param string $description the original description submitted by the dev
-     * @param string $reportId    the report id relating to the ticket
+     * @param integer $reportId       Report Id
+     * @param array   $report         Report associative array
      *
-     * @return string augmented description
+     * @return string
      */
-    protected function _augmentDescription($description, $reportId)
+    protected function _getReportDescriptionText($reportId, $report)
     {
-        $report = TableRegistry::get('Reports');
-        $report->id = $reportId;
         $incident_count = $this->_getTotalIncidentCount($reportId);
 
-        return "$description\n\n\nThis report is related to user submitted report "
-            . '[#' . $report->id . '](' . $report->getUrl()
-            . ') on the phpmyadmin error reporting server.'
-            . 'It, along with its related reports, has been reported **'
-            . $incident_count . '** times.';
+        // "formatted" text of the comment.
+        $formattedText
+            = array_key_exists('description', $report) ? $report['description'] . "\n\n"
+                : '';
+        $formattedText .= "\nParam | Value "
+            . "\n -----------|--------------------"
+            . "\n Error Type | " . $report['error_name']
+            . "\n Error Message |" . $report['error_message']
+            . "\n Exception Type |" . $report['exception_type']
+            . "\n phpMyAdmin version |" . $report['pma_version']
+            . "\n Incident count | " . $incident_count
+            . "\n Link | [Report#"
+                . $reportId
+                . ']('
+                . Router::url('/reports/view/' . $reportId, true)
+                . ')'
+            . "\n\n*This comment is posted automatically by phpMyAdmin's "
+            . '[error-reporting-server](https://reports.phpmyadmin.net).*';
+
+        return $formattedText;
     }
 
     /**
