@@ -331,13 +331,20 @@ class IncidentsTableTest extends TestCase
 
         // Case-1.1: closest report = null
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
-        $this->assertEquals(1, count($result));
+        $this->assertEquals(1, count($result['incidents']));
+
+        // One new report added (no closest report found)
+        $this->assertEquals(1, count($result['reports']));
 
         // Case-1.2: closest report = some report.
         // Previously(in Case-1.1) inserted Reports serve as ClosestReports.
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
-        $this->assertEquals(1, count($result));
-        $incident = $this->Incidents->get($result[0]);
+        $this->assertEquals(1, count($result['incidents']));
+
+        // No new report added (closest report found)
+        $this->assertEquals(0, count($result['reports']));
+
+        $incident = $this->Incidents->get($result['incidents'][0]);
         // check the incident has been reported under the same 'Report'
         $result = TableRegistry::get('Incidents')->find('all', array('conditions' => array('report_id = ' . $incident->report_id)));
         $result = $result->hydrate(false)->toArray();
@@ -348,18 +355,24 @@ class IncidentsTableTest extends TestCase
         $bugReport = json_decode($bugReport, true);
         // Case-2.1: closest report = null.
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
-        $this->assertEquals(3, count($result));
+        $this->assertEquals(3, count($result['incidents']));
+
+        // Three (one for each incident) new report added (no closest report found)
+        $this->assertEquals(3, count($result['reports']));
 
         // Case-2.2: closest report = some report.
         // Previously(in Case-2.1) inserted Reports serve as ClosestReports.
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
-        $this->assertEquals(3, count($result));
+        $this->assertEquals(3, count($result['incidents']));
+
+        // No new report added (closest report found)
+        $this->assertEquals(0, count($result['reports']));
+
         // check the incidents have been reported under the same 'Report's
-        $incident = $this->Incidents->get($result[0]);
+        $incident = $this->Incidents->get($result['incidents'][0]);
         $result = TableRegistry::get('Incidents')->find('all', array('conditions' => array('report_id = ' . $incident->report_id)));
         $result = $result->hydrate(false)->toArray();
         $this->assertEquals(2, count($result));
-
 
         // Case 3.1: Long PHP report submission
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_php.json');
@@ -371,7 +384,7 @@ class IncidentsTableTest extends TestCase
         }
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
 
-        $this->assertEquals(true, in_array(false, $result));
+        $this->assertEquals(true, in_array(false, $result['incidents']));
 
 
         // Case 3.2: Long JS report submission
@@ -384,7 +397,7 @@ class IncidentsTableTest extends TestCase
         }
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
 
-        $this->assertEquals(true, in_array(false, $result));
+        $this->assertEquals(true, in_array(false, $result['incidents']));
     }
 
     /**

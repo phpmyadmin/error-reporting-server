@@ -323,4 +323,8 @@ return [
     'Session' => [
         'defaults' => 'php',
     ],
+
+
+    'NotificationEmailTo' => '',
+    'NotificationEmailFrom' => ''
 ];

@@ -19,7 +19,9 @@
 
 namespace App\Controller;
 
+use Cake\Core\Configure;
 use Cake\Network\Exception\NotFoundException;
+use Cake\ORM\TableRegistry;
 
 /**
  * Incidents controller handling incident creation and rendering.
@@ -28,6 +30,8 @@ class IncidentsController extends AppController
 {
     public $uses = array('Incident', 'Notification');
 
+    public $components = array('Mailer');
+
     public function create()
     {
         // Only allow POST requests
@@ -35,13 +39,14 @@ class IncidentsController extends AppController
 
         $bugReport = $this->request->input('json_decode', true);
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
-        if (count($result) > 0
-            && !in_array(false, $result)
+
+        if (count($result['incidents']) > 0
+            && !in_array(false, $result['incidents'])
         ) {
             $response = array(
                 'success' => true,
                 'message' => 'Thank you for your submission',
-                'incident_id' => $result,        // Return a list of incident ids.
+                'incident_id' => $result['incidents'],        // Return a list of incident ids.
             );
         } else {
             $response = array(
@@ -54,7 +59,15 @@ class IncidentsController extends AppController
             'Content-Type' => 'application/json',
             'X-Content-Type-Options' => 'nosniff',
         ));
-        $this->response->body(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $this->response->body(
+            json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+        );
+
+        // For all the newly added reports,
+        // send notification emails
+        foreach ($result['reports'] as $report_id) {
+            $this->_sendNotificationMail($report_id);
+        }
 
         return $this->response;
     }
@@ -99,5 +112,46 @@ class IncidentsController extends AppController
             json_decode($incident['stacktrace'], true);
 
         $this->set('incident', $incident);
+    }
+
+    private function _sendNotificationMail($reportId)
+    {
+        $this->Reports = TableRegistry::get('Reports');
+        $report = $this->Reports->findById($reportId)->all()->first()->toArray();
+        $this->Reports->id = $reportId;
+
+        $viewVars = array(
+            'report' => $report,
+            'project_name' => Configure::read('GithubRepoPath'),
+            'incidents' => $this->Reports->getIncidents()->toArray(),
+            'incidents_with_description' => $this->Reports->getIncidentsWithDescription(),
+            'incidents_with_stacktrace' => $this->Reports->getIncidentsWithDifferentStacktrace(),
+            'related_reports' => $this->Reports->getRelatedReports(),
+            'status' => $this->Reports->status
+        );
+        $viewVars = array_merge($viewVars, $this->_getSimilarFields($reportId));
+
+        $this->Mailer->sendReportMail($viewVars);
+    }
+
+    protected function _getSimilarFields($id)
+    {
+        $this->Reports->id = $id;
+
+        $viewVars = array(
+            'columns' => TableRegistry::get('Incidents')->summarizableFields
+        );
+        $relatedEntries = array();
+
+        foreach (TableRegistry::get('Incidents')->summarizableFields as $field) {
+            list($entriesWithCount, $totalEntries) =
+                    $this->Reports->getRelatedByField($field, 25, true);
+            $relatedEntries[$field] = $entriesWithCount;
+            $viewVars["${field}_distinct_count"] = $totalEntries;
+        }
+
+        $viewVars['related_entries'] = $relatedEntries;
+
+        return $viewVars;
     }
 }

@@ -324,4 +324,7 @@ return [
     'Session' => [
         'defaults' => 'php',
     ],
+
+    'NotificationEmailTo' => 'developers@phpmyadmin.net',
+    'NotificationEmailFrom' => 'developers@phpmyadmin.net'
 ];
