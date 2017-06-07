@@ -83,7 +83,14 @@ class NotificationsController extends AppController
         $pagedParams['offset'] = intval($this->request->query('iDisplayStart'));
 
         $rows = $this->Notifications->find('all', $pagedParams);
-        //$rows = Sanitize::clean($rows);
+        $totalFiltered = $this->Notifications->find(
+            'all',
+            array(
+                'conditions' => array(
+                    'developer_id' => $current_developer['id']
+                )
+            )
+        )->count();
 
         // Make the display rows array
         $dispRows = array();
@@ -112,7 +119,7 @@ class NotificationsController extends AppController
         }
 
         $response = array(
-            'iTotalDisplayRecords' => count($dispRows),
+            'iTotalDisplayRecords' => $totalFiltered,
             'iTotalRecords' => $this->Notifications->find('all', $params)->count(),
             'sEcho' => intval($this->request->query('sEcho')),
             'aaData' => $dispRows,
@@ -131,15 +138,26 @@ class NotificationsController extends AppController
      */
     public function mass_action()
     {
-        $msg = 'Selected Notifications have been marked <i>Read</i>!';
+        $msg = 'Selected Notifications have been marked \'Read\'!';
         $flash_class = 'alert alert-success';
-        foreach ($this->request->data['notifs'] as $notif_id) {
-            if (!$this->Notifications->delete($this->Notifications->get(intval($notif_id)))) {
-                $msg = '<b>ERROR</b>: There was some problem in deleting Notification(ID:'
-                    . $notif_id
-                    . ')!';
-                $flash_class = 'alert alert-error';
-                break;
+
+        if ($this->request->getData('mark_all')) {
+
+            // Delete all notifications for this Developer
+            $this->Notifications->deleteAll(
+                ['developer_id' => $this->request->session()->read('Developer.id')]
+            );
+
+            $msg = 'All your notifications have been marked \'Read\'';
+        } else {
+            foreach ($this->request->data['notifs'] as $notif_id) {
+                if (!$this->Notifications->delete($this->Notifications->get(intval($notif_id)))) {
+                    $msg = '<b>ERROR</b>: There was some problem in deleting Notification(ID:'
+                        . $notif_id
+                        . ')!';
+                    $flash_class = 'alert alert-error';
+                    break;
+                }
             }
         }
         $this->Flash->default($msg,

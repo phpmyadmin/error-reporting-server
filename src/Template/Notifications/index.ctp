@@ -9,8 +9,16 @@
         );
     ?>">
         <div style="margin-bottom:10px;">
-            <span>Action for Selected Notifications:</span>
-            <input type="submit" value="Mark Read" class="btn btn-primary"/>
+            <input type="checkbox" id="notificationsForm_checkall"
+                class="checkall_box" title="Check All"
+                style="display:inline-block; margin:0;" />
+            <label for="notificationsForm_checkall" style="pointer:cursor; display: inline-block;">
+                Check all
+            </label>
+
+            <span style="margin-left:2em">Action for Selected Notifications:</span>
+            <input type="submit" value="Mark Read" name="mass_action" class="btn btn-primary"/>
+            <input type="submit" value="Mark all notifications read" name="mark_all" class="btn btn-success" style="float:right" id="mark_all_btn"/>
         </div>
         <table id="notifications_table" class="hover" data-ajax-url="<?=
             Router::url(
