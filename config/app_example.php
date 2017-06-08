@@ -191,6 +191,9 @@ return [
             'client' => null,
             'tls' => null,
         ],
+        'test' => [
+            'className' => 'Test'
+        ],
     ],
 
     'Email' => [
@@ -326,5 +329,6 @@ return [
     ],
 
     'NotificationEmailTo' => 'developers@phpmyadmin.net',
-    'NotificationEmailFrom' => 'developers@phpmyadmin.net'
+    'NotificationEmailFrom' => 'developers@phpmyadmin.net',
+    'NotificationEmailsTransport' => 'default'
 ];

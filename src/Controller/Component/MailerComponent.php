@@ -38,9 +38,10 @@ class MailerComponent extends Component
      */
     public function sendReportMail($viewVars)
     {
-        $email = new Email();
+        $email = new Email('default');
         $emailTo = Configure::read('NotificationEmailsTo');
         $emailFrom = Configure::read('NotificationEmailsFrom');
+        $emailTransport = Configure::read('NotificationEmailsTransport');
 
         if (! $emailTo || $emailTo === ''
             || ! $emailFrom || $emailFrom === ''
@@ -48,7 +49,7 @@ class MailerComponent extends Component
             return false;
         }
 
-        $email->transport('default')
+        $email->transport($emailTransport)
             ->viewVars($viewVars)
             ->subject(
                 sprintf(
