@@ -2,6 +2,7 @@
 
 namespace App\Test\TestCase\Controller;
 
+use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
 
@@ -80,6 +81,21 @@ class IncidentsControllerTest extends IntegrationTestCase
         $this->configRequest(array('input' => $bugReport));
         $this->post('/incidents/create');
 
+        $report = $this->Reports->find('all',
+            array('order' => 'Reports.created desc'))->all()->first();
+        $subject = 'A new report has been submitted '
+            . 'on the Error Reporting Server: '
+            . $report['id'];
+
+        // Test notification email
+        $emailContent = Configure::read('test_transport_email');
+
+        $this->assertEquals('reports-notify@phpmyadmin.net', $emailContent['headers']['From']);
+        $this->assertEquals('reports-notify@phpmyadmin.net', $emailContent['headers']['To']);
+        $this->assertEquals($subject, $emailContent['headers']['Subject']);
+
+        Configure::write('test_transport_email', NULL);
+
         $this->post('/incidents/create');
 
         $report = $this->Reports->find('all',
@@ -99,5 +115,27 @@ class IncidentsControllerTest extends IntegrationTestCase
         $this->post('/incidents/create');
         $result = json_decode($this->_response->body(), true);
         $this->assertEquals(false, $result['success']);
+
+
+
+        // Test invalid Notification email configuration
+        Configure::write('NotificationEmailsTo', '');
+
+        $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_php.json');
+        $bugReportDecoded = json_decode($bugReport, true);
+        $this->configRequest(array('input' => $bugReport));
+        $this->post('/incidents/create');
+
+        $report = $this->Reports->find('all',
+            array('order' => 'Reports.created desc'))->all()->first();
+        $subject = 'A new report has been submitted '
+            . 'on the Error Reporting Server: '
+            . $report['id'];
+
+        $emailContent = Configure::read('test_transport_email');
+
+        // Since no email sent
+        $this->assertEquals(NULL, $emailContent);
+
     }
 }

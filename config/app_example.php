@@ -191,6 +191,9 @@ return [
             'client' => null,
             'tls' => null,
         ],
+        'test' => [
+            'className' => 'Test'
+        ],
     ],
 
     'Email' => [
@@ -324,4 +327,8 @@ return [
     'Session' => [
         'defaults' => 'php',
     ],
+
+    'NotificationEmailTo' => 'developers@phpmyadmin.net',
+    'NotificationEmailFrom' => 'developers@phpmyadmin.net',
+    'NotificationEmailsTransport' => 'default'
 ];

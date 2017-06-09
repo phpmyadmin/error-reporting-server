@@ -152,8 +152,11 @@ class IncidentsTable extends Table
      *
      * @param array $bugReport the bug report being submitted
      *
-     * @return array of inserted incident ids. If the report/incident was not
+     * @return array of:
+     *          1. array of inserted incident ids. If the report/incident was not
      *               correctly saved, false is put in it place.
+     *          2. array of newly created report ids. If no new report was created,
+     *               an empty array is returned
      */
     public function createIncidentFromBugReport($bugReport)
     {
@@ -161,6 +164,7 @@ class IncidentsTable extends Table
             return array(false);
         }
         $incident_ids = array();    // array to hold ids of all the inserted incidents
+        $new_report_ids = array(); // array to hold ids of all newly created reports
 
         // Also sanitizes the bug report
         $schematizedIncidents = $this->_getSchematizedIncidents($bugReport);
@@ -193,7 +197,9 @@ class IncidentsTable extends Table
                 $report->created = date('Y-m-d H:i:s', time());
                 $report->modified = date('Y-m-d H:i:s', time());
                 $reportsTable->save($report);
+
                 $si['report_id'] = $report->id;
+                $new_report_ids[] = $report->id;
                 $si = $incidentsTable->newEntity($si);
                 $si->created = date('Y-m-d H:i:s', time());
                 $si->modified = date('Y-m-d H:i:s', time());
@@ -219,7 +225,10 @@ class IncidentsTable extends Table
             }
         }
 
-        return $incident_ids;
+        return array(
+            'incidents' => $incident_ids,
+            'reports' => $new_report_ids
+        );
     }
 
     /**
