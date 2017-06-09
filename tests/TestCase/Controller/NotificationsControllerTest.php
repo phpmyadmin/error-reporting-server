@@ -30,6 +30,7 @@ class NotificationsControllerTest extends IntegrationTestCase
 
     public function testMassAction()
     {
+        /* Test case 1 */
         $this->post('/notifications/mass_action',
             array('notifs' => array('1', '3'))
         );
@@ -42,6 +43,18 @@ class NotificationsControllerTest extends IntegrationTestCase
                 'id' => '2',
             ),
         );
+        $this->assertEquals($actual, $expected);
+
+
+        /* Test case 2 */
+        $this->post('/notifications/mass_action',
+            array('mark_all' => 1)
+        );
+
+        $notifications = $this->Notifications->find('all', array('fields' => array('Notifications.id')));
+        $this->assertInstanceOf('Cake\ORM\Query', $notifications);
+        $actual = $notifications->hydrate(false)->toArray();
+        $expected = array();
         $this->assertEquals($actual, $expected);
     }
 }

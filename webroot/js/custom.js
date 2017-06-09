@@ -72,7 +72,7 @@ $(document).ready(function () {
 		"bServerSide": true,
 		"sAjaxSource": $('#notifications_table').data('ajax-url'),
 		"aoColumnDefs": [
-			{ "bSearchable": false, "aTargets": [ 1 ] },
+			{ "bSearchable": false, "aTargets": [ 1, 6 ] },
 			{ "sClass": "center", "aTargets": [ 0, 1, 2, 3, 4, 5 ] }
 		],
 		"aoColumns": [
@@ -137,13 +137,33 @@ $(document).ready(function () {
 		return false;
 	});
 
-		$('#resultsForm_checkall').click(function () {
-			if($(this).attr('checked') == 'checked') {
-				$('#reports_table td input').attr('checked', 'checked');
-			} else {
-				$('#reports_table td input').removeAttr('checked');
-			}
-		});
+	$('#resultsForm_checkall').click(function () {
+		if($(this).attr('checked') == 'checked') {
+			$('#reports_table td input').attr('checked', 'checked');
+		} else {
+			$('#reports_table td input').removeAttr('checked');
+		}
+	});
+
+	$('#notificationsForm_checkall').click(function () {
+		if($(this).attr('checked') == 'checked') {
+			$('#notifications_table td input').attr('checked', 'checked');
+		} else {
+			$('#notifications_table td input').removeAttr('checked');
+		}
+	});
+
+	$('#mark_all_btn').click(function (e) {
+        if (
+            !confirm(
+				'This would mark all your notifications as '
+				+ '\'read\'. These notifications would NOT be recoverable. '
+				+ 'Are you sure to continue?'
+            )
+        ) {
+            e.preventDefault();
+        }
+    });
 
 	// display notifications count
 	if (notifications_count > 0)

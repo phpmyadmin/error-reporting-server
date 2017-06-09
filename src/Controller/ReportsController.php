@@ -187,7 +187,7 @@ class ReportsController extends AppController
             'iTotalRecords' => $this->Reports->find('all')->count(),
             'iTotalDisplayRecords' => $totalFiltered,
             'sEcho' => intval($this->request->query('sEcho')),
-            'aaData' => $dispRows,
+            'aaData' => $dispRows
         );
         $this->autoRender = false;
         $this->response->body(json_encode($response));
