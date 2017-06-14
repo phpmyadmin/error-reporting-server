@@ -329,5 +329,6 @@ return [
 
     'NotificationEmailsTo' => 'reports-notify@phpmyadmin.net',
     'NotificationEmailsFrom' => 'reports-notify@phpmyadmin.net',
-    'NotificationEmailsTransport' => 'test'
+    'NotificationEmailsTransport' => 'test',
+    'GithubWebhookSecret' => 'test-pma-ers-1'
 ];

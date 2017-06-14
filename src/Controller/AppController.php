@@ -45,6 +45,7 @@ class AppController extends Controller
         'Incidents' => array(
             'create',
         ),
+        'Events'
     );
 
     public $css_files = array(

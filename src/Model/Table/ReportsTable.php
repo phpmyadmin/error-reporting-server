@@ -290,6 +290,26 @@ class ReportsTable extends Table
     }
 
     /**
+     * Updates the linked reports to a Github issue to newly recieved status
+     *
+     * @param string $issueNumber Github Issue number
+     * @param string $status      New status to be set
+     *
+     * @return int Number of Linked reports updated
+     */
+    public function setLinkedReportStatus($issueNumber, $status)
+    {
+        $conditions = array(
+            'sourceforge_bug_id' =>  $issueNumber
+        );
+        $fields = array(
+            'status' => $status
+        );
+
+        return $this->updateAll($fields, $conditions);
+    }
+
+    /**
      * returns an array of conditions that would return all related incidents to the
      * current report.
      *
