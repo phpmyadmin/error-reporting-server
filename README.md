@@ -120,6 +120,15 @@ The obtained cliend ID and secret should be stored in the ``config/oauth.php``.
 
 [gh-oauth]: https://github.com/settings/applications
 
+
+## Github Events ##
+- Add a [webhook](https://developer.github.com/webhooks/creating/) at your [target repository](https://github.com/phpmyadmin/phpmyadmin) with payload URL as `https://<host>:<port>/events`
+  - Select content-type as `application/json`
+  - Select `Issues` events from available events
+  - Set the secret token value
+
+- Set the appropriate value of secret token in app.php (same as what you set while setting up the webhook)
+
 # How to run the test suite #
 
 If you are on a development machine you can use the webrunner at `/test.php`
