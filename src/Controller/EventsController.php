@@ -84,7 +84,6 @@ class EventsController extends AppController
                     . '\'. Ignoring the event.'
                 );
                 $statusCode = 204;
-                print_r('asd ' . $issueNumber . ' ' . $eventAction);
             }
         } else {
             Log::info(
