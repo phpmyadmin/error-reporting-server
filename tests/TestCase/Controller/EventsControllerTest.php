@@ -184,5 +184,17 @@ class EventsControllerTest extends IntegrationTestCase
         $this->assertResponseCode(201);
         $report = $this->Reports->get(4);
         $this->assertEquals($report->status, 'forwarded');
+
+        /* Test case 9 */
+        // Event 'ping'
+        $this->configRequest([
+            'headers' => [
+                'User-Agent' => 'GitHub-Hookshot-abcdef',
+                'X-GitHub-Event' => 'ping',
+                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03'
+            ]
+        ]);
+        $this->post('/events');
+        $this->assertResponseCode(200);
     }
 }

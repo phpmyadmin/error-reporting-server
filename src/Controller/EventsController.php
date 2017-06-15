@@ -60,6 +60,12 @@ class EventsController extends AppController
             $this->response->statusCode($statusCode);
 
             return $this->response;
+        } elseif ($statusCode === 200) {
+           // Send a success response to ping event
+            $this->auto_render = false;
+            $this->response->statusCode($statusCode);
+
+            return $this->response;
         }
 
         $issuesData = $this->request->input('json_decode', true);
@@ -138,6 +144,16 @@ class EventsController extends AppController
                 . '. Ignoring the event.'
             );
             $statusCode = 403;
+
+            return $statusCode;
+        } elseif ($eventType !== NULL && $eventType === 'ping') {
+            // Check if the request is based on 'issues' event
+            // Otherwise, Send a '400: Bad Request'
+
+            Log::info(
+                'Ping event type recieved.'
+            );
+            $statusCode = 200;
 
             return $statusCode;
         } elseif ($eventType !== NULL && $eventType !== 'issues') {
