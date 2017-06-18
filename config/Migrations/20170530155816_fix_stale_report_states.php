@@ -19,13 +19,13 @@ class FixStaleReportStates extends AbstractMigration
 
     private function _migrateBasedOnGithubLinked()
     {
-        $sql = 'UPDATE `reports` SET `status` = \'resolved\''
+        $sql = 'UPDATE `reports` SET `status` = \'forwarded\''
             . ' WHERE `sourceforge_bug_id` IS NOT NULL AND `status` <> \'fixed\'';
         $rowsAffected = $this->execute($sql);
 
         Log::debug(
-            $rowsAffected . ' reports are linked to an'
-                . ' open Github issue.'
+            $rowsAffected . ' reports are linked to a'
+                . ' Github issue.'
                 . ' These have been marked to have a \'forwarded\' status.'
         );
     }
