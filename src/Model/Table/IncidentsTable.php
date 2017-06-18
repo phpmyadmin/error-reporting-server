@@ -528,15 +528,20 @@ class IncidentsTable extends Table
 
         $stacktraceLength = mb_strlen($si['stacktrace']);
         $fullReportLength = mb_strlen($si['full_report']);
+        $errorMessageLength = mb_strlen($si['error_message']);
 
-        if ($stacktraceLength > 65535 || $fullReportLength > 65535) {
+        if ($stacktraceLength > 65535
+            || $fullReportLength > 65535
+            || $errorMessageLength > 100 // length of field in 'incidents' table
+        ) {
             // If length of report is longer than
             // what can fit in the table field,
             // we log it and don't save it in the database
             Log::error(
                 'Too long data submitted in the incident. The length of stacktrace: '
-                . $stacktraceLength . ', while length of bug report: '
-                . $fullReportLength . '. The full incident reported was as follows: '
+                . $stacktraceLength . ', the length of bug report: '
+                . $fullReportLength . ', the length of error message: '
+                . $errorMessageLength . '. The full incident reported was as follows: '
                 . json_encode($si)
             );
 
