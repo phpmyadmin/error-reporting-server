@@ -75,7 +75,8 @@ class ReportsTable extends Table
     public $status = array(
         'new' => 'New',
         'invalid' => 'Invalid',
-        'resolved' => 'Resolved'
+        'resolved' => 'Resolved',
+        'forwarded' => 'Forwarded'
     );
 
     public function initialize(array $config)
