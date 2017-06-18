@@ -398,6 +398,35 @@ class IncidentsTableTest extends TestCase
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
 
         $this->assertEquals(true, in_array(false, $result['incidents']));
+
+
+        // Case 3.3: Long error_message in PHP report submission
+        $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_php.json');
+        $bugReport = json_decode($bugReport, true);
+
+        // Forcefully inflate error message
+        for ($i = 0; $i < 6; $i++) {
+            $bugReport['errors'][0]['msg'] .= $bugReport['errors'][0]['msg'];
+        }
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertEquals(true, in_array(false, $result['incidents']));
+
+
+        // Case 3.4: Long error_message in JS report submission
+        $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
+        $bugReport = json_decode($bugReport, true);
+
+        // Forcefully inflate error message
+        for ($i = 0; $i < 8; $i++) {
+            $bugReport['exception']['message'] .= $bugReport['exception']['message'];
+        }
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertEquals(true, in_array(false, $result['incidents']));
+
     }
 
     /**
