@@ -108,7 +108,9 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid reportId'));
         }
 
-        $report = TableRegistry::get('Reports')->findById($reportId)->all()->first()->toArray();
+        $reportsTable = TableRegistry::get('Reports');
+        $report = $reportsTable->findById($reportId)->all()->first();
+        $reportArray = $report->toArray();
         if (!$report) {
             throw new NotFoundException(__('Invalid Report'));
         }
@@ -120,10 +122,10 @@ class GithubController extends AppController
 
         $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
         $incident = $incidents_query->first();
-        $report['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
+        $reportArray['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
 
         $commentText = $this->_getReportDescriptionText(
-            $reportId, $report
+            $reportId, $reportArray
         );
         list($commentDetails, $status) = $this->GithubApi->createComment(
             Configure::read('GithubRepoPath'),
@@ -136,6 +138,10 @@ class GithubController extends AppController
             $this->Flash->default(_getErrors($commentDetails, $status),
                     array('params' => array('class' => $flash_class)));
         }
+
+        // Update report status
+        $report->status = 'forwarded';
+        $reportsTable->save($report);
 
         $this->redirect(array('controller' => 'reports', 'action' => 'view',
                         $reportId, ));
@@ -152,12 +158,15 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid reportId'));
         }
 
-        $report = TableRegistry::get('Reports')->findById($reportId)->all()->first()->toArray();
+        $reportsTable = TableRegistry::get('Reports');
+        $report = $reportsTable->findById($reportId)->all()->first();
+        $reportArray = $report->toArray();
+
         if (!$report) {
             throw new NotFoundException(__('Invalid Report'));
         }
 
-        $ticket_id = $report['sourceforge_bug_id'];
+        $ticket_id = $reportArray['sourceforge_bug_id'];
         if (!$ticket_id) {
             throw new NotFoundException(__('Invalid Ticket ID!!'));
         }
@@ -183,6 +192,10 @@ class GithubController extends AppController
             $this->Flash->default(_getErrors($commentDetails, $status),
                     array('params' => array('class' => $flash_class)));
         }
+
+        // Update report status
+        $report->status = 'new';
+        $reportsTable->save($report);
 
         $this->redirect(array('controller' => 'reports', 'action' => 'view',
                         $reportId, ));
