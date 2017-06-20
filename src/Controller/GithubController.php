@@ -56,15 +56,18 @@ class GithubController extends AppController
             throw new \NotFoundException(__('Invalid report'));
         }
 
-        $report = TableRegistry::get('Reports')->findById($reportId)->first()->toArray();
+        $reportsTable = TableRegistry::get('Reports');
+        $report = $reportsTable->findById($reportId)->all()->first();
+        $reportArray = $report->toArray();
+
         if (!$report) {
             throw new NotFoundException(__('Invalid report'));
         }
 
         if (empty($this->request->data)) {
-            $this->set('pma_version', $report['pma_version']);
-            $this->set('error_name', $report['error_name']);
-            $this->set('error_message', $report['error_message']);
+            $this->set('pma_version', $reportArray['pma_version']);
+            $this->set('error_name', $reportArray['error_name']);
+            $this->set('error_message', $reportArray['error_message']);
 
             return;
         }
@@ -74,11 +77,11 @@ class GithubController extends AppController
         );
         $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
         $incident = $incidents_query->first();
-        $report['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
-        $report['description'] = $this->request->data['description'];
+        $reportArray['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
+        $reportArray['description'] = $this->request->data['description'];
 
         $data['body']
-            = $this->_getReportDescriptionText($reportId, $report);
+            = $this->_getReportDescriptionText($reportId, $reportArray);
         $data['labels'][] = 'automated-error-report';
 
         list($issueDetails, $status) = $this->GithubApi->createIssue(
@@ -88,6 +91,10 @@ class GithubController extends AppController
         );
 
         if ($this->_handleGithubResponse($status, 1, $reportId, $issueDetails['number'])) {
+            // Update report status
+            $report->status = $this->_getReportStatusFromIssueState($issueDetails['state']);
+            $reportsTable->save($report);
+
             $this->redirect(array('controller' => 'reports', 'action' => 'view',
                 $reportId, ));
         } else {
@@ -133,15 +140,29 @@ class GithubController extends AppController
             $ticket_id,
             $this->request->session()->read('access_token')
         );
-        if (!$this->_handleGithubResponse($status, 2, $reportId, $ticket_id)) {
+        if ($this->_handleGithubResponse($status, 2, $reportId, $ticket_id)) {
+            // Update report status
+            $report->status = 'forwarded';
+
+            list($issueDetails, $status) = $this->GithubApi->getIssue(
+                Configure::read('GithubRepoPath'),
+                array(),
+                $ticket_id,
+                $this->request->session()->read('access_token')
+            );
+            if ($this->_handleGithubResponse($status, 4, $reportId, $ticket_id)) {
+                // If linked Github issue state is available, use it to update Report's status
+                $report->status = $this->_getReportStatusFromIssueState(
+                    $issueDetails['state']
+                );
+            }
+
+            $reportsTable->save($report);
+        } else {
             $flash_class = 'alert alert-error';
             $this->Flash->default(_getErrors($commentDetails, $status),
                     array('params' => array('class' => $flash_class)));
         }
-
-        // Update report status
-        $report->status = 'forwarded';
-        $reportsTable->save($report);
 
         $this->redirect(array('controller' => 'reports', 'action' => 'view',
                         $reportId, ));
@@ -187,15 +208,15 @@ class GithubController extends AppController
             $this->request->session()->read('access_token')
         );
 
-        if (!$this->_handleGithubResponse($status, 3, $reportId)) {
+        if ($this->_handleGithubResponse($status, 3, $reportId)) {
+            // Update report status
+            $report->status = 'new';
+            $reportsTable->save($report);
+        } else {
             $flash_class = 'alert alert-error';
             $this->Flash->default(_getErrors($commentDetails, $status),
                     array('params' => array('class' => $flash_class)));
         }
-
-        // Update report status
-        $report->status = 'new';
-        $reportsTable->save($report);
 
         $this->redirect(array('controller' => 'reports', 'action' => 'view',
                         $reportId, ));
@@ -264,19 +285,24 @@ class GithubController extends AppController
      *                       1 for create_issue,
      *                       2 for link_issue,
      *                       3 for unlink_issue,
+     *                       4 for get_issue
      * @param int $report_id report id
-     * @param int $ticket_id ticket id, required for link tivket only
+     * @param int $ticket_id ticket id, required for link ticket only
      *
      * @return bool value. True on success. False on any type of failure.
      */
     protected function _handleGithubResponse($response, $type, $report_id, $ticket_id = 1)
     {
-        if (!in_array($type, array(1, 2, 3))) {
+        if (!in_array($type, array(1, 2, 3, 4))) {
             throw new InvalidArgumentException('Invalid Argument "$type".');
         }
 
-        if ($response == 201) {
-            echo $response;
+        $updateReport = true;
+
+        if ($type == 4 && $response == 200) {
+            // issue details fetched successfully
+            return true;
+        } elseif ($response == 201) {
             // success
             switch ($type) {
                 case 1:
@@ -288,18 +314,24 @@ class GithubController extends AppController
                 case 3:
                     $msg = 'Github issue has been unlinked with this report.';
                     $ticket_id = null;
-
                     break;
+
                 default:
-                    $msg = 'Something went wrong!!';
+                    $msg = 'Something went wrong!';
                     break;
             }
-            $report = TableRegistry::get('Reports')->get($report_id);
-            $report->sourceforge_bug_id = $ticket_id;
-            TableRegistry::get('Reports')->save($report);
-            $flash_class = 'alert alert-success';
-            $this->Flash->default($msg,
-                array('params' => array('class' => $flash_class)));
+
+            if ($updateReport) {
+                $report = TableRegistry::get('Reports')->get($report_id);
+                $report->sourceforge_bug_id = $ticket_id;
+                TableRegistry::get('Reports')->save($report);
+            }
+
+            if ($msg !== '') {
+                $flash_class = 'alert alert-success';
+                $this->Flash->default($msg,
+                    array('params' => array('class' => $flash_class)));
+            }
 
             return true;
         } elseif ($response === 403) {
@@ -322,9 +354,10 @@ class GithubController extends AppController
 
             return false;
         }
-            //fail
-            $flash_class = 'alert alert-error';
-        $this->Flash->default(json_encode($response),
+
+        // unknown response code
+        $flash_class = 'alert alert-error';
+        $this->Flash->default('Unhandled response code recieved: ' . $response,
                     array('params' => array('class' => $flash_class)));
 
         return false;
@@ -363,6 +396,30 @@ class GithubController extends AppController
             )->count();
 
         return $incident_count + $inci_count_related;
+    }
+
+    /**
+     * Get corresponding report status from Github issue state
+     *
+     * @param $issueState Linked Github issue's state
+     *
+     * @return Corresponding status to which the linked report should be updated to
+     */
+    protected function _getReportStatusFromIssueState($issueState)
+    {
+        // default
+        $reportStatus = '';
+        switch ($issueState) {
+            case 'closed':
+                $reportStatus = 'resolved';
+                break;
+
+            default:
+                $reportStatus = 'forwarded';
+                break;
+        }
+
+        return $reportStatus;
     }
 
     /*
