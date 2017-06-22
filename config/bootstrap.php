@@ -174,13 +174,6 @@ Request::addDetector('tablet', function ($request) {
  * Configures default file logging options
  */
 
-Log::config('sourceforge', array(
-	'engine' => 'File',
-	'types' => array('sourceforge'),
-	'scopes' => array('sourceforge'),
-	'file' => 'sourceforge',
-));
-
 Log::config('cron_jobs', array(
 	'engine' => 'File',
 	'types' => array('cron_jobs'),

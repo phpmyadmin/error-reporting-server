@@ -422,60 +422,77 @@ class GithubController extends AppController
         return $reportStatus;
     }
 
-    /*
-     * Synchronize Report Statuses from Github issue
-     * To be used as a cron job.
-     * Can not (& should not) be directly accessed via Web.
-     * TODO
+    /**
+     * Synchronize Report Statuses from Github issues
+     *
+     * To be used as a cron job (using webroot/cron_dispatcher.php).
+     *
+     * Can not (& should not) be directly accessed via web.
      */
-    /* public function sync_issue_statuses(){
+    public function sync_issue_status()
+    {
+
         if (!defined('CRON_DISPATCHER')) {
+            $flash_class = 'alert alert-error';
+            $this->Flash->default(
+                'Unauthorised action! This action is not available on Web interface',
+                array('params' => array('class' => $flash_class))
+            );
+
             $this->redirect('/');
-            exit();
         }
 
-        $reports = TableRegistry::get('Reports')->find(
+        $this->autoRender = false;
+        $reportsTable = TableRegistry::get('Reports');
+
+        // Fetch all linked reports
+        $reports = $reportsTable->find(
             'all',
             array(
                 'conditions' => array(
-                    'NOT' => array(
-                        'Report.sourceforge_bug_id' => null
-                    )
+                    'sourceforge_bug_id IS NOT NULL'
                 )
             )
         );
 
-        foreach ($reports as $key => $report) {
-            $i=0;
-            // fetch the new ticket status
-            do {
-                $new_status = $this->SourceForgeApi->getBugTicketStatus(
-                    Configure::read('SourceForgeProjectName'),
-                    $report['sourceforge_bug_id']
-                );
-                $i++;
-            } while($new_status == false && $i <= 3);
+        foreach ($reports as $report) {
+            $report = $report->toArray();
 
-            // if fails all three times, then simply write failure
-            // into cron_jobs log and move on.
-            if (!$new_status) {
-                Log::write(
-                    'cron_jobs',
-                    'FAILED: Fetching status of BugTicket#'
+            // fetch the new issue status
+            list($issueDetails, $status) = $this->GithubApi->getIssue(
+                Configure::read('GithubRepoPath'),
+                array(),
+                $report['sourceforge_bug_id'],
+                Configure::read('GithubAccessToken')
+            );
+
+            if (!$this->_handleGithubResponse($status, 4, $report['id'], $report['sourceforge_bug_id'])) {
+                Log::error(
+                    'FAILED: Fetching status of Issue #'
                         . ($report['sourceforge_bug_id'])
                         . ' associated with Report#'
-                        . ($report['id']),
-                    'cron_jobs'
+                        . ($report['id'])
+                        . '. Status returned: ' . $status,
+                    ['scope' => 'cron_jobs']
                 );
                 continue;
             }
 
-            if ($report['status'] != $new_status) {
-                $rep = TableRegistry::get('Reports')->get($report['id']);
-                $rep->status = $new_status;
-                TableRegistry::get('Reports')->save($rep);
+            // if Github issue state has changed, update the status of report
+            if ($report['status'] !== $issueDetails['state']) {
+                $rep = $reportsTable->get($report['id']);
+                $rep->status = $this->_getReportStatusFromIssueState($issueDetails['state']);
+
+                // Save the report
+                $reportsTable->save($rep);
+
+                Log::debug(
+                    'SUCCESS: Updated status of Report #'
+                    . $report['id'] . ' from state of its linked Github issue #'
+                    . $report['sourceforge_bug_id'] . ' to ' . $rep->status,
+                    ['scope' => 'cron_jobs']
+                );
             }
         }
-        $this->autoRender = false;
-    } */
+    }
 }
