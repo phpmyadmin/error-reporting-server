@@ -1,6 +1,6 @@
 <?php
-
 /* vim: set expandtab sw=4 ts=4 sts=4: */
+
 /**
  * Github api component handling comunication with github.
  *
@@ -53,7 +53,7 @@ class GithubApiComponent extends Component
     ) {
         $path = 'https://api.github.com/' . $path;
         if (strtoupper($method) === 'GET') {
-            $path .= '?' . $data;
+            $path .= '?' . http_build_query($data);
             $data = array();
         }
 
@@ -95,7 +95,7 @@ class GithubApiComponent extends Component
             'access_token' => $accessToken,
         );
 
-        return $this->apiRequest('user', http_build_query($data), 'GET', true);
+        return $this->apiRequest('user', $data, 'GET', true);
     }
 
     /**
@@ -222,4 +222,24 @@ class GithubApiComponent extends Component
             $access_token
         );
     }
+
+    /**
+     * Make API request for getting Github issue's status
+     *
+     * @param string $repoPath
+     * @param array  $data
+     * @param int    $issueNumber
+     * @param string $access_token
+     */
+    public function getIssue($repoPath, $data, $issueNumber, $access_token)
+    {
+        return $this->apiRequest(
+            "repos/$repoPath/issues/$issueNumber",
+            $data,
+            'GET',
+            true,
+            $access_token
+        );
+    }
+
 }
