@@ -129,6 +129,16 @@ The obtained cliend ID and secret should be stored in the ``config/oauth.php``.
 
 - Set the appropriate value of secret token in app.php (same as what you set while setting up the webhook)
 
+
+## Sync Github Issue state ##
+- Get a Github Personal Access token as explained [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
+- Set value of obtained `GithubAccessToken` in config/oauth.php
+- After setting value of GithubAccessToken in config/oauth.php as explained above, you can run the synchronization action as
+```Shell
+cd /to/app/dir && php webroot/cron_dispatcher.php github/sync_issue_status
+```
+- This can be scheduled as a cron job too.
+
 # How to run the test suite #
 
 If you are on a development machine you can use the webrunner at `/test.php`

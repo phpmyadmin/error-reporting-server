@@ -16,3 +16,8 @@ Configure::write('GithubConfig', array(
  * Configures the github repo to check commit access for
  */
 Configure::write('GithubRepoPath', 'phpmyadmin/phpmyadmin');
+
+/**
+ * Access token for syncing Github issue states
+ */
+Configure::write('GithubAccessToken', '<access-token>');
