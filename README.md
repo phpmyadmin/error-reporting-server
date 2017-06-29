@@ -135,7 +135,7 @@ The obtained cliend ID and secret should be stored in the ``config/oauth.php``.
 - Set value of obtained `GithubAccessToken` in config/oauth.php
 - After setting value of GithubAccessToken in config/oauth.php as explained above, you can run the synchronization action as
 ```Shell
-cd /to/app/dir && php webroot/cron_dispatcher.php github/sync_issue_status
+./bin/cake sync_github_issue_states
 ```
 - This can be scheduled as a cron job too.
 
