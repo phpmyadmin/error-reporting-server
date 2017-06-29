@@ -450,7 +450,10 @@ class GithubController extends AppController
             'all',
             array(
                 'conditions' => array(
-                    'sourceforge_bug_id IS NOT NULL'
+                    'sourceforge_bug_id IS NOT NULL',
+                    'NOT' => array(
+                        'status' => 'resolved'
+                    )
                 )
             )
         );
