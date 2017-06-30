@@ -59,7 +59,10 @@ class DevelopersController extends AppController
                         array('class' => 'alert alert-error'));
             } else {
                 $userInfo['has_commit_access'] = $this->GithubApi->canCommitTo(
-                        $userInfo['login'], $this->GithubApi->githubRepo);
+                    $userInfo['login'],
+                    $this->GithubApi->githubRepo,
+                    Configure::read('GithubAccessToken')
+                );
 
                 $this->_authenticateDeveloper($userInfo, $accessToken);
 
@@ -90,49 +93,6 @@ class DevelopersController extends AppController
         $this->redirect('/');
     }
 
-    public function currentDeveloper()
-    {
-        $this->autoRender = false;
-
-        return json_encode($this->GithubApi->canCommitTo('smita786',
-                'smita786/phpmyadmin'));
-    }
-
-    public function create_issue($reportId)
-    {
-        if (!$reportId) {
-            throw new \NotFoundException(__('Invalid report'));
-        }
-
-        $report = TableRegistry::get('Reports')->findById($reportId)->toArray();
-        if (!$report) {
-            throw new NotFoundException(__('Invalid report'));
-        }
-
-        if (empty($this->request->data)) {
-            $this->set('pma_version', $report[0]['pma_version']);
-            $this->set('error_name', $report[0]['error_name']);
-            $this->set('error_message', $report[0]['error_message']);
-
-            return;
-        }
-        $data = array(
-            'title' => $this->request->data['summary'],
-            'body' => $this->_augmentDescription(
-                    $this->request->data['description'], $reportId),
-            'labels' => $this->request->data['labels'] ? explode(',', $this->request->data['labels']) : array(),
-        );
-        $data['labels'][] = 'automated-error-report';
-        list($issueDetails, $status) = $this->GithubApi->create_issue(
-            'smita786/tic-tac-toe-php',
-            $data,
-            $this->request->session()->read('access_token')
-        );
-
-        $this->redirect(array('controller' => 'reports', 'action' => 'view',
-                    $reportId, ));
-    }
-
     protected function _authenticateDeveloper($userInfo, $accessToken)
     {
         $developers = $this->Developers->findByGithubId($userInfo['id']);
@@ -145,23 +105,6 @@ class DevelopersController extends AppController
         $this->Developers->id = $this->Developers->saveFromGithub($userInfo, $accessToken, $developer);
         $this->request->session()->write('Developer.id', $this->Developers->id);
         $this->request->session()->write('access_token', $accessToken);
-    }
-
-    /**
-     * Returns the description with the added string to link to the report.
-     *
-     * @param string $description the original description submitted by the dev
-     * @param string $reportId    the report id relating to the ticket
-     *
-     * @return string augmented description
-     */
-    protected function _augmentDescription($description, $reportId)
-    {
-        $report = TableRegistry::get('Reports');
-        $report->id = $reportId;
-
-        return '$description\n\n\nThis report is related to user submitted report '
-                . '[#' . $report->id . '](' . $report->getUrl()
-                . ') on the phpmyadmin error reporting server.';
+        $this->request->session()->write('read_only', !($userInfo['has_commit_access']));
     }
 }

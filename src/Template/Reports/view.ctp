@@ -3,34 +3,39 @@
     <h1 style="display: inline">Error Report #<?= $report[0]['id'] ?>
             <small>[<?= $status[$report[0]['status']]; ?>]</small>
     </h1>
-    <a href="#" onclick="showStateForm(); return false">Change state</a>
+    <?php if (! $read_only) : ?>
+        <a href="#" onclick="showStateForm(); return false">Change state</a>
+    <?php endif; ?>
 </div>
 <br />
-<form class="form-inline" id="state-form" style="display: none"
-        action="/<?= BASE_DIR ?>reports/change_state/<?= $report[0]['id']; ?>"
-        method="post">
-    <span>Change state to:</span>
-    <?=
-        $this->Form->select(
-                'state',
-                $status,
-                array(
-                    'value' => $report[0]['status'],
-                    'empty' => false
-                )
-        );
-    ?>
-    <input type="submit" value="Change" class="btn btn-primary" />
-</form>
 
-<?php if ($related_reports->isEmpty()): ?>
+<?php if (! $read_only) : ?>
+    <form class="form-inline" id="state-form" style="display: none"
+            action="/<?= BASE_DIR ?>reports/change_state/<?= $report[0]['id']; ?>"
+            method="post">
+        <span>Change state to:</span>
+        <?=
+            $this->Form->select(
+                    'state',
+                    $status,
+                    array(
+                        'value' => $report[0]['status'],
+                        'empty' => false
+                    )
+            );
+        ?>
+        <input type="submit" value="Change" class="btn btn-primary" />
+    </form>
+<?php endif; ?>
+
+<?php if ($related_reports->isEmpty() && !$read_only): ?>
     <form class="form-inline" action="/<?= BASE_DIR ?>reports/mark_related_to/<?=
         $report[0]['id']; ?>" method="post">
         <span>Mark the same as:</span>
         <input type="number" min="1" name="related_to" />
         <input type="submit" value="Submit" class="btn btn-primary" />
     </form>
-<?php else: ?>
+<?php elseif (! $related_reports->isEmpty()): ?>
     <p>
         This report has been marked the same as the following reports:
         (<?= $this->Reports->createReportsLinks($related_reports); ?>).
@@ -56,7 +61,7 @@
     <tr>
         <td>GitHub Issue</td>
         <td>
-            <?php if($report[0]['sourceforge_bug_id']) : ?>
+            <?php if ($report[0]['sourceforge_bug_id']) : ?>
                 <?=
                     $this->Html->link(
                         '#' . $report[0]['sourceforge_bug_id'],
@@ -82,7 +87,7 @@
                     )
                     . '</form>';
                 ?>
-            <?php else: ?>
+            <?php elseif (! $read_only): ?>
                 <table cellspacing="0" class="table table-bordered error-report"
                     style="width:300px; margin-bottom:5px;">
                     <tr>
@@ -135,6 +140,8 @@
                         </td>
                     </tr>
                 </table>
+            <?php else: ?>
+                This report is not linked to any Github issue.
             <?php endif; ?>
         </td>
     </tr>

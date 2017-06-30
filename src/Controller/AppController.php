@@ -1,6 +1,6 @@
 <?php
-
 /* vim: set expandtab sw=4 ts=4 sts=4: */
+
 /**
  * Application level Controller.
  *
@@ -46,6 +46,19 @@ class AppController extends Controller
             'create',
         ),
         'Events'
+    );
+
+    public $readonly_whitelist = array(
+        'Developers',
+        'Pages',
+        'Reports' => array(
+            'index',
+            'view',
+            'data_tables'
+        ),
+        'Incidents' => array(
+            'view'
+        )
     );
 
     public $css_files = array(
@@ -118,6 +131,8 @@ class AppController extends Controller
         $notif_count = 0;
 
         if ($this->request->session()->read('Developer.id')) {
+            $this->_checkReadonlyAccess();
+
             $current_developer = TableRegistry::get('Developers')->
                     findById($this->request->session()->read('Developer.id'))->all()->first();
 
@@ -129,8 +144,15 @@ class AppController extends Controller
             )->count();
             $this->set('current_developer', $current_developer);
             $this->set('developer_signed_in', true);
+
+            $read_only = false;
+            if ($this->request->session()->read('read_only')) {
+                $read_only = true;
+            }
+            $this->set('read_only', $read_only);
         } else {
             $this->set('developer_signed_in', false);
+            $this->set('read_only', true);
             $this->_checkAccess();
         }
         $this->set('notif_count', $notif_count);
@@ -147,8 +169,9 @@ class AppController extends Controller
         if (in_array($controller, $this->whitelist)) {
             return;
         }
-        if (isset($this->whitelist[$controller]) &&
-                in_array($action, $this->whitelist[$controller])) {
+        if (isset($this->whitelist[$controller])
+            && in_array($action, $this->whitelist[$controller])
+        ) {
             return;
         }
         $flash_class = 'alert';
@@ -160,5 +183,42 @@ class AppController extends Controller
         $this->request->session()->write('last_page', $ret_url);
 
         return $this->redirect('/');
+    }
+
+    protected function _checkReadonlyAccess()
+    {
+        $controller = $this->request->controller;
+        $action = $this->request->action;
+        $read_only = $this->request->session()->read('read_only');
+
+        // If developer has commit access on phpmyadmin/phpmyadmin
+        if (!$read_only) {
+            return;
+        }
+
+        if (in_array($controller, $this->readonly_whitelist)) {
+            return;
+        }
+        if (isset($this->readonly_whitelist[$controller])
+            && in_array($action, $this->readonly_whitelist[$controller])
+        ) {
+            return;
+        }
+
+        $this->request->session()->destroy();
+        $this->request->session()->write('last_page', '');
+
+        $flash_class = 'alert';
+        $this->Flash->default(
+            'You need to have commit access on phpmyadmin/phpmyadmin '
+            . 'repository on Github.com to do this',
+            array(
+                'params' => array(
+                    'class' => $flash_class
+                )
+            )
+        );
+
+        $this->redirect('/');
     }
 }
