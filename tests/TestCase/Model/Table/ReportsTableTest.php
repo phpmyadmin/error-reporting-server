@@ -140,7 +140,7 @@ class ReportsTableTest extends TestCase
             ),
             array(
             'php_version' => '5.3',
-            'count' => '3',
+            'count' => '4',
             ),
         );
         $this->assertEquals($expected, $result);

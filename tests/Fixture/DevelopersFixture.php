@@ -30,7 +30,7 @@ class DevelopersFixture extends TestFixture
         ),
         'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_general_ci', 'engine' => 'InnoDB')
     );*/
-    public $import = array('table' => 'developers', 'connection' => 'test');
+    public $import = array('table' => 'developers');
     /**
      * Records.
      *

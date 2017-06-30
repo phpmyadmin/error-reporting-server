@@ -65,7 +65,7 @@ class ReportsController extends AppController
 
     public function view($reportId)
     {
-        if (!$reportId) {
+        if (!isset($reportId) || !$reportId) {
             throw new NotFoundException(__('Invalid Report'));
         }
         $report = $this->Reports->findById($reportId)->toArray();
@@ -88,7 +88,7 @@ class ReportsController extends AppController
         // if there is an unread notification for this report, then mark it as read
         $current_developer = TableRegistry::get('Developers')->
                     findById($this->request->session()->read('Developer.id'))->all()->first();
-        //$current_developer = Sanitize::clean($current_developer);
+
         if ($current_developer) {
             TableRegistry::get('Notifications')->deleteAll(
                 array('developer_id' => $current_developer['Developer']['id'],

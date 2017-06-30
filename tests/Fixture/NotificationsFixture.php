@@ -25,7 +25,7 @@ class NotificationsFixture extends TestFixture
         ),
         'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_general_ci', 'engine' => 'InnoDB')
     );*/
-    public $import = array('table' => 'notifications', 'connection' => 'test');
+    public $import = array('table' => 'notifications');
     /**
      * Records.
      *

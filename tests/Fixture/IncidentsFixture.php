@@ -101,5 +101,26 @@ class IncidentsFixture extends TestFixture
             'created' => '2013-08-29 18:10:00',
             'modified' => '2013-08-29 18:10:00',
         ),
+
+        array(
+            'id' => 5,
+            'error_name' => 'Lorem ipsum dolor sit amet',
+            'error_message' => 'Lorem ipsum dolor sit amet',
+            'pma_version' => 'Lorem ipsum dolor sit amet',
+            'php_version' => '5.3',
+            'browser' => 'Lorem ipsum dolor sit amet',
+            'user_os' => 'Lorem ipsum dolor sit amet',
+            'locale' => 'Lorem ipsum dolor sit amet',
+            'server_software' => 'Lorem ipsum dolor sit amet',
+            'stackhash' => 'hash3',
+            'configuration_storage' => 'Lorem ipsum dolor sit amet',
+            'script_name' => 'Lorem ipsum dolor sit amet',
+            'steps' => null,
+            'stacktrace' => '[{"context": ["test"]}]',
+            'full_report' => '{"pma_version": "1.2"}',
+            'report_id' => 5,
+            'created' => '2013-08-29 18:10:00',
+            'modified' => '2013-08-29 18:10:00',
+        ),
     );
 }
