@@ -41,7 +41,7 @@ class ReportsFixture extends TestFixture
             'error_message' => 'Lorem ipsum dolor sit amet',
             'error_name' => 'error1',
             'pma_version' => '3.8',
-            'status' => 'new',
+            'status' => 'forwarded',
             'location' => 'filename_3.js',
             'linenumber' => 4,
             'sourceforge_bug_id' => 4,

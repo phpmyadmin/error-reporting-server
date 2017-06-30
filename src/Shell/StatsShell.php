@@ -36,7 +36,6 @@ class StatsShell extends Shell
 
     public function main()
     {
-        //Cache::clear(false);
         foreach ($this->Incidents->filterTimes as $filter_string => $filter) {
             foreach ($this->Incidents->summarizableFields as $field) {
                 $this->out('processing ' . $filter_string . ':' . $field);
