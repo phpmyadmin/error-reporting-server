@@ -51,22 +51,30 @@ use Cake\Utility\Inflector;
         <div class="navbar">
             <div class="navbar-inner">
                 <a class="brand" href="<?= $baseURL; ?>">phpMyAdmin</a>
-                <ul class="nav">
-                    <?php
-                        $controllers = array('reports', 'stats', 'notifications');
-                        foreach ($controllers as $controller) {
-                            $class = '';
-                            if ($current_controller === $controller) {
-                                $class = 'active';
+                <?php if ($developer_signed_in): ?>
+                    <ul class="nav">
+                        <?php
+                            $controllers = array('reports');
+
+                            // Show these only if Developer has commit access
+                            if (! $read_only) {
+                                $controllers[] = 'stats';
+                                $controllers[] = 'notifications';
                             }
-                            echo "<li class='$class' id='nav_"
-                                . $controller . "'><a href='"
-                                . $baseURL . $controller . "'>";
-                            echo Inflector::humanize($controller);
-                            echo "</a></li>";
-                        }
-                    ?>
-                </ul>
+                            foreach ($controllers as $controller) {
+                                $class = '';
+                                if ($current_controller === $controller) {
+                                    $class = 'active';
+                                }
+                                echo "<li class='$class' id='nav_"
+                                    . $controller . "'><a href='"
+                                    . $baseURL . $controller . "'>";
+                                echo Inflector::humanize($controller);
+                                echo "</a></li>";
+                            }
+                        ?>
+                    </ul>
+                <?php endif; ?>
                 <ul class="nav pull-right">
                     <?php if ($developer_signed_in): ?>
                         <li>

@@ -177,11 +177,15 @@ class GithubApiComponent extends Component
      *
      * @return bool true if the user is a collaborator and false if they arent
      */
-    public function canCommitTo($username, $repoPath)
+    public function canCommitTo($username, $repoPath, $access_token)
     {
-        list(, $status) = $this->
-                apiRequest("repos/$repoPath/collaborators/$username",
-                http_build_query(array()), 'GET', true);
+        list(, $status) = $this->apiRequest(
+            "repos/$repoPath/collaborators/$username",
+            array(),
+            'GET',
+            true,
+            $access_token
+        );
 
         return $status === 204;
     }

@@ -440,6 +440,7 @@ class GithubController extends AppController
             );
 
             $this->redirect('/');
+            return;
         }
 
         $this->autoRender = false;
