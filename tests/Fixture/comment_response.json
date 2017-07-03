@@ -1,0 +1,27 @@
+{
+    "id": 1,
+    "url": "https://api.github.com/repos/phpmyadmin/Hello-World/issues/comments/1",
+    "html_url": "https://github.com/pma-bot/Hello-World/issues/1347#issuecomment-1",
+    "body": "Me too",
+    "user": {
+        "login": "pma-bot",
+        "id": 1,
+        "avatar_url": "https://github.com/images/error/pma-bot_happy.gif",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/pma-bot",
+        "html_url": "https://github.com/phpmyadmin",
+        "followers_url": "https://api.github.com/users/pma-bot/followers",
+        "following_url": "https://api.github.com/users/pma-bot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/pma-bot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/pma-bot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/pma-bot/subscriptions",
+        "organizations_url": "https://api.github.com/users/pma-bot/orgs",
+        "repos_url": "https://api.github.com/users/pma-bot/repos",
+        "events_url": "https://api.github.com/users/pma-bot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/pma-bot/received_events",
+        "type": "User",
+        "site_admin": false
+    },
+    "created_at": "2011-04-14T16:00:49Z",
+    "updated_at": "2011-04-14T16:00:49Z"
+}
