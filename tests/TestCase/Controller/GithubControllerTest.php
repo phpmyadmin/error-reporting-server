@@ -67,7 +67,6 @@ class GithubControllerTest extends IntegrationTestCase
 
         // Case 2. Test form with valid reportId
         $this->get('github/create_issue/5');
-        $this->assertResponseContains('3.8'); // phpMyAdmin version
         $this->assertResponseContains('Lorem ipsum dolor sit amet'); // Description
 
         $issueResponse = file_get_contents(TESTS . 'Fixture' . DS . 'issue_response.json');

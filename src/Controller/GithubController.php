@@ -64,7 +64,6 @@ class GithubController extends AppController
 
         $reportArray = $report->toArray();
         if (empty($this->request->data)) {
-            $this->set('pma_version', $reportArray['pma_version']);
             $this->set('error_name', $reportArray['error_name']);
             $this->set('error_message', $reportArray['error_message']);
 

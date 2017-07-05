@@ -16,27 +16,12 @@
 ?>
     <fieldset>
         <legend>Github Issue</legend>
-        <?php
-            $milestone_default_val = $pma_version;
-            if (substr($pma_version, -4) == '-dev') {
-                $milestone_default_val = 'Latest_Git';
-            }
-        ?>
         <?=
             $this->Form->input(
                 'summary',
                 array(
                     'placeholder' => 'Summary',
                     'value' => $error_name
-                )
-            );
-        ?>
-        <?=
-            $this->Form->input(
-                'milestone',
-                array(
-                    'placeholder' => 'Milestone',
-                    'value'=> $milestone_default_val
                 )
             );
         ?>
@@ -52,14 +37,14 @@
         ?>
         <?= $this->Form->input('labels', array('placeholder' => 'Labels')); ?>
 
-        <div class="control-group">
-            <div class="controls span6">
+        <div class="control-group row">
+            <div class="span3">
                 <p>
                     <span class="label label-info">Heads up!</span>
                     The link to the error report is automatically added to the end of the description and an extra label is added to denote that the report is from the automated error reporting system
                 </p>
-                <button type="submit" class="btn btn-default">Submit</button>
             </div>
         </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </fieldset>
 </form>
