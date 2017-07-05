@@ -67,4 +67,24 @@ class NotificationsControllerTest extends IntegrationTestCase
         $expected = array();
         $this->assertEquals($actual, $expected);
     }
+
+    public function testDataTables()
+    {
+        $this->session(array('Developer.id' => 1, 'read_only' => false));
+
+        $this->get('notifications/data_tables?sEcho=1&iDisplayLength=25');
+
+        $expected = array(
+            'iTotalRecords' => 2,
+            'iTotalDisplayRecords' => 2,
+            'sEcho' => 1,
+            'aaData' => array(
+                array('<input type="checkbox" name="notifs[]" value="1"/>', '<a href="/reports/view/1">1</a>', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'js', '2014-01-01T07:05:09'),
+                array('<input type="checkbox" name="notifs[]" value="2"/>', '<a href="/reports/view/4">4</a>', 'error1', 'Lorem ipsum dolor sit amet', '3.8', 'js', '2014-01-02T07:05:09'),
+            ),
+        );
+
+        $this->assertResponseOk();
+        $this->assertEquals($expected, json_decode($this->_response->body(), true));
+    }
 }
