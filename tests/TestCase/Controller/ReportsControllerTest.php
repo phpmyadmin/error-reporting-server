@@ -143,7 +143,8 @@ class ReportsControllerTest extends IntegrationTestCase
      *
      * So, call at the end of testMarkRelatedTo()
      */
-    private function _testUnmarkRelatedTo() {
+    private function _testUnmarkRelatedTo()
+    {
         $this->Reports->id = 2;
         $incidents = $this->Reports->getIncidents();
         $this->assertEquals(3, $incidents->count());
@@ -153,5 +154,88 @@ class ReportsControllerTest extends IntegrationTestCase
         $this->Reports->id = 2;
         $incidents = $this->Reports->getIncidents();
         $this->assertEquals(1, $incidents->count());
+    }
+
+    /**
+     * Test for 'mass_action' action
+     */
+    public function testMassAction()
+    {
+        $report1 = $this->Reports->get(1);
+        $this->assertEquals('forwarded', $report1->status);
+
+        $report5 = $this->Reports->get(5);
+        $this->assertEquals('new', $report5->status);
+
+        /* Test case 1: Incorrect state */
+        $this->post('/reports/mass_action',
+            array('reports' => array('1', '5'), 'state' => 'incorrect_state')
+        );
+
+        // Should not change
+        $report1 = $this->Reports->get(1);
+        $this->assertEquals('forwarded', $report1->status);
+
+        $report5 = $this->Reports->get(5);
+        $this->assertEquals('new', $report5->status);
+
+        /* Test case 2: No reports selected */
+        $this->post('/reports/mass_action',
+            array('reports' => array(), 'state' => 'resolved')
+        );
+
+        // Should not change
+        $report1 = $this->Reports->get(1);
+        $this->assertEquals('forwarded', $report1->status);
+
+        $report5 = $this->Reports->get(5);
+        $this->assertEquals('new', $report5->status);
+
+        /* Test case 3: Invalid report id passed */
+        $this->post('/reports/mass_action',
+            array('reports' => array(10), 'state' => 'resolved')
+        );
+
+        /* Test case 4 */
+        $this->post('/reports/mass_action',
+            array('reports' => array(1, 5), 'state' => 'resolved')
+        );
+
+        // Should change
+        $report1 = $this->Reports->get(1);
+        $this->assertEquals('resolved', $report1->status);
+
+        $report5 = $this->Reports->get(5);
+        $this->assertEquals('resolved', $report5->status);
+    }
+
+    /**
+     * Test for 'change_state' action
+     */
+    public function testChangeState()
+    {
+        $this->session(array('Developer.id' => 1, 'read_only' => false));
+
+        $report = $this->Reports->get(1);
+        $this->assertEquals('forwarded', $report->status);
+
+        /* Test case 1: Incorrect Report ID */
+        $this->post('/reports/change_state/6',
+            array('state' => 'resolved')
+        );
+
+        /* Test case 2: Incorrect State */
+        $this->post('/reports/change_state/1',
+            array('state' => 'incorrect_state')
+        );
+        $report = $this->Reports->get(1);
+        $this->assertEquals('forwarded', $report->status);
+
+        /* Test case 3 */
+        $this->post('/reports/change_state/1',
+            array('state' => 'resolved')
+        );
+        $report = $this->Reports->get(1);
+        $this->assertEquals('resolved', $report->status);
     }
 }

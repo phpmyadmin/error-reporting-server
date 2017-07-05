@@ -256,7 +256,11 @@ class ReportsController extends AppController
         }
 
         $state = $this->request->data['state'];
-        $newState = $this->Reports->status[$state];
+        $newState = null;
+
+        if (array_key_exists($state, $this->Reports->status)) {
+            $newState = $this->Reports->status[$state];
+        }
         if (!$newState) {
             throw new NotFoundException(__('Invalid State'));
         }
@@ -279,7 +283,11 @@ class ReportsController extends AppController
     {
         $flash_class = 'alert alert-error';
         $state = $this->request->data['state'];
-        $newState = $this->Reports->status[$state];
+        $newState = null;
+        if (array_key_exists($state, $this->Reports->status)) {
+            $newState = $this->Reports->status[$state];
+        }
+
         if (!$newState) {
             Log::write(
                 'error',
