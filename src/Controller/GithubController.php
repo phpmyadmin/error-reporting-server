@@ -431,7 +431,6 @@ class GithubController extends AppController
      */
     public function sync_issue_status()
     {
-
         if (!defined('CRON_DISPATCHER')) {
             $flash_class = 'alert alert-error';
             $this->Flash->default(

@@ -74,7 +74,7 @@ class IncidentsController extends AppController
 
     public function json($id)
     {
-        if (!$id) {
+        if (!isset($id) || !$id) {
             throw new NotFoundException(__('Invalid Incident'));
         }
 
@@ -97,7 +97,7 @@ class IncidentsController extends AppController
 
     public function view($incidentId)
     {
-        if (!$incidentId) {
+        if (!isset($incidentId) || !$incidentId) {
             throw new NotFoundException(__('Invalid Incident'));
         }
 

@@ -25,7 +25,7 @@ class NotificationsFixture extends TestFixture
         ),
         'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_general_ci', 'engine' => 'InnoDB')
     );*/
-    public $import = array('table' => 'notifications', 'connection' => 'test');
+    public $import = array('table' => 'notifications');
     /**
      * Records.
      *
@@ -48,7 +48,7 @@ class NotificationsFixture extends TestFixture
         ),
         array(
             'id' => 3,
-            'developer_id' => 1,
+            'developer_id' => 2,
             'report_id' => 4,
             'created' => '2014-07-02 07:05:09',
             'modified' => '2014-07-03 07:05:09',

@@ -4,6 +4,7 @@ namespace App\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
+use Cake\Network\Exception\NotFoundException;
 
 class ReportsControllerTest extends IntegrationTestCase
 {
@@ -24,7 +25,7 @@ class ReportsControllerTest extends IntegrationTestCase
     {
         $this->get('/reports');
         $this->assertEquals(array('3.8', '4.0'), $this->viewVariable('distinct_versions'));
-        $this->assertEquals(array('new'), $this->viewVariable('distinct_statuses'));
+        $this->assertEquals(array('forwarded', 'new'), $this->viewVariable('distinct_statuses'));
         $this->assertEquals(array('error1', 'error2'),
                 $this->viewVariable('distinct_error_names'));
     }
@@ -61,34 +62,33 @@ class ReportsControllerTest extends IntegrationTestCase
 
         $this->get('/reports/view/3');
         $this->assertResponseContains('Invalid Report');
-       // $this->assertResponseOk();
-        //$this->setExpectedException('NotFoundException');
-        //	$this->get('/reports/view');
+        $this->assertResponseContains('/reports/view/3');
     }
 
     public function testDataTables()
     {
         $this->get('/reports/data_tables?sEcho=1&iDisplayLength=25');
         $expected = array(
-            'iTotalRecords' => 3,
-            'iTotalDisplayRecords' => 3,
+            'iTotalRecords' => 4,
+            'iTotalDisplayRecords' => 4,
             'sEcho' => 1,
             'aaData' => array(
-                array("<input type='checkbox' name='reports[]' value='1'/>", 1, 'error2', 'Lorem ipsum dolor sit amet', 'filename_1.php', '4.0', 'New', 'js', '1'),
-                array("<input type='checkbox' name='reports[]' value='2'/>", 2, 'error2', 'Lorem ipsum dolor sit amet', 'filename_2.php', '4.0', 'New', 'js', '1'),
-                array("<input type='checkbox' name='reports[]' value='4'/>", 4, 'error1', 'Lorem ipsum dolor sit amet', 'filename_3.js', '3.8', 'New', 'js', '2'),
+                array("<input type='checkbox' name='reports[]' value='1'/>", 1, 'error2', 'Lorem ipsum dolor sit amet', 'filename_1.php', '4.0', 'Forwarded', 'js', '1'),
+                array("<input type='checkbox' name='reports[]' value='2'/>", 2, 'error2', 'Lorem ipsum dolor sit amet', 'filename_2.php', '4.0', 'Forwarded', 'js', '1'),
+                array("<input type='checkbox' name='reports[]' value='4'/>", 4, 'error1', 'Lorem ipsum dolor sit amet', 'filename_3.js', '3.8', 'Forwarded', 'js', '2'),
+                array("<input type='checkbox' name='reports[]' value='5'/>", 5, 'error1', 'Lorem ipsum dolor sit amet', 'filename_4.js', '3.8', 'New', 'js', '1')
             ),
         );
         $this->assertEquals($expected, json_decode($this->_response->body(), true));
 
         $this->get('/reports/data_tables?sEcho=1&sSearch=error2&bSearchable_2=true&iSortCol_0=0&sSortDir_0=desc&bSortable_0=true&iSortingCols=2&iDisplayLength=25');
         $expected = array(
-            'iTotalRecords' => 3,
+            'iTotalRecords' => 4,
             'iTotalDisplayRecords' => 2,
             'sEcho' => 1,
             'aaData' => array(
-                array("<input type='checkbox' name='reports[]' value='1'/>", 1, 'error2', 'Lorem ipsum dolor sit amet', 'filename_1.php', '4.0', 'New', 'js', '1'),
-                array("<input type='checkbox' name='reports[]' value='2'/>", 2, 'error2', 'Lorem ipsum dolor sit amet', 'filename_2.php', '4.0', 'New', 'js', '1'),
+                array("<input type='checkbox' name='reports[]' value='1'/>", 1, 'error2', 'Lorem ipsum dolor sit amet', 'filename_1.php', '4.0', 'Forwarded', 'js', '1'),
+                array("<input type='checkbox' name='reports[]' value='2'/>", 2, 'error2', 'Lorem ipsum dolor sit amet', 'filename_2.php', '4.0', 'Forwarded', 'js', '1'),
             ),
         );
         $result = json_decode($this->_response->body(), true);
@@ -96,11 +96,11 @@ class ReportsControllerTest extends IntegrationTestCase
 
         $this->get('/reports/data_tables?sEcho=1&sSearch_1=1&iDisplayLength=25');
         $expected = array(
-            'iTotalRecords' => 3,
+            'iTotalRecords' => 4,
             'iTotalDisplayRecords' => 1,
             'sEcho' => 1,
             'aaData' => array(
-                array("<input type='checkbox' name='reports[]' value='1'/>", 1, 'error2', 'Lorem ipsum dolor sit amet', 'filename_1.php', '4.0', 'New', 'js', '1'),
+                array("<input type='checkbox' name='reports[]' value='1'/>", 1, 'error2', 'Lorem ipsum dolor sit amet', 'filename_1.php', '4.0', 'Forwarded', 'js', '1'),
             ),
         );
         $result = json_decode($this->_response->body(), true);
@@ -108,7 +108,7 @@ class ReportsControllerTest extends IntegrationTestCase
 
         $this->get('/reports/data_tables?sEcho=1&sSearch_1=error&iDisplayLength=25');
         $expected = array(
-            'iTotalRecords' => 3,
+            'iTotalRecords' => 4,
             'iTotalDisplayRecords' => 0,
             'sEcho' => 1,
             'aaData' => array(
