@@ -25,11 +25,21 @@ class NotificationsControllerTest extends IntegrationTestCase
     public function setUp()
     {
         $this->Notifications = TableRegistry::get('Notifications');
-        $this->session(array('Developer.id' => 1));
+        $this->session(array('Developer.id' => 1, 'read_only' => true));
+    }
+
+    public function testIndex()
+    {
+        $this->get('notifications');
+
+        // 'read_only' users are not allowed to view notifications page
+        $this->assertRedirect(['controller' => '', 'action' => 'index']);
     }
 
     public function testMassAction()
     {
+        $this->session(array('Developer.id' => 1, 'read_only' => false));
+
         /* Test case 1 */
         $this->post('/notifications/mass_action',
             array('notifs' => array('1', '3'))
