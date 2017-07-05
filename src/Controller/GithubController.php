@@ -1,8 +1,8 @@
 <?php
-
 /* vim: set expandtab sw=4 ts=4 sts=4: */
+
 /**
- * Sourceforge controller handling source forge ticket submission and creation.
+ * Github controller handling issue creation, comments and sync.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -47,23 +47,22 @@ class GithubController extends AppController
      *
      * @param int $reportId
      *
-     * @throws \NotFoundException
      * @throws NotFoundException
      */
     public function create_issue($reportId)
     {
-        if (!$reportId) {
-            throw new \NotFoundException(__('Invalid report'));
+        if (!isset($reportId) || !$reportId) {
+            throw new NotFoundException(__('Invalid report'));
         }
 
         $reportsTable = TableRegistry::get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
-        $reportArray = $report->toArray();
 
         if (!$report) {
             throw new NotFoundException(__('Invalid report'));
         }
 
+        $reportArray = $report->toArray();
         if (empty($this->request->data)) {
             $this->set('pma_version', $reportArray['pma_version']);
             $this->set('error_name', $reportArray['error_name']);
@@ -71,6 +70,8 @@ class GithubController extends AppController
 
             return;
         }
+
+        $this->autoRender = false;
         $data = array(
             'title' => $this->request->data['summary'],
             'labels' => $this->request->data['labels'] ? explode(',', $this->request->data['labels']) : array(),
@@ -99,7 +100,7 @@ class GithubController extends AppController
                 $reportId, ));
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(_getErrors($issueDetails, $status),
+            $this->Flash->default($this->_getErrors($issueDetails, $status),
                 array('params' => array('class' => $flash_class)));
         }
     }
@@ -111,21 +112,22 @@ class GithubController extends AppController
      */
     public function link_issue($reportId)
     {
-        if (!$reportId) {
+        if (!isset($reportId) || !$reportId) {
             throw new NotFoundException(__('Invalid reportId'));
         }
 
         $reportsTable = TableRegistry::get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
-        $reportArray = $report->toArray();
+
         if (!$report) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException(__('Invalid report'));
         }
 
         $ticket_id = intval($this->request->query['ticket_id']);
         if (!$ticket_id) {
             throw new NotFoundException(__('Invalid Ticket ID!!'));
         }
+        $reportArray = $report->toArray();
 
         $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
         $incident = $incidents_query->first();
@@ -160,7 +162,7 @@ class GithubController extends AppController
             $reportsTable->save($report);
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(_getErrors($commentDetails, $status),
+            $this->Flash->default($this->_getErrors($commentDetails, $status),
                     array('params' => array('class' => $flash_class)));
         }
 
@@ -175,19 +177,20 @@ class GithubController extends AppController
      */
     public function unlink_issue($reportId)
     {
-        if (!$reportId) {
+        if (!isset($reportId) || ! $reportId) {
             throw new NotFoundException(__('Invalid reportId'));
         }
 
         $reportsTable = TableRegistry::get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
-        $reportArray = $report->toArray();
 
         if (!$report) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException(__('Invalid report'));
         }
 
+        $reportArray = $report->toArray();
         $ticket_id = $reportArray['sourceforge_bug_id'];
+
         if (!$ticket_id) {
             throw new NotFoundException(__('Invalid Ticket ID!!'));
         }
@@ -214,7 +217,7 @@ class GithubController extends AppController
             $reportsTable->save($report);
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(_getErrors($commentDetails, $status),
+            $this->Flash->default($this->_getErrors($commentDetails, $status),
                     array('params' => array('class' => $flash_class)));
         }
 
