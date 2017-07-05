@@ -52,11 +52,15 @@ class DevelopersController extends AppController
     {
         $code = $this->request->query('code');
         $accessToken = $this->GithubApi->getAccessToken($code);
-        if ($accessToken) {
+        if ($code && $accessToken) {
             list($userInfo, $status) = $this->GithubApi->getUserInfo($accessToken);
             if ($status != 200) {
-                $this->Session->setFlash($userInfo['message'],
-                        array('class' => 'alert alert-error'));
+                $flash_class = 'alert alert-error';
+                $this->Flash->default($userInfo['message'],
+                    array('params' => array('class' => $flash_class)));
+
+                $this->redirect('/');
+                return;
             } else {
                 $userInfo['has_commit_access'] = $this->GithubApi->canCommitTo(
                     $userInfo['login'],
@@ -73,9 +77,13 @@ class DevelopersController extends AppController
         } else {
             $flash_class = 'alert alert-error';
             $this->Flash->default('We were not able to authenticate you.'
-                    . 'Please try again later',
+                    . ' Please try again later',
                     array('params' => array('class' => $flash_class)));
+
+            $this->redirect('/');
+            return;
         }
+
         $last_page = $this->request->session()->read('last_page');
         if (empty($last_page)) {
             $last_page = array('controller' => 'reports', 'action' => 'index');
