@@ -45,7 +45,7 @@ class CleanOldNotifsShell extends Shell
                 'No notifications found for deleting!',
                 'cron_jobs'
             );
-        } elseif (!$this->Notifications->deleteAll($conditions)) {
+        } elseif ($this->Notifications->deleteAll($conditions)) {
             // Try deleting the matched records
             Log::write(
                 'info',
