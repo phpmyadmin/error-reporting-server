@@ -123,7 +123,6 @@
                                     )
                                 );
                             ?>
-                            <br/>;
                             <?=
                                 $this->Form->input(
                                     'Link with existing Issue',
