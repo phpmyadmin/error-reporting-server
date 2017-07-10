@@ -66,8 +66,7 @@
                     $this->Html->link(
                         '#' . $report[0]['sourceforge_bug_id'],
                         "https://github.com/$project_name/issues/"
-                            . $report[0]['sourceforge_bug_id']
-                            . "/",
+                            . $report[0]['sourceforge_bug_id'],
                         ['target' => '_blank']
                     );
                 ?>
