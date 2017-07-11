@@ -47,7 +47,9 @@ class SyncGithubIssueStatesShell extends Shell
         );
 
 
-        define('CRON_DISPATCHER', true);
+        if (!defined('CRON_DISPATCHER')) {
+            define('CRON_DISPATCHER', true);
+        }
         if (PHP_SAPI === 'cli') {
             $dispatcher = DispatcherFactory::create();
 
