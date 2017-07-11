@@ -266,6 +266,7 @@ class GithubControllerTest extends IntegrationTestCase
         $curlGetInfoMock = $this->getFunctionMock('\App\Controller\Component', 'curl_getinfo');
 
         // Test via web interface
+        Configure::write('CronDispatcher', false);
         $this->enableRetainFlashMessages();
         $this->get('github/sync_issue_status');
         $this->assertRedirect('/');
@@ -287,10 +288,8 @@ class GithubControllerTest extends IntegrationTestCase
             200
         );
 
-        // Test via cli (i.e. the constant CRON_DISPATCHER should be defined)
-        if (!defined('CRON_DISPATCHER')) {
-            define('CRON_DISPATCHER', true);
-        }
+        // Test via cli (i.e. the CronDispatcher setting should be defined)
+        Configure::write('CronDispatcher', true);
         $this->get('github/sync_issue_status');
 
         // 401

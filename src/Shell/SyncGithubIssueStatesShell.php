@@ -20,6 +20,7 @@
 namespace App\Shell;
 
 use Cake\Console\Shell;
+use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\Network\Request;
 use Cake\Network\Response;
@@ -47,9 +48,7 @@ class SyncGithubIssueStatesShell extends Shell
         );
 
 
-        if (!defined('CRON_DISPATCHER')) {
-            define('CRON_DISPATCHER', true);
-        }
+        Configure::write('CronDispatcher', true);
         if (PHP_SAPI === 'cli') {
             $dispatcher = DispatcherFactory::create();
 

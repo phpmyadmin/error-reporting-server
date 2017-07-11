@@ -433,7 +433,7 @@ class GithubController extends AppController
      */
     public function sync_issue_status()
     {
-        if (!defined('CRON_DISPATCHER')) {
+        if (!Configure::read('CronDispatcher')) {
             $flash_class = 'alert alert-error';
             $this->Flash->default(
                 'Unauthorised action! This action is not available on Web interface',
