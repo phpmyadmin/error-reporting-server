@@ -390,7 +390,7 @@ class IncidentsTable extends Table
      */
     protected function _getIdentifyingLocation($stacktrace)
     {
-        $fallback = 'UNKNOWN';
+        $fallback = array('UNKNOWN', 0);
         foreach ($stacktrace as $level) {
             if (isset($level['filename'])) {
                 // ignore unrelated files that sometimes appear in the error report
