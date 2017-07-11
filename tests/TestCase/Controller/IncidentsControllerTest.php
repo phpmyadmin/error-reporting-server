@@ -21,6 +21,7 @@ class IncidentsControllerTest extends IntegrationTestCase
         //$Session = new SessionComponent(new ComponentRegistry());
         $this->session(array('Developer.id' => 1));
         $this->Reports = TableRegistry::get('Reports');
+        Configure::write('NotificationEmailsTransport', 'test');
     }
 
     public function testView()
