@@ -532,7 +532,7 @@ class IncidentsTable extends Table
 
         if ($stacktraceLength > 65535
             || $fullReportLength > 65535
-            || $errorMessageLength > 100 // length of field in 'incidents' table
+            || $errorMessageLength > 200 // length of field in 'incidents' table
         ) {
             // If length of report is longer than
             // what can fit in the table field,
