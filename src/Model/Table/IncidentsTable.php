@@ -161,7 +161,7 @@ class IncidentsTable extends Table
     public function createIncidentFromBugReport($bugReport)
     {
         if ($bugReport == null) {
-            return array(false);
+            return array('incidents' => array(false), 'reports' => array());
         }
         $incident_ids = array();    // array to hold ids of all the inserted incidents
         $new_report_ids = array(); // array to hold ids of all newly created reports
