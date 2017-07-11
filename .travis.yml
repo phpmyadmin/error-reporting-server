@@ -12,7 +12,6 @@ script:
   - bin/cake migrations migrate
   - vendor/bin/phpunit --coverage-clover build/logs/clover.xml -c phpunit.xml.dist
 after_script:
-  - php vendor/bin/coveralls -v
   - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
 after_success:
   - bash <(curl -s https://codecov.io/bash)
