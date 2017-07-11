@@ -93,7 +93,9 @@ class IncidentsHelper extends AppHelper
             $html .= "'>";
 
             if ($exception_type == 'js') {
-                $html .= htmlspecialchars(join("\n", $level['context']));
+                if (isset($level['context'])) {
+                    $html .= htmlspecialchars(join("\n", $level['context']));
+                }
             } else {
                 $html .= htmlspecialchars($level['function']);
                 $html .= '(';
