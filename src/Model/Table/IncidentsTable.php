@@ -299,7 +299,7 @@ class IncidentsTable extends Table
             array(
                 'status' => 'new',
                 'location' => $location,
-                'linenumber' => $linenumber,
+                'linenumber' => is_null($linenumber) ? 0 : $linenumber,
                 'pma_version' => $bugReport['pma_version'],
                 'exception_type' => $exception_type,
             )
