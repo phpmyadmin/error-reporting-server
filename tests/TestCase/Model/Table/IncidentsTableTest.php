@@ -383,9 +383,9 @@ class IncidentsTableTest extends TestCase
             $bugReport['errors'][] = $bugReport['errors'][0];
         }
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
-
-        $this->assertEquals(true, in_array(false, $result['incidents']));
-
+        $this->assertEquals(40, count($result['incidents']));
+        // No new report added (closest report found)
+        $this->assertEquals(0, count($result['reports']));
 
         // Case 3.2: Long JS report submission
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
@@ -396,9 +396,9 @@ class IncidentsTableTest extends TestCase
             $bugReport['exception']['stack'][] = $bugReport['exception']['stack'][0];
         }
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
-
-        $this->assertEquals(true, in_array(false, $result['incidents']));
-
+        $this->assertEquals(1, count($result['incidents']));
+        // No new report added (closest report found)
+        $this->assertEquals(0, count($result['reports']));
 
         // Case 3.3: Long error_message in PHP report submission
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_php.json');
