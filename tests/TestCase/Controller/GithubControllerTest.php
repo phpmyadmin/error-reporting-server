@@ -288,7 +288,9 @@ class GithubControllerTest extends IntegrationTestCase
         );
 
         // Test via cli (i.e. the constant CRON_DISPATCHER should be defined)
-        define('CRON_DISPATCHER', true);
+        if (!defined('CRON_DISPATCHER')) {
+            define('CRON_DISPATCHER', true);
+        }
         $this->get('github/sync_issue_status');
 
         // 401
