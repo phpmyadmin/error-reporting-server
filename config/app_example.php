@@ -328,8 +328,8 @@ return [
         'defaults' => 'php',
     ],
 
-    'NotificationEmailTo' => 'developers@phpmyadmin.net',
-    'NotificationEmailFrom' => 'developers@phpmyadmin.net',
+    'NotificationEmailsTo' => 'reports-notify@phpmyadmin.net',
+    'NotificationEmailsFrom' => 'reports-notify@phpmyadmin.net',
     'NotificationEmailsTransport' => 'default',
     'GithubWebhookSecret' => 'test-pma-ers-1'
 ];
