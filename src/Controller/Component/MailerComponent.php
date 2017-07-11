@@ -49,7 +49,7 @@ class MailerComponent extends Component
             return false;
         }
 
-        $email->transport($emailTransport)
+        $email->setTransport($emailTransport)
             ->viewVars($viewVars)
             ->subject(
                 sprintf(
