@@ -167,8 +167,11 @@ class IncidentsTable extends Table
         $new_report_ids = array(); // array to hold ids of all newly created reports
 
         // Avoid storing too many errors from single report
-        if (isset($bugReport['errors']) && count($bugReport['errors']) > 20) {
-            $bugReport['errors'] = array_slice($bugReport['errors'], 0, 20);
+        if (isset($bugReport['errors']) && count($bugReport['errors']) > 40) {
+            $bugReport['errors'] = array_slice($bugReport['errors'], 0, 40);
+        }
+        if (isset($bugReport['exception']['stack']) && count($bugReport['exception']['stack']) > 40) {
+            $bugReport['exception']['stack'] = array_slice($bugReport['exception']['stack'], 0, 40);
         }
 
         // Also sanitizes the bug report
