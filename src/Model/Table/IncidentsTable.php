@@ -166,6 +166,11 @@ class IncidentsTable extends Table
         $incident_ids = array();    // array to hold ids of all the inserted incidents
         $new_report_ids = array(); // array to hold ids of all newly created reports
 
+        // Avoid storing too many errors from single report
+        if (isset($bugReport['errors']) && count($bugReport['errors']) > 20) {
+            $bugReport['errors'] = array_slice($bugReport['errors'], 0, 20);
+        }
+
         // Also sanitizes the bug report
         $schematizedIncidents = $this->_getSchematizedIncidents($bugReport);
         $incidentsTable = TableRegistry::get('Incidents');
