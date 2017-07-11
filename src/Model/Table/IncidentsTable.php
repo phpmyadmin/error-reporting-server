@@ -399,7 +399,7 @@ class IncidentsTable extends Table
                 } elseif ($level['filename'] === 'error_report.js') {
                     // in case the error really is in the error_report.js file save it for
                     // later
-                    if ($fallback == 'UNKNOWN') {
+                    if ($fallback[0] == 'UNKNOWN') {
                         $fallback = array($level['filename'], $level['line']);
                     }
                     continue;
