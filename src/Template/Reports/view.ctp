@@ -269,8 +269,10 @@
     </tr>
 </table>
 
+<?php if (! $read_only) : ?>
 <h4>Stacktraces:</h4>
 <?= $this->Reports->getStacktracesForIncidents($incidents_with_stacktrace); ?>
+<?php endif; ?>
 
 <?php if ($incidents_with_description->count() > 0): ?>
     <h4>Descriptions submitted by users:</h4>
