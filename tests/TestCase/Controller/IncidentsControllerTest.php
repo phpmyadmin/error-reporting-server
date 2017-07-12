@@ -55,15 +55,15 @@ class IncidentsControllerTest extends IntegrationTestCase
                 'stacktrace' => array(array('context' => array('test'))),
                 'full_report' => array(
                     'pma_version' => '',
-          'php_version' => '',
-          'browser_name' => '',
-          'browser_version' => '',
-          'user_agent_string' => '',
-          'server_software' => '',
-          'locale' => '',
-          'exception' => array('uri' => ''),
-          'configuration_storage' => '',
-          'microhistory' => '',
+                    'php_version' => '',
+                    'browser_name' => '',
+                    'browser_version' => '',
+                    'user_agent_string' => '',
+                    'server_software' => '',
+                    'locale' => '',
+                    'exception' => array('uri' => ''),
+                    'configuration_storage' => '',
+                    'microhistory' => '',
                 ),
                 'report_id' => 1,
                 'created' => '2013-08-29T18:10:01',
@@ -86,6 +86,7 @@ class IncidentsControllerTest extends IntegrationTestCase
         $subject = 'A new report has been submitted '
             . 'on the Error Reporting Server: '
             . $report['id'];
+        $this->assertEquals('4.5.4.1', $report['pma_version']);
 
         // Test notification email
         $emailContent = Configure::read('test_transport_email');
@@ -100,7 +101,6 @@ class IncidentsControllerTest extends IntegrationTestCase
 
         $report = $this->Reports->find('all',
                 array('order' => 'Reports.created desc'))->all()->first();
-        //$report = $report->hydrate(false)->toArray();
         $this->Reports->id = $report['id'];
         $incidents = $this->Reports->getIncidents();
         $incidents = $incidents->hydrate(false)->toArray();
@@ -111,12 +111,11 @@ class IncidentsControllerTest extends IntegrationTestCase
                 $report['error_name']);
         $this->assertEquals($bugReportDecoded['pma_version'],
                 $report['pma_version']);
+
         $this->configRequest(array('input' => ''));
         $this->post('/incidents/create');
         $result = json_decode($this->_response->body(), true);
         $this->assertEquals(false, $result['success']);
-
-
 
         // Test invalid Notification email configuration
         Configure::write('NotificationEmailsTo', '');
@@ -131,6 +130,7 @@ class IncidentsControllerTest extends IntegrationTestCase
         $subject = 'A new report has been submitted '
             . 'on the Error Reporting Server: '
             . $report['id'];
+        $this->assertEquals('4.5.4.1', $report['pma_version']);
 
         $emailContent = Configure::read('test_transport_email');
 

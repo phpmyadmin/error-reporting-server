@@ -182,7 +182,7 @@ class IncidentsTableTest extends TestCase
 
         $expected = array(
             array(
-                'pma_version' => '4.0',
+                'pma_version' => '4.5.4.1',
                 'php_version' => '5.2',
                 'steps' => '<script>test steps',
                 'error_message' => 'a is not defined',
@@ -211,7 +211,7 @@ class IncidentsTableTest extends TestCase
 
         $expected = array(
             array(
-                'pma_version' => '4.3.0-dev',
+                'pma_version' => '4.5.4.1',
                 'php_version' => '5.5',
                 'error_message' => 'Undefined variable: haha',
                 'error_name' => 'Notice',
@@ -227,7 +227,7 @@ class IncidentsTableTest extends TestCase
                 'exception_type' => 1,
             ),
             array(
-                'pma_version' => '4.3.0-dev',
+                'pma_version' => '4.5.4.1',
                 'php_version' => '5.5',
                 'error_message' => 'Undefined variable: hihi',
                 'error_name' => 'Notice',
@@ -243,7 +243,7 @@ class IncidentsTableTest extends TestCase
                 'exception_type' => 1,
             ),
             array(
-                'pma_version' => '4.3.0-dev',
+                'pma_version' => '4.5.4.1',
                 'php_version' => '5.5',
                 'error_message' => 'Undefined variable: hehe',
                 'error_name' => 'Notice',
@@ -281,7 +281,7 @@ class IncidentsTableTest extends TestCase
             'status' => 'new',
             'location' => 'error.js',
             'linenumber' => (int) 312,
-            'pma_version' => '4.0',
+            'pma_version' => '4.5.4.1',
             'exception_type' => 0,
         );
 
@@ -300,7 +300,7 @@ class IncidentsTableTest extends TestCase
             'status' => 'new',
             'location' => './libraries/Util.class.php',
             'linenumber' => (int) 557,
-            'pma_version' => '4.3.0-dev',
+            'pma_version' => '4.5.4.1',
             'exception_type' => 1,
         );
         $this->assertEquals($expected, $result);
@@ -446,6 +446,7 @@ class IncidentsTableTest extends TestCase
             array('4.1.6deb0ubuntu1ppa1', '4.1.6'),
             array('4.2.3deb1.trusty~ppa.1', '4.2.3'),
             array('4.2.9deb0.1', '4.2.9'),
+            array('4.5.4.1deb2ubuntu2', '4.5.4.1')
         );
     }
 }

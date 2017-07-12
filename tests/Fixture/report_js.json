@@ -46,9 +46,9 @@
         "useragent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36",
         "uri": "tbl_structure.php?target="
     },
-		"steps": "<script>test steps",
+    "steps": "<script>test steps",
     "script_name": "tbl_relation.php",
-    "pma_version": "4.0",
+    "pma_version": "4.5.4.1deb2ubuntu2",
     "browser_name": "FIREFOX",
     "browser_version": "17.5",
     "user_os": "Windows",

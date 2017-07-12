@@ -309,6 +309,7 @@ class IncidentsTable extends Table
                 'location' => $location,
                 'linenumber' => is_null($linenumber) ? 0 : $linenumber,
                 'pma_version' => $bugReport['pma_version'],
+                'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
                 'exception_type' => $exception_type,
             )
         );

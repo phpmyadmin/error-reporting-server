@@ -76,7 +76,6 @@ class NotificationsController extends AppController
             ),
             'order' => $orderConditions,
         );
-        //$current_developer = Sanitize::clean($current_developer);
 
         $pagedParams = $params;
         $pagedParams['limit'] = intval($this->request->query('iDisplayLength'));
