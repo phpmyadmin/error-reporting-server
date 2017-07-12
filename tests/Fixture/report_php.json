@@ -1,58 +1,62 @@
 {
-	"pma_version": "4.3.0-dev",
-	"browser_name": "CHROME",
-	"browser_version": "27.0.1453.93",
-	"user_os":"Linux",
-	"server_software":"Apache\/2.4.9 (Unix) OpenSSL\/1.0.1g PHP\/5.5.11 mod_perl\/2.0.8-dev Perl\/v5.16.3",
-	"user_agent_string":"Mozilla\/5.0 (X11; Linux i686) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/27.0.1453.93 Safari\/537.36",
-	"locale":"en",
-	"configuration_storage": "disabled",
-	"php_version": "5.5.11",
-	"exception_type": "php",
-	"errors":[
-		{
-			"lineNum":1771,
-			"file":".\/libraries\/Config.class.php",
-			"type":"Notice",
-			"msg":"Undefined variable: haha",
-			"stackTrace":[
-				{
-					"file":"\/opt\/lampp\/htdocs\/phpmyadmin-new\/index.php",
-					"line":228,
-					"function":"getFontsizeForm",
-					"class":"PMA_Config",
-					"type":"::",
-					"args":[]
-				}
-			],
-			"stackhash":"5063bbe81a2daa6a6ad39c5cd315701c"
-		},
-		{
-			"lineNum":557,
-			"file":".\/libraries\/Util.class.php",
-			"type":"Notice",
-			"msg":"Undefined variable: hihi",
-			"stackTrace":[
-				{
-					"file":"\/opt\/lampp\/htdocs\/phpmyadmin-new\/index.php",
-					"line":322,
-					"function":"showPHPDocu",
-					"class":"PMA_Util",
-					"type":"::",
-					"args":[
-						"book.mysqli.php"
-					]
-				}
-			],
-			"stackhash":"e911a21765eae766463612e033773716"
-		},
-		{
-			"lineNum":665,
-			"file":".\/index.php",
-			"type":"Notice",
-			"msg":"Undefined variable: hehe",
-			"stackTrace":[],
-			"stackhash":"37848b23bdd6e737273516b9575fe407"
-		}
-	]
+    "pma_version": "4.5.4.1deb2ubuntu2",
+    "browser_name": "CHROME",
+    "browser_version": "27.0.1453.93",
+    "user_os": "Linux",
+    "server_software": "Apache\/2.4.9 (Unix) OpenSSL\/1.0.1g PHP\/5.5.11 mod_perl\/2.0.8-dev Perl\/v5.16.3",
+    "user_agent_string": "Mozilla\/5.0 (X11; Linux i686) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/27.0.1453.93 Safari\/537.36",
+    "locale": "en",
+    "configuration_storage": "disabled",
+    "php_version": "5.5.11",
+    "exception_type": "php",
+    "errors": [
+        {
+            "lineNum": 1771,
+            "file": ".\/libraries\/Config.class.php",
+            "type": "Notice",
+            "msg": "Undefined variable: haha",
+            "stackTrace": [
+                {
+                    "file": "\/opt\/lampp\/htdocs\/phpmyadmin-new\/index.php",
+                    "line": 228,
+                    "function": "getFontsizeForm",
+                    "class": "PMA_Config",
+                    "type": ":: ",
+                    "args": [
+
+                    ]
+                }
+            ],
+            "stackhash": "5063bbe81a2daa6a6ad39c5cd315701c"
+        },
+        {
+            "lineNum": 557,
+            "file": ".\/libraries\/Util.class.php",
+            "type": "Notice",
+            "msg": "Undefined variable: hihi",
+            "stackTrace": [
+                {
+                    "file": "\/opt\/lampp\/htdocs\/phpmyadmin-new\/index.php",
+                    "line": 322,
+                    "function": "showPHPDocu",
+                    "class": "PMA_Util",
+                    "type": ":: ",
+                    "args": [
+                        "book.mysqli.php"
+                    ]
+                }
+            ],
+            "stackhash": "e911a21765eae766463612e033773716"
+        },
+        {
+            "lineNum": 665,
+            "file": ".\/index.php",
+            "type": "Notice",
+            "msg": "Undefined variable: hehe",
+            "stackTrace": [
+
+            ],
+            "stackhash": "37848b23bdd6e737273516b9575fe407"
+        }
+    ]
 }
