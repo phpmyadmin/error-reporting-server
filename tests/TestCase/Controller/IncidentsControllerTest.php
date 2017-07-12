@@ -109,8 +109,10 @@ class IncidentsControllerTest extends IntegrationTestCase
                 $report['error_message']);
         $this->assertEquals($bugReportDecoded['exception']['name'],
                 $report['error_name']);
-        $this->assertEquals($bugReportDecoded['pma_version'],
-                $report['pma_version']);
+        $this->assertEquals(
+            $this->Incidents->getStrippedPmaVersion($bugReportDecoded['pma_version']),
+            $report['pma_version']
+        );
 
         $this->configRequest(array('input' => ''));
         $this->post('/incidents/create');
