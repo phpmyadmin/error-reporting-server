@@ -53,7 +53,9 @@ In order to deploy the app in this repo you need to follow these steps:
 
 ## Web server setup ##
 
-- Configuration for Apache:
+- Configuration for Apache (this will run the server on port 80, if you
+  already have services on port 80 you may wish to use a different port
+  or configuration method):
 ```
 <VirtualHost *:80>
 			ServerAdmin webmaster@localhost
