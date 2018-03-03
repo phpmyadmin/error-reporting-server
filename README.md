@@ -17,6 +17,7 @@ In order to deploy the app in this repo you need to follow these steps:
 - Add a virtual hosts entry pointing at the directory where you extracted the
   files in the previous step. Make sure that the installation is in the
   document root.
+- Run `composer install` to download and configure dependencies and library files
 - Configure the web server (see below)
 - Create the database for the server
 - install mbstring (required for cake 3.0)
