@@ -61,9 +61,7 @@ In order to deploy the app in this repo you need to follow these steps:
 			<Directory /path/to/repo/dir/webroot/>
 				AddType application/x-httpd-php .html
 				Options Indexes MultiViews
-				AllowOverride All
-				Order allow,deny
-				allow from all
+				Require all granted
 			</Directory>
 
 			ErrorLog "/var/log/httpd/dummy-host.example.com-error_log"
