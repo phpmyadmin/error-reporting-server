@@ -17,21 +17,20 @@ In order to deploy the app in this repo you need to follow these steps:
 - Add a virtual hosts entry pointing at the directory where you extracted the
   files in the previous step. Make sure that the installation is in the
   document root.
+- Run `composer install` to download and configure dependencies and library files
 - Configure the web server (see below)
 - Create the database for the server
 - install mbstring (required for cake 3.0)
-- install intl extension: `sudo apt-get install php5-intl` //(required for cake 3.0)
+- install intl extension; on Debian use: `sudo apt-get install php-intl` //(required for cake 3.0)
 - cd application_root_dir (directory under which subdirectory `src` resides)
 - mkdir tmp;
 - mkdir logs;
 - set permissions for tmp and logs directory
-          ``
-	- ```HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1````
+	-     HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
 	- `setfacl -R -m u:${HTTPDUSER}:rwx tmp`
 	- `setfacl -R -d -m u:${HTTPDUSER}:rwx tmp`
 	- `setfacl -R -m u:${HTTPDUSER}:rwx logs`
 	- `setfacl -R -d -m u:${HTTPDUSER}:rwx logs`
-``
 - Rename the example files `config/app_example.php` to
   `config/app.php` and fill out the required info.
   Make sure to change the salts, debug level and
@@ -52,7 +51,9 @@ In order to deploy the app in this repo you need to follow these steps:
 
 ## Web server setup ##
 
-- Configuration for Apache:
+- Configuration for Apache (this will run the server on port 80, if you
+  already have services on port 80 you may wish to use a different port
+  or configuration method):
 ```
 <VirtualHost *:80>
 			ServerAdmin webmaster@localhost
@@ -61,9 +62,7 @@ In order to deploy the app in this repo you need to follow these steps:
 			<Directory /path/to/repo/dir/webroot/>
 				AddType application/x-httpd-php .html
 				Options Indexes MultiViews
-				AllowOverride All
-				Order allow,deny
-				allow from all
+				Require all granted
 			</Directory>
 
 			ErrorLog "/var/log/httpd/dummy-host.example.com-error_log"
