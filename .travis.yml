@@ -1,6 +1,9 @@
 language: php
 php:
-  - "7.2"
+  - 7.1
+  - 7.2
+  - 7.3
+  - nightly
 sudo: false
 before_script:
   - cp config/app_travis.php config/app.php
