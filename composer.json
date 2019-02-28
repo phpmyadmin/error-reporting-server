@@ -20,7 +20,6 @@
     "require": {
         "php": ">=5.4.0",
         "ext-curl": "*",
-        "cakephp/cakephp": "~3.4",
         "cakephp/cakephp": "3.7.*",
         "cakephp/migrations": "~1.0",
         "cakephp/plugin-installer": "*"
