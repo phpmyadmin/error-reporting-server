@@ -92,7 +92,7 @@ class IncidentsHelper extends AppHelper
             }
             $html .= "'>";
 
-            if ($exception_type == 'js') {
+            if ('js' == $exception_type) {
                 if (isset($level['context'])) {
                     $html .= htmlspecialchars(join("\n", $level['context']));
                 }
@@ -124,7 +124,7 @@ class IncidentsHelper extends AppHelper
     protected function _getStackLevelInfo($level, $exception_type = 'js')
     {
         $html = '<span>';
-        if ($exception_type == 'js') {
+        if ('js' == $exception_type) {
             $elements = array('filename', 'scriptname', 'line', 'func', 'column');
         } else {
             $elements = array('file', 'line', 'function', 'class');

@@ -1,4 +1,5 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 
 /**
@@ -22,7 +23,7 @@ namespace App\Controller;
 use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\Log\Log;
-use Cake\Network\Exception\NotFoundException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 
@@ -176,7 +177,7 @@ class GithubController extends AppController
      */
     public function unlink_issue($reportId)
     {
-        if (!isset($reportId) || ! $reportId) {
+        if (!isset($reportId) || !$reportId) {
             throw new NotFoundException(__('Invalid reportId'));
         }
 
@@ -246,10 +247,10 @@ class GithubController extends AppController
     }
 
     /**
-     * Returns the text to be added while creating an issue
+     * Returns the text to be added while creating an issue.
      *
-     * @param integer $reportId       Report Id
-     * @param array   $report         Report associative array
+     * @param int   $reportId Report Id
+     * @param array $report   Report associative array
      *
      * @return string
      */
@@ -301,10 +302,10 @@ class GithubController extends AppController
 
         $updateReport = true;
 
-        if ($type == 4 && $response == 200) {
+        if (4 == $type && 200 == $response) {
             // issue details fetched successfully
             return true;
-        } elseif ($response == 201) {
+        } elseif (201 == $response) {
             // success
             switch ($type) {
                 case 1:
@@ -329,14 +330,14 @@ class GithubController extends AppController
                 TableRegistry::get('Reports')->save($report);
             }
 
-            if ($msg !== '') {
+            if ('' !== $msg) {
                 $flash_class = 'alert alert-success';
                 $this->Flash->default($msg,
                     array('params' => array('class' => $flash_class)));
             }
 
             return true;
-        } elseif ($response === 403) {
+        } elseif (403 === $response) {
             $flash_class = 'alert alert-error';
             $this->Flash->default(
                     'Unauthorised access to Github. github'
@@ -345,8 +346,8 @@ class GithubController extends AppController
                     array('params' => array('class' => $flash_class)));
 
             return false;
-        } elseif ($response === 404
-            && $type == 2
+        } elseif (404 === $response
+            && 2 == $type
         ) {
             $flash_class = 'alert alert-error';
             $this->Flash->default(
@@ -367,7 +368,7 @@ class GithubController extends AppController
 
     /**
      * Get Incident counts for a report and
-     * all its related reports
+     * all its related reports.
      *
      * @param $reportId Report ID
      *
@@ -401,7 +402,7 @@ class GithubController extends AppController
     }
 
     /**
-     * Get corresponding report status from Github issue state
+     * Get corresponding report status from Github issue state.
      *
      * @param $issueState Linked Github issue's state
      *
@@ -425,7 +426,7 @@ class GithubController extends AppController
     }
 
     /**
-     * Synchronize Report Statuses from Github issues
+     * Synchronize Report Statuses from Github issues.
      *
      * To be used as a cron job (using webroot/cron_dispatcher.php).
      *
@@ -441,6 +442,7 @@ class GithubController extends AppController
             );
 
             $this->redirect('/');
+
             return;
         }
 
@@ -454,9 +456,9 @@ class GithubController extends AppController
                 'conditions' => array(
                     'sourceforge_bug_id IS NOT NULL',
                     'NOT' => array(
-                        'status' => 'resolved'
-                    )
-                )
+                        'status' => 'resolved',
+                    ),
+                ),
             )
         );
 
@@ -478,7 +480,7 @@ class GithubController extends AppController
                         . ' associated with Report#'
                         . ($report['id'])
                         . '. Status returned: ' . $status,
-                    ['scope' => 'cron_jobs']
+                    array('scope' => 'cron_jobs')
                 );
                 continue;
             }
@@ -495,7 +497,7 @@ class GithubController extends AppController
                     'SUCCESS: Updated status of Report #'
                     . $report['id'] . ' from state of its linked Github issue #'
                     . $report['sourceforge_bug_id'] . ' to ' . $rep->status,
-                    ['scope' => 'cron_jobs']
+                    array('scope' => 'cron_jobs')
                 );
             }
         }

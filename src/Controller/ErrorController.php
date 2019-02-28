@@ -1,4 +1,5 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * Error Controller.
@@ -21,14 +22,13 @@
  *
  * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Controller;
 
-use App\Controller\AppController;
 use Cake\Event\Event;
 
 class ErrorController extends AppController
 {
-
     public function beforeFilter(Event $event)
     {
         parent::beforeFilter($event);
@@ -39,5 +39,4 @@ class ErrorController extends AppController
         parent::beforeRender($event);
         $this->viewBuilder()->templatePath('Error');
     }
-
 }

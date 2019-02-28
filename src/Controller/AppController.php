@@ -1,4 +1,5 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 
 /**
@@ -45,7 +46,7 @@ class AppController extends Controller
         'Incidents' => array(
             'create',
         ),
-        'Events'
+        'Events',
     );
 
     public $readonly_whitelist = array(
@@ -54,11 +55,11 @@ class AppController extends Controller
         'Reports' => array(
             'index',
             'view',
-            'data_tables'
+            'data_tables',
         ),
         'Incidents' => array(
-            'view'
-        )
+            'view',
+        ),
     );
 
     public $css_files = array(
@@ -68,7 +69,7 @@ class AppController extends Controller
         'bootstrap-responsive.min',
         'shCore',
         'shThemeDefault',
-        'custom'
+        'custom',
     );
 
     public $js_files = array(
@@ -95,7 +96,7 @@ class AppController extends Controller
         'jqplot.canvasAxisTickRenderer.min',
         'jqplot.cursor.min',
         'pie',
-        'custom'
+        'custom',
     );
 
     /**
@@ -214,8 +215,8 @@ class AppController extends Controller
             . 'repository on Github.com to do this',
             array(
                 'params' => array(
-                    'class' => $flash_class
-                )
+                    'class' => $flash_class,
+                ),
             )
         );
 

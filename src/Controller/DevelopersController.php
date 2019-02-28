@@ -21,8 +21,6 @@ namespace App\Controller;
 
 use Cake\Core\Configure;
 use Cake\Event\Event;
-use Cake\Network\Exception\NotFoundException;
-use Cake\ORM\TableRegistry;
 
 /**
  * Developer controller handling developer login/logout/register.
@@ -54,26 +52,26 @@ class DevelopersController extends AppController
         $accessToken = $this->GithubApi->getAccessToken($code);
         if ($code && $accessToken) {
             list($userInfo, $status) = $this->GithubApi->getUserInfo($accessToken);
-            if ($status != 200) {
+            if (200 != $status) {
                 $flash_class = 'alert alert-error';
                 $this->Flash->default($userInfo['message'],
                     array('params' => array('class' => $flash_class)));
 
                 $this->redirect('/');
+
                 return;
-            } else {
-                $userInfo['has_commit_access'] = $this->GithubApi->canCommitTo(
+            }
+            $userInfo['has_commit_access'] = $this->GithubApi->canCommitTo(
                     $userInfo['login'],
                     $this->GithubApi->githubRepo,
                     Configure::read('GithubAccessToken')
                 );
 
-                $this->_authenticateDeveloper($userInfo, $accessToken);
+            $this->_authenticateDeveloper($userInfo, $accessToken);
 
-                $flash_class = 'alert alert-success';
-                $this->Flash->default('You have been logged in successfully',
+            $flash_class = 'alert alert-success';
+            $this->Flash->default('You have been logged in successfully',
                         array('params' => array('class' => $flash_class)));
-            }
         } else {
             $flash_class = 'alert alert-error';
             $this->Flash->default('We were not able to authenticate you.'
@@ -81,6 +79,7 @@ class DevelopersController extends AppController
                     array('params' => array('class' => $flash_class)));
 
             $this->redirect('/');
+
             return;
         }
 

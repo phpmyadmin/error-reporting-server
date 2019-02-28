@@ -22,7 +22,7 @@ namespace App\Controller;
 use App\Utility\Sanitize;
 use Cake\Core\Configure;
 use Cake\Log\Log;
-use Cake\Network\Exception\NotFoundException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 
 /**
@@ -38,9 +38,12 @@ class ReportsController extends AppController
     public function index()
     {
         $this->Reports->recursive = -1;
-        $this->set('distinct_statuses',
-            $this->_findArrayList($this->Reports->find()->select(array('status'))->distinct(array('status')),
-            'status')
+        $this->set(
+            'distinct_statuses',
+            $this->_findArrayList(
+                $this->Reports->find()->select(array('status'))->distinct(array('status')),
+            'status'
+            )
         );
         $this->set(
             'distinct_locations',
@@ -50,10 +53,12 @@ class ReportsController extends AppController
                 'location'
             )
         );
-        $this->set('distinct_versions',
+        $this->set(
+            'distinct_versions',
             $this->_findArrayList($this->Reports->find()->select(array('pma_version'))->distinct(array('pma_version')), 'pma_version')
         );
-        $this->set('distinct_error_names',
+        $this->set(
+            'distinct_error_names',
             $this->_findArrayList($this->Reports->find('all', array(
                 'fields' => array('error_name'),
                 'conditions' => array('error_name !=' => ''),
@@ -77,10 +82,14 @@ class ReportsController extends AppController
         $this->set('project_name', Configure::read('GithubRepoPath'));
         $this->Reports->id = $reportId;
         $this->set('incidents', $this->Reports->getIncidents()->toArray());
-        $this->set('incidents_with_description',
-            $this->Reports->getIncidentsWithDescription());
-        $this->set('incidents_with_stacktrace',
-            $this->Reports->getIncidentsWithDifferentStacktrace());
+        $this->set(
+            'incidents_with_description',
+            $this->Reports->getIncidentsWithDescription()
+        );
+        $this->set(
+            'incidents_with_stacktrace',
+            $this->Reports->getIncidentsWithDifferentStacktrace()
+        );
         $this->set('related_reports', $this->Reports->getRelatedReports());
         $this->set('status', $this->Reports->status);
         $this->_setSimilarFields($reportId);
@@ -140,7 +149,8 @@ class ReportsController extends AppController
 
         $rows = $this->_findAllDataTable(
             $this->Reports->find('all', $pagedParams)->innerJoin(
-                array('incidents' => $subquery), array('incidents.report_id = Reports.id')
+                array('incidents' => $subquery),
+                array('incidents.report_id = Reports.id')
             )
         );
         //$rows = Sanitize::clean($rows);
@@ -162,7 +172,8 @@ class ReportsController extends AppController
                 ),
             );
             $subquery_count = TableRegistry::get('incidents')->find(
-                'all', $subquery_params_count
+                'all',
+                $subquery_params_count
             );
 
             $params_count = array(
@@ -216,9 +227,11 @@ class ReportsController extends AppController
         $this->Reports->addToRelatedGroup($report, $relatedTo);
 
         $flash_class = 'alert alert-success';
-        $this->Flash->default('This report has been marked the same as #'
+        $this->Flash->default(
+            'This report has been marked the same as #'
                 . $relatedTo,
-                array('params' => array('class' => $flash_class)));
+                array('params' => array('class' => $flash_class))
+        );
         $this->redirect("/reports/view/$reportId");
     }
 
@@ -239,8 +252,10 @@ class ReportsController extends AppController
         $this->Reports->removeFromRelatedGroup($report);
 
         $flash_class = 'alert alert-success';
-        $this->Flash->default('This report has been marked as different.',
-            array('params' => array('class' => $flash_class)));
+        $this->Flash->default(
+            'This report has been marked as different.',
+            array('params' => array('class' => $flash_class))
+        );
         $this->redirect("/reports/view/$reportId");
     }
 
@@ -268,8 +283,10 @@ class ReportsController extends AppController
         $this->Reports->save($report);
 
         $flash_class = 'alert alert-success';
-        $this->Flash->default('The state has been successfully changed.',
-            array('params' => array('class' => $flash_class)));
+        $this->Flash->default(
+            'The state has been successfully changed.',
+            array('params' => array('class' => $flash_class))
+        );
         $this->redirect("/reports/view/$reportId");
     }
 
@@ -319,8 +336,10 @@ class ReportsController extends AppController
             }
         }
 
-        $this->Flash->default($msg,
-            array('params' => array('class' => $flash_class)));
+        $this->Flash->default(
+            $msg,
+            array('params' => array('class' => $flash_class))
+        );
         $this->redirect('/reports/');
     }
 

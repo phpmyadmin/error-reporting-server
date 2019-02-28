@@ -69,7 +69,7 @@ class ReportsHelper extends AppHelper
         foreach ($incidents as $incident) {
             $class = 'well span5';
 
-            if ($count % 2 == 1) {
+            if (1 == $count % 2) {
                 $class .= ' ';
             } else {
                 $html .= "</div><div class='row'>";

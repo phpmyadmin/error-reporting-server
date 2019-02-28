@@ -19,7 +19,6 @@
 
 namespace App\Controller;
 
-
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
@@ -37,7 +36,7 @@ class NotificationsController extends AppController
 
     public function beforeFilter(Event $event)
     {
-        if ($this->action != 'clean_old_notifs') {
+        if ('clean_old_notifs' != $this->action) {
             parent::beforeFilter($event);
         }
     }
@@ -86,8 +85,8 @@ class NotificationsController extends AppController
             'all',
             array(
                 'conditions' => array(
-                    'developer_id' => $current_developer['id']
-                )
+                    'developer_id' => $current_developer['id'],
+                ),
             )
         )->count();
 
@@ -141,10 +140,9 @@ class NotificationsController extends AppController
         $flash_class = 'alert alert-success';
 
         if ($this->request->getData('mark_all')) {
-
             // Delete all notifications for this Developer
             $this->Notifications->deleteAll(
-                ['developer_id' => $this->request->session()->read('Developer.id')]
+                array('developer_id' => $this->request->session()->read('Developer.id'))
             );
 
             $msg = 'All your notifications have been marked \'Read\'';

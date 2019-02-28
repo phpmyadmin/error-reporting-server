@@ -76,7 +76,7 @@ class ReportsTable extends Table
         'new' => 'New',
         'invalid' => 'Invalid',
         'resolved' => 'Resolved',
-        'forwarded' => 'Forwarded'
+        'forwarded' => 'Forwarded',
     );
 
     public function initialize(array $config)
@@ -291,7 +291,7 @@ class ReportsTable extends Table
     }
 
     /**
-     * Updates the linked reports to a Github issue to newly recieved status
+     * Updates the linked reports to a Github issue to newly recieved status.
      *
      * @param string $issueNumber Github Issue number
      * @param string $status      New status to be set
@@ -301,10 +301,10 @@ class ReportsTable extends Table
     public function setLinkedReportStatus($issueNumber, $status)
     {
         $conditions = array(
-            'sourceforge_bug_id' =>  $issueNumber
+            'sourceforge_bug_id' => $issueNumber,
         );
         $fields = array(
-            'status' => $status
+            'status' => $status,
         );
 
         return $this->updateAll($fields, $conditions);

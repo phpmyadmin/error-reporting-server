@@ -1,4 +1,5 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 
 /**
@@ -52,7 +53,7 @@ class GithubApiComponent extends Component
         $access_token = ''
     ) {
         $path = 'https://api.github.com/' . $path;
-        if (strtoupper($method) === 'GET') {
+        if ('GET' === strtoupper($method)) {
             $path .= '?' . http_build_query($data);
             $data = array();
         }
@@ -124,7 +125,7 @@ class GithubApiComponent extends Component
         $curlHandle = curl_init($url);
         curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $method);
         $header = array('Accept: application/json');
-        if (isset($access_token) && $access_token != '') {
+        if (isset($access_token) && '' != $access_token) {
             $header[] = 'Authorization: token ' . $access_token;
         }
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $header);
@@ -172,8 +173,9 @@ class GithubApiComponent extends Component
     /**
      * Check if a user can commit to a rep.
      *
-     * @param string $username the username to check
-     * @param string $repoPath the repo path of the repo to check for
+     * @param string $username     the username to check
+     * @param string $repoPath     the repo path of the repo to check for
+     * @param mixed  $access_token
      *
      * @return bool true if the user is a collaborator and false if they arent
      */
@@ -187,7 +189,7 @@ class GithubApiComponent extends Component
             $access_token
         );
 
-        return $status === 204;
+        return 204 === $status;
     }
 
     /**
@@ -228,7 +230,7 @@ class GithubApiComponent extends Component
     }
 
     /**
-     * Make API request for getting Github issue's status
+     * Make API request for getting Github issue's status.
      *
      * @param string $repoPath
      * @param array  $data
@@ -245,5 +247,4 @@ class GithubApiComponent extends Component
             $access_token
         );
     }
-
 }

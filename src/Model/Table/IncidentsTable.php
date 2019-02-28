@@ -1,4 +1,5 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 
 /**
@@ -153,14 +154,14 @@ class IncidentsTable extends Table
      * @param array $bugReport the bug report being submitted
      *
      * @return array of:
-     *          1. array of inserted incident ids. If the report/incident was not
+     *               1. array of inserted incident ids. If the report/incident was not
      *               correctly saved, false is put in it place.
-     *          2. array of newly created report ids. If no new report was created,
+     *               2. array of newly created report ids. If no new report was created,
      *               an empty array is returned
      */
     public function createIncidentFromBugReport($bugReport)
     {
-        if ($bugReport == null) {
+        if (null == $bugReport) {
             return array('incidents' => array(false), 'reports' => array());
         }
         $incident_ids = array();    // array to hold ids of all the inserted incidents
@@ -179,7 +180,6 @@ class IncidentsTable extends Table
         $incidentsTable = TableRegistry::get('Incidents');
         $reportsTable = TableRegistry::get('Reports');
         foreach ($schematizedIncidents as $index => $si) {
-
             // find closest report. If not found, create a new report.
             $closestReport = $this->_getClosestReport($bugReport, $index);
             if ($closestReport) {
@@ -235,7 +235,7 @@ class IncidentsTable extends Table
 
         return array(
             'incidents' => $incident_ids,
-            'reports' => $new_report_ids
+            'reports' => $new_report_ids,
         );
     }
 
@@ -254,7 +254,7 @@ class IncidentsTable extends Table
     protected function _getClosestReport($bugReport, $index = 0)
     {
         if (isset($bugReport['exception_type'])
-            && $bugReport['exception_type'] == 'php'
+            && 'php' == $bugReport['exception_type']
         ) {
             $location = $bugReport['errors'][$index]['file'];
             $linenumber = $bugReport['errors'][$index]['lineNum'];
@@ -282,7 +282,7 @@ class IncidentsTable extends Table
     protected function _getReportDetails($bugReport, $index = 0)
     {
         if (isset($bugReport['exception_type'])
-            && $bugReport['exception_type'] == 'php'
+            && 'php' == $bugReport['exception_type']
         ) {
             $location = $bugReport['errors'][$index]['file'];
             $linenumber = $bugReport['errors'][$index]['lineNum'];
@@ -341,7 +341,7 @@ class IncidentsTable extends Table
         );
 
         if (isset($bugReport['exception_type'])
-            && $bugReport['exception_type'] == 'php'
+            && 'php' == $bugReport['exception_type']
         ) {
             // for each "errors"
             foreach ($bugReport['errors'] as $error) {
@@ -402,12 +402,12 @@ class IncidentsTable extends Table
         foreach ($stacktrace as $level) {
             if (isset($level['filename'])) {
                 // ignore unrelated files that sometimes appear in the error report
-                if ($level['filename'] === 'tracekit/tracekit.js') {
+                if ('tracekit/tracekit.js' === $level['filename']) {
                     continue;
-                } elseif ($level['filename'] === 'error_report.js') {
+                } elseif ('error_report.js' === $level['filename']) {
                     // in case the error really is in the error_report.js file save it for
                     // later
-                    if ($fallback[0] == 'UNKNOWN') {
+                    if ('UNKNOWN' == $fallback[0]) {
                         $fallback = array($level['filename'], $level['line']);
                     }
                     continue;
@@ -460,7 +460,7 @@ class IncidentsTable extends Table
 
     /**
      * Returns the version string stripped of
-     * 'deb', 'ubuntu' and other suffixes
+     * 'deb', 'ubuntu' and other suffixes.
      *
      * @param string $versionString phpMyAdmin version
      *
@@ -525,15 +525,15 @@ class IncidentsTable extends Table
 
     /**
      * Checks the length of stacktrace and full_report
-     * and logs if it is greater than what it can hold
+     * and logs if it is greater than what it can hold.
      *
      * @param array $si           submitted incident
      * @param array $incident_ids incident IDs
      *
      * @return array $incident_ids
      */
-    private function _logLongIncidentSubmissions($si, &$incident_ids) {
-
+    private function _logLongIncidentSubmissions($si, &$incident_ids)
+    {
         $stacktraceLength = mb_strlen($si['stacktrace']);
         $fullReportLength = mb_strlen($si['full_report']);
         $errorMessageLength = mb_strlen($si['error_message']);

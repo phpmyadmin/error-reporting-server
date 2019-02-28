@@ -1,8 +1,9 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 
 /**
- * Mailer component handling sending of report notification mails
+ * Mailer component handling sending of report notification mails.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -20,9 +21,8 @@
 namespace App\Controller\Component;
 
 use Cake\Controller\Component;
-use Cake\ORM\TableRegistry;
-use Cake\Mailer\Email;
 use Cake\Core\Configure;
+use Cake\Mailer\Email;
 
 /**
  * Mailer component handling report notification emails.
@@ -30,11 +30,11 @@ use Cake\Core\Configure;
 class MailerComponent extends Component
 {
     /**
-     * Send an email about the report to configured Email
+     * Send an email about the report to configured Email.
      *
      * @param $viewVars Array of View Variables
      *
-     * @return boolean if Email was sent
+     * @return bool if Email was sent
      */
     public function sendReportMail($viewVars)
     {
@@ -43,8 +43,8 @@ class MailerComponent extends Component
         $emailFrom = Configure::read('NotificationEmailsFrom');
         $emailTransport = Configure::read('NotificationEmailsTransport');
 
-        if (! $emailTo || $emailTo === ''
-            || ! $emailFrom || $emailFrom === ''
+        if (!$emailTo || '' === $emailTo
+            || !$emailFrom || '' === $emailFrom
         ) {
             return false;
         }

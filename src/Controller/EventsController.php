@@ -1,8 +1,9 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 
 /**
- * Events controller Github webhook events
+ * Events controller Github webhook events.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -25,11 +26,10 @@ use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 
 /**
- * Events controller Github webhook events
+ * Events controller Github webhook events.
  */
 class EventsController extends AppController
 {
-
     public function initialize()
     {
         parent::initialize();
@@ -46,10 +46,10 @@ class EventsController extends AppController
     public function index()
     {
         // Only allow POST requests
-        $this->request->allowMethod(['post']);
+        $this->request->allowMethod(array('post'));
 
         // Validate request
-        if (($statusCode = $this->_validateRequest($this->request)) !== 201) {
+        if (201 !== ($statusCode = $this->_validateRequest($this->request))) {
             Log::error(
                 'Could not validate the request. Sending a '
                     . $statusCode . ' response.'
@@ -60,8 +60,8 @@ class EventsController extends AppController
             $this->response->statusCode($statusCode);
 
             return $this->response;
-        } elseif ($statusCode === 200) {
-           // Send a success response to ping event
+        } elseif (200 === $statusCode) {
+            // Send a success response to ping event
             $this->auto_render = false;
             $this->response->statusCode($statusCode);
 
@@ -72,9 +72,9 @@ class EventsController extends AppController
         $eventAction = $issuesData['action'];
         $issueNumber = $issuesData['issue'] ? $issuesData['issue']['number'] : '';
 
-        if ($eventAction === 'closed'
-            || $eventAction === 'opened'
-            || $eventAction === 'reopened'
+        if ('closed' === $eventAction
+            || 'opened' === $eventAction
+            || 'reopened' === $eventAction
         ) {
             $status = $this->_getAppropriateStatus($eventAction);
 
@@ -106,9 +106,8 @@ class EventsController extends AppController
         return $this->response;
     }
 
-
     /**
-     * Validate HTTP Request recieved
+     * Validate HTTP Request recieved.
      *
      * @param Request $request Request object
      *
@@ -125,7 +124,7 @@ class EventsController extends AppController
         $recievedHashHeader = $request->getHeaderLine('X-Hub-Signature');
         $algo = '';
         $recievedHash = '';
-        if ($recievedHashHeader !== NULL) {
+        if (null !== $recievedHashHeader) {
             $parts = explode('=', $recievedHashHeader);
             if (count($parts) > 1) {
                 $algo = $parts[0];
@@ -135,7 +134,7 @@ class EventsController extends AppController
 
         $expectedHash = $this->_getHash(file_get_contents('php://input'), $algo);
 
-        if ($userAgent !== NULL && strpos($userAgent, 'GitHub-Hookshot') !== 0) {
+        if (null !== $userAgent && 0 !== strpos($userAgent, 'GitHub-Hookshot')) {
             // Check if the User-agent is Github
             // Otherwise, Send a '403: Forbidden'
 
@@ -146,7 +145,7 @@ class EventsController extends AppController
             $statusCode = 403;
 
             return $statusCode;
-        } elseif ($eventType !== NULL && $eventType === 'ping') {
+        } elseif (null !== $eventType && 'ping' === $eventType) {
             // Check if the request is based on 'issues' event
             // Otherwise, Send a '400: Bad Request'
 
@@ -156,7 +155,7 @@ class EventsController extends AppController
             $statusCode = 200;
 
             return $statusCode;
-        } elseif ($eventType !== NULL && $eventType !== 'issues') {
+        } elseif (null !== $eventType && 'issues' !== $eventType) {
             // Check if the request is based on 'issues' event
             // Otherwise, Send a '400: Bad Request'
 
@@ -185,7 +184,7 @@ class EventsController extends AppController
     }
 
     /**
-     * Get the hash of raw POST payload
+     * Get the hash of raw POST payload.
      *
      * @param string $payload Raw POST body string
      * @param string $algo    Algorithm used to calculate the hash
@@ -194,7 +193,7 @@ class EventsController extends AppController
      */
     protected function _getHash($payload, $algo)
     {
-        if ($algo === '') {
+        if ('' === $algo) {
             return '';
         }
         $key = Configure::read('GithubWebhookSecret');
@@ -203,7 +202,7 @@ class EventsController extends AppController
     }
 
     /**
-     * Get appropriate new status based on action recieved in github event
+     * Get appropriate new status based on action recieved in github event.
      *
      * @param string $action Action recieved in Github webhook event
      *

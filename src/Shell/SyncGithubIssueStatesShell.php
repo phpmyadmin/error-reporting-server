@@ -1,4 +1,5 @@
 <?php
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 
 /**
@@ -44,9 +45,8 @@ class SyncGithubIssueStatesShell extends Shell
                 . 'github/sync_issue_status'
                 . '" at '
                 . date('d-m-Y G:i:s (e)'),
-            ['scope' => 'cron_jobs']
+            array('scope' => 'cron_jobs')
         );
-
 
         Configure::write('CronDispatcher', true);
         if (PHP_SAPI === 'cli') {
@@ -63,8 +63,7 @@ class SyncGithubIssueStatesShell extends Shell
                 $request,
                 new Response()
             );
-        }
-        else {
+        } else {
             exit;
         }
 
@@ -73,8 +72,7 @@ class SyncGithubIssueStatesShell extends Shell
                 . 'github/sync_issue_status'
                 . '" at '
                 . date('d-m-Y G:i:s (e)'),
-            ['scope' => 'cron_jobs']
+            array('scope' => 'cron_jobs')
         );
-
     }
 }

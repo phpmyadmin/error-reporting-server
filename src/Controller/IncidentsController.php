@@ -20,7 +20,7 @@
 namespace App\Controller;
 
 use Cake\Core\Configure;
-use Cake\Network\Exception\NotFoundException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 
 /**
@@ -35,7 +35,7 @@ class IncidentsController extends AppController
     public function create()
     {
         // Only allow POST requests
-        $this->request->allowMethod(['post']);
+        $this->request->allowMethod(array('post'));
 
         $bugReport = $this->request->input('json_decode', true);
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
@@ -127,7 +127,7 @@ class IncidentsController extends AppController
             'incidents_with_description' => $this->Reports->getIncidentsWithDescription(),
             'incidents_with_stacktrace' => $this->Reports->getIncidentsWithDifferentStacktrace(),
             'related_reports' => $this->Reports->getRelatedReports(),
-            'status' => $this->Reports->status
+            'status' => $this->Reports->status,
         );
         $viewVars = array_merge($viewVars, $this->_getSimilarFields($reportId));
 
@@ -139,7 +139,7 @@ class IncidentsController extends AppController
         $this->Reports->id = $id;
 
         $viewVars = array(
-            'columns' => TableRegistry::get('Incidents')->summarizableFields
+            'columns' => TableRegistry::get('Incidents')->summarizableFields,
         );
         $relatedEntries = array();
 

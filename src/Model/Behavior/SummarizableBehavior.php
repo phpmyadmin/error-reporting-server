@@ -43,7 +43,7 @@ class SummarizableBehavior extends ModelBehavior
         $query,
         $results = array()
     ) {
-        if ($state === 'before') {
+        if ('before' === $state) {
             return $query;
         }
         $output = array();
