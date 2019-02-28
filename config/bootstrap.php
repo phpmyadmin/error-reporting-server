@@ -20,7 +20,7 @@
 require __DIR__ . '/paths.php';
 
 // Use composer to load the autoloader.
-require ROOT . DS . 'vendor' . DS . 'autoload.php';
+require VENDOR. 'autoload.php';
 
 /**
  * Bootstrap CakePHP.
@@ -40,7 +40,6 @@ if (!extension_loaded('intl')) {
 
 use Cake\Cache\Cache;
 use Cake\Console\ConsoleErrorHandler;
-use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Core\Configure\Engine\PhpConfig;
 use Cake\Core\Plugin;
@@ -48,7 +47,8 @@ use Cake\Database\Type;
 use Cake\Datasource\ConnectionManager;
 use Cake\Error\ErrorHandler;
 use Cake\Log\Log;
-use Cake\Network\Email\Email;
+use Cake\Mailer\Email;
+use Cake\Mailer\TransportFactory;
 use Cake\Network\Request;
 use Cake\Routing\DispatcherFactory;
 use Cake\Utility\Inflector;
@@ -134,11 +134,11 @@ if (!Configure::read('App.fullBaseUrl')) {
     unset($httpHost, $s);
 }
 
-Cache::config(Configure::consume('Cache'));
-ConnectionManager::config(Configure::consume('Datasources'));
-Email::configTransport(Configure::consume('EmailTransport'));
-Email::config(Configure::consume('Email'));
-Log::config(Configure::consume('Log'));
+Cache::getConfig(Configure::consume('Cache'));
+ConnectionManager::getConfig(Configure::consume('Datasources'));
+TransportFactory::getConfig(Configure::consume('EmailTransport'));
+Email::getConfig(Configure::consume('Email'));
+Log::getConfig(Configure::consume('Log'));
 Security::salt(Configure::consume('Security.salt'));
 
 /**

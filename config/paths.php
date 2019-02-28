@@ -72,6 +72,11 @@ define('LOGS', ROOT . DS . 'logs' . DS);
 define('CACHE', TMP . 'cache' . DS);
 
 /**
+ * Path to the vendor files directory.
+ */
+define('VENDOR', ROOT . DS . 'vendor');
+
+/**
  * The absolute path to the "cake" directory, WITHOUT a trailing DS.
  *
  * CakePHP should always be installed with composer, so look there.

@@ -15,6 +15,7 @@
 use Cake\Core\Configure;
 use Cake\Core\Exception\MissingPluginException;
 use Cake\Core\Plugin;
+use Symfony\Component\Console\Application;
 
 /**
  * Additional bootstrapping and configuration for CLI environments should
