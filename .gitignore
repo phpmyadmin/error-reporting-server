@@ -16,5 +16,6 @@ logs/
 composer.phar
 composer.lock
 .php_cs.cache
+/config/Migrations/schema-dump-default.lock
 /.idea
 /.vscode
