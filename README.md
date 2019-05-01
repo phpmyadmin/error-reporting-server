@@ -18,7 +18,7 @@ In order to deploy the app in this repo you need to follow these steps:
   files in the previous step. Make sure that the installation is in the
   document root.
 - Run `composer install` to download and configure dependencies and library files
-- Configure the web server (see below)
+- Configure the web server (see [below](#oauth-configuration-setup))
 - Create the database for the server
 - install mbstring (required for cake 3.0)
 - install intl extension; on Debian use: `sudo apt-get install php-intl` //(required for cake 3.0)
@@ -105,7 +105,7 @@ server {
 }
 ```
 
-## Oath configuration setup ##
+## OAuth configuration setup ##
 
 ### Creating the GitHub app ###
 
@@ -113,11 +113,11 @@ The application relies on authentication using GitHub. To obtain the client ID
 and key, visit [application settings in your Github profile][gh-oauth] and
 register an application there.
 
-The callback for the github app should be ``/developers/callback``.
+The callback for the github app should be ``<http://YOUR_PREFERRED_DOMAIN>/developers/callback`` where ``YOUR_PREFERRED_DOMAIN`` is the URL you wish to access the local instance on.
 
-The obtained cliend ID and secret should be stored in the ``config/oauth.php``.
+Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth.php`` and replace the dummy credentials with the obtained cliend ID and secret.
 
-[gh-oauth]: https://github.com/settings/applications
+[gh-oauth]: https://github.com/settings/developers
 
 
 ## Github Events ##
