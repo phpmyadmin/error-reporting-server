@@ -52,13 +52,13 @@ class ReportsControllerTest extends IntegrationTestCase
         $this->assertEquals(1, count($this->viewVariable('incidents')));
 
         $this->assertNotEmpty($this->viewVariable('incidents_with_description'));
-        $this->assertEquals(1, count($this->viewVariable('incidents_with_description')));
+        $this->assertEquals(1, count($this->viewVariable('incidents_with_description')->toList()));
 
         $this->assertNotEmpty($this->viewVariable('incidents_with_stacktrace'));
-        $this->assertEquals(1, count($this->viewVariable('incidents_with_stacktrace')));
+        $this->assertEquals(1, count($this->viewVariable('incidents_with_stacktrace')->toList()));
 
         $this->assertNotEmpty($this->viewVariable('related_reports'));
-        $this->assertEquals(1, count($this->viewVariable('related_reports')));
+        $this->assertEquals(1, count($this->viewVariable('related_reports')->toList()));
 
         $this->get('/reports/view/3');
         $this->assertResponseContains('Invalid Report');

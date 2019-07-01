@@ -79,8 +79,8 @@ class NotificationsControllerTest extends IntegrationTestCase
             'iTotalDisplayRecords' => 2,
             'sEcho' => 1,
             'aaData' => array(
-                array('<input type="checkbox" name="notifs[]" value="1"/>', '<a href="/reports/view/1">1</a>', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'js', '2014-01-01T07:05:09'),
-                array('<input type="checkbox" name="notifs[]" value="2"/>', '<a href="/reports/view/4">4</a>', 'error1', 'Lorem ipsum dolor sit amet', '3.8', 'js', '2014-01-02T07:05:09'),
+                array('<input type="checkbox" name="notifs[]" value="1"/>', '<a href="/reports/view/1">1</a>', 'error2', 'Lorem ipsum dolor sit amet', '4.0', 'js', '2014-01-01T07:05:09+00:00'),
+                array('<input type="checkbox" name="notifs[]" value="2"/>', '<a href="/reports/view/4">4</a>', 'error1', 'Lorem ipsum dolor sit amet', '3.8', 'js', '2014-01-02T07:05:09+00:00'),
             ),
         );
 
