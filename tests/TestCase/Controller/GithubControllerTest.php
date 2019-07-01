@@ -238,7 +238,7 @@ class GithubControllerTest extends IntegrationTestCase
         $this->assertEquals(1387, $report->sourceforge_bug_id);
         $this->assertEquals('forwarded', $report->status);
         $this->assertSession(
-            'Unhandled response code recieved: 401',
+            'Unhandled response code received: 401',
             'Flash.flash.0.message'
         );
 

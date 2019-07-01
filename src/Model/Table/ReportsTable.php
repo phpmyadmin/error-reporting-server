@@ -291,7 +291,7 @@ class ReportsTable extends Table
     }
 
     /**
-     * Updates the linked reports to a Github issue to newly recieved status
+     * Updates the linked reports to a Github issue to newly received status
      *
      * @param string $issueNumber Github Issue number
      * @param string $status      New status to be set

@@ -81,7 +81,7 @@ class EventsController extends AppController
             if (($reportsUpdated = $this->Reports->setLinkedReportStatus($issueNumber, $status)) > 0) {
                 Log::debug(
                     $reportsUpdated . ' linked reports to issue number '
-                        . $issueNumber . ' were updated according to recieved action '
+                        . $issueNumber . ' were updated according to received action '
                         . $eventAction
                 );
             } else {
@@ -93,7 +93,7 @@ class EventsController extends AppController
             }
         } else {
             Log::info(
-                'Recieved a webhook event for action \'' . $eventAction
+                'received a webhook event for action \'' . $eventAction
                 . '\' on issue number ' . $issueNumber . '. Ignoring the event.'
             );
             $statusCode = 204;
@@ -108,7 +108,7 @@ class EventsController extends AppController
 
 
     /**
-     * Validate HTTP Request recieved
+     * Validate HTTP Request received
      *
      * @param Request $request Request object
      *
@@ -122,14 +122,14 @@ class EventsController extends AppController
         $userAgent = $request->getHeaderLine('User-Agent');
         $eventType = $request->getHeaderLine('X-GitHub-Event');
 
-        $recievedHashHeader = $request->getHeaderLine('X-Hub-Signature');
+        $receivedHashHeader = $request->getHeaderLine('X-Hub-Signature');
         $algo = '';
-        $recievedHash = '';
-        if ($recievedHashHeader !== NULL) {
-            $parts = explode('=', $recievedHashHeader);
+        $receivedHash = '';
+        if ($receivedHashHeader !== NULL) {
+            $parts = explode('=', $receivedHashHeader);
             if (count($parts) > 1) {
                 $algo = $parts[0];
-                $recievedHash = $parts[1];
+                $receivedHash = $parts[1];
             }
         }
 
@@ -151,7 +151,7 @@ class EventsController extends AppController
             // Otherwise, Send a '400: Bad Request'
 
             Log::info(
-                'Ping event type recieved.'
+                'Ping event type received.'
             );
             $statusCode = 200;
 
@@ -167,12 +167,12 @@ class EventsController extends AppController
             $statusCode = 400;
 
             return $statusCode;
-        } elseif ($recievedHash !== $expectedHash) {
+        } elseif ($receivedHash !== $expectedHash) {
             // Check if hash matches
             // Otherwise, Send a '401: Unauthorized'
 
             Log::error(
-                'Recieved hash ' . $recievedHash . ' does not match '
+                'received hash ' . $receivedHash . ' does not match '
                 . ' expected hash ' . $expectedHash
                 . '. Ignoring the event.'
             );
@@ -203,9 +203,9 @@ class EventsController extends AppController
     }
 
     /**
-     * Get appropriate new status based on action recieved in github event
+     * Get appropriate new status based on action received in github event
      *
-     * @param string $action Action recieved in Github webhook event
+     * @param string $action Action received in Github webhook event
      *
      * @return string Appropriate new status for the related reports
      */

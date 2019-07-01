@@ -359,7 +359,7 @@ class GithubController extends AppController
 
         // unknown response code
         $flash_class = 'alert alert-error';
-        $this->Flash->default('Unhandled response code recieved: ' . $response,
+        $this->Flash->default('Unhandled response code received: ' . $response,
                     array('params' => array('class' => $flash_class)));
 
         return false;
