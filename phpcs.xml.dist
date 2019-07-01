@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<ruleset
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="phpMyAdmin"
+    xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd"
+>
+    <rule ref="vendor/phpmyadmin/coding-standard/PhpMyAdmin/ruleset.xml">
+        <exclude name="PEAR.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="PEAR.Commenting.FileComment.Missing"/>
+        <exclude name="PEAR.Commenting.ClassComment.Missing"/>
+        <exclude name="PEAR.Commenting.FunctionComment.Missing"/>
+        <exclude name="PEAR.Commenting.FileComment.MissingPackageTag"/>
+        <exclude name="PEAR.Commenting.ClassComment.MissingPackageTag"/>
+        <exclude name="PEAR.Commenting.FileComment.IncompleteCopyright"/>
+        <exclude name="PEAR.Commenting.FileComment.LicenseTagOrder"/>
+        <exclude name="PEAR.Commenting.FileComment.LinkTagOrder"/>
+        <exclude name="PEAR.Commenting.FileComment.SinceTagOrder"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.KeySpecified"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.NoKeySpecified"/>
+    </rule>
+
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*/src/Controller/*</exclude-pattern>
+    </rule>
+
+     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>*/config/Migrations/*</exclude-pattern>
+    </rule>
+    <rule ref="PEAR.Commenting.FunctionComment.MissingReturn">
+        <exclude-pattern>*/config/Migrations/*</exclude-pattern>
+    </rule>
+
+    <rule ref="Generic.Files.LineLength.TooLong">
+        <severity>4</severity>
+    </rule>
+    <rule ref="Generic.Metrics.NestingLevel.TooHigh">
+        <severity>4</severity>
+    </rule>
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <severity>4</severity>
+    </rule>
+    <rule ref="PSR2.Classes.PropertyDeclaration.Underscore">
+        <severity>4</severity>
+    </rule>
+    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
+        <severity>4</severity>
+    </rule>
+    <rule ref="Squiz.NamingConventions.ValidVariableName">
+        <severity>4</severity>
+    </rule>
+
+    <arg value="sp"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+
+    <exclude-pattern>*/src/Console/Installer.php</exclude-pattern>
+    <exclude-pattern>*/tmp/*</exclude-pattern>
+    <exclude-pattern>*/bin/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <file>.</file>
+</ruleset>
