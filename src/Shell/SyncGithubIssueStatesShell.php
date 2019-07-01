@@ -55,7 +55,7 @@ class SyncGithubIssueStatesShell extends Shell
             $request = new ServerRequest('github/sync_issue_status');
             $request = $request->addParams(
                 Router::parse(
-                    $request->url,
+                    $request->getPath(),
                     ''
                 )
             );
