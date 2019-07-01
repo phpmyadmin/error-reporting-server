@@ -37,7 +37,7 @@ class NotificationsController extends AppController
 
     public function beforeFilter(Event $event)
     {
-        if ($this->action != 'clean_old_notifs') {
+        if ($this->request->getParam('action') != 'clean_old_notifs') {
             parent::beforeFilter($event);
         }
     }

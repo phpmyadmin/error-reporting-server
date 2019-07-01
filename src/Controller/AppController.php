@@ -164,7 +164,7 @@ class AppController extends Controller
     protected function _checkAccess()
     {
         $controller = $this->request->controller;
-        $action = $this->request->action;
+        $action = $this->request->getParam('action');
 
         if (in_array($controller, $this->whitelist)) {
             return;
@@ -188,7 +188,7 @@ class AppController extends Controller
     protected function _checkReadonlyAccess()
     {
         $controller = $this->request->controller;
-        $action = $this->request->action;
+        $action = $this->request->getParam('action');
         $read_only = $this->request->session()->read('read_only');
 
         // If developer has commit access on phpmyadmin/phpmyadmin
