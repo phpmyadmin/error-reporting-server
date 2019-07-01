@@ -156,7 +156,7 @@ class ReportsTable extends Table
     /**
      * Removes a report from a group of related reports.
      *
-     * @param \Cake\Datasource\EntityInterface $report
+     * @param \Cake\Datasource\EntityInterface $report The report instance
      * @return void
      */
     public function removeFromRelatedGroup($report)
@@ -182,8 +182,8 @@ class ReportsTable extends Table
     /**
      * Adds a report to a group of related reports.
      *
-     * @param \Cake\Datasource\EntityInterface $report
-     * @param int                              $related_to
+     * @param \Cake\Datasource\EntityInterface $report     The report instance
+     * @param int                              $related_to The report Id
      * @return void
      */
     public function addToRelatedGroup($report, $related_to)

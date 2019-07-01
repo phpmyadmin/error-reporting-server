@@ -37,7 +37,7 @@ class GithubApiComponent extends Component
      * @param string $method       the method type of the request
      * @param bool   $returnStatus whether to return the status code with the
      *                             request
-     * @param mixed  $access_token
+     * @param string $access_token the github access token
      *
      * @return array the returned response decoded and optionally the status code,
      *               see GithubApiComponent::sendRequest()
@@ -109,7 +109,7 @@ class GithubApiComponent extends Component
      * @param string $method       the method type of the request
      * @param bool   $returnCode   whether to return the status code with the
      *                             request
-     * @param mixed  $access_token
+     * @param string $access_token the github access token
      *
      * @return array the returned response decoded and optionally the status code,
      *               eg: array($decodedResponse, $statusCode) or just $decodedResponse
@@ -198,9 +198,9 @@ class GithubApiComponent extends Component
     /**
      * make api request for github issue creation.
      *
-     * @param string $repoPath
+     * @param string $repoPath     The repo slug
      * @param array  $data         issue details
-     * @param string $access_token
+     * @param string $access_token the github access token
      * @return array
      */
     public function createIssue($repoPath, $data, $access_token)
@@ -217,10 +217,10 @@ class GithubApiComponent extends Component
     /**
      * make api request for github comment creation.
      *
-     * @param string $repoPath
-     * @param array  $data
-     * @param int    $issueNumber
-     * @param string $access_token
+     * @param string $repoPath     The repo slug
+     * @param array  $data         The data
+     * @param int    $issueNumber  The issue number
+     * @param string $access_token The github access token
      * @return array
      */
     public function createComment($repoPath, $data, $issueNumber, $access_token)
@@ -237,10 +237,10 @@ class GithubApiComponent extends Component
     /**
      * Make API request for getting Github issue's status
      *
-     * @param string $repoPath
-     * @param array  $data
-     * @param int    $issueNumber
-     * @param string $access_token
+     * @param string $repoPath     The repo slug
+     * @param array  $data         The data
+     * @param int    $issueNumber  The issue number
+     * @param string $access_token The github access token
      * @return array
      */
     public function getIssue($repoPath, $data, $issueNumber, $access_token)

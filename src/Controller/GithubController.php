@@ -48,7 +48,7 @@ class GithubController extends AppController
     /**
      * create Github Issue.
      *
-     * @param int $reportId
+     * @param int $reportId The report number
      *
      * @throws NotFoundException
      * @return void

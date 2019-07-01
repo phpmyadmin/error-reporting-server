@@ -254,7 +254,7 @@ class IncidentsTable extends Table
      *
      * @param array $bugReport the bug report being checked
      *                         Integer $index: for php exception type
-     * @param mixed $index
+     * @param int   $index     The report index
      *
      * @return array the first similar report or null
      */
@@ -283,7 +283,7 @@ class IncidentsTable extends Table
      *
      * @param array $bugReport the bug report the report record is being created for
      *                         Integer $index: for php exception type
-     * @param mixed $index
+     * @param int   $index     The report index
      *
      * @return array an array with the report fields can be used with Report->save
      */

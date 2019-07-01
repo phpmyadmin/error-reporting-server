@@ -29,9 +29,9 @@ class DevelopersTable extends Table
     /**
      * creates a developer record given his github info and his access token.
      *
-     * @param array  $githubInfo  the data gitub has on this developer
-     * @param string $accessToken this developer's access token
-     * @param mixed  $developer
+     * @param array                            $githubInfo  the data gitub has on this developer
+     * @param string                           $accessToken this developer's access token
+     * @param \Cake\Datasource\EntityInterface $developer   the developper
      *
      * @return bool true if the developer was correctly saved otherwise false
      */

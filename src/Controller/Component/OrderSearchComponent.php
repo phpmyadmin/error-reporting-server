@@ -31,7 +31,7 @@ class OrderSearchComponent extends Component
      * Indexes are +1'ed because first column is of checkboxes
      * and hence it should be ingnored.
      *
-     * @param string[] $aColumns
+     * @param string[] $aColumns The columns
      *
      * @return array
      */
@@ -59,7 +59,7 @@ class OrderSearchComponent extends Component
     }
 
     /**
-     * @param string[] $aColumns
+     * @param string[] $aColumns The columns
      *
      * @return array
      */
