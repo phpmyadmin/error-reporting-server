@@ -7,10 +7,10 @@ namespace App\Config;
 
 use Cake\Core\Configure;
 
-Configure::write('GithubConfig', array(
-	'client_id' => '<application-client-id>',
-	'client_secret' => '<application-client-secret>'
-));
+Configure::write('GithubConfig', [
+    'client_id' => '<application-client-id>',
+    'client_secret' => '<application-client-secret>',
+]);
 
 /**
  * Configures the github repo to check commit access for

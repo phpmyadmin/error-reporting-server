@@ -27,14 +27,14 @@ use Cake\View\View;
  */
 class IncidentsHelper extends AppHelper
 {
-    public function __construct(View $view, $settings = array())
+    public function __construct(View $view, $settings = [])
     {
         parent::__construct($view, $settings);
     }
 
     public function createIncidentsLinks($incidents)
     {
-        $links = array();
+        $links = [];
         foreach ($incidents as $incident) {
             $links[] = $this->linkToIncident($incident);
         }
@@ -125,9 +125,20 @@ class IncidentsHelper extends AppHelper
     {
         $html = '<span>';
         if ($exception_type == 'js') {
-            $elements = array('filename', 'scriptname', 'line', 'func', 'column');
+            $elements = [
+                'filename',
+                'scriptname',
+                'line',
+                'func',
+                'column',
+            ];
         } else {
-            $elements = array('file', 'line', 'function', 'class');
+            $elements = [
+                'file',
+                'line',
+                'function',
+                'class',
+            ];
         }
         foreach ($elements as $element) {
             if (isset($level[$element])) {

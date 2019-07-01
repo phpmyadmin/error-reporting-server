@@ -35,7 +35,7 @@ class IncidentsTable extends Table
      * @see http://book.cakephp.org/2.0/en/models/behaviors.html#using-behaviors
      * @see Model::$actsAs
      */
-    public $actsAs = array('Summarizable');
+    public $actsAs = ['Summarizable'];
 
     /**
      * @var array
@@ -44,52 +44,52 @@ class IncidentsTable extends Table
      * @see http://book.cakephp.org/2.0/en/models/data-validation.html
      * @see Model::$validate
      */
-    public $validate = array(
-        'pma_version' => array(
+    public $validate = [
+        'pma_version' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'php_version' => array(
+        ],
+        'php_version' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'full_report' => array(
+        ],
+        'full_report' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'stacktrace' => array(
+        ],
+        'stacktrace' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'browser' => array(
+        ],
+        'browser' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'stackhash' => array(
+        ],
+        'stackhash' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'user_os' => array(
+        ],
+        'user_os' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'locale' => array(
+        ],
+        'locale' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'script_name' => array(
+        ],
+        'script_name' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'server_software' => array(
+        ],
+        'server_software' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-        'configuration_storage' => array(
+        ],
+        'configuration_storage' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var array
@@ -104,43 +104,48 @@ class IncidentsTable extends Table
      *
      * @var array
      */
-    public $summarizableFields = array(
-        'browser', 'pma_version', 'php_version',
-        'locale', 'server_software', 'user_os', 'script_name',
+    public $summarizableFields = [
+        'browser',
+        'pma_version',
+        'php_version',
+        'locale',
+        'server_software',
+        'user_os',
+        'script_name',
         'configuration_storage',
-    );
+    ];
 
     public function __construct($id = false, $table = null, $ds = null)
     {
         parent::__construct($id, $table, $ds);
 
-        $this->filterTimes = array(
-            'all_time' => array(
+        $this->filterTimes = [
+            'all_time' => [
                 'label' => 'All Time',
                 'limit' => null,
                 'group' => "DATE_FORMAT(Incidents.created, '%m %Y')",
-            ),
-            'day' => array(
+            ],
+            'day' => [
                 'label' => 'Last Day',
                 'limit' => date('Y-m-d', strtotime('-1 day')),
                 'group' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %H')",
-            ),
-            'week' => array(
+            ],
+            'week' => [
                 'label' => 'Last Week',
                 'limit' => date('Y-m-d', strtotime('-1 week')),
                 'group' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y')",
-            ),
-            'month' => array(
+            ],
+            'month' => [
                 'label' => 'Last Month',
                 'limit' => date('Y-m-d', strtotime('-1 month')),
                 'group' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y')",
-            ),
-            'year' => array(
+            ],
+            'year' => [
                 'label' => 'Last Year',
                 'limit' => date('Y-m-d', strtotime('-1 year')),
                 'group' => "DATE_FORMAT(Incidents.created, '%b %u %Y')",
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -161,10 +166,13 @@ class IncidentsTable extends Table
     public function createIncidentFromBugReport($bugReport)
     {
         if ($bugReport == null) {
-            return array('incidents' => array(false), 'reports' => array());
+            return [
+                'incidents' => [false],
+                'reports' => []
+            ];
         }
-        $incident_ids = array();    // array to hold ids of all the inserted incidents
-        $new_report_ids = array(); // array to hold ids of all newly created reports
+        $incident_ids = [];    // array to hold ids of all the inserted incidents
+        $new_report_ids = []; // array to hold ids of all newly created reports
 
         // Avoid storing too many errors from single report
         if (isset($bugReport['errors']) && count($bugReport['errors']) > 40) {
@@ -179,7 +187,6 @@ class IncidentsTable extends Table
         $incidentsTable = TableRegistry::get('Incidents');
         $reportsTable = TableRegistry::get('Reports');
         foreach ($schematizedIncidents as $index => $si) {
-
             // find closest report. If not found, create a new report.
             $closestReport = $this->_getClosestReport($bugReport, $index);
             if ($closestReport) {
@@ -216,10 +223,10 @@ class IncidentsTable extends Table
             $isSaved = $incidentsTable->save($si);
             if ($isSaved) {
                 array_push($incident_ids, $si->id);
-                if (!$closestReport) {
+                if (! $closestReport) {
                     // add notifications entry
                     $tmpIncident = $incidentsTable->findById($si->id)->all()->first();
-                    if (!TableRegistry::get('Notifications')->addNotifications(intval($tmpIncident['report_id']))) {
+                    if (! TableRegistry::get('Notifications')->addNotifications(intval($tmpIncident['report_id']))) {
                         Log::write(
                             'error',
                             'ERRORED: Notification::addNotifications() failed on Report#'
@@ -233,10 +240,10 @@ class IncidentsTable extends Table
             }
         }
 
-        return array(
+        return [
             'incidents' => $incident_ids,
             'reports' => $new_report_ids
-        );
+        ];
     }
 
     /**
@@ -263,9 +270,10 @@ class IncidentsTable extends Table
                     $this->_getIdentifyingLocation($bugReport['exception']['stack']);
         }
         $report = TableRegistry::get('Reports')->findByLocationAndLinenumberAndPmaVersion(
-                    $location, $linenumber,
-                    $this->getStrippedPmaVersion($bugReport['pma_version'])
-                )->all()->first();
+            $location,
+            $linenumber,
+            $this->getStrippedPmaVersion($bugReport['pma_version'])
+        )->all()->first();
 
         return $report;
     }
@@ -286,31 +294,31 @@ class IncidentsTable extends Table
         ) {
             $location = $bugReport['errors'][$index]['file'];
             $linenumber = $bugReport['errors'][$index]['lineNum'];
-            $reportDetails = array(
-                    'error_message' => $bugReport['errors'][$index]['msg'],
-                    'error_name' => $bugReport['errors'][$index]['type'],
-                    );
+            $reportDetails = [
+                'error_message' => $bugReport['errors'][$index]['msg'],
+                'error_name' => $bugReport['errors'][$index]['type'],
+            ];
             $exception_type = 1;
         } else {
             list($location, $linenumber) =
                 $this->_getIdentifyingLocation($bugReport['exception']['stack']);
 
-            $reportDetails = array(
-                    'error_message' => $bugReport['exception']['message'],
-                    'error_name' => $bugReport['exception']['name'],
-                    );
+            $reportDetails = [
+                'error_message' => $bugReport['exception']['message'],
+                'error_name' => $bugReport['exception']['name'],
+            ];
             $exception_type = 0;
         }
 
         $reportDetails = array_merge(
             $reportDetails,
-            array(
+            [
                 'status' => 'new',
                 'location' => $location,
                 'linenumber' => is_null($linenumber) ? 0 : $linenumber,
                 'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
                 'exception_type' => $exception_type,
-            )
+            ]
         );
 
         return $reportDetails;
@@ -327,8 +335,8 @@ class IncidentsTable extends Table
     protected function _getSchematizedIncidents($bugReport)
     {
         //$bugReport = Sanitize::clean($bugReport, array('escape' => false));
-        $schematizedReports = array();
-        $schematizedCommonReport = array(
+        $schematizedReports = [];
+        $schematizedCommonReport = [
             'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
             'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
             'browser' => $bugReport['browser_name'] . ' '
@@ -338,7 +346,7 @@ class IncidentsTable extends Table
             'configuration_storage' => $bugReport['configuration_storage'],
             'server_software' => $this->_getServer($bugReport['server_software']),
             'full_report' => json_encode($bugReport),
-        );
+        ];
 
         if (isset($bugReport['exception_type'])
             && $bugReport['exception_type'] == 'php'
@@ -347,28 +355,28 @@ class IncidentsTable extends Table
             foreach ($bugReport['errors'] as $error) {
                 $tmpReport = array_merge(
                     $schematizedCommonReport,
-                    array(
+                    [
                         'error_name' => $error['type'],
                         'error_message' => $error['msg'],
                         'script_name' => $error['file'],
                         'stacktrace' => json_encode($error['stackTrace']),
                         'stackhash' => $error['stackhash'],
                         'exception_type' => 1,         // 'php'
-                    )
+                    ]
                 );
                 array_push($schematizedReports, $tmpReport);
             }
         } else {
             $tmpReport = array_merge(
                 $schematizedCommonReport,
-                array(
+                [
                     'error_name' => $bugReport['exception']['name'],
                     'error_message' => $bugReport['exception']['message'],
                     'script_name' => $bugReport['script_name'],
                     'stacktrace' => json_encode($bugReport['exception']['stack']),
                     'stackhash' => $this->getStackHash($bugReport['exception']['stack']),
                     'exception_type' => 0,     //'js'
-                )
+                ]
             );
 
             if (isset($bugReport['steps'])) {
@@ -398,7 +406,10 @@ class IncidentsTable extends Table
      */
     protected function _getIdentifyingLocation($stacktrace)
     {
-        $fallback = array('UNKNOWN', 0);
+        $fallback = [
+            'UNKNOWN',
+            0,
+        ];
         foreach ($stacktrace as $level) {
             if (isset($level['filename'])) {
                 // ignore unrelated files that sometimes appear in the error report
@@ -408,14 +419,23 @@ class IncidentsTable extends Table
                     // in case the error really is in the error_report.js file save it for
                     // later
                     if ($fallback[0] == 'UNKNOWN') {
-                        $fallback = array($level['filename'], $level['line']);
+                        $fallback = [
+                            $level['filename'],
+                            $level['line'],
+                        ];
                     }
                     continue;
                 }
 
-                return array($level['filename'], $level['line']);
+                return [
+                    $level['filename'],
+                    $level['line'],
+                ];
             } elseif (isset($level['scriptname'])) {
-                return array($level['scriptname'], $level['line']);
+                return [
+                    $level['scriptname'],
+                    $level['line'],
+                ];
             }
             continue;
         }
@@ -469,7 +489,7 @@ class IncidentsTable extends Table
     public function getStrippedPmaVersion($versionString)
     {
         $allowedRegexp = '/^(\d+)(\.\d+){0,3}(\-.*)?/';
-        $matches = array();
+        $matches = [];
 
         // Check if $versionString matches the regexp
         // and store the matched strings
@@ -491,9 +511,12 @@ class IncidentsTable extends Table
      */
     protected function _getServer($signature)
     {
-        if (preg_match("/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)"
+        if (preg_match(
+            "/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)"
                 . "|(lighttpd\/\d+\.\d+)/i",
-                $signature, $matches)) {
+            $signature,
+            $matches
+        )) {
             return $matches[0];
         }
 
@@ -511,9 +534,15 @@ class IncidentsTable extends Table
     {
         $handle = hash_init('md5');
         foreach ($stacktrace as $level) {
-            $elements = array('filename', 'scriptname', 'line', 'func', 'column');
+            $elements = [
+                'filename',
+                'scriptname',
+                'line',
+                'func',
+                'column',
+            ];
             foreach ($elements as $element) {
-                if (!isset($level[$element])) {
+                if (! isset($level[$element])) {
                     continue;
                 }
                 hash_update($handle, $level[$element]);
@@ -532,7 +561,8 @@ class IncidentsTable extends Table
      *
      * @return array $incident_ids
      */
-    private function _logLongIncidentSubmissions($si, &$incident_ids) {
+    private function _logLongIncidentSubmissions($si, &$incident_ids)
+    {
 
         $stacktraceLength = mb_strlen($si['stacktrace']);
         $fullReportLength = mb_strlen($si['full_report']);

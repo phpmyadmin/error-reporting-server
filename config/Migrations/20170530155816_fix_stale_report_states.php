@@ -32,13 +32,13 @@ class FixStaleReportStates extends AbstractMigration
 
     private function _migrateToNewStatus()
     {
-        $statusMap = array(
+        $statusMap = [
             'fixed' => 'resolved',
             'open' => 'new',
             'out-of-date' => 'invalid',
             'works-for-me' => 'invalid',
             'wontfix' => 'invalid'
-        );
+        ];
 
         foreach ($statusMap as $oldStatus => $newStatus) {
             $sql = 'UPDATE `reports` SET `status` = \'' . $newStatus . '\''
@@ -73,7 +73,7 @@ class FixStaleReportStates extends AbstractMigration
 
         Log::debug(
             $rowsAffected . ' duplicate reports were mapped to '
-                . ' same status as their ' . $origCount .' original reports'
+                . ' same status as their ' . $origCount . ' original reports'
         );
     }
 }

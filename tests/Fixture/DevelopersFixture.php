@@ -30,14 +30,14 @@ class DevelopersFixture extends TestFixture
         ),
         'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_general_ci', 'engine' => 'InnoDB')
     );*/
-    public $import = array('table' => 'developers');
+    public $import = ['table' => 'developers'];
     /**
      * Records.
      *
      * @var array
      */
-    public $records = array(
-        array(
+    public $records = [
+        [
             'id' => 1,
             'github_id' => 1,
             'full_name' => 'Lorem ipsum dolor sit amet',
@@ -47,8 +47,8 @@ class DevelopersFixture extends TestFixture
             'created' => '2013-08-29 22:11:02',
             'modified' => '2013-08-29 22:11:02',
             'has_commit_access' => 1,
-        ),
-        array(
+        ],
+        [
             'id' => 2,
             'github_id' => 2,
             'full_name' => 'Lorem ipsum dolor sit amet',
@@ -58,6 +58,6 @@ class DevelopersFixture extends TestFixture
             'created' => '2013-08-29 22:11:02',
             'modified' => '2013-08-29 22:11:02',
             'has_commit_access' => 0,
-        ),
-    );
+        ],
+    ];
 }

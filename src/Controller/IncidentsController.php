@@ -28,9 +28,12 @@ use Cake\ORM\TableRegistry;
  */
 class IncidentsController extends AppController
 {
-    public $uses = array('Incident', 'Notification');
+    public $uses = [
+        'Incident',
+        'Notification',
+    ];
 
-    public $components = array('Mailer');
+    public $components = ['Mailer'];
 
     public function create()
     {
@@ -41,24 +44,24 @@ class IncidentsController extends AppController
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
 
         if (count($result['incidents']) > 0
-            && !in_array(false, $result['incidents'])
+            && ! in_array(false, $result['incidents'])
         ) {
-            $response = array(
+            $response = [
                 'success' => true,
                 'message' => 'Thank you for your submission',
                 'incident_id' => $result['incidents'],        // Return a list of incident ids.
-            );
+            ];
         } else {
-            $response = array(
+            $response = [
                 'success' => false,
                 'message' => 'There was a problem with your submission.',
-            );
+            ];
         }
         $this->autoRender = false;
-        $this->response->header(array(
+        $this->response->header([
             'Content-Type' => 'application/json',
             'X-Content-Type-Options' => 'nosniff',
-        ));
+        ]);
         $this->response->body(
             json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
@@ -74,13 +77,13 @@ class IncidentsController extends AppController
 
     public function json($id)
     {
-        if (!isset($id) || !$id) {
+        if (! isset($id) || ! $id) {
             throw new NotFoundException(__('Invalid Incident'));
         }
 
         $this->Incidents->recursive = -1;
         $incident = $this->Incidents->findById($id)->all()->first();
-        if (!$incident) {
+        if (! $incident) {
             throw new NotFoundException(__('Invalid Incident'));
         }
 
@@ -97,12 +100,12 @@ class IncidentsController extends AppController
 
     public function view($incidentId)
     {
-        if (!isset($incidentId) || !$incidentId) {
+        if (! isset($incidentId) || ! $incidentId) {
             throw new NotFoundException(__('Invalid Incident'));
         }
 
         $incident = $this->Incidents->findById($incidentId)->all()->first();
-        if (!$incident) {
+        if (! $incident) {
             throw new NotFoundException(__('Invalid Incident'));
         }
 
@@ -120,7 +123,7 @@ class IncidentsController extends AppController
         $report = $this->Reports->findById($reportId)->all()->first()->toArray();
         $this->Reports->id = $reportId;
 
-        $viewVars = array(
+        $viewVars = [
             'report' => $report,
             'project_name' => Configure::read('GithubRepoPath'),
             'incidents' => $this->Reports->getIncidents()->toArray(),
@@ -128,7 +131,7 @@ class IncidentsController extends AppController
             'incidents_with_stacktrace' => $this->Reports->getIncidentsWithDifferentStacktrace(),
             'related_reports' => $this->Reports->getRelatedReports(),
             'status' => $this->Reports->status
-        );
+        ];
         $viewVars = array_merge($viewVars, $this->_getSimilarFields($reportId));
 
         $this->Mailer->sendReportMail($viewVars);
@@ -138,10 +141,10 @@ class IncidentsController extends AppController
     {
         $this->Reports->id = $id;
 
-        $viewVars = array(
-            'columns' => TableRegistry::get('Incidents')->summarizableFields
-        );
-        $relatedEntries = array();
+        $viewVars = [
+            'columns' => TableRegistry::get('Incidents')->summarizableFields,
+        ];
+        $relatedEntries = [];
 
         foreach (TableRegistry::get('Incidents')->summarizableFields as $field) {
             list($entriesWithCount, $totalEntries) =

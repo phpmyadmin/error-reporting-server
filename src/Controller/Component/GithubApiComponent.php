@@ -46,7 +46,7 @@ class GithubApiComponent extends Component
      */
     public function apiRequest(
         $path = '',
-        $data = array(),
+        $data = [],
         $method = 'GET',
         $returnStatus = false,
         $access_token = ''
@@ -54,7 +54,7 @@ class GithubApiComponent extends Component
         $path = 'https://api.github.com/' . $path;
         if (strtoupper($method) === 'GET') {
             $path .= '?' . http_build_query($data);
-            $data = array();
+            $data = [];
         }
 
         return $this->sendRequest($path, $data, $method, $returnStatus, $access_token);
@@ -72,9 +72,9 @@ class GithubApiComponent extends Component
         $url = 'https://github.com/login/oauth/access_token';
         $data = array_merge(
             $this->githubConfig,
-            array(
+            [
                 'code' => $code,
-            )
+            ]
         );
         $decodedResponse = $this->sendRequest($url, http_build_query($data), 'POST');
 
@@ -91,9 +91,9 @@ class GithubApiComponent extends Component
      */
     public function getUserInfo($accessToken)
     {
-        $data = array(
+        $data = [
             'access_token' => $accessToken,
-        );
+        ];
 
         return $this->apiRequest('user', $data, 'GET', true);
     }
@@ -123,7 +123,7 @@ class GithubApiComponent extends Component
     ) {
         $curlHandle = curl_init($url);
         curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $method);
-        $header = array('Accept: application/json');
+        $header = ['Accept: application/json'];
         if (isset($access_token) && $access_token != '') {
             $header[] = 'Authorization: token ' . $access_token;
         }
@@ -136,7 +136,10 @@ class GithubApiComponent extends Component
         if ($returnCode) {
             $status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
 
-            return array($decodedResponse, $status);
+            return [
+                $decodedResponse,
+                $status,
+            ];
         }
 
         return $decodedResponse;
@@ -153,16 +156,17 @@ class GithubApiComponent extends Component
     public function getRedirectUrl($scope = null)
     {
         $url = 'https://github.com/login/oauth/authorize';
-        $data = array(
+        $data = [
             'client_id' => $this->githubConfig['client_id'],
             'redirect_uri' => Router::url(
-                array(
+                [
                     'controller' => 'developers',
                     'action' => 'callback',
-                ), true
+                ],
+                true
             ),
             'scope' => $scope,
-        );
+        ];
 
         $url .= '?' . http_build_query($data);
 
@@ -172,8 +176,9 @@ class GithubApiComponent extends Component
     /**
      * Check if a user can commit to a rep.
      *
-     * @param string $username the username to check
-     * @param string $repoPath the repo path of the repo to check for
+     * @param string $username     the username to check
+     * @param string $repoPath     the repo path of the repo to check for
+     * @param string $access_token the github access token
      *
      * @return bool true if the user is a collaborator and false if they arent
      */
@@ -181,7 +186,7 @@ class GithubApiComponent extends Component
     {
         list(, $status) = $this->apiRequest(
             "repos/$repoPath/collaborators/$username",
-            array(),
+            [],
             'GET',
             true,
             $access_token
@@ -196,6 +201,7 @@ class GithubApiComponent extends Component
      * @param string $repoPath
      * @param array  $data         issue details
      * @param string $access_token
+     * @return array
      */
     public function createIssue($repoPath, $data, $access_token)
     {
@@ -215,6 +221,7 @@ class GithubApiComponent extends Component
      * @param array  $data
      * @param int    $issueNumber
      * @param string $access_token
+     * @return array
      */
     public function createComment($repoPath, $data, $issueNumber, $access_token)
     {
@@ -234,6 +241,7 @@ class GithubApiComponent extends Component
      * @param array  $data
      * @param int    $issueNumber
      * @param string $access_token
+     * @return array
      */
     public function getIssue($repoPath, $data, $issueNumber, $access_token)
     {
@@ -245,5 +253,4 @@ class GithubApiComponent extends Component
             $access_token
         );
     }
-
 }

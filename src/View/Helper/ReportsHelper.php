@@ -11,9 +11,9 @@ use Cake\View\View;
 
 class ReportsHelper extends AppHelper
 {
-    public $helpers = array('Incidents');
+    public $helpers = ['Incidents'];
 
-    public function __construct(View $view, $settings = array())
+    public function __construct(View $view, $settings = [])
     {
         parent::__construct($view, $settings);
     }
@@ -21,7 +21,7 @@ class ReportsHelper extends AppHelper
     public function entriesFromIncidents($entries, $totalCount, $key)
     {
         //$entries = Sanitize::clean($entries);
-        $values = array();
+        $values = [];
         foreach ($entries as $entry) {
             $values[] = "$entry[$key] <span class='count'>("
                 . $entry['count'] . ')</span>';
@@ -37,7 +37,7 @@ class ReportsHelper extends AppHelper
 
     public function createReportsLinks($reports)
     {
-        $links = array();
+        $links = [];
         foreach ($reports as $report) {
             $links[] = $this->linkToReport($report);
         }

@@ -36,7 +36,7 @@ class DevelopersControllerTest extends IntegrationTestCase
      */
     public $fixtures = [
         'app.developers',
-        'app.notifications'
+        'app.notifications',
     ];
 
     public function setUp()
@@ -52,7 +52,7 @@ class DevelopersControllerTest extends IntegrationTestCase
     public function testLogin()
     {
         // Empty session during initiation
-        $this->session(array());
+        $this->session([]);
 
         $this->get('developers/login');
         $this->assertRedirectContains('https://github.com/login/oauth/authorize');
@@ -71,41 +71,48 @@ class DevelopersControllerTest extends IntegrationTestCase
         $curlExecMock = $this->getFunctionMock('\App\Controller\Component', 'curl_exec');
         $curlGetInfoMock = $this->getFunctionMock('\App\Controller\Component', 'curl_getinfo');
 
-        $accessTokenResponse = json_encode(array('access_token' => 'abc'));
-        $emptyAccessTokenResponse = json_encode(array('access_token' => null));
+        $accessTokenResponse = json_encode(['access_token' => 'abc']);
+        $emptyAccessTokenResponse = json_encode(['access_token' => null]);
 
-        $nonSuccessUserResponse = json_encode(array('message' => 'Unauthorized access'));
+        $nonSuccessUserResponse = json_encode(['message' => 'Unauthorized access']);
         $userResponse = file_get_contents(TESTS . 'Fixture' . DS . 'user_response.json');
 
         // Github unsuccessful response followed by successful response
         $curlExecMock->expects($this->exactly(10))->willReturnOnConsecutiveCalls(
             $emptyAccessTokenResponse,
             $emptyAccessTokenResponse,
-            $accessTokenResponse, $nonSuccessUserResponse,
-            $accessTokenResponse, $userResponse, null,
-            $accessTokenResponse, $userResponse, null
+            $accessTokenResponse,
+            $nonSuccessUserResponse,
+            $accessTokenResponse,
+            $userResponse,
+            null,
+            $accessTokenResponse,
+            $userResponse,
+            null
         );
         $curlGetInfoMock->expects($this->exactly(5))->willReturnOnConsecutiveCalls(
             401,
-            200, 404,
-            200, 204
+            200,
+            404,
+            200,
+            204
         );
 
         // Case 1.1 Test no access_token in Github response (with last_page not set in session)
         // So, empty the session
-        $this->session(array());
+        $this->session([]);
 
         $this->get('developers/callback/?code=123123123');
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
         // Case 1.2 Test no access_token in Github response (with last_page set in session)
         $this->session(
-            array(
-                'last_page' => array(
+            [
+                'last_page' => [
                     'controller' => 'notifications',
                     'action' => 'index'
-                )
-            )
+                ],
+            ]
         );
 
         $this->get('developers/callback/?code=123123123');
@@ -113,12 +120,12 @@ class DevelopersControllerTest extends IntegrationTestCase
 
         // Case 2. Non successful response code from Github
         $this->session(
-            array(
-                'last_page' => array(
+            [
+                'last_page' => [
                     'controller' => 'reports',
                     'action' => 'index'
-                )
-            )
+                ],
+            ]
         );
         $this->get('developers/callback/?code=123123123');
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
@@ -136,7 +143,7 @@ class DevelopersControllerTest extends IntegrationTestCase
 
         // Case 4. Successful response code (returning user)
         // check whether session variables are init
-        $this->session(array('last_page' => null));
+        $this->session(['last_page' => null]);
 
         $this->get('developers/callback/?code=123123123');
         $this->assertSession(3, 'Developer.id');
@@ -154,7 +161,7 @@ class DevelopersControllerTest extends IntegrationTestCase
      */
     public function testLogout()
     {
-        $this->session(array('Developer.id' => 1));
+        $this->session(['Developer.id' => 1]);
 
         $this->get('developers/logout');
         $this->assertSession(null, 'Developer.id');

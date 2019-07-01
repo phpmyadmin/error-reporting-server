@@ -27,9 +27,9 @@ class SyncGithubIssueStatesShellTest extends TestCase
      */
     public $SyncGithubIssueStates;
 
-    public $fixtures = array(
+    public $fixtures = [
         'app.reports',
-    );
+    ];
 
     /**
      * setUp method
@@ -74,23 +74,27 @@ class SyncGithubIssueStatesShellTest extends TestCase
         $issueResponseWithClosed = json_encode($decodedResponse);
 
         $curlExecMock->expects($this->exactly(3))->willReturnOnConsecutiveCalls(
-            $issueResponse, $issueResponse, $issueResponseWithClosed
+            $issueResponse,
+            $issueResponse,
+            $issueResponseWithClosed
         );
         $curlGetInfoMock->expects($this->exactly(3))->willReturnOnConsecutiveCalls(
-            200, 200, 200
+            200,
+            200,
+            200
         );
 
         // Fetch all linked reports
         $reports = $this->Reports->find(
             'all',
-            array(
-                'conditions' => array(
+            [
+                'conditions' => [
                     'sourceforge_bug_id IS NOT NULL',
-                    'NOT' => array(
-                        'status' => 'resolved'
-                    )
-                )
-            )
+                    'NOT' => [
+                        'status' => 'resolved',
+                    ]
+                ],
+            ]
         );
         $this->assertEquals(3, $reports->count());
 
@@ -99,26 +103,26 @@ class SyncGithubIssueStatesShellTest extends TestCase
         // Fetch all linked reports
         $reports = $this->Reports->find(
             'all',
-            array(
-                'conditions' => array(
+            [
+                'conditions' => [
                     'sourceforge_bug_id IS NOT NULL',
-                    'NOT' => array(
-                        'status' => 'resolved'
-                    )
-                )
-            )
+                    'NOT' => [
+                        'status' => 'resolved',
+                    ]
+                ],
+            ]
         );
         $this->assertEquals(2, $reports->count());
 
         // Fetch all closed reports
         $reports = $this->Reports->find(
             'all',
-            array(
-                'conditions' => array(
+            [
+                'conditions' => [
                     'sourceforge_bug_id IS NOT NULL',
                     'status' => 'resolved'
-                )
-            )
+                ],
+            ]
         );
         $this->assertEquals(1, $reports->count());
         $report5 = $this->Reports->get(4);

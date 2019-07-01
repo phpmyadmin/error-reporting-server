@@ -31,6 +31,7 @@ class Application extends BaseApplication
 {
     /**
      * {@inheritDoc}
+     * @return void
      */
     public function bootstrap()
     {
@@ -67,7 +68,7 @@ class Application extends BaseApplication
 
             // Handle plugin/theme assets like CakePHP normally does.
             ->add(new AssetMiddleware([
-                'cacheTime' => Configure::read('Asset.cacheTime')
+                'cacheTime' => Configure::read('Asset.cacheTime'),
             ]))
 
             // Add routing middleware.
@@ -88,7 +89,7 @@ class Application extends BaseApplication
     {
         try {
             $this->addPlugin('Bake');
-        } catch (MissingPluginException $e) {
+        } catch (MissingPluginException $e) {// phpcs:ignore
             // Do not halt if the plugin is missing
         }
 

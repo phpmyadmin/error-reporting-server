@@ -125,7 +125,7 @@ class EventsController extends AppController
         $receivedHashHeader = $request->getHeaderLine('X-Hub-Signature');
         $algo = '';
         $receivedHash = '';
-        if ($receivedHashHeader !== NULL) {
+        if ($receivedHashHeader !== null) {
             $parts = explode('=', $receivedHashHeader);
             if (count($parts) > 1) {
                 $algo = $parts[0];
@@ -135,7 +135,7 @@ class EventsController extends AppController
 
         $expectedHash = $this->_getHash(file_get_contents('php://input'), $algo);
 
-        if ($userAgent !== NULL && strpos($userAgent, 'GitHub-Hookshot') !== 0) {
+        if ($userAgent !== null && strpos($userAgent, 'GitHub-Hookshot') !== 0) {
             // Check if the User-agent is Github
             // Otherwise, Send a '403: Forbidden'
 
@@ -146,7 +146,7 @@ class EventsController extends AppController
             $statusCode = 403;
 
             return $statusCode;
-        } elseif ($eventType !== NULL && $eventType === 'ping') {
+        } elseif ($eventType !== null && $eventType === 'ping') {
             // Check if the request is based on 'issues' event
             // Otherwise, Send a '400: Bad Request'
 
@@ -156,7 +156,7 @@ class EventsController extends AppController
             $statusCode = 200;
 
             return $statusCode;
-        } elseif ($eventType !== NULL && $eventType !== 'issues') {
+        } elseif ($eventType !== null && $eventType !== 'issues') {
             // Check if the request is based on 'issues' event
             // Otherwise, Send a '400: Bad Request'
 

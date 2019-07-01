@@ -37,41 +37,44 @@ use Cake\Routing\Router;
  */
 class AppController extends Controller
 {
-    public $uses = array('Developer', 'Notification');
+    public $uses = [
+        'Developer',
+        'Notification',
+    ];
 
-    public $whitelist = array(
+    public $whitelist = [
         'Developers',
         'Pages',
-        'Incidents' => array(
+        'Incidents' => [
             'create',
-        ),
+        ],
         'Events'
-    );
+    ];
 
-    public $readonly_whitelist = array(
+    public $readonly_whitelist = [
         'Developers',
         'Pages',
-        'Reports' => array(
+        'Reports' => [
             'index',
             'view',
-            'data_tables'
-        ),
-        'Incidents' => array(
+            'data_tables',
+        ],
+        'Incidents' => [
             'view'
-        )
-    );
+        ]
+    ];
 
-    public $css_files = array(
+    public $css_files = [
         'jquery.dataTables',
         'jquery.dataTables_themeroller',
         'bootstrap.min',
         'bootstrap-responsive.min',
         'shCore',
         'shThemeDefault',
-        'custom'
-    );
+        'custom',
+    ];
 
-    public $js_files = array(
+    public $js_files = [
         'jquery',
         'jquery.dataTables.min',
         'bootstrap',
@@ -95,13 +98,14 @@ class AppController extends Controller
         'jqplot.canvasAxisTickRenderer.min',
         'jqplot.cursor.min',
         'pie',
-        'custom'
-    );
+        'custom',
+    ];
 
     /**
      * Initialization hook method.
      *
      * Use this method to add common initialization code like loading components.
+     * @return void
      */
     public function initialize()
     {
@@ -138,9 +142,9 @@ class AppController extends Controller
 
             $notif_count = TableRegistry::get('Notifications')->find(
                 'all',
-                array(
-                    'conditions' => array('developer_id' => intval($current_developer['id'])),
-                )
+                [
+                    'conditions' => ['developer_id' => intval($current_developer['id'])],
+                ]
             )->count();
             $this->set('current_developer', $current_developer);
             $this->set('developer_signed_in', true);
@@ -175,8 +179,10 @@ class AppController extends Controller
             return;
         }
         $flash_class = 'alert';
-        $this->Flash->default('You need to be signed in to do this',
-            array('params' => array('class' => $flash_class)));
+        $this->Flash->default(
+            'You need to be signed in to do this',
+            ['params' => ['class' => $flash_class]]
+        );
 
         // save the return url
         $ret_url = Router::url($this->request->here(), true);
@@ -192,7 +198,7 @@ class AppController extends Controller
         $read_only = $this->request->session()->read('read_only');
 
         // If developer has commit access on phpmyadmin/phpmyadmin
-        if (!$read_only) {
+        if (! $read_only) {
             return;
         }
 
@@ -212,11 +218,11 @@ class AppController extends Controller
         $this->Flash->default(
             'You need to have commit access on phpmyadmin/phpmyadmin '
             . 'repository on Github.com to do this',
-            array(
-                'params' => array(
-                    'class' => $flash_class
-                )
-            )
+            [
+                'params' => [
+                    'class' => $flash_class,
+                ],
+            ]
         );
 
         $this->redirect('/');

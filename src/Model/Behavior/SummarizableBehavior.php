@@ -29,9 +29,9 @@ use Cake\Model\Model;
  */
 class SummarizableBehavior extends ModelBehavior
 {
-    public $mapMethods = array('/\b_findGroupedCount\b/' => 'findGroupedCount');
+    public $mapMethods = ['/\b_findGroupedCount\b/' => 'findGroupedCount'];
 
-    public function setup(Model $model, $config = array())
+    public function setup(Model $model, $config = [])
     {
         $model->findMethods['groupedCount'] = true;
     }
@@ -41,12 +41,12 @@ class SummarizableBehavior extends ModelBehavior
         $method,
         $state,
         $query,
-        $results = array()
+        $results = []
     ) {
         if ($state === 'before') {
             return $query;
         }
-        $output = array();
+        $output = [];
         foreach ($results as $row) {
             foreach ($row[$model->name] as $key => $value) {
                 $output[$value] = $row[0]['count'];

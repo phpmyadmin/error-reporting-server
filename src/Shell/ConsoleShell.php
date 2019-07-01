@@ -35,7 +35,7 @@ class ConsoleShell extends Shell
      */
     public function main()
     {
-        if (!class_exists('Psy\Shell')) {
+        if (! class_exists('Psy\Shell')) {
             $this->err('<error>Unable to load Psy\Shell.</error>');
             $this->err('');
             $this->err('Make sure you have installed psysh as a dependency,');

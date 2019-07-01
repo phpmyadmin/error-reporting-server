@@ -21,12 +21,24 @@ class TestTransport extends AbstractTransport
     public function send(Email $email)
     {
         $headers = $email->getHeaders(
-            ['from', 'sender', 'replyTo', 'readReceipt', 'returnPath', 'to', 'cc', 'subject']
+            [
+                'from',
+                'sender',
+                'replyTo',
+                'readReceipt',
+                'returnPath',
+                'to',
+                'cc',
+                'subject',
+            ]
         );
 
         trim($this->_headersToString($headers));
-        $message = trim(implode("\r\n", (array)$email->message()));
-        $result = ['headers' => $headers, 'message' => $message];
+        $message = trim(implode("\r\n", (array) $email->message()));
+        $result = [
+            'headers' => $headers,
+            'message' => $message,
+        ];
 
         Configure::write('test_transport_email', $result);
 

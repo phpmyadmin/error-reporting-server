@@ -29,6 +29,7 @@ class AppView extends View
      *
      * For e.g. use this method to load a helper for all views:
      * `$this->loadHelper('Html');`
+     * @return void
      */
     public function initialize()
     {

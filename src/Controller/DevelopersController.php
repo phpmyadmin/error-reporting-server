@@ -29,11 +29,14 @@ use Cake\ORM\TableRegistry;
  */
 class DevelopersController extends AppController
 {
-    public $helpers = array('Html', 'Form');
+    public $helpers = [
+        'Html',
+        'Form',
+    ];
 
-    public $components = array(
+    public $components = [
         'GithubApi',
-    );
+    ];
 
     public function beforeFilter(Event $event)
     {
@@ -56,8 +59,10 @@ class DevelopersController extends AppController
             list($userInfo, $status) = $this->GithubApi->getUserInfo($accessToken);
             if ($status != 200) {
                 $flash_class = 'alert alert-error';
-                $this->Flash->default($userInfo['message'],
-                    array('params' => array('class' => $flash_class)));
+                $this->Flash->default(
+                    $userInfo['message'],
+                    ['params' => ['class' => $flash_class]]
+                );
 
                 $this->redirect('/');
                 return;
@@ -71,14 +76,18 @@ class DevelopersController extends AppController
                 $this->_authenticateDeveloper($userInfo, $accessToken);
 
                 $flash_class = 'alert alert-success';
-                $this->Flash->default('You have been logged in successfully',
-                        array('params' => array('class' => $flash_class)));
+                $this->Flash->default(
+                    'You have been logged in successfully',
+                    ['params' => ['class' => $flash_class]]
+                );
             }
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default('We were not able to authenticate you.'
+            $this->Flash->default(
+                'We were not able to authenticate you.'
                     . ' Please try again later',
-                    array('params' => array('class' => $flash_class)));
+                ['params' => ['class' => $flash_class]]
+            );
 
             $this->redirect('/');
             return;
@@ -86,7 +95,10 @@ class DevelopersController extends AppController
 
         $last_page = $this->request->session()->read('last_page');
         if (empty($last_page)) {
-            $last_page = array('controller' => 'reports', 'action' => 'index');
+            $last_page = [
+                'controller' => 'reports',
+                'action' => 'index'
+            ];
         }
         $this->redirect($last_page);
     }
@@ -96,8 +108,10 @@ class DevelopersController extends AppController
         $this->request->session()->destroy();
 
         $flash_class = 'alert alert-success';
-        $this->Flash->default('You have been logged out successfully',
-                array('params' => array('class' => $flash_class)));
+        $this->Flash->default(
+            'You have been logged out successfully',
+            ['params' => ['class' => $flash_class]]
+        );
         $this->redirect('/');
     }
 
@@ -105,7 +119,7 @@ class DevelopersController extends AppController
     {
         $developers = $this->Developers->findByGithubId($userInfo['id']);
         $developer = $developers->all()->first();
-        if (!$developer) {
+        if (! $developer) {
             $developer = $this->Developers->newEntity();
         } else {
             $this->Developers->id = $developer['id'];
@@ -113,6 +127,6 @@ class DevelopersController extends AppController
         $this->Developers->id = $this->Developers->saveFromGithub($userInfo, $accessToken, $developer);
         $this->request->session()->write('Developer.id', $this->Developers->id);
         $this->request->session()->write('access_token', $accessToken);
-        $this->request->session()->write('read_only', !($userInfo['has_commit_access']));
+        $this->request->session()->write('read_only', ! ($userInfo['has_commit_access']));
     }
 }

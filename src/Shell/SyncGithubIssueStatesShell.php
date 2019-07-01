@@ -63,8 +63,7 @@ class SyncGithubIssueStatesShell extends Shell
                 $request,
                 new Response()
             );
-        }
-        else {
+        } else {
             exit;
         }
 
@@ -75,6 +74,5 @@ class SyncGithubIssueStatesShell extends Shell
                 . date('d-m-Y G:i:s (e)'),
             ['scope' => 'cron_jobs']
         );
-
     }
 }

@@ -43,9 +43,9 @@ class StatsShellTest extends TestCase
      */
     public $Stats;
 
-    public $fixtures = array(
+    public $fixtures = [
         'app.incidents'
-    );
+    ];
 
     /**
      * setUp method
@@ -89,7 +89,6 @@ class StatsShellTest extends TestCase
 
         foreach ($this->Stats->Incidents->filterTimes as $filter_string => $filter) {
             foreach ($this->Stats->Incidents->summarizableFields as $field) {
-
                 // Make sure all the fields are covered
                 $this->assertNotEquals(
                     false,

@@ -15,15 +15,16 @@ class NotificationsTableTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = array(
+    public $fixtures = [
         'app.notifications',
         'app.developers',
         'app.reports',
         'app.incidents',
-    );
+    ];
 
     /**
      * setUp method.
+     * @return void
      */
     public function setUp()
     {
@@ -38,7 +39,7 @@ class NotificationsTableTest extends TestCase
         $devs = $developer->find('all');
         $devs = $devs->hydrate(false)->toArray();
         $this->Notifications->addNotifications($report_id);
-        $notifs = $this->Notifications->find('all', array('conditions' => array('report_id' => $report_id)));
+        $notifs = $this->Notifications->find('all', ['conditions' => ['report_id' => $report_id]]);
         $notifs = $notifs->hydrate(false)->toArray();
         $this->assertEquals(count($notifs), count($devs));
     }

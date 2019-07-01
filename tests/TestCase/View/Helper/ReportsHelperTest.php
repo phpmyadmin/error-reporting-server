@@ -21,10 +21,11 @@ class ReportsHelperTest extends TestCase
      *
      * @return array array data for testLinkToReport
      */
-    public function providerForTestLinkToReport() {
-        return array(
-            array(
-                array(
+    public function providerForTestLinkToReport()
+    {
+        return [
+            [
+                [
                     'id' => 116273,
                     'error_message' => 'TypeError: url is undefined',
                     'error_name' => null,
@@ -35,11 +36,11 @@ class ReportsHelperTest extends TestCase
                     'sourceforge_bug_id' => null,
                     'related_to' => 12567,
                     'exception_type' => 'js'
-                ),
-                '<a href=/reports/view/116273>#116273</a>'
-            ),
-            array(
-                array(
+                ],
+                '<a href=/reports/view/116273>#116273</a>',
+            ],
+            [
+                [
                     'id' => 1879,
                     'error_message' => 'TypeError: url is undefined',
                     'error_name' => null,
@@ -50,14 +51,17 @@ class ReportsHelperTest extends TestCase
                     'sourceforge_bug_id' => null,
                     'related_to' => null,
                     'exception_type' => 'php'
-                ),
-                '<a href=/reports/view/1879>#1879</a>'
-            )
-        );
+                ],
+                '<a href=/reports/view/1879>#1879</a>',
+            ],
+        ];
     }
 
     /**
      * @dataProvider providerForTestLinkToReport
+     * @param array $report   The report
+     * @param array $expected The expected
+     * @return void
      */
     public function testLinkToReport($report, $expected)
     {
@@ -72,14 +76,14 @@ class ReportsHelperTest extends TestCase
     /**
      * Provider for testCreateReportsLinks
      *
-     * return array array data to testCreateReportsLinks
+     * @return array array data to testCreateReportsLinks
      */
     public function providerForTestCreateReportsLinks()
     {
-        return array(
-            array(
-                array(
-                    array(
+        return [
+            [
+                [
+                    [
                         'id' => 116273,
                         'error_message' => 'TypeError: url is undefined',
                         'error_name' => null,
@@ -90,8 +94,8 @@ class ReportsHelperTest extends TestCase
                         'sourceforge_bug_id' => null,
                         'related_to' => 12567,
                         'exception_type' => 'js'
-                    ),
-                    array(
+                    ],
+                    [
                         'id' => 1879,
                         'error_message' => 'TypeError: url is undefined',
                         'error_name' => null,
@@ -102,17 +106,20 @@ class ReportsHelperTest extends TestCase
                         'sourceforge_bug_id' => null,
                         'related_to' => null,
                         'exception_type' => 'php'
-                    ),
-                ),
+                    ],
+                ],
                 '<a href=/reports/view/116273>#116273</a>, '
-                    . '<a href=/reports/view/1879>#1879</a>'
-            )
-        );
+                    . '<a href=/reports/view/1879>#1879</a>',
+            ],
+        ];
     }
 
 
     /**
      * @dataProvider providerForTestCreateReportsLinks
+     * @param array $reports  The reports
+     * @param array $expected The expected reports
+     * @return void
      */
     public function testCreateReportsLinks($reports, $expected)
     {

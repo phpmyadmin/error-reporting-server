@@ -39,14 +39,13 @@ class FixLongPmaVersions extends AbstractMigration
         while ($row = $result->fetch()) {
             $strippedVersionString
                 = $incidentsTable->getStrippedPmaVersion(
-                        $row['pma_version']
-                    );
+                    $row['pma_version']
+                );
 
             if ($strippedVersionString !== $row['pma_version']) {
                 $this->execute('UPDATE ' . $table . ' SET `pma_version` = \''
                     . $strippedVersionString . '\' WHERE `id` = \''
-                    . $row['id'] . '\''
-                );
+                    . $row['id'] . '\'');
 
                 ++$count;
             }

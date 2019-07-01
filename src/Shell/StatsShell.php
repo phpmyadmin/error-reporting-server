@@ -44,21 +44,21 @@ class StatsShell extends Shell
                 $entriesWithCount = json_encode($entriesWithCount);
                 Cache::write($field . '_' . $filter_string, $entriesWithCount);
             }
-            $query = array(
+            $query = [
                 'group' => 'grouped_by',
                 'order' => 'Incidents.created',
-            );
+            ];
             if (isset($filter['limit'])) {
-                $query['conditions'] = array(
+                $query['conditions'] = [
                     'Incidents.created >=' => $filter['limit'],
-                );
+                ];
             }
             $downloadStats = $this->Incidents->find('all', $query);
-            $downloadStats->select(array(
+            $downloadStats->select([
                 'grouped_by' => $filter['group'],
                 'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
                 'count' => $downloadStats->func()->count('*'),
-            ));
+            ]);
             $downloadStats = json_encode($downloadStats->toArray());
             Cache::write('downloadStats_' . $filter_string, $downloadStats);
         }

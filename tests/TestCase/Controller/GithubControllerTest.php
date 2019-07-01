@@ -40,12 +40,12 @@ class GithubControllerTest extends IntegrationTestCase
         'app.reports',
         'app.developers',
         'app.incidents',
-        'app.notifications'
+        'app.notifications',
     ];
 
     public function setUp()
     {
-        $this->session(array('Developer.id' => 1, 'access_token' => 'abc'));
+        $this->session(['Developer.id' => 1, 'access_token' => 'abc']);
         $this->Reports = TableRegistry::get('Reports');
     }
 
@@ -73,21 +73,23 @@ class GithubControllerTest extends IntegrationTestCase
 
         // Github unsuccessful response followed by successful response
         $curlExecMock->expects($this->exactly(2))->willReturnOnConsecutiveCalls(
-            $issueResponse, $issueResponse
+            $issueResponse,
+            $issueResponse
         );
         $curlGetInfoMock->expects($this->exactly(2))->willReturnOnConsecutiveCalls(
-            403, 201
+            403,
+            201
         );
 
         // Case 3. Test submission of form with unsuccessful github response
         $this->post(
             'github/create_issue/5',
-            array(
+            [
                 'summary' => 'Error testing',
                 'milestone' => '3.8',
                 'description' => 'Lorem ipsum dolor sit amet',
                 'labels' => 'test-pma'
-            )
+            ]
         );
 
         $this->enableRetainFlashMessages();
@@ -103,12 +105,12 @@ class GithubControllerTest extends IntegrationTestCase
         // Case 4. Test submission of form with successful Github response
         $this->post(
             'github/create_issue/5',
-            array(
+            [
                 'summary' => 'Error testing',
                 'milestone' => '3.8',
                 'description' => 'Lorem ipsum dolor sit amet',
                 'labels' => 'test-pma'
-            )
+            ]
         );
 
         $report = $this->Reports->get(5);
@@ -147,13 +149,17 @@ class GithubControllerTest extends IntegrationTestCase
         // Github response unsuccessful followed by successful (open) and successful (closed)
         $curlExecMock->expects($this->exactly(5))->willReturnOnConsecutiveCalls(
             $issueResponse,
-            $issueResponse, $issueResponse,
-            $issueResponseWithClosed, $issueResponseWithClosed
+            $issueResponse,
+            $issueResponse,
+            $issueResponseWithClosed,
+            $issueResponseWithClosed
         );
         $curlGetInfoMock->expects($this->exactly(5))->willReturnOnConsecutiveCalls(
             404,
-            201, 200,
-            201, 200
+            201,
+            200,
+            201,
+            200
         );
 
         // Case 2. Test submission of form with unsuccessful github response
@@ -214,7 +220,7 @@ class GithubControllerTest extends IntegrationTestCase
 
         // Github response unsuccessful followed by successful
         $curlExecMock->expects($this->exactly(2))->willReturnOnConsecutiveCalls(
-            json_encode(array('message' => 'Unauthorised access')),
+            json_encode(['message' => 'Unauthorised access']),
             $commentResponse
         );
         $curlGetInfoMock->expects($this->exactly(2))->willReturnOnConsecutiveCalls(
@@ -250,7 +256,6 @@ class GithubControllerTest extends IntegrationTestCase
         $report = $this->Reports->get(5);
         $this->assertEquals(null, $report->sourceforge_bug_id);
         $this->assertEquals('new', $report->status);
-
     }
 
     /**
@@ -278,7 +283,7 @@ class GithubControllerTest extends IntegrationTestCase
 
         // Github response unsuccessful followed by two successful responses
         $curlExecMock->expects($this->exactly(3))->willReturnOnConsecutiveCalls(
-            json_encode(array('message' => 'Unauthorised access')),
+            json_encode(['message' => 'Unauthorised access']),
             $issueResponse,
             $issueResponseWithClosed
         );

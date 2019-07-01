@@ -27,19 +27,23 @@ use Cake\ORM\TableRegistry;
  */
 class StatsController extends AppController
 {
-    public $uses = array('Report', 'Incident', 'Notification');
+    public $uses = [
+        'Report',
+        'Incident',
+        'Notification',
+    ];
 
-    public $helper = array('Reports');
+    public $helper = ['Reports'];
 
     public function stats()
     {
         $filter = $this->_getTimeFilter();
-        $relatedEntries = array();
+        $relatedEntries = [];
         $filter_string = $this->request->query('filter');
-        if (!$filter_string) {
+        if (! $filter_string) {
             $filter_string = 'all_time';
         }
-        $entriesWithCount = array();
+        $entriesWithCount = [];
         //Cache::clear(false);
         foreach (TableRegistry::get('Incidents')->summarizableFields as $field) {
             if (($entriesWithCount = Cache::read($field . '_' . $filter_string)) === false) {
@@ -55,26 +59,26 @@ class StatsController extends AppController
         $this->set('filter_times', TableRegistry::get('Incidents')->filterTimes);
         $this->set('selected_filter', $this->request->query('filter'));
 
-        $query = array(
+        $query = [
             'group' => 'grouped_by',
             'order' => 'Incidents.created',
-        );
+        ];
 
         if (isset($filter['limit'])) {
-            $query['conditions'] = array(
+            $query['conditions'] = [
                 'Incidents.created >=' => $filter['limit'],
-            );
+            ];
         }
 
         TableRegistry::get('Incidents')->recursive = -1;
-        $downloadStats = array();
+        $downloadStats = [];
         if (($downloadStats = Cache::read('downloadStats_' . $filter_string)) === false) {
             $downloadStats = TableRegistry::get('Incidents')->find('all', $query);
-            $downloadStats->select(array(
+            $downloadStats->select([
                 'grouped_by' => $filter['group'],
                 'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
                 'count' => $downloadStats->func()->count('*'),
-            ));
+            ]);
             $downloadStats = json_encode($downloadStats->toArray());
             Cache::write('downloadStats_' . $filter_string, $downloadStats);
         }

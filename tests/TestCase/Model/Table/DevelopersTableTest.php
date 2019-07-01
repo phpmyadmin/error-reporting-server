@@ -86,15 +86,15 @@ class DevelopersTableTest extends TestCase
 
         $nextId = $i;
 
-        $githubInfo = array(
+        $githubInfo = [
             'login' => 'pma-bot',
             'id' => 1231231,
             'gravatar_id' => '',
             'url' => 'https://api.github.com/users/pma-bot',
             'name' => 'PMA BOT',
             'email' => 'pma-bot@phpmyadmin.net',
-            'has_commit_access' => 0
-        );
+            'has_commit_access' => 0,
+        ];
         $developer = $this->Developers->newEntity();
         $access_token = 'abc';
 
@@ -107,15 +107,15 @@ class DevelopersTableTest extends TestCase
         $this->assertEquals('pma-bot@phpmyadmin.net', $savedDeveloper->email);
         $this->assertEquals(false, $savedDeveloper->has_commit_access);
 
-        $updatedGithubInfo = array(
+        $updatedGithubInfo = [
             'login' => 'pma-bot',
             'id' => 1231231,
             'gravatar_id' => '',
             'url' => 'https://api.github.com/users/pma-bot',
             'name' => 'PMA BOT',
             'email' => 'pma-bot@phpmyadmin.net',
-            'has_commit_access' => 1 // changed
-        );
+            'has_commit_access' => 1,// changed
+        ];
 
         $this->Developers->saveFromGithub($updatedGithubInfo, $access_token, $developer);
 
@@ -125,6 +125,5 @@ class DevelopersTableTest extends TestCase
         $this->assertEquals('PMA BOT', $savedDeveloper->full_name);
         $this->assertEquals('pma-bot@phpmyadmin.net', $savedDeveloper->email);
         $this->assertEquals(true, $savedDeveloper->has_commit_access);
-
     }
 }

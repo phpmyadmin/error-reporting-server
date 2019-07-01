@@ -37,13 +37,13 @@ class OrderSearchComponent extends Component
      */
     public function getSearchConditions($aColumns)
     {
-        $searchConditions = array('OR' => array());
+        $searchConditions = ['OR' => []];
         $keys = array_keys($aColumns);
 
         if ($this->request->query('sSearch') != '') {
             for ($i = 0; $i < count($aColumns); ++$i) {
                 if ($this->request->query('bSearchable_' . ($i + 1)) == 'true') {
-                    $searchConditions['OR'][] = array($aColumns[$keys[$i]] . ' LIKE' => '%' . $this->request->query('sSearch') . '%');
+                    $searchConditions['OR'][] = [$aColumns[$keys[$i]] . ' LIKE' => '%' . $this->request->query('sSearch') . '%'];
                 }
             }
         }
@@ -51,7 +51,7 @@ class OrderSearchComponent extends Component
         /* Individual column filtering */
         for ($i = 0; $i < count($aColumns); ++$i) {
             if ($this->request->query('sSearch_' . ($i + 1)) != '') {
-                $searchConditions[] = array($aColumns[$keys[$i]] . ' LIKE' => $this->request->query('sSearch_' . ($i + 1)));
+                $searchConditions[] = [$aColumns[$keys[$i]] . ' LIKE' => $this->request->query('sSearch_' . ($i + 1))];
             }
         }
 
@@ -66,7 +66,7 @@ class OrderSearchComponent extends Component
     public function getOrder($aColumns)
     {
         if ($this->request->query('iSortCol_0') != null) {
-            $order = array();
+            $order = [];
             //Seems like we need to sort with only one column each time, so no need to loop
             $sort_column_index = intval($this->request->query('iSortCol_0'));
 

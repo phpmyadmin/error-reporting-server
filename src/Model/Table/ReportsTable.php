@@ -35,11 +35,11 @@ class ReportsTable extends Table
      * @see http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html#hasmany
      * @see Cake::Model::$hasMany
      */
-    public $hasMany = array(
-        'Incidents' => array(
+    public $hasMany = [
+        'Incidents' => [
             'dependant' => true,
-        ),
-    );
+        ],
+    ];
 
     /**
      * @var array
@@ -48,12 +48,12 @@ class ReportsTable extends Table
      * @see http://book.cakephp.org/2.0/en/models/data-validation.html
      * @see Model::$validate
      */
-    public $validate = array(
-        'error_message' => array(
+    public $validate = [
+        'error_message' => [
             'rule' => 'notEmpty',
             'required' => true,
-        ),
-    );
+        ],
+    ];
 
     /**
      * List of valid finder method options, supplied as the first parameter to find().
@@ -62,28 +62,28 @@ class ReportsTable extends Table
      *
      * @see Model::$findMethods
      */
-    public $findMethods = array(
+    public $findMethods = [
         'allDataTable' => true,
         'arrayList' => true,
-    );
+    ];
 
     /**
      * List of valid finder method options, supplied as the first parameter to find().
      *
      * @var array
      */
-    public $status = array(
+    public $status = [
         'new' => 'New',
         'invalid' => 'Invalid',
         'resolved' => 'Resolved',
-        'forwarded' => 'Forwarded'
-    );
+        'forwarded' => 'Forwarded',
+    ];
 
     public function initialize(array $config)
     {
-        $this->hasMany('Incidents', array(
+        $this->hasMany('Incidents', [
             'dependent' => true,
-        ));
+        ]);
     }
 
     /**
@@ -93,11 +93,11 @@ class ReportsTable extends Table
      */
     public function getIncidents()
     {
-        $incidents = TableRegistry::get('Incidents')->find('all', array(
+        $incidents = TableRegistry::get('Incidents')->find('all', [
             'limit' => 50,
             'conditions' => $this->_relatedIncidentsConditions(),
             'order' => 'Incidents.created desc',
-        ));
+        ]);
 
         return $incidents;
     }
@@ -109,9 +109,9 @@ class ReportsTable extends Table
      */
     public function getRelatedReports()
     {
-        return $this->find('all', array(
+        return $this->find('all', [
             'conditions' => $this->_relatedReportsConditions(),
-        ));
+        ]);
     }
 
     /**
@@ -122,15 +122,15 @@ class ReportsTable extends Table
      */
     public function getIncidentsWithDescription()
     {
-        return TableRegistry::get('Incidents')->find('all', array(
-            'conditions' => array(
-                'NOT' => array(
+        return TableRegistry::get('Incidents')->find('all', [
+            'conditions' => [
+                'NOT' => [
                     'Incidents.steps is null',
-                ),
+                ],
                 $this->_relatedIncidentsConditions(),
-            ),
+            ],
             'order' => 'Incidents.steps desc',
-        ));
+        ]);
     }
 
     /**
@@ -141,18 +141,23 @@ class ReportsTable extends Table
      */
     public function getIncidentsWithDifferentStacktrace()
     {
-        return TableRegistry::get('Incidents')->find('all', array(
-            'fields' => array('DISTINCT Incidents.stackhash', 'Incidents.stacktrace',
-                    'Incidents.full_report', 'Incidents.exception_type', ),
+        return TableRegistry::get('Incidents')->find('all', [
+            'fields' => [
+                'DISTINCT Incidents.stackhash',
+                'Incidents.stacktrace',
+                'Incidents.full_report',
+                'Incidents.exception_type',
+            ],
             'conditions' => $this->_relatedIncidentsConditions(),
             'group' => 'Incidents.stackhash',
-        ));
+        ]);
     }
 
     /**
      * Removes a report from a group of related reports.
      *
-     * @param mixed $report
+     * @param \Cake\Datasource\EntityInterface $report
+     * @return void
      */
     public function removeFromRelatedGroup($report)
     {
@@ -162,23 +167,24 @@ class ReportsTable extends Table
         $rel_report = $this->findByRelatedTo($report->id)->first();
         if ($rel_report) {
             $this->updateAll(
-                array('related_to' => $rel_report->id),
-                array('related_to' => $report->id)
+                ['related_to' => $rel_report->id],
+                ['related_to' => $report->id]
             );
         }
 
         // remove all redundant self-groupings
         $this->updateAll(
-            array('related_to' => null),
-            array('reports.related_to = reports.id')
+            ['related_to' => null],
+            ['reports.related_to = reports.id']
         );
     }
 
     /**
      * Adds a report to a group of related reports.
      *
-     * @param mixed $report
-     * @param mixed $related_to
+     * @param \Cake\Datasource\EntityInterface $report
+     * @param int                              $related_to
+     * @return void
      */
     public function addToRelatedGroup($report, $related_to)
     {
@@ -201,8 +207,9 @@ class ReportsTable extends Table
      */
     public function getUrl()
     {
-        return Router::url(array('controller' => 'reports', 'action' => 'view',
-                $this->id, ), true);
+        return Router::url(['controller' => 'reports', 'action' => 'view',
+            $this->id,
+        ], true);
     }
 
     /**
@@ -220,27 +227,31 @@ class ReportsTable extends Table
      * @return array the groups with the count of each group and possibly the number
      *               of groups. Ex: array('Apache' => 2) or array(array('Apache' => 2), 1)
      */
-    public function getRelatedByField($fieldName, $limit = 10, $count = false,
-        $related = true, $timeLimit = null)
-    {
+    public function getRelatedByField(
+        $fieldName,
+        $limit = 10,
+        $count = false,
+        $related = true,
+        $timeLimit = null
+    ) {
         $fieldAlias = "Incidents__$fieldName";
-        $queryDetails = array(
-            'conditions' => array(
-                'NOT' => array(
+        $queryDetails = [
+            'conditions' => [
+                'NOT' => [
                     "Incidents.$fieldName is null",
-                ),
-            ),
+                ],
+            ],
             'limit' => $limit,
-        );
+        ];
 
         if ($related) {
             $queryDetails['conditions'][] = $this->_relatedIncidentsConditions();
         }
 
         if ($timeLimit) {
-            $queryDetails['conditions'][] = array(
+            $queryDetails['conditions'][] = [
                 'Incidents.created >=' => $timeLimit,
-            );
+            ];
         }
 
         $groupedCount = TableRegistry::get('Incidents')->find('all', $queryDetails);
@@ -256,35 +267,39 @@ class ReportsTable extends Table
         switch ($fieldName) {
             case 'browser':
                 // SUBSTRING(browser, 1, LOCATE(' ', Incidents.browser)-1))
-                $field = $groupedCount->func()->substring(array(
+                $field = $groupedCount->func()->substring([
                     $fieldName => 'literal',
                     '1' => 'literal',
                     "Locate(' ', Incidents.browser)-1" => 'literal',
-                    ));
+                ]);
                 break;
             case 'server_software':
                 // SUBSTRING(server_software, 1, LOCATE('/', Incidents.server_software)-1))
-                $field = $groupedCount->func()->substring(array(
-                    $fieldName => 'literal', '1' => 'literal',
+                $field = $groupedCount->func()->substring([
+                    $fieldName => 'literal',
+                    '1' => 'literal',
                     "Locate('/', Incidents.server_software)-1" => 'literal',
-                    ));
+                ]);
                 break;
             default:
                 $field = $fieldName;
         }
-        $groupedCount->select(array(
+        $groupedCount->select([
             'count' => $groupedCount->func()->count('*'),
             $fieldAlias => $field,
-        ))->group($fieldAlias)->distinct(array("$fieldAlias"))
+        ])->group($fieldAlias)->distinct(["$fieldAlias"])
           ->order('count')->toArray();
 
         if ($count) {
-            $queryDetails['fields'] = array("$fieldName");
+            $queryDetails['fields'] = ["$fieldName"];
             $queryDetails['limit'] = null;
             $queryDetails['group'] = "Incidents.$fieldName";
             $totalCount = TableRegistry::get('Incidents')->find('all', $queryDetails)->count();
 
-            return array($groupedCount, $totalCount);
+            return [
+                $groupedCount,
+                $totalCount,
+            ];
         }
 
         return $groupedCount;
@@ -300,12 +315,12 @@ class ReportsTable extends Table
      */
     public function setLinkedReportStatus($issueNumber, $status)
     {
-        $conditions = array(
-            'sourceforge_bug_id' =>  $issueNumber
-        );
-        $fields = array(
-            'status' => $status
-        );
+        $conditions = [
+            'sourceforge_bug_id' =>  $issueNumber,
+        ];
+        $fields = [
+            'status' => $status,
+        ];
 
         return $this->updateAll($fields, $conditions);
     }
@@ -318,15 +333,15 @@ class ReportsTable extends Table
      */
     protected function _relatedIncidentsConditions()
     {
-        $conditions = array(
-            array('Incidents.report_id = ' . $this->id),
-        );
+        $conditions = [
+            ['Incidents.report_id = ' . $this->id],
+        ];
         $report = $this->get($this->id);
         if ($report->related_to) { //TODO: fix when fix related reports
-            $conditions[] = array('Incidents.report_id = ' . $report->related_to);
+            $conditions[] = ['Incidents.report_id = ' . $report->related_to];
         }
 
-        return array('OR' => $conditions);
+        return ['OR' => $conditions];
     }
 
     /**
@@ -337,14 +352,14 @@ class ReportsTable extends Table
      */
     protected function _relatedReportsConditions()
     {
-        $conditions = array(array('related_to' => $this->id));
+        $conditions = [['related_to' => $this->id]];
         $report = $this->get($this->id);
         if ($report->related_to) { //TODO: fix related to
-            $conditions[] = array('related_to' => $report->related_to);
-            $conditions[] = array('id' => $report->related_to);
+            $conditions[] = ['related_to' => $report->related_to];
+            $conditions[] = ['id' => $report->related_to];
         }
-        $conditions = array(array('OR' => $conditions));
-        $conditions[] = array('Reports.id !=' => $this->id);
+        $conditions = [['OR' => $conditions]];
+        $conditions[] = ['Reports.id !=' => $this->id];
 
         return $conditions;
     }

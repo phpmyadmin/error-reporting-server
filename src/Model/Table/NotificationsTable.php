@@ -36,22 +36,22 @@ class NotificationsTable extends Table
      *
      * @var array
      */
-    public $validate = array(
-        'developer_id' => array(
-            'numeric' => array(
-                'rule' => array('numeric'),
+    public $validate = [
+        'developer_id' => [
+            'numeric' => [
+                'rule' => ['numeric'],
                 'allowEmpty' => false,
                 'required' => true,
-            ),
-        ),
-        'report_id' => array(
-            'numeric' => array(
-                'rule' => array('numeric'),
+            ],
+        ],
+        'report_id' => [
+            'numeric' => [
+                'rule' => ['numeric'],
                 'allowEmpty' => false,
                 'required' => true,
-            ),
-        ),
-    );
+            ],
+        ],
+    ];
 
     /**
      * The Associations below have been created with all possible keys,
@@ -61,14 +61,15 @@ class NotificationsTable extends Table
     /**
      * belongsTo associations.
      *
-     * @var array
+     * @param array $config Config array
+     * @return void
      */
     public function initialize(array $config)
     {
-        $this->belongsTo('Reports', array(
+        $this->belongsTo('Reports', [
             'className' => 'Reports',
             'foreignKey' => 'report_id',
-        ));
+        ]);
     }
 
     /**
@@ -80,7 +81,7 @@ class NotificationsTable extends Table
      */
     public static function addNotifications($report_id)
     {
-        if (!is_int($report_id)) {
+        if (! is_int($report_id)) {
             throw new InvalidArgumentException('Invalid Argument "$report_id"! Integer Expected.');
         }
         $devs = TableRegistry::get('Developers')->find('all');

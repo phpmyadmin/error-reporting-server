@@ -9,15 +9,15 @@ use Cake\TestSuite\Fixture\TestFixture;
 
 class IncidentsFixture extends TestFixture
 {
-    public $import = array('table' => 'incidents');
+    public $import = ['table' => 'incidents'];
 
     /**
      * Records.
      *
      * @var array
      */
-    public $records = array(
-        array(
+    public $records = [
+        [
             'id' => 1,
             'error_name' => 'Lorem ipsum dolor sit amet',
             'error_message' => 'Lorem ipsum dolor sit amet',
@@ -39,8 +39,8 @@ class IncidentsFixture extends TestFixture
             'report_id' => 1,
             'created' => '2013-08-29 18:10:01',
             'modified' => '2013-08-29 18:10:01',
-        ),
-        array(
+        ],
+        [
             'id' => 2,
             'error_name' => 'Lorem ipsum dolor sit amet',
             'error_message' => 'Lorem ipsum dolor sit amet',
@@ -59,8 +59,8 @@ class IncidentsFixture extends TestFixture
             'report_id' => 4,
             'created' => '2013-08-29 18:10:01',
             'modified' => '2013-08-29 18:10:01',
-        ),
-        array(
+        ],
+        [
             'id' => 3,
             'error_name' => 'Lorem ipsum dolor sit amet',
             'error_message' => 'Lorem ipsum dolor sit amet',
@@ -79,9 +79,9 @@ class IncidentsFixture extends TestFixture
             'report_id' => 4,
             'created' => '2013-08-29 18:10:00',
             'modified' => '2013-08-29 18:10:00',
-        ),
+        ],
 
-        array(
+        [
             'id' => 4,
             'error_name' => 'Lorem ipsum dolor sit amet',
             'error_message' => 'Lorem ipsum dolor sit amet',
@@ -100,9 +100,9 @@ class IncidentsFixture extends TestFixture
             'report_id' => 2,
             'created' => '2013-08-29 18:10:00',
             'modified' => '2013-08-29 18:10:00',
-        ),
+        ],
 
-        array(
+        [
             'id' => 5,
             'error_name' => 'Lorem ipsum dolor sit amet',
             'error_message' => 'Lorem ipsum dolor sit amet',
@@ -121,6 +121,6 @@ class IncidentsFixture extends TestFixture
             'report_id' => 5,
             'created' => '2013-08-29 18:10:00',
             'modified' => '2013-08-29 18:10:00',
-        ),
-    );
+        ],
+    ];
 }

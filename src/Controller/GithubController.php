@@ -31,9 +31,12 @@ use Cake\Routing\Router;
  */
 class GithubController extends AppController
 {
-    public $helpers = array('Html', 'Form');
+    public $helpers = [
+        'Html',
+        'Form',
+    ];
 
-    public $components = array('GithubApi');
+    public $components = ['GithubApi'];
 
     public function beforeFilter(Event $event)
     {
@@ -48,17 +51,18 @@ class GithubController extends AppController
      * @param int $reportId
      *
      * @throws NotFoundException
+     * @return void
      */
     public function create_issue($reportId)
     {
-        if (!isset($reportId) || !$reportId) {
+        if (! isset($reportId) || ! $reportId) {
             throw new NotFoundException(__('Invalid report'));
         }
 
         $reportsTable = TableRegistry::get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
-        if (!$report) {
+        if (! $report) {
             throw new NotFoundException(__('Invalid report'));
         }
 
@@ -71,10 +75,10 @@ class GithubController extends AppController
         }
 
         $this->autoRender = false;
-        $data = array(
+        $data = [
             'title' => $this->request->data['summary'],
-            'labels' => $this->request->data['labels'] ? explode(',', $this->request->data['labels']) : array(),
-        );
+            'labels' => $this->request->data['labels'] ? explode(',', $this->request->data['labels']) : [],
+        ];
         $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
         $incident = $incidents_query->first();
         $reportArray['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
@@ -95,35 +99,39 @@ class GithubController extends AppController
             $report->status = $this->_getReportStatusFromIssueState($issueDetails['state']);
             $reportsTable->save($report);
 
-            $this->redirect(array('controller' => 'reports', 'action' => 'view',
-                $reportId, ));
+            $this->redirect(['controller' => 'reports', 'action' => 'view',
+                $reportId,
+            ]);
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default($this->_getErrors($issueDetails, $status),
-                array('params' => array('class' => $flash_class)));
+            $this->Flash->default(
+                $this->_getErrors($issueDetails, $status),
+                ['params' => ['class' => $flash_class]]
+            );
         }
     }
 
     /**
      * Links error report to existing issue on Github.
      *
-     * @param mixed $reportId
+     * @param int $reportId The report Id
+     * @return void
      */
     public function link_issue($reportId)
     {
-        if (!isset($reportId) || !$reportId) {
+        if (! isset($reportId) || ! $reportId) {
             throw new NotFoundException(__('Invalid reportId'));
         }
 
         $reportsTable = TableRegistry::get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
-        if (!$report) {
+        if (! $report) {
             throw new NotFoundException(__('Invalid report'));
         }
 
         $ticket_id = intval($this->request->query['ticket_id']);
-        if (!$ticket_id) {
+        if (! $ticket_id) {
             throw new NotFoundException(__('Invalid Ticket ID!!'));
         }
         $reportArray = $report->toArray();
@@ -133,11 +141,12 @@ class GithubController extends AppController
         $reportArray['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
 
         $commentText = $this->_getReportDescriptionText(
-            $reportId, $reportArray
+            $reportId,
+            $reportArray
         );
         list($commentDetails, $status) = $this->GithubApi->createComment(
             Configure::read('GithubRepoPath'),
-            array('body' => $commentText),
+            ['body' => $commentText],
             $ticket_id,
             $this->request->session()->read('access_token')
         );
@@ -147,7 +156,7 @@ class GithubController extends AppController
 
             list($issueDetails, $status) = $this->GithubApi->getIssue(
                 Configure::read('GithubRepoPath'),
-                array(),
+                [],
                 $ticket_id,
                 $this->request->session()->read('access_token')
             );
@@ -161,36 +170,40 @@ class GithubController extends AppController
             $reportsTable->save($report);
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default($this->_getErrors($commentDetails, $status),
-                    array('params' => array('class' => $flash_class)));
+            $this->Flash->default(
+                $this->_getErrors($commentDetails, $status),
+                ['params' => ['class' => $flash_class]]
+            );
         }
 
-        $this->redirect(array('controller' => 'reports', 'action' => 'view',
-                        $reportId, ));
+        $this->redirect(['controller' => 'reports', 'action' => 'view',
+            $reportId,
+        ]);
     }
 
     /**
      * Un-links error report to associated issue on Github.
      *
-     * @param mixed $reportId
+     * @param int $reportId The report Id
+     * @return void
      */
     public function unlink_issue($reportId)
     {
-        if (!isset($reportId) || ! $reportId) {
+        if (! isset($reportId) || ! $reportId) {
             throw new NotFoundException(__('Invalid reportId'));
         }
 
         $reportsTable = TableRegistry::get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
-        if (!$report) {
+        if (! $report) {
             throw new NotFoundException(__('Invalid report'));
         }
 
         $reportArray = $report->toArray();
         $ticket_id = $reportArray['sourceforge_bug_id'];
 
-        if (!$ticket_id) {
+        if (! $ticket_id) {
             throw new NotFoundException(__('Invalid Ticket ID!!'));
         }
 
@@ -205,7 +218,7 @@ class GithubController extends AppController
 
         list($commentDetails, $status) = $this->GithubApi->createComment(
             Configure::read('GithubRepoPath'),
-            array('body' => $commentText),
+            ['body' => $commentText],
             $ticket_id,
             $this->request->session()->read('access_token')
         );
@@ -216,12 +229,15 @@ class GithubController extends AppController
             $reportsTable->save($report);
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default($this->_getErrors($commentDetails, $status),
-                    array('params' => array('class' => $flash_class)));
+            $this->Flash->default(
+                $this->_getErrors($commentDetails, $status),
+                ['params' => ['class' => $flash_class]]
+            );
         }
 
-        $this->redirect(array('controller' => 'reports', 'action' => 'view',
-                        $reportId, ));
+        $this->redirect(['controller' => 'reports', 'action' => 'view',
+            $reportId,
+        ]);
     }
 
     /**
@@ -248,8 +264,8 @@ class GithubController extends AppController
     /**
      * Returns the text to be added while creating an issue
      *
-     * @param integer $reportId       Report Id
-     * @param array   $report         Report associative array
+     * @param integer $reportId Report Id
+     * @param array   $report   Report associative array
      *
      * @return string
      */
@@ -295,7 +311,7 @@ class GithubController extends AppController
      */
     protected function _handleGithubResponse($response, $type, $report_id, $ticket_id = 1)
     {
-        if (!in_array($type, array(1, 2, 3, 4))) {
+        if (! in_array($type, [1, 2, 3, 4])) {
             throw new InvalidArgumentException('Invalid Argument "$type".');
         }
 
@@ -331,18 +347,21 @@ class GithubController extends AppController
 
             if ($msg !== '') {
                 $flash_class = 'alert alert-success';
-                $this->Flash->default($msg,
-                    array('params' => array('class' => $flash_class)));
+                $this->Flash->default(
+                    $msg,
+                    ['params' => ['class' => $flash_class]]
+                );
             }
 
             return true;
         } elseif ($response === 403) {
             $flash_class = 'alert alert-error';
             $this->Flash->default(
-                    'Unauthorised access to Github. github'
+                'Unauthorised access to Github. github'
                     . ' credentials may be out of date. Please check and try again'
                     . ' later.',
-                    array('params' => array('class' => $flash_class)));
+                ['params' => ['class' => $flash_class]]
+            );
 
             return false;
         } elseif ($response === 404
@@ -350,17 +369,20 @@ class GithubController extends AppController
         ) {
             $flash_class = 'alert alert-error';
             $this->Flash->default(
-                    'Bug Issue not found on Github.'
+                'Bug Issue not found on Github.'
                     . ' Are you sure the issue number is correct? Please check and try again!',
-                     array('params' => array('class' => $flash_class)));
+                ['params' => ['class' => $flash_class]]
+            );
 
             return false;
         }
 
         // unknown response code
         $flash_class = 'alert alert-error';
-        $this->Flash->default('Unhandled response code received: ' . $response,
-                    array('params' => array('class' => $flash_class)));
+        $this->Flash->default(
+            'Unhandled response code received: ' . $response,
+            ['params' => ['class' => $flash_class]]
+        );
 
         return false;
     }
@@ -369,33 +391,34 @@ class GithubController extends AppController
      * Get Incident counts for a report and
      * all its related reports
      *
-     * @param $reportId Report ID
+     * @param int $reportId The report Id
      *
-     * @return $total_incident_count Total Incident count for a report
+     * @return int Total Incident count for a report
      */
     protected function _getTotalIncidentCount($reportId)
     {
         $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
         $incident_count = $incidents_query->count();
 
-        $params_count = array(
-            'fields' => array('inci_count' => 'inci_count'),
-            'conditions' => array(
-                    'related_to = ' . $reportId,
-            ),
-        );
-        $subquery_params_count = array(
-            'fields' => array(
+        $params_count = [
+            'fields' => ['inci_count' => 'inci_count'],
+            'conditions' => [
+                'related_to = ' . $reportId,
+            ],
+        ];
+        $subquery_params_count = [
+            'fields' => [
                 'report_id' => 'report_id',
-            ),
-        );
+            ],
+        ];
         $subquery_count = TableRegistry::get('Incidents')->find(
-            'all', $subquery_params_count
+            'all',
+            $subquery_params_count
         );
         $inci_count_related = TableRegistry::get('Reports')->find('all', $params_count)->innerJoin(
-                array('incidents' => $subquery_count),
-                array('incidents.report_id = Reports.related_to')
-            )->count();
+            ['incidents' => $subquery_count],
+            ['incidents.report_id = Reports.related_to']
+        )->count();
 
         return $incident_count + $inci_count_related;
     }
@@ -403,9 +426,9 @@ class GithubController extends AppController
     /**
      * Get corresponding report status from Github issue state
      *
-     * @param $issueState Linked Github issue's state
+     * @param string $issueState Linked Github issue's state
      *
-     * @return Corresponding status to which the linked report should be updated to
+     * @return string Corresponding status to which the linked report should be updated to
      */
     protected function _getReportStatusFromIssueState($issueState)
     {
@@ -430,14 +453,15 @@ class GithubController extends AppController
      * To be used as a cron job (using webroot/cron_dispatcher.php).
      *
      * Can not (& should not) be directly accessed via web.
+     * @return void
      */
     public function sync_issue_status()
     {
-        if (!Configure::read('CronDispatcher')) {
+        if (! Configure::read('CronDispatcher')) {
             $flash_class = 'alert alert-error';
             $this->Flash->default(
                 'Unauthorised action! This action is not available on Web interface',
-                array('params' => array('class' => $flash_class))
+                ['params' => ['class' => $flash_class]]
             );
 
             $this->redirect('/');
@@ -450,14 +474,14 @@ class GithubController extends AppController
         // Fetch all linked reports
         $reports = $reportsTable->find(
             'all',
-            array(
-                'conditions' => array(
+            [
+                'conditions' => [
                     'sourceforge_bug_id IS NOT NULL',
-                    'NOT' => array(
-                        'status' => 'resolved'
-                    )
-                )
-            )
+                    'NOT' => [
+                        'status' => 'resolved',
+                    ]
+                ],
+            ]
         );
 
         foreach ($reports as $report) {
@@ -466,12 +490,12 @@ class GithubController extends AppController
             // fetch the new issue status
             list($issueDetails, $status) = $this->GithubApi->getIssue(
                 Configure::read('GithubRepoPath'),
-                array(),
+                [],
                 $report['sourceforge_bug_id'],
                 Configure::read('GithubAccessToken')
             );
 
-            if (!$this->_handleGithubResponse($status, 4, $report['id'], $report['sourceforge_bug_id'])) {
+            if (! $this->_handleGithubResponse($status, 4, $report['id'], $report['sourceforge_bug_id'])) {
                 Log::error(
                     'FAILED: Fetching status of Issue #'
                         . ($report['sourceforge_bug_id'])

@@ -7,10 +7,10 @@ use Cake\TestSuite\Fixture\TestFixture;
 class ReportsFixture extends TestFixture
 {
     public $connection = 'test';
-    public $import = array('table' => 'reports');
+    public $import = ['table' => 'reports'];
 
-    public $records = array(
-        array(
+    public $records = [
+        [
             'id' => 1,
             'error_message' => 'Lorem ipsum dolor sit amet',
             'error_name' => 'error2',
@@ -22,8 +22,8 @@ class ReportsFixture extends TestFixture
             'related_to' => null,
             'created' => '2013-08-28 21:47:17',
             'modified' => '2013-08-28 21:47:17',
-        ),
-        array(
+        ],
+        [
             'id' => 2,
             'error_message' => 'Lorem ipsum dolor sit amet',
             'error_name' => 'error2',
@@ -35,8 +35,8 @@ class ReportsFixture extends TestFixture
             'related_to' => null,
             'created' => '2013-08-28 21:47:17',
             'modified' => '2013-08-28 21:47:17',
-        ),
-        array(
+        ],
+        [
             'id' => 4,
             'error_message' => 'Lorem ipsum dolor sit amet',
             'error_name' => 'error1',
@@ -48,8 +48,8 @@ class ReportsFixture extends TestFixture
             'related_to' => null,
             'created' => '2013-08-28 21:47:17',
             'modified' => '2013-08-28 21:47:17',
-        ),
-        array(
+        ],
+        [
             'id' => 5,
             'error_message' => 'Lorem ipsum dolor sit amet',
             'error_name' => 'error1',
@@ -61,6 +61,6 @@ class ReportsFixture extends TestFixture
             'related_to' => null,
             'created' => '2013-08-28 21:47:17',
             'modified' => '2013-08-28 21:47:17',
-        ),
-    );
+        ],
+    ];
 }

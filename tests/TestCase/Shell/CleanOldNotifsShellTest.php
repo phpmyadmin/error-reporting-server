@@ -42,10 +42,10 @@ class CleanOldNotifsShellTest extends TestCase
      */
     public $CleanOldNotifs;
 
-    public $fixtures = array(
+    public $fixtures = [
         'app.notifications',
-        'app.developers'
-    );
+        'app.developers',
+    ];
 
     /**
      * setUp method
@@ -81,9 +81,9 @@ class CleanOldNotifsShellTest extends TestCase
         // Call intialize method to load the models
         $this->CleanOldNotifs->initialize();
 
-        $conditions = array(
-            'developer_id' => 1
-        );
+        $conditions = [
+            'developer_id' => 1,
+        ];
         $currentNotificationCount
             = $this->CleanOldNotifs->Notifications->find('all')->where($conditions)->count();
         $this->assertEquals(2, $currentNotificationCount);

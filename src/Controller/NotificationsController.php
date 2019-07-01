@@ -19,7 +19,6 @@
 
 namespace App\Controller;
 
-
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
@@ -29,11 +28,22 @@ use Cake\Routing\Router;
  */
 class NotificationsController extends AppController
 {
-    public $components = array('RequestHandler', 'OrderSearch');
+    public $components = [
+        'RequestHandler',
+        'OrderSearch',
+    ];
 
-    public $helpers = array('Html', 'Form', 'Reports');
+    public $helpers = [
+        'Html',
+        'Form',
+        'Reports',
+    ];
 
-    public $uses = array('Notification', 'Developer', 'Report');
+    public $uses = [
+        'Notification',
+        'Developer',
+        'Report',
+    ];
 
     public function beforeFilter(Event $event)
     {
@@ -52,30 +62,30 @@ class NotificationsController extends AppController
         $current_developer = TableRegistry::get('Developers')->
                     findById($this->request->session()->read('Developer.id'))->all()->first();
 
-        $aColumns = array(
+        $aColumns = [
             'report_id' => 'Reports.id',
             'error_message' => 'Reports.error_message',
             'error_name' => 'Reports.error_name',
             'pma_version' => 'Reports.pma_version',
             'exception_type' => 'Reports.exception_type',
             'created_time' => 'Notifications.created',
-        );
+        ];
 
         $orderConditions = $this->OrderSearch->getOrder($aColumns);
         $searchConditions = $this->OrderSearch->getSearchConditions($aColumns);
 
         $aColumns['id'] = 'Notifications.id';
-        $params = array(
+        $params = [
             'contain' => 'Reports',
             'fields' => $aColumns,
-            'conditions' => array(
-                'AND' => array(
-                    array('Notifications.developer_id ' => $current_developer['id']),
+            'conditions' => [
+                'AND' => [
+                    ['Notifications.developer_id ' => $current_developer['id']],
                     $searchConditions,
-                ),
-            ),
+                ],
+            ],
             'order' => $orderConditions,
-        );
+        ];
 
         $pagedParams = $params;
         $pagedParams['limit'] = intval($this->request->query('iDisplayLength'));
@@ -84,28 +94,28 @@ class NotificationsController extends AppController
         $rows = $this->Notifications->find('all', $pagedParams);
         $totalFiltered = $this->Notifications->find(
             'all',
-            array(
-                'conditions' => array(
-                    'developer_id' => $current_developer['id']
-                )
-            )
+            [
+                'conditions' => [
+                    'developer_id' => $current_developer['id'],
+                ],
+            ]
         )->count();
 
         // Make the display rows array
-        $dispRows = array();
-        $tmp_row = array();
+        $dispRows = [];
+        $tmp_row = [];
         foreach ($rows as $row) {
             $tmp_row[0] = '<input type="checkbox" name="notifs[]" value="'
                 . $row['id']
                 . '"/>';
             $tmp_row[1] = '<a href="'
                 . Router::url(
-                    array(
+                    [
                         'controller' => 'reports',
                         'action' => 'view',
                         $row['report_id'],
-                        )
-                    )
+                    ]
+                )
                 . '">'
                 . $row['report_id']
                 . '</a>';
@@ -117,12 +127,12 @@ class NotificationsController extends AppController
             array_push($dispRows, $tmp_row);
         }
 
-        $response = array(
+        $response = [
             'iTotalDisplayRecords' => $totalFiltered,
             'iTotalRecords' => $this->Notifications->find('all', $params)->count(),
             'sEcho' => intval($this->request->query('sEcho')),
             'aaData' => $dispRows,
-        );
+        ];
         $this->autoRender = false;
         $this->response->body(json_encode($response));
 
@@ -134,6 +144,7 @@ class NotificationsController extends AppController
      * Currently it deletes them (marks them "read").
      * Can be Extended for other mass operations as well.
      * Expects an array of Notification Ids as a POST parameter.
+     * @return void
      */
     public function mass_action()
     {
@@ -141,7 +152,6 @@ class NotificationsController extends AppController
         $flash_class = 'alert alert-success';
 
         if ($this->request->getData('mark_all')) {
-
             // Delete all notifications for this Developer
             $this->Notifications->deleteAll(
                 ['developer_id' => $this->request->session()->read('Developer.id')]
@@ -150,7 +160,7 @@ class NotificationsController extends AppController
             $msg = 'All your notifications have been marked \'Read\'';
         } else {
             foreach ($this->request->data['notifs'] as $notif_id) {
-                if (!$this->Notifications->delete($this->Notifications->get(intval($notif_id)))) {
+                if (! $this->Notifications->delete($this->Notifications->get(intval($notif_id)))) {
                     $msg = '<b>ERROR</b>: There was some problem in deleting Notification(ID:'
                         . $notif_id
                         . ')!';
@@ -159,8 +169,10 @@ class NotificationsController extends AppController
                 }
             }
         }
-        $this->Flash->default($msg,
-            array('params' => array('class' => $flash_class)));
+        $this->Flash->default(
+            $msg,
+            ['params' => ['class' => $flash_class]]
+        );
         $this->redirect('/notifications/');
     }
 }

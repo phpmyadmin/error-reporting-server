@@ -32,7 +32,7 @@ class MailerComponent extends Component
     /**
      * Send an email about the report to configured Email
      *
-     * @param $viewVars Array of View Variables
+     * @param array $viewVars Array of View Variables
      *
      * @return boolean if Email was sent
      */

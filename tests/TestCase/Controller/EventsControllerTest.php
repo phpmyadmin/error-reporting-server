@@ -7,7 +7,7 @@ use Cake\TestSuite\IntegrationTestCase;
 
 class EventsControllerTest extends IntegrationTestCase
 {
-    public $fixtures = array('app.reports');
+    public $fixtures = ['app.reports'];
 
     public function setUp()
     {
@@ -20,7 +20,7 @@ class EventsControllerTest extends IntegrationTestCase
         /* Test case 1 */
         // Invalid User Agent
         $this->configRequest([
-            'headers' => ['User-Agent' => 'Invalid-GitHub-Hookshot-abcdef']
+            'headers' => ['User-Agent' => 'Invalid-GitHub-Hookshot-abcdef'],
         ]);
         $this->post('/events');
         $this->assertResponseCode(403);
@@ -30,8 +30,8 @@ class EventsControllerTest extends IntegrationTestCase
         $this->configRequest([
             'headers' => [
                 'User-Agent' => 'GitHub-Hookshot-abcdef',
-                'X-GitHub-Event' => 'anything-except-issues'
-            ]
+                'X-GitHub-Event' => 'anything-except-issues',
+            ],
         ]);
         $this->post('/events');
         $this->assertResponseCode(400);
@@ -42,18 +42,18 @@ class EventsControllerTest extends IntegrationTestCase
             'headers' => [
                 'User-Agent' => 'GitHub-Hookshot-abcdef',
                 'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=89db05030cf4c1fbcfb4d590deda30fa40a247ed'
-            ]
+                'X-Hub-Signature' => 'sha1=89db05030cf4c1fbcfb4d590deda30fa40a247ed',
+            ],
         ]);
         $this->post(
             '/events',
             json_encode(
-                array(
+                [
                     'action' => 'closed',
-                    'issue' => array(
-                        'number' => 4
-                    )
-                )
+                    'issue' => [
+                        'number' => 4,
+                    ]
+                ]
             )
         );
         $this->assertResponseCode(401);
@@ -64,18 +64,18 @@ class EventsControllerTest extends IntegrationTestCase
             'headers' => [
                 'User-Agent' => 'GitHub-Hookshot-abcdef',
                 'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03'
-            ]
+                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
+            ],
         ]);
         $this->post(
             '/events',
             json_encode(
-                array(
+                [
                     'action' => 'anything-invalid',
-                    'issue' => array(
-                        'number' => 4
-                    )
-                )
+                    'issue' => [
+                        'number' => 4,
+                    ]
+                ]
             )
         );
         $this->assertResponseCode(204);
@@ -86,18 +86,18 @@ class EventsControllerTest extends IntegrationTestCase
             'headers' => [
                 'User-Agent' => 'GitHub-Hookshot-abcdef',
                 'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03'
-            ]
+                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
+            ],
         ]);
         $this->post(
             '/events',
             json_encode(
-                array(
+                [
                     'action' => 'closed',
-                    'issue' => array(
-                        'number' => 1234
-                    )
-                )
+                    'issue' => [
+                        'number' => 1234,
+                    ]
+                ]
             )
         );
         $this->assertResponseCode(204);
@@ -113,18 +113,18 @@ class EventsControllerTest extends IntegrationTestCase
             'headers' => [
                 'User-Agent' => 'GitHub-Hookshot-abcdef',
                 'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03'
-            ]
+                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
+            ],
         ]);
         $this->post(
             '/events',
             json_encode(
-                array(
+                [
                     'action' => 'opened',
-                    'issue' => array(
-                        'number' => 4
-                    )
-                )
+                    'issue' => [
+                        'number' => 4,
+                    ]
+                ]
             )
         );
         $this->assertResponseCode(201);
@@ -138,18 +138,18 @@ class EventsControllerTest extends IntegrationTestCase
             'headers' => [
                 'User-Agent' => 'GitHub-Hookshot-abcdef',
                 'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03'
-            ]
+                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
+            ],
         ]);
         $this->post(
             '/events',
             json_encode(
-                array(
+                [
                     'action' => 'closed',
-                    'issue' => array(
-                        'number' => 4
-                    )
-                )
+                    'issue' => [
+                        'number' => 4,
+                    ]
+                ]
             )
         );
         $this->assertResponseCode(201);
@@ -167,18 +167,18 @@ class EventsControllerTest extends IntegrationTestCase
             'headers' => [
                 'User-Agent' => 'GitHub-Hookshot-abcdef',
                 'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03'
-            ]
+                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
+            ],
         ]);
         $this->post(
             '/events',
             json_encode(
-                array(
+                [
                     'action' => 'reopened',
-                    'issue' => array(
-                        'number' => 4
-                    )
-                )
+                    'issue' => [
+                        'number' => 4,
+                    ]
+                ]
             )
         );
         $this->assertResponseCode(201);
@@ -191,8 +191,8 @@ class EventsControllerTest extends IntegrationTestCase
             'headers' => [
                 'User-Agent' => 'GitHub-Hookshot-abcdef',
                 'X-GitHub-Event' => 'ping',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03'
-            ]
+                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
+            ],
         ]);
         $this->post('/events');
         $this->assertResponseCode(200);

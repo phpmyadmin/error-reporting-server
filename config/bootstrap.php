@@ -133,7 +133,7 @@ if ($isCli) {
  *
  * If you define fullBaseUrl in your config file you can remove this.
  */
-if (!Configure::read('App.fullBaseUrl')) {
+if (! Configure::read('App.fullBaseUrl')) {
     $s = null;
     if (env('HTTPS')) {
         $s = 's';
