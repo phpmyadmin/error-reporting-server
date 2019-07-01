@@ -21,7 +21,7 @@
  * @since     CakePHP(tm) v 0.2.9
  */
 
-namespace app\View\Helper;
+namespace App\View\Helper;
 
 use Cake\View\Helper;
 

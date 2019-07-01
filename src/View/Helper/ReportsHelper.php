@@ -2,7 +2,7 @@
 
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 
-namespace app\View\Helper;
+namespace App\View\Helper;
 
 use App\Utility\Sanitize;
 use App\View\Helper\AppHelper;

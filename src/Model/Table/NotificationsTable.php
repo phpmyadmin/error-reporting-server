@@ -82,7 +82,7 @@ class NotificationsTable extends Table
     public static function addNotifications($report_id)
     {
         if (! is_int($report_id)) {
-            throw new InvalidArgumentException('Invalid Argument "$report_id"! Integer Expected.');
+            throw new \InvalidArgumentException('Invalid Argument "$report_id"! Integer Expected.');
         }
         $devs = TableRegistry::get('Developers')->find('all');
         $notoficationTable = TableRegistry::get('Notifications');

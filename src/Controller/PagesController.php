@@ -23,6 +23,8 @@ namespace App\Controller;
 
 use Cake\Core\Configure;
 use Cake\Utility\Inflector;
+use Cake\View\Exception\MissingViewException;
+use Cake\Http\Exception\NotFoundException;
 
 /**
  * Static content controller.

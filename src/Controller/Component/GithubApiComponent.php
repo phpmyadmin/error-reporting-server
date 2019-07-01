@@ -87,7 +87,7 @@ class GithubApiComponent extends Component
      * @param string $accessToken the access token belonging to the user being
      *                            requested
      *
-     * @return Arrray the github info returned by github as an associative array
+     * @return array the github info returned by github as an associative array
      */
     public function getUserInfo($accessToken)
     {

@@ -246,7 +246,7 @@ class GithubController extends AppController
      * @param object $response the response returned by Github api
      * @param int    $status   status returned by Github API
      *
-     * @return error string
+     * @return string error string
      */
     protected function _getErrors($response, $status)
     {
@@ -312,7 +312,7 @@ class GithubController extends AppController
     protected function _handleGithubResponse($response, $type, $report_id, $ticket_id = 1)
     {
         if (! in_array($type, [1, 2, 3, 4])) {
-            throw new InvalidArgumentException('Invalid Argument "$type".');
+            throw new \InvalidArgumentException('Invalid Argument "$type".');
         }
 
         $updateReport = true;

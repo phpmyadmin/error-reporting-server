@@ -25,6 +25,7 @@ use Cake\Log\Log;
 use Cake\Http\Response;
 use Cake\Routing\DispatcherFactory;
 use Cake\Routing\Router;
+use Cake\Http\Client\Request;
 
 /**
  * Sync Github issue states Shell.

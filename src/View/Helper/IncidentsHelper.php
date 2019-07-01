@@ -17,7 +17,7 @@
  * @see      https://www.phpmyadmin.net/
  */
 
-namespace app\View\Helper;
+namespace App\View\Helper;
 
 use App\View\Helper\AppHelper;
 use Cake\View\View;

@@ -110,7 +110,7 @@ class EventsController extends AppController
     /**
      * Validate HTTP Request received
      *
-     * @param Request $request Request object
+     * @param \Cake\Http\Client\Request $request Request object
      *
      * @return int status code based on if this is a valid request
      */

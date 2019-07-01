@@ -222,7 +222,7 @@ class ReportsTable extends Table
      * @param int    $limit     the max number of groups to return
      * @param bool   $count     whether to return the number of distinct groups
      * @param bool   $related   whether to limit the search to only related incidents
-     * @param Date   $timeLimit the date at which to start the search
+     * @param string $timeLimit the date at which to start the search
      *
      * @return array the groups with the count of each group and possibly the number
      *               of groups. Ex: array('Apache' => 2) or array(array('Apache' => 2), 1)
