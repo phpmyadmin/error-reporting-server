@@ -18,7 +18,7 @@ In order to deploy the app in this repo you need to follow these steps:
   files in the previous step. Make sure that the installation is in the
   document root.
 - Run `composer install` to download and configure dependencies and library files
-- Configure the web server (see below)
+- Configure the web server (see [below](#oauth-configuration-setup))
 - Create the database for the server
 - install mbstring (required for cake 3.0)
 - install intl extension; on Debian use: `sudo apt-get install php-intl` //(required for cake 3.0)
@@ -31,18 +31,18 @@ In order to deploy the app in this repo you need to follow these steps:
 	- `setfacl -R -d -m u:${HTTPDUSER}:rwx tmp`
 	- `setfacl -R -m u:${HTTPDUSER}:rwx logs`
 	- `setfacl -R -d -m u:${HTTPDUSER}:rwx logs`
-- Rename the example files `config/app_example.php` to
+- Copy the example files `config/app_example.php` to
   `config/app.php` and fill out the required info.
   Make sure to change the salts, debug level and
   the database credentials in the `app.php` file.
-- Rename the `oauth_example.php` to `oauth.php` and follow the instructions below
+- Copy the `oauth_example.php` to `oauth.php` and follow the instructions below
   to set the appropriate variables in the file.
 - Run the migrations that have been created so far to setup the database
  	- For existing systems: update and run migrations
-    	`sudo bin/cake migrations mark_migrated 20150607191654`
-    	`sudo bin/cake migrations migrate`
+    	`bin/cake migrations mark_migrated 20150607191654`
+    	`bin/cake migrations migrate`
 	- For new system: just run migration
-	 `sudo bin/cake migrations migrate`
+	 `bin/cake migrations migrate`
 
 ## Requirements ##
  - php >= 5.4
@@ -54,7 +54,7 @@ In order to deploy the app in this repo you need to follow these steps:
 - Configuration for Apache (this will run the server on port 80, if you
   already have services on port 80 you may wish to use a different port
   or configuration method):
-```
+```apache
 <VirtualHost *:80>
 			ServerAdmin webmaster@localhost
 			ServerName reports.phpmyadmin.net
@@ -70,7 +70,7 @@ In order to deploy the app in this repo you need to follow these steps:
 </VirtualHost>
 ```
 - Configuration for lighttpd:
-```
+```lighttpd
 $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
 			server.document-root = "/srv/http/reports.phpmyadmin.net/webroot/"
 			url.rewrite-if-not-file =(
@@ -79,7 +79,7 @@ $HTTP["host"] =~ "^reports.phpmyadmin.net$" {
 }
 ```
 - Configuration for nginx:
-```
+```nginx
 server {
         listen [::]:80;
         listen [::]:443 ssl;
@@ -105,7 +105,7 @@ server {
 }
 ```
 
-## Oath configuration setup ##
+## OAuth configuration setup ##
 
 ### Creating the GitHub app ###
 
@@ -113,11 +113,11 @@ The application relies on authentication using GitHub. To obtain the client ID
 and key, visit [application settings in your Github profile][gh-oauth] and
 register an application there.
 
-The callback for the github app should be ``/developers/callback``.
+The callback for the github app should be ``<http://YOUR_PREFERRED_DOMAIN>/developers/callback`` where ``YOUR_PREFERRED_DOMAIN`` is the URL you wish to access the local instance on.
 
-The obtained cliend ID and secret should be stored in the ``config/oauth.php``.
+Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth.php`` and replace the dummy credentials with the obtained cliend ID and secret.
 
-[gh-oauth]: https://github.com/settings/applications
+[gh-oauth]: https://github.com/settings/developers
 
 
 ## Github Events ##
@@ -133,7 +133,7 @@ The obtained cliend ID and secret should be stored in the ``config/oauth.php``.
 - Get a Github Personal Access token as explained [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
 - Set value of obtained `GithubAccessToken` in config/oauth.php
 - After setting value of GithubAccessToken in config/oauth.php as explained above, you can run the synchronization action as
-```Shell
+```shell
 ./bin/cake sync_github_issue_states
 ```
 - This can be scheduled as a cron job too.
@@ -142,8 +142,8 @@ The obtained cliend ID and secret should be stored in the ``config/oauth.php``.
 
 If you are on a development machine you can use the webrunner at `/test.php`
 However if you need a command line runner. You can use:
-```
-sudo vendor/bin/phpunit -c phpunit.xml.dist
+```shell
+./vendor/bin/phpunit -c phpunit.xml.dist
 ```
 
 # Running the stackhash update shell #
@@ -151,7 +151,7 @@ sudo vendor/bin/phpunit -c phpunit.xml.dist
 There is a new way of finding unique stacktraces that uses hashes that did not
 exist previously. I created a shell to calculate those hashes for old records so
 that they can work with the new code. To use the shell you can just type:
-```
+```shell
 Console/cake custom addHashesToOldRecords
 ```
 
@@ -159,7 +159,7 @@ Console/cake custom addHashesToOldRecords
 To Schedule & run cron jobs cakephp provides a console tool. We need to create shell for use in console. We can run the created shell as cron job.
 ### Execute an Action as Cron Job ###
 For example, following is the command to execute the shell src/Shell/StatsShell.php which cache the error reporting statistics for later use.
-```Shell
+```shell
 bin/cake stats
 ```
 stats cache will expire in one day so we need to schedule this command to run everyday as cron job.
