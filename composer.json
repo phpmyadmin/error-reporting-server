@@ -18,7 +18,7 @@
         "source": "https://github.com/phpmyadmin/error-reporting-server"
     },
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.1",
         "ext-curl": "*",
         "cakephp/cakephp": "3.8.*",
         "cakephp/migrations": "^2.0.0",
