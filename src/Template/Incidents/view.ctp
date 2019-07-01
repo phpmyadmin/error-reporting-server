@@ -105,6 +105,7 @@
 <h4>Stacktrace:</h4>
 <?= $this->Incidents->getStacktrace($incident, 'well'); ?>
 
+<?php if (isset($incident['full_report']['microhistory'])): ?>
 <h4>Microhistory:</h4>
 <pre>
     <?php if (($incident['exception_type'])): ?>
@@ -118,3 +119,4 @@
         ?>
     <?php endif; ?>
 </pre>
+<?php endif; ?>
