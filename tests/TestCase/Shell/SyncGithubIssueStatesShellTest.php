@@ -28,7 +28,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
     public $SyncGithubIssueStates;
 
     public $fixtures = [
-        'app.reports',
+        'app.Reports',
     ];
 
     /**

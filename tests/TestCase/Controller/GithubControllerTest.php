@@ -37,10 +37,10 @@ class GithubControllerTest extends IntegrationTestCase
      * @var array
      */
     public $fixtures = [
-        'app.reports',
-        'app.developers',
-        'app.incidents',
-        'app.notifications',
+        'app.Reports',
+        'app.Developers',
+        'app.Incidents',
+        'app.Notifications',
     ];
 
     public function setUp()

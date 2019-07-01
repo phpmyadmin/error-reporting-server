@@ -7,7 +7,7 @@ use Cake\TestSuite\IntegrationTestCase;
 
 class EventsControllerTest extends IntegrationTestCase
 {
-    public $fixtures = ['app.reports'];
+    public $fixtures = ['app.Reports'];
 
     public function setUp()
     {

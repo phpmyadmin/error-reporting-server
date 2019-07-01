@@ -8,10 +8,10 @@ use Cake\TestSuite\IntegrationTestCase;
 class ReportsControllerTest extends IntegrationTestCase
 {
     public $fixtures = [
-        'app.notifications',
-        'app.developers',
-        'app.reports',
-        'app.incidents',
+        'app.Notifications',
+        'app.Developers',
+        'app.Reports',
+        'app.Incidents',
     ];
 
     public function setUp()

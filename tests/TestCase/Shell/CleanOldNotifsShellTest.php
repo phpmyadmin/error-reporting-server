@@ -43,8 +43,8 @@ class CleanOldNotifsShellTest extends TestCase
     public $CleanOldNotifs;
 
     public $fixtures = [
-        'app.notifications',
-        'app.developers',
+        'app.Notifications',
+        'app.Developers',
     ];
 
     /**

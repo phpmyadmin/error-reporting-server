@@ -41,7 +41,7 @@ class DevelopersTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'app.developers'
+        'app.Developers'
     ];
 
     /**

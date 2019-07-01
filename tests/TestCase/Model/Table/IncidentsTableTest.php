@@ -8,10 +8,10 @@ use Cake\TestSuite\TestCase;
 class IncidentsTableTest extends TestCase
 {
     public $fixtures = [
-        'app.notifications',
-        'app.developers',
-        'app.reports',
-        'app.incidents',
+        'app.Notifications',
+        'app.Developers',
+        'app.Reports',
+        'app.Incidents',
     ];
 
     public function setUp()

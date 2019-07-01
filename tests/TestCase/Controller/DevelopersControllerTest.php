@@ -35,8 +35,8 @@ class DevelopersControllerTest extends IntegrationTestCase
      * @var array
      */
     public $fixtures = [
-        'app.developers',
-        'app.notifications',
+        'app.Developers',
+        'app.Notifications',
     ];
 
     public function setUp()

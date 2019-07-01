@@ -44,7 +44,7 @@ class StatsShellTest extends TestCase
     public $Stats;
 
     public $fixtures = [
-        'app.incidents'
+        'app.Incidents'
     ];
 
     /**
