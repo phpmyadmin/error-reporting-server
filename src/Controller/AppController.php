@@ -179,7 +179,7 @@ class AppController extends Controller
             array('params' => array('class' => $flash_class)));
 
         // save the return url
-        $ret_url = Router::url($this->here, true);
+        $ret_url = Router::url($this->request->here(), true);
         $this->request->session()->write('last_page', $ret_url);
 
         return $this->redirect('/');
