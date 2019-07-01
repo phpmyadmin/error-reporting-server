@@ -6,6 +6,7 @@ use Cake\Database\Driver\Mysql;
 use Cake\Error\ExceptionRenderer;
 use Cake\Log\Engine\FileLog;
 use Cake\Mailer\Transport\MailTransport;
+use Cake\Mailer\Transport\DebugTransport;
 
 return [
     /**
@@ -219,7 +220,7 @@ return [
             'url' => null,
         ],
         'test' => [
-            'className' => 'Test',
+            'className' => DebugTransport::class,
         ]
     ],
 
