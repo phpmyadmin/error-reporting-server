@@ -22,7 +22,7 @@ namespace App\Controller;
 use App\Utility\Sanitize;
 use Cake\Core\Configure;
 use Cake\Log\Log;
-use Cake\Network\Exception\NotFoundException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 
 /**

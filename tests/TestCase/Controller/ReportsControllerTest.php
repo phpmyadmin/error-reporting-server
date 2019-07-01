@@ -4,7 +4,6 @@ namespace App\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
-use Cake\Network\Exception\NotFoundException;
 
 class ReportsControllerTest extends IntegrationTestCase
 {

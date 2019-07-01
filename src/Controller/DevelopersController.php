@@ -21,8 +21,6 @@ namespace App\Controller;
 
 use Cake\Core\Configure;
 use Cake\Event\Event;
-use Cake\Network\Exception\NotFoundException;
-use Cake\ORM\TableRegistry;
 
 /**
  * Developer controller handling developer login/logout/register.

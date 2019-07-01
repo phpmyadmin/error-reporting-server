@@ -22,8 +22,7 @@ namespace App\Shell;
 use Cake\Console\Shell;
 use Cake\Core\Configure;
 use Cake\Log\Log;
-use Cake\Network\Request;
-use Cake\Network\Response;
+use Cake\Http\Response;
 use Cake\Routing\DispatcherFactory;
 use Cake\Routing\Router;
 
