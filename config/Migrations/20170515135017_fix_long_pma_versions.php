@@ -1,7 +1,7 @@
 <?php
 
 use Phinx\Migration\AbstractMigration;
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\TableLocator;
 use Cake\Log\Log;
 
 class FixLongPmaVersions extends AbstractMigration

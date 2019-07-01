@@ -273,11 +273,11 @@ class Initial extends AbstractMigration
 
     public function down()
     {
-        $this->dropTable('developers');
-        $this->dropTable('incidents');
-        $this->dropTable('notifications');
-        $this->dropTable('products');
-        $this->dropTable('reports');
-        $this->dropTable('schema_migrations');
+        $this->table('developers')->drop()->save();
+        $this->table('incidents')->drop()->save();
+        $this->table('notifications')->drop()->save();
+        $this->table('products')->drop()->save();
+        $this->table('reports')->drop()->save();
+        $this->table('schema_migrations')->drop()->save();
     }
 }

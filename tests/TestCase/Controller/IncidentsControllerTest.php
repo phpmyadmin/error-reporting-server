@@ -5,7 +5,6 @@ namespace App\Test\TestCase\Controller;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
-use Cake\Mailer\Transport\DebugTransport;
 
 class IncidentsControllerTest extends IntegrationTestCase
 {
