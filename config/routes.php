@@ -18,8 +18,9 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-use Cake\Core\Plugin;
 use Cake\Routing\Router;
+use Cake\Routing\Route\Route;
+use Cake\Routing\Route\InflectedRoute;
 
 /**
  * The default class to use for all routes
@@ -42,7 +43,7 @@ use Cake\Routing\Router;
  * constructor in your `src/Application.php` file to change this behavior.
  *
  */
-Router::defaultRouteClass(DashedRoute::class);
+Router::defaultRouteClass(Route::class);
 
 
 Router::scope('/', function ($routes) {
@@ -58,7 +59,7 @@ Router::scope('/', function ($routes) {
      */
     $routes->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
 
-    Router::connect('/stats', array('controller' => 'Stats', 'action' => 'stats'));
+    $routes->connect('/stats', ['controller' => 'Stats', 'action' => 'stats']);
     /**
      * Connect catchall routes for all controllers.
      *
@@ -78,7 +79,7 @@ Router::scope('/', function ($routes) {
      * You can remove these routes once you've connected the
      * routes you want in your application.
      */
-    $routes->fallbacks(DashedRoute::class);
+    $routes->fallbacks(InflectedRoute::class);
 });
 
 /**
@@ -92,4 +93,3 @@ Router::scope('/', function ($routes) {
  * });
  * ```
  */
-Plugin::routes();
