@@ -12,9 +12,9 @@ filter:
         - vendor/
 checks:
     php: true
-  tools:
-    external_code_coverage:
-        timeout: 3600 # Timeout in seconds.
+tools:
+  external_code_coverage:
+      timeout: 3600 # Timeout in seconds.
 build:
     nodes:
         analysis:
