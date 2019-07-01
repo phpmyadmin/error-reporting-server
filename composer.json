@@ -4,7 +4,7 @@
     "description": "phpMyAdmin server side component for the error reporting system",
     "keywords": ["phpmyadmin","mysql","web"],
     "homepage": "https://www.phpmyadmin.net/",
-    "license": "BSD",
+    "license": "MIT",
     "authors": [
         {
             "name": "The phpMyAdmin Team",
@@ -18,34 +18,43 @@
         "source": "https://github.com/phpmyadmin/error-reporting-server"
     },
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.6",
         "ext-curl": "*",
         "cakephp/cakephp": "~3.4",
-        "cakephp/migrations": "~1.0",
-        "cakephp/plugin-installer": "*"
+        "cakephp/migrations": "^2.0.0",
+        "cakephp/plugin-installer": "^1.0"
     },
     "require-dev": {
-        "psy/psysh": "@stable",
+        "cakephp/bake": "^1.9.0",
         "cakephp/debug_kit": "~3.0",
-        "cakephp/bake": "~1.0",
-        "phpunit/phpunit": "*",
-        "php-mock/php-mock-phpunit": "^1.1"
+        "php-mock/php-mock-phpunit": "^2.4",
+        "phpunit/phpunit": "^5|^6",
+        "psy/psysh": "@stable"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src"
+            "App\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Test\\": "tests",
-            "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
+            "App\\Test\\": "tests/",
+            "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
         }
     },
     "scripts": {
         "post-install-cmd": "App\\Console\\Installer::postInstall",
-        "post-autoload-dump": "Cake\\Composer\\Installer\\PluginInstaller::postAutoloadDump"
+        "post-autoload-dump": "Cake\\Composer\\Installer\\PluginInstaller::postAutoloadDump",
+        "check": [
+            "@test",
+            "@cs-check"
+        ],
+        "cs-check": "phpcs --colors -p src/ tests/",
+        "cs-fix": "phpcbf --colors src/ tests/",
+        "test": "phpunit --coverage-clover build/logs/clover.xml -c phpunit.xml.dist --colors=always"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
 }
