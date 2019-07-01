@@ -115,9 +115,9 @@ class IncidentsTable extends Table
         'configuration_storage',
     ];
 
-    public function __construct()
+    public function __construct($id = false)
     {
-        parent::__construct();
+        parent::__construct($id);
 
         $this->filterTimes = [
             'all_time' => [

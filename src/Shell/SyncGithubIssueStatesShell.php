@@ -22,10 +22,10 @@ namespace App\Shell;
 use Cake\Console\Shell;
 use Cake\Core\Configure;
 use Cake\Log\Log;
+use Cake\Http\ServerRequest;
 use Cake\Http\Response;
 use Cake\Routing\DispatcherFactory;
 use Cake\Routing\Router;
-use Cake\Http\Client\Request;
 
 /**
  * Sync Github issue states Shell.
@@ -52,7 +52,7 @@ class SyncGithubIssueStatesShell extends Shell
         if (PHP_SAPI === 'cli') {
             $dispatcher = DispatcherFactory::create();
 
-            $request = new Request('github/sync_issue_status');
+            $request = new ServerRequest('github/sync_issue_status');
             $request = $request->addParams(
                 Router::parse(
                     $request->url,
