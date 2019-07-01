@@ -1,26 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <phpunit
-    bootstrap="./tests/bootstrap.php" 
-    colors="true" 
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true" 
-    convertWarningsToExceptions="true" 
+    colors="true"
     processIsolation="false"
-    stopOnFailure="false" 
-    strict="true" 
-    syntaxCheck="false" 
-    timeoutForMediumTests="30"
-    timeoutForSmallTests="10" 
-    verbose="true"
->
+    stopOnFailure="false"
+    bootstrap="tests/bootstrap.php"
+    >
     <php>
-        <ini name="memory_limit" value="-1" />
-        <ini name="apc.enable_cli" value="1" />
+        <ini name="memory_limit" value="-1"/>
+        <ini name="apc.enable_cli" value="1"/>
     </php>
+
     <!-- Add any additional test suites you want to run here -->
     <testsuites>
-        <testsuite name="App Test Suite">
-            <directory>./tests/TestCase</directory>
+        <testsuite name="app">
+            <directory>tests/TestCase/</directory>
         </testsuite>
         <!-- Add plugin test suites here. -->
     </testsuites>
@@ -30,16 +23,22 @@
     </logging>
     <!-- Setup a listener for fixtures -->
     <listeners>
-        <listener class="\Cake\TestSuite\Fixture\FixtureInjector"
-        file="./vendor/cakephp/cakephp/src/TestSuite/Fixture/FixtureInjector.php">
+        <listener
+        class="\Cake\TestSuite\Fixture\FixtureInjector">
             <arguments>
                 <object class="\Cake\TestSuite\Fixture\FixtureManager" />
             </arguments>
         </listener>
     </listeners>
+
+    <!-- Ignore vendor tests in code coverage reports -->
     <filter>
-        <whitelist addUncoveredFilesFromWhitelist="true">
+        <whitelist>
             <directory suffix=".php">src/</directory>
+            <directory suffix=".php">plugins/*/src/</directory>
+            <exclude>
+                <file>src/Console/Installer.php</file>
+            </exclude>
         </whitelist>
     </filter>
 </phpunit>
