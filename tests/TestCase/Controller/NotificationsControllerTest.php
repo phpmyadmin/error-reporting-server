@@ -24,7 +24,7 @@ class NotificationsControllerTest extends IntegrationTestCase
 
     public function setUp()
     {
-        $this->Notifications = TableRegistry::get('Notifications');
+        $this->Notifications = TableRegistry::getTableLocator()->get('Notifications');
         $this->session(['Developer.id' => 1, 'read_only' => true]);
     }
 

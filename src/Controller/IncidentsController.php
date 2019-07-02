@@ -119,7 +119,7 @@ class IncidentsController extends AppController
 
     private function _sendNotificationMail($reportId)
     {
-        $this->Reports = TableRegistry::get('Reports');
+        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $report = $this->Reports->findById($reportId)->all()->first()->toArray();
         $this->Reports->id = $reportId;
 
@@ -142,11 +142,11 @@ class IncidentsController extends AppController
         $this->Reports->id = $id;
 
         $viewVars = [
-            'columns' => TableRegistry::get('Incidents')->summarizableFields,
+            'columns' => TableRegistry::getTableLocator()->get('Incidents')->summarizableFields,
         ];
         $relatedEntries = [];
 
-        foreach (TableRegistry::get('Incidents')->summarizableFields as $field) {
+        foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
             list($entriesWithCount, $totalEntries) =
                     $this->Reports->getRelatedByField($field, 25, true);
             $relatedEntries[$field] = $entriesWithCount;

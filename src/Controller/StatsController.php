@@ -45,9 +45,9 @@ class StatsController extends AppController
         }
         $entriesWithCount = [];
         //Cache::clear(false);
-        foreach (TableRegistry::get('Incidents')->summarizableFields as $field) {
+        foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
             if (($entriesWithCount = Cache::read($field . '_' . $filter_string)) === false) {
-                $entriesWithCount = TableRegistry::get('Reports')->
+                $entriesWithCount = TableRegistry::getTableLocator()->get('Reports')->
                         getRelatedByField($field, 25, false, false, $filter['limit']);
                 $entriesWithCount = json_encode($entriesWithCount);
                 Cache::write($field . '_' . $filter_string, $entriesWithCount);
@@ -55,8 +55,8 @@ class StatsController extends AppController
             $relatedEntries[$field] = json_decode($entriesWithCount, true);
         }
         $this->set('related_entries', $relatedEntries);
-        $this->set('columns', TableRegistry::get('Incidents')->summarizableFields);
-        $this->set('filter_times', TableRegistry::get('Incidents')->filterTimes);
+        $this->set('columns', TableRegistry::getTableLocator()->get('Incidents')->summarizableFields);
+        $this->set('filter_times', TableRegistry::getTableLocator()->get('Incidents')->filterTimes);
         $this->set('selected_filter', $this->request->query('filter'));
 
         $query = [
@@ -70,10 +70,10 @@ class StatsController extends AppController
             ];
         }
 
-        TableRegistry::get('Incidents')->recursive = -1;
+        TableRegistry::getTableLocator()->get('Incidents')->recursive = -1;
         $downloadStats = [];
         if (($downloadStats = Cache::read('downloadStats_' . $filter_string)) === false) {
-            $downloadStats = TableRegistry::get('Incidents')->find('all', $query);
+            $downloadStats = TableRegistry::getTableLocator()->get('Incidents')->find('all', $query);
             $downloadStats->select([
                 'grouped_by' => $filter['group'],
                 'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
@@ -88,12 +88,12 @@ class StatsController extends AppController
     protected function _getTimeFilter()
     {
         if ($this->request->query('filter')) {
-            $filter = TableRegistry::get('Incidents')->filterTimes[$this->request->query('filter')];
+            $filter = TableRegistry::getTableLocator()->get('Incidents')->filterTimes[$this->request->query('filter')];
         }
         if (isset($filter)) {
             return $filter;
         }
 
-        return TableRegistry::get('Incidents')->filterTimes['all_time'];
+        return TableRegistry::getTableLocator()->get('Incidents')->filterTimes['all_time'];
     }
 }

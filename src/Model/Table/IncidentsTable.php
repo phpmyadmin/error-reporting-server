@@ -184,8 +184,8 @@ class IncidentsTable extends Table
 
         // Also sanitizes the bug report
         $schematizedIncidents = $this->_getSchematizedIncidents($bugReport);
-        $incidentsTable = TableRegistry::get('Incidents');
-        $reportsTable = TableRegistry::get('Reports');
+        $incidentsTable = TableRegistry::getTableLocator()->get('Incidents');
+        $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         foreach ($schematizedIncidents as $index => $si) {
             // find closest report. If not found, create a new report.
             $closestReport = $this->_getClosestReport($bugReport, $index);
@@ -226,7 +226,7 @@ class IncidentsTable extends Table
                 if (! $closestReport) {
                     // add notifications entry
                     $tmpIncident = $incidentsTable->findById($si->id)->all()->first();
-                    if (! TableRegistry::get('Notifications')->addNotifications(intval($tmpIncident['report_id']))) {
+                    if (! TableRegistry::getTableLocator()->get('Notifications')->addNotifications(intval($tmpIncident['report_id']))) {
                         Log::write(
                             'error',
                             'ERRORED: Notification::addNotifications() failed on Report#'
@@ -269,7 +269,7 @@ class IncidentsTable extends Table
             list($location, $linenumber) =
                     $this->_getIdentifyingLocation($bugReport['exception']['stack']);
         }
-        $report = TableRegistry::get('Reports')->findByLocationAndLinenumberAndPmaVersion(
+        $report = TableRegistry::getTableLocator()->get('Reports')->findByLocationAndLinenumberAndPmaVersion(
             $location,
             $linenumber,
             $this->getStrippedPmaVersion($bugReport['pma_version'])

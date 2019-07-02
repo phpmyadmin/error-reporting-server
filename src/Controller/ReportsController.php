@@ -108,11 +108,11 @@ class ReportsController extends AppController
         $this->_setSimilarFields($reportId);
 
         // if there is an unread notification for this report, then mark it as read
-        $current_developer = TableRegistry::get('Developers')->
+        $current_developer = TableRegistry::getTableLocator()->get('Developers')->
                     findById($this->request->session()->read('Developer.id'))->all()->first();
 
         if ($current_developer) {
-            TableRegistry::get('Notifications')->deleteAll(
+            TableRegistry::getTableLocator()->get('Notifications')->deleteAll(
                 [
                     'developer_id' => $current_developer['Developer']['id'],
                     'report_id' => $reportId,
@@ -131,7 +131,7 @@ class ReportsController extends AppController
             ],
             'group' => 'report_id',
         ];
-        $subquery = TableRegistry::get('incidents')->find('all', $subquery_params);
+        $subquery = TableRegistry::getTableLocator()->get('incidents')->find('all', $subquery_params);
 
         // override automatic aliasing, for proper usage in joins
         $aColumns = [
@@ -185,7 +185,7 @@ class ReportsController extends AppController
                     'report_id' => 'report_id',
                 ],
             ];
-            $subquery_count = TableRegistry::get('incidents')->find(
+            $subquery_count = TableRegistry::getTableLocator()->get('incidents')->find(
                 'all',
                 $subquery_params_count
             );
@@ -362,10 +362,10 @@ class ReportsController extends AppController
     {
         $this->Reports->id = $id;
 
-        $this->set('columns', TableRegistry::get('Incidents')->summarizableFields);
+        $this->set('columns', TableRegistry::getTableLocator()->get('Incidents')->summarizableFields);
         $relatedEntries = [];
 
-        foreach (TableRegistry::get('Incidents')->summarizableFields as $field) {
+        foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
             list($entriesWithCount, $totalEntries) =
                     $this->Reports->getRelatedByField($field, 25, true);
             $relatedEntries[$field] = $entriesWithCount;

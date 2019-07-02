@@ -17,7 +17,7 @@ class ReportsTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->Reports = TableRegistry::get('Reports');
+        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
     public function testGetIncidents()

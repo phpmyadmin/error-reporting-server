@@ -1,7 +1,7 @@
 <?php
 
 use Phinx\Migration\AbstractMigration;
-use Cake\ORM\Locator\TableLocator;
+use Cake\ORM\TableRegistry;
 use Cake\Log\Log;
 
 class FixLongPmaVersions extends AbstractMigration
@@ -33,7 +33,7 @@ class FixLongPmaVersions extends AbstractMigration
     {
         $sql = 'SELECT `id`, `pma_version` FROM `' . $table . '`';
         $count = 0;
-        $incidentsTable = TableLocator::get('Incidents');
+        $incidentsTable = TableRegistry::getTableLocator()->get('Incidents');
         $result = $this->query($sql);
 
         while ($row = $result->fetch()) {

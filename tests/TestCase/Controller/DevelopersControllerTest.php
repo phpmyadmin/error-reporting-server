@@ -41,7 +41,7 @@ class DevelopersControllerTest extends IntegrationTestCase
 
     public function setUp()
     {
-        $this->Developers = TableRegistry::get('Developers');
+        $this->Developers = TableRegistry::getTableLocator()->get('Developers');
     }
 
     /**

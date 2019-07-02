@@ -29,13 +29,13 @@ class NotificationsTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->Notifications = TableRegistry::get('Notifications');
+        $this->Notifications = TableRegistry::getTableLocator()->get('Notifications');
     }
 
     public function testAddNotifications()
     {
         $report_id = 2;
-        $developer = TableRegistry::get('Developers');
+        $developer = TableRegistry::getTableLocator()->get('Developers');
         $devs = $developer->find('all');
         $devs = $devs->hydrate(false)->toArray();
         $this->Notifications->addNotifications($report_id);

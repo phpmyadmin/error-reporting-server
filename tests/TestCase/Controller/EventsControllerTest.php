@@ -11,7 +11,7 @@ class EventsControllerTest extends IntegrationTestCase
 
     public function setUp()
     {
-        $this->Reports = TableRegistry::get('Reports');
+        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
     public function testIndex()

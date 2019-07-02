@@ -59,7 +59,7 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid report'));
         }
 
-        $reportsTable = TableRegistry::get('Reports');
+        $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
         if (! $report) {
@@ -79,7 +79,7 @@ class GithubController extends AppController
             'title' => $this->request->data['summary'],
             'labels' => $this->request->data['labels'] ? explode(',', $this->request->data['labels']) : [],
         ];
-        $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
+        $incidents_query = TableRegistry::getTableLocator()->get('Incidents')->findByReportId($reportId)->all();
         $incident = $incidents_query->first();
         $reportArray['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
         $reportArray['description'] = $this->request->data['description'];
@@ -123,7 +123,7 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid reportId'));
         }
 
-        $reportsTable = TableRegistry::get('Reports');
+        $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
         if (! $report) {
@@ -136,7 +136,7 @@ class GithubController extends AppController
         }
         $reportArray = $report->toArray();
 
-        $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
+        $incidents_query = TableRegistry::getTableLocator()->get('Incidents')->findByReportId($reportId)->all();
         $incident = $incidents_query->first();
         $reportArray['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
 
@@ -193,7 +193,7 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid reportId'));
         }
 
-        $reportsTable = TableRegistry::get('Reports');
+        $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
         if (! $report) {
@@ -340,9 +340,9 @@ class GithubController extends AppController
             }
 
             if ($updateReport) {
-                $report = TableRegistry::get('Reports')->get($report_id);
+                $report = TableRegistry::getTableLocator()->get('Reports')->get($report_id);
                 $report->sourceforge_bug_id = $ticket_id;
-                TableRegistry::get('Reports')->save($report);
+                TableRegistry::getTableLocator()->get('Reports')->save($report);
             }
 
             if ($msg !== '') {
@@ -397,7 +397,7 @@ class GithubController extends AppController
      */
     protected function _getTotalIncidentCount($reportId)
     {
-        $incidents_query = TableRegistry::get('Incidents')->findByReportId($reportId)->all();
+        $incidents_query = TableRegistry::getTableLocator()->get('Incidents')->findByReportId($reportId)->all();
         $incident_count = $incidents_query->count();
 
         $params_count = [
@@ -411,11 +411,11 @@ class GithubController extends AppController
                 'report_id' => 'report_id',
             ],
         ];
-        $subquery_count = TableRegistry::get('Incidents')->find(
+        $subquery_count = TableRegistry::getTableLocator()->get('Incidents')->find(
             'all',
             $subquery_params_count
         );
-        $inci_count_related = TableRegistry::get('Reports')->find('all', $params_count)->innerJoin(
+        $inci_count_related = TableRegistry::getTableLocator()->get('Reports')->find('all', $params_count)->innerJoin(
             ['incidents' => $subquery_count],
             ['incidents.report_id = Reports.related_to']
         )->count();
@@ -469,7 +469,7 @@ class GithubController extends AppController
         }
 
         $this->autoRender = false;
-        $reportsTable = TableRegistry::get('Reports');
+        $reportsTable = TableRegistry::getTableLocator()->get('Reports');
 
         // Fetch all linked reports
         $reports = $reportsTable->find(

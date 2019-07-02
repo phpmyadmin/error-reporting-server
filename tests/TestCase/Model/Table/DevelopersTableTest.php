@@ -52,7 +52,7 @@ class DevelopersTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->Developers = TableRegistry::get('Developers');
+        $this->Developers = TableRegistry::getTableLocator()->get('Developers');
     }
 
     /**

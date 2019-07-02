@@ -16,7 +16,7 @@ class ReportsControllerTest extends IntegrationTestCase
 
     public function setUp()
     {
-        $this->Reports = TableRegistry::get('Reports');
+        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $this->session(['Developer.id' => 1]);
     }
 

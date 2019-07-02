@@ -3,7 +3,7 @@
 namespace App\Test\TestCase\Controller;
 
 use Cake\Core\Configure;
-use Cake\ORM\Locator\TableLocator;
+use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
 
 class IncidentsControllerTest extends IntegrationTestCase
@@ -17,10 +17,10 @@ class IncidentsControllerTest extends IntegrationTestCase
 
     public function setUp()
     {
-        $this->Incidents = TableLocator::get('Incidents');
+        $this->Incidents = TableRegistry::getTableLocator()->get('Incidents');
         //$Session = new SessionComponent(new ComponentRegistry());
         $this->session(['Developer.id' => 1]);
-        $this->Reports = TableLocator::get('Reports');
+        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
     public function testView()

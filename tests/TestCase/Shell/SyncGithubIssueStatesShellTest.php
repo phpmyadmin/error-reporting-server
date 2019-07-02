@@ -41,7 +41,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
         parent::setUp();
         $this->io = $this->getMockBuilder('Cake\Console\ConsoleIo')->getMock();
         $this->SyncGithubIssueStates = new SyncGithubIssueStatesShell($this->io);
-        $this->Reports = TableRegistry::get('Reports');
+        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
     /**

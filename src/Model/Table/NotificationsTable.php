@@ -84,8 +84,8 @@ class NotificationsTable extends Table
         if (! is_int($report_id)) {
             throw new \InvalidArgumentException('Invalid Argument "$report_id"! Integer Expected.');
         }
-        $devs = TableRegistry::get('Developers')->find('all');
-        $notoficationTable = TableRegistry::get('Notifications');
+        $devs = TableRegistry::getTableLocator()->get('Developers')->find('all');
+        $notoficationTable = TableRegistry::getTableLocator()->get('Notifications');
         $res = true;
         foreach ($devs as $dev) {
             $notification = $notoficationTable->newEntity();

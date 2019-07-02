@@ -93,7 +93,7 @@ class ReportsTable extends Table
      */
     public function getIncidents()
     {
-        $incidents = TableRegistry::get('Incidents')->find('all', [
+        $incidents = TableRegistry::getTableLocator()->get('Incidents')->find('all', [
             'limit' => 50,
             'conditions' => $this->_relatedIncidentsConditions(),
             'order' => 'Incidents.created desc',
@@ -122,7 +122,7 @@ class ReportsTable extends Table
      */
     public function getIncidentsWithDescription()
     {
-        return TableRegistry::get('Incidents')->find('all', [
+        return TableRegistry::getTableLocator()->get('Incidents')->find('all', [
             'conditions' => [
                 'NOT' => [
                     'Incidents.steps is null',
@@ -141,7 +141,7 @@ class ReportsTable extends Table
      */
     public function getIncidentsWithDifferentStacktrace()
     {
-        return TableRegistry::get('Incidents')->find('all', [
+        return TableRegistry::getTableLocator()->get('Incidents')->find('all', [
             'fields' => [
                 'DISTINCT Incidents.stackhash',
                 'Incidents.stacktrace',
@@ -254,7 +254,7 @@ class ReportsTable extends Table
             ];
         }
 
-        $groupedCount = TableRegistry::get('Incidents')->find('all', $queryDetails);
+        $groupedCount = TableRegistry::getTableLocator()->get('Incidents')->find('all', $queryDetails);
 
         /* Ommit version number in case of browser and server_software fields.
          * In case of browser field, version number is seperated by space,
@@ -294,7 +294,7 @@ class ReportsTable extends Table
             $queryDetails['fields'] = ["$fieldName"];
             $queryDetails['limit'] = null;
             $queryDetails['group'] = "Incidents.$fieldName";
-            $totalCount = TableRegistry::get('Incidents')->find('all', $queryDetails)->count();
+            $totalCount = TableRegistry::getTableLocator()->get('Incidents')->find('all', $queryDetails)->count();
 
             return [
                 $groupedCount,

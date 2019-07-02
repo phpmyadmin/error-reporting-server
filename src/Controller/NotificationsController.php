@@ -59,7 +59,7 @@ class NotificationsController extends AppController
 
     public function data_tables()
     {
-        $current_developer = TableRegistry::get('Developers')->
+        $current_developer = TableRegistry::getTableLocator()->get('Developers')->
                     findById($this->request->session()->read('Developer.id'))->all()->first();
 
         $aColumns = [

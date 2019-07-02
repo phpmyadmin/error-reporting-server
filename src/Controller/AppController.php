@@ -137,10 +137,10 @@ class AppController extends Controller
         if ($this->request->session()->read('Developer.id')) {
             $this->_checkReadonlyAccess();
 
-            $current_developer = TableRegistry::get('Developers')->
+            $current_developer = TableRegistry::getTableLocator()->get('Developers')->
                     findById($this->request->session()->read('Developer.id'))->all()->first();
 
-            $notif_count = TableRegistry::get('Notifications')->find(
+            $notif_count = TableRegistry::getTableLocator()->get('Notifications')->find(
                 'all',
                 [
                     'conditions' => ['developer_id' => intval($current_developer['id'])],

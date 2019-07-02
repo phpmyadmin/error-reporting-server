@@ -46,7 +46,7 @@ class GithubControllerTest extends IntegrationTestCase
     public function setUp()
     {
         $this->session(['Developer.id' => 1, 'access_token' => 'abc']);
-        $this->Reports = TableRegistry::get('Reports');
+        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
     /**

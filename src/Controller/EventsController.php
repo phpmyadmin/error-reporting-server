@@ -35,7 +35,7 @@ class EventsController extends AppController
         parent::initialize();
         $this->loadComponent('Csrf');
 
-        $this->Reports = TableRegistry::get('Reports');
+        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
     public function beforeFilter(Event $event)
