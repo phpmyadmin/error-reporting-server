@@ -91,7 +91,7 @@ class GithubController extends AppController
         list($issueDetails, $status) = $this->GithubApi->createIssue(
             Configure::read('GithubRepoPath'),
             $data,
-            $this->request->session()->read('access_token')
+            $this->request->getSession()->read('access_token')
         );
 
         if ($this->_handleGithubResponse($status, 1, $reportId, $issueDetails['number'])) {
@@ -148,7 +148,7 @@ class GithubController extends AppController
             Configure::read('GithubRepoPath'),
             ['body' => $commentText],
             $ticket_id,
-            $this->request->session()->read('access_token')
+            $this->request->getSession()->read('access_token')
         );
         if ($this->_handleGithubResponse($status, 2, $reportId, $ticket_id)) {
             // Update report status
@@ -158,7 +158,7 @@ class GithubController extends AppController
                 Configure::read('GithubRepoPath'),
                 [],
                 $ticket_id,
-                $this->request->session()->read('access_token')
+                $this->request->getSession()->read('access_token')
             );
             if ($this->_handleGithubResponse($status, 4, $reportId, $ticket_id)) {
                 // If linked Github issue state is available, use it to update Report's status
@@ -220,7 +220,7 @@ class GithubController extends AppController
             Configure::read('GithubRepoPath'),
             ['body' => $commentText],
             $ticket_id,
-            $this->request->session()->read('access_token')
+            $this->request->getSession()->read('access_token')
         );
 
         if ($this->_handleGithubResponse($status, 3, $reportId)) {

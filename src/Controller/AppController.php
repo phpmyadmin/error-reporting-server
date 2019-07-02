@@ -134,11 +134,11 @@ class AppController extends Controller
         $this->set('current_controller', $controller);
         $notif_count = 0;
 
-        if ($this->request->session()->read('Developer.id')) {
+        if ($this->request->getSession()->read('Developer.id')) {
             $this->_checkReadonlyAccess();
 
             $current_developer = TableRegistry::getTableLocator()->get('Developers')->
-                    findById($this->request->session()->read('Developer.id'))->all()->first();
+                    findById($this->request->getSession()->read('Developer.id'))->all()->first();
 
             $notif_count = TableRegistry::getTableLocator()->get('Notifications')->find(
                 'all',
@@ -150,7 +150,7 @@ class AppController extends Controller
             $this->set('developer_signed_in', true);
 
             $read_only = false;
-            if ($this->request->session()->read('read_only')) {
+            if ($this->request->getSession()->read('read_only')) {
                 $read_only = true;
             }
             $this->set('read_only', $read_only);
@@ -185,8 +185,8 @@ class AppController extends Controller
         );
 
         // save the return url
-        $ret_url = Router::url($this->request->here(), true);
-        $this->request->session()->write('last_page', $ret_url);
+        $ret_url = Router::url($this->request->getRequestTarget(), true);
+        $this->request->getSession()->write('last_page', $ret_url);
 
         return $this->redirect('/');
     }
@@ -195,7 +195,7 @@ class AppController extends Controller
     {
         $controller = $this->request->controller;
         $action = $this->request->getParam('action');
-        $read_only = $this->request->session()->read('read_only');
+        $read_only = $this->request->getSession()->read('read_only');
 
         // If developer has commit access on phpmyadmin/phpmyadmin
         if (! $read_only) {
@@ -211,8 +211,8 @@ class AppController extends Controller
             return;
         }
 
-        $this->request->session()->destroy();
-        $this->request->session()->write('last_page', '');
+        $this->request->getSession()->destroy();
+        $this->request->getSession()->write('last_page', '');
 
         $flash_class = 'alert';
         $this->Flash->default(

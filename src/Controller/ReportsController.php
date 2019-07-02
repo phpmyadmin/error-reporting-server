@@ -109,7 +109,7 @@ class ReportsController extends AppController
 
         // if there is an unread notification for this report, then mark it as read
         $current_developer = TableRegistry::getTableLocator()->get('Developers')->
-                    findById($this->request->session()->read('Developer.id'))->all()->first();
+                    findById($this->request->getSession()->read('Developer.id'))->all()->first();
 
         if ($current_developer) {
             TableRegistry::getTableLocator()->get('Notifications')->deleteAll(

@@ -60,7 +60,7 @@ class NotificationsController extends AppController
     public function data_tables()
     {
         $current_developer = TableRegistry::getTableLocator()->get('Developers')->
-                    findById($this->request->session()->read('Developer.id'))->all()->first();
+                    findById($this->request->getSession()->read('Developer.id'))->all()->first();
 
         $aColumns = [
             'report_id' => 'Reports.id',
@@ -154,7 +154,7 @@ class NotificationsController extends AppController
         if ($this->request->getData('mark_all')) {
             // Delete all notifications for this Developer
             $this->Notifications->deleteAll(
-                ['developer_id' => $this->request->session()->read('Developer.id')]
+                ['developer_id' => $this->request->getSession()->read('Developer.id')]
             );
 
             $msg = 'All your notifications have been marked \'Read\'';

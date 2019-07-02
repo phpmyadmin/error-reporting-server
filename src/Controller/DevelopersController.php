@@ -91,7 +91,7 @@ class DevelopersController extends AppController
             return;
         }
 
-        $last_page = $this->request->session()->read('last_page');
+        $last_page = $this->request->getSession()->read('last_page');
         if (empty($last_page)) {
             $last_page = [
                 'controller' => 'reports',
@@ -103,7 +103,7 @@ class DevelopersController extends AppController
 
     public function logout()
     {
-        $this->request->session()->destroy();
+        $this->request->getSession()->destroy();
 
         $flash_class = 'alert alert-success';
         $this->Flash->default(
@@ -123,8 +123,8 @@ class DevelopersController extends AppController
             $this->Developers->id = $developer['id'];
         }
         $this->Developers->id = $this->Developers->saveFromGithub($userInfo, $accessToken, $developer);
-        $this->request->session()->write('Developer.id', $this->Developers->id);
-        $this->request->session()->write('access_token', $accessToken);
-        $this->request->session()->write('read_only', ! ($userInfo['has_commit_access']));
+        $this->request->getSession()->write('Developer.id', $this->Developers->id);
+        $this->request->getSession()->write('access_token', $accessToken);
+        $this->request->getSession()->write('read_only', ! ($userInfo['has_commit_access']));
     }
 }
