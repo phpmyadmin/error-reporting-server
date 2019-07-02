@@ -54,7 +54,7 @@ before_script:
 
 script:
   - bin/cake migrations migrate
-  - composer run test
+  - composer run test --timeout=0
 
 after_script:
   - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml

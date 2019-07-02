@@ -6,7 +6,7 @@ phpMyAdmin's Error Reporting Server
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/badges/quality-score.png?s=9d696be27235e042548ad09e1002841b532ee6bb)](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/)
 
 phpMyAdmin server side component for the error reporting system. It uses
-CakePHP v2.3 with some extra plugins like migrations, debugkit and OAuth
+CakePHP with some extra plugins like migrations, debugkit and OAuth
 component.
 
 # How To deploy #
@@ -45,7 +45,7 @@ In order to deploy the app in this repo you need to follow these steps:
 	 `bin/cake migrations migrate`
 
 ## Requirements ##
- - php >= 5.4
+ - php >= 7.1
  - MySQL
 
 
@@ -143,7 +143,7 @@ Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth
 If you are on a development machine you can use the webrunner at `/test.php`
 However if you need a command line runner. You can use:
 ```shell
-./vendor/bin/phpunit -c phpunit.xml.dist
+composer run test --timeout=0
 ```
 
 # Running the stackhash update shell #

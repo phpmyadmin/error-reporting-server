@@ -143,9 +143,6 @@ class GithubControllerTest extends IntegrationTestCase
         $decodedResponse['state'] = 'closed';
         $issueResponseWithClosed = json_encode($decodedResponse);
 
-        $commentResponse = file_get_contents(TESTS . 'Fixture' . DS . 'comment_response.json');
-
-
         // Github response unsuccessful followed by successful (open) and successful (closed)
         $curlExecMock->expects($this->exactly(5))->willReturnOnConsecutiveCalls(
             $issueResponse,

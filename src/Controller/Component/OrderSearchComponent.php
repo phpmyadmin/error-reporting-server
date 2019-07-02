@@ -39,9 +39,10 @@ class OrderSearchComponent extends Component
     {
         $searchConditions = ['OR' => []];
         $keys = array_keys($aColumns);
+        $columnsCount = count($aColumns);
 
         if ($this->request->query('sSearch') != '') {
-            for ($i = 0; $i < count($aColumns); ++$i) {
+            for ($i = 0; $i < $columnsCount; ++$i) {
                 if ($this->request->query('bSearchable_' . ($i + 1)) == 'true') {
                     $searchConditions['OR'][] = [$aColumns[$keys[$i]] . ' LIKE' => '%' . $this->request->query('sSearch') . '%'];
                 }
@@ -49,7 +50,7 @@ class OrderSearchComponent extends Component
         }
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); ++$i) {
+        for ($i = 0; $i < $columnsCount; ++$i) {
             if ($this->request->query('sSearch_' . ($i + 1)) != '') {
                 $searchConditions[] = [$aColumns[$keys[$i]] . ' LIKE' => $this->request->query('sSearch_' . ($i + 1))];
             }

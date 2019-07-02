@@ -48,19 +48,20 @@ class MailerComponent extends Component
         ) {
             return false;
         }
+        $email->viewBuilder()->setLayout('default');
+        $email->viewBuilder()->setTemplate('report');
 
         $email->setTransport($emailTransport)
-            ->viewVars($viewVars)
-            ->subject(
+            ->setViewVars($viewVars)
+            ->setSubject(
                 sprintf(
                     'A new report has been submitted on the Error Reporting Server: %s',
                     $viewVars['report']['id']
                 )
             )
-            ->template('report', 'default')
-            ->emailFormat('html')
-            ->to($emailTo)
-            ->from($emailFrom)
+            ->setEmailFormat('html')
+            ->setTo($emailTo)
+            ->setFrom($emailFrom)
             ->send();
 
         return true;

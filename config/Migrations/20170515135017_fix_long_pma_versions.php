@@ -33,7 +33,7 @@ class FixLongPmaVersions extends AbstractMigration
     {
         $sql = 'SELECT `id`, `pma_version` FROM `' . $table . '`';
         $count = 0;
-        $incidentsTable = TableRegistry::get('Incidents');
+        $incidentsTable = TableLocator::get('Incidents');
         $result = $this->query($sql);
 
         while ($row = $result->fetch()) {
