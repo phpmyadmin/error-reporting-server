@@ -91,11 +91,7 @@ class GithubApiComponent extends Component
      */
     public function getUserInfo($accessToken)
     {
-        $data = [
-            'access_token' => $accessToken,
-        ];
-
-        return $this->apiRequest('user', $data, 'GET', true);
+        return $this->apiRequest('user', [], 'GET', true, $accessToken);
     }
 
     /**
