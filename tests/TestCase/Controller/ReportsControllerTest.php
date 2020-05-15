@@ -253,7 +253,8 @@ class ReportsControllerTest extends IntegrationTestCase
                 'reports' => [
                     '1',
                     '5',
-                ], 'state' => 'incorrect_state'
+                ],
+                'state' => 'incorrect_state'
             ]
         );
 
@@ -296,7 +297,8 @@ class ReportsControllerTest extends IntegrationTestCase
                 'reports' => [
                     1,
                     5,
-                ], 'state' => 'resolved'
+                ],
+                'state' => 'resolved'
             ]
         );
 
