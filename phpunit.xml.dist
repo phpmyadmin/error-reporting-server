@@ -19,7 +19,7 @@
     </testsuites>
     <logging>
         <log target="build/logs/clover.xml" type="coverage-clover" />
-        <log logIncompleteSkipped="false" target="build/logs/junit.xml" type="junit" />
+        <log target="build/logs/junit.xml" type="junit" />
     </logging>
     <!-- Setup a listener for fixtures -->
     <listeners>
