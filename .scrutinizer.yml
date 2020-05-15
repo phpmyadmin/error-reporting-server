@@ -14,7 +14,9 @@ checks:
     php: true
 tools:
   external_code_coverage:
-      timeout: 3600 # Timeout in seconds.
+    runs: 4 # php 7.x versions
+    timeout: 900 # 15 min
+
 build:
     nodes:
         analysis:
