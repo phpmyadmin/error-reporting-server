@@ -19,7 +19,7 @@
 namespace App\Controller;
 
 use Cake\Core\Configure;
-use Cake\Event\Event;
+use Cake\Event\EventInterface;
 use Cake\Http\Response;
 
 /**
@@ -36,7 +36,7 @@ class DevelopersController extends AppController
     /** @var string */
     public $components = ['GithubApi'];
 
-    public function beforeFilter(Event $event): void
+    public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
         $this->GithubApi->githubConfig = Configure::read('GithubConfig');

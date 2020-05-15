@@ -19,7 +19,7 @@
 namespace App\Controller;
 
 use Cake\Core\Configure;
-use Cake\Event\Event;
+use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\Log\Log;
@@ -43,7 +43,7 @@ class EventsController extends AppController
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
-    public function beforeFilter(Event $event): void
+    public function beforeFilter(EventInterface $event)
     {
         $this->eventManager()->off($this->Csrf);
     }

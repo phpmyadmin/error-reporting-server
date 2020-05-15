@@ -4,6 +4,7 @@ namespace App\Mailer\Transport;
 
 use Cake\Core\Configure;
 use Cake\Mailer\AbstractTransport;
+use Cake\Mailer\Message;
 use Cake\Mailer\Email;
 use function implode;
 use function trim;
@@ -34,7 +35,6 @@ class TestTransport extends AbstractTransport
             ]
         );
 
-        trim($this->_headersToString($headers));
         $message = trim(implode("\r\n", (array) $email->message()));
         $result = [
             'headers' => $headers,

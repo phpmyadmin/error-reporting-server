@@ -18,7 +18,7 @@
 
 namespace App\Controller;
 
-use Cake\Event\Event;
+use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
@@ -51,7 +51,7 @@ class NotificationsController extends AppController
         'Report',
     ];
 
-    public function beforeFilter(Event $event): void
+    public function beforeFilter(EventInterface $event)
     {
         if ($this->request->getParam('action') === 'clean_old_notifs') {
             return;

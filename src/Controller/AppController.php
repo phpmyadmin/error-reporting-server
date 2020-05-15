@@ -22,7 +22,7 @@
 namespace App\Controller;
 
 use Cake\Controller\Controller;
-use Cake\Event\Event;
+use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
@@ -131,7 +131,7 @@ class AppController extends Controller
         */
     }
 
-    public function beforeFilter(Event $event): void
+    public function beforeFilter(EventInterface $event)
     {
         $controller = $this->request->controller;
         $this->set('current_controller', $controller);

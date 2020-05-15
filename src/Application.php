@@ -38,7 +38,7 @@ class Application extends BaseApplication
      *
      * @return void
      */
-    public function bootstrap()
+    public function bootstrap(): void
     {
         // Call parent to load bootstrap from files.
         parent::bootstrap();
@@ -64,7 +64,7 @@ class Application extends BaseApplication
      * @param MiddlewareQueue $middlewareQueue The middleware queue to setup.
      * @return MiddlewareQueue The updated middleware queue.
      */
-    public function middleware($middlewareQueue)// phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint, SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
+    public function middleware($middlewareQueue): MiddlewareQueue
     {
         $middlewareQueue
             // Catch any exceptions in the lower layers,
