@@ -111,7 +111,7 @@ class ReportsController extends AppController
         $current_developer = TableRegistry::getTableLocator()->get('Developers')->
                     findById($this->request->getSession()->read('Developer.id'))->all()->first();
 
-        if ($current_developer) {
+        if ($current_developer && $current_developer['Developer']) {
             TableRegistry::getTableLocator()->get('Notifications')->deleteAll(
                 [
                     'developer_id' => $current_developer['Developer']['id'],
