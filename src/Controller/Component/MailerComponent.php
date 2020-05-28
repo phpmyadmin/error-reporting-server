@@ -1,5 +1,4 @@
 <?php
-/* vim: set expandtab sw=4 ts=4 sts=4: */
 
 /**
  * Mailer component handling sending of report notification mails

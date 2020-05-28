@@ -1,6 +1,5 @@
 <?php
 
-/* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * A developer who has access to the system.
  *

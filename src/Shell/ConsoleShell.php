@@ -1,6 +1,5 @@
 <?php
 
-/* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org).

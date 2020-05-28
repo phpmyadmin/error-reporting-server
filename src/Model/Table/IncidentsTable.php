@@ -1,5 +1,4 @@
 <?php
-/* vim: set expandtab sw=4 ts=4 sts=4: */
 
 /**
  * An incident a representing a single incident of a submited bug.
