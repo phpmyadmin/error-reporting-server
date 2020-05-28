@@ -1,23 +1,22 @@
 <?php
 
-use Migrations\AbstractMigration;
 use Cake\Log\Log;
+use Migrations\AbstractMigration;
 
 class FixStaleReportStates extends AbstractMigration
 {
     /**
      * This migration changes the old report statuses to more
      * Github-related status
-     *
      */
-    public function up()
+    public function up(): void
     {
         $this->_migrateBasedOnGithubLinked();
         $this->_migrateToNewStatus();
         $this->_migrateDuplicateReports();
     }
 
-    private function _migrateBasedOnGithubLinked()
+    private function _migrateBasedOnGithubLinked(): void
     {
         $sql = 'UPDATE `reports` SET `status` = \'forwarded\''
             . ' WHERE `sourceforge_bug_id` IS NOT NULL AND `status` <> \'fixed\'';
@@ -30,14 +29,14 @@ class FixStaleReportStates extends AbstractMigration
         );
     }
 
-    private function _migrateToNewStatus()
+    private function _migrateToNewStatus(): void
     {
         $statusMap = [
             'fixed' => 'resolved',
             'open' => 'new',
             'out-of-date' => 'invalid',
             'works-for-me' => 'invalid',
-            'wontfix' => 'invalid'
+            'wontfix' => 'invalid',
         ];
 
         foreach ($statusMap as $oldStatus => $newStatus) {
@@ -52,7 +51,7 @@ class FixStaleReportStates extends AbstractMigration
         }
     }
 
-    private function _migrateDuplicateReports()
+    private function _migrateDuplicateReports(): void
     {
         // Find the original reports and set the status
         // of their duplicate reports same as their status

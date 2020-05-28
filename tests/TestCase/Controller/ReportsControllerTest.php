@@ -4,9 +4,16 @@ namespace App\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
+use function count;
+use function json_decode;
 
 class ReportsControllerTest extends IntegrationTestCase
 {
+    /**
+     * Fixtures.
+     *
+     * @var array
+     */
     public $fixtures = [
         'app.Notifications',
         'app.Developers',
@@ -14,13 +21,13 @@ class ReportsControllerTest extends IntegrationTestCase
         'app.Incidents',
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $this->session(['Developer.id' => 1]);
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->get('/reports');
         $this->assertEquals(['3.8', '4.0'], $this->viewVariable('distinct_versions'));
@@ -34,7 +41,7 @@ class ReportsControllerTest extends IntegrationTestCase
         );
     }
 
-    public function testView()
+    public function testView(): void
     {
         $this->get('/reports/view/1');
 
@@ -72,7 +79,7 @@ class ReportsControllerTest extends IntegrationTestCase
         $this->assertResponseContains('/reports/view/3');
     }
 
-    public function testDataTables()
+    public function testDataTables(): void
     {
         $this->get('/reports/data_tables?sEcho=1&iDisplayLength=25');
         $expected = [
@@ -194,7 +201,7 @@ class ReportsControllerTest extends IntegrationTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testMarkRelatedTo()
+    public function testMarkRelatedTo(): void
     {
         $this->Reports->id = 2;
         $incidents = $this->Reports->getIncidents();
@@ -208,21 +215,15 @@ class ReportsControllerTest extends IntegrationTestCase
         $this->Reports->id = 2;
         $incidents = $this->Reports->getIncidents();
         $this->assertEquals(3, $incidents->count());
-
-        $this->_testUnmarkRelatedTo();
     }
 
-
     /**
-     * Don't run this as a separate test,
-     * as the fixture tables are re-created and
-     * we lose the previous related_to updations.
-     *
-     * So, call at the end of testMarkRelatedTo()
-     * @return void
+     * @depends testMarkRelatedTo
+     * @return void nothing
      */
-    private function _testUnmarkRelatedTo()
+    public function testUnmarkRelatedTo(): void
     {
+        $this->testMarkRelatedTo();
         $this->Reports->id = 2;
         $incidents = $this->Reports->getIncidents();
         $this->assertEquals(3, $incidents->count());
@@ -236,9 +237,8 @@ class ReportsControllerTest extends IntegrationTestCase
 
     /**
      * Test for 'mass_action' action
-     * @return void
      */
-    public function testMassAction()
+    public function testMassAction(): void
     {
         $report1 = $this->Reports->get(1);
         $this->assertEquals('forwarded', $report1->status);
@@ -254,7 +254,7 @@ class ReportsControllerTest extends IntegrationTestCase
                     '1',
                     '5',
                 ],
-                'state' => 'incorrect_state'
+                'state' => 'incorrect_state',
             ]
         );
 
@@ -270,7 +270,7 @@ class ReportsControllerTest extends IntegrationTestCase
             '/reports/mass_action',
             [
                 'reports' => [],
-                'state' => 'resolved'
+                'state' => 'resolved',
             ]
         );
 
@@ -286,7 +286,7 @@ class ReportsControllerTest extends IntegrationTestCase
             '/reports/mass_action',
             [
                 'reports' => [10],
-                'state' => 'resolved'
+                'state' => 'resolved',
             ]
         );
 
@@ -298,7 +298,7 @@ class ReportsControllerTest extends IntegrationTestCase
                     1,
                     5,
                 ],
-                'state' => 'resolved'
+                'state' => 'resolved',
             ]
         );
 
@@ -312,9 +312,8 @@ class ReportsControllerTest extends IntegrationTestCase
 
     /**
      * Test for 'change_state' action
-     * @return void
      */
-    public function testChangeState()
+    public function testChangeState(): void
     {
         $this->session(['Developer.id' => 1, 'read_only' => false]);
 

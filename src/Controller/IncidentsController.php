@@ -20,21 +20,32 @@ namespace App\Controller;
 
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
+use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
+use function __;
+use function array_merge;
+use function count;
+use function in_array;
+use function json_decode;
+use function json_encode;
 
 /**
  * Incidents controller handling incident creation and rendering.
  */
 class IncidentsController extends AppController
 {
+    /** @var string[] */
     public $uses = [
         'Incident',
         'Notification',
     ];
 
+    /** @var string */
     public $components = ['Mailer'];
 
-    public function create()
+    public function create(): ?Response
     {
         // Only allow POST requests
         $this->request->allowMethod(['post']);
@@ -68,15 +79,15 @@ class IncidentsController extends AppController
         // For all the newly added reports,
         // send notification emails
         foreach ($result['reports'] as $report_id) {
-            $this->_sendNotificationMail($report_id);
+            $this->sendNotificationMail($report_id);
         }
 
         return $this->response;
     }
 
-    public function json($id)
+    public function json(?string $id): ?Response
     {
-        if (! isset($id) || ! $id) {
+        if (empty($id)) {
             throw new NotFoundException(__('Invalid Incident'));
         }
 
@@ -97,9 +108,9 @@ class IncidentsController extends AppController
         return $this->response;
     }
 
-    public function view($incidentId)
+    public function view(?string $incidentId): void
     {
-        if (! isset($incidentId) || ! $incidentId) {
+        if (empty($incidentId)) {
             throw new NotFoundException(__('Invalid Incident'));
         }
 
@@ -116,7 +127,7 @@ class IncidentsController extends AppController
         $this->set('incident', $incident);
     }
 
-    private function _sendNotificationMail($reportId)
+    private function sendNotificationMail(int $reportId): void
     {
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $report = $this->Reports->findById($reportId)->all()->first()->toArray();
@@ -129,14 +140,14 @@ class IncidentsController extends AppController
             'incidents_with_description' => $this->Reports->getIncidentsWithDescription(),
             'incidents_with_stacktrace' => $this->Reports->getIncidentsWithDifferentStacktrace(),
             'related_reports' => $this->Reports->getRelatedReports(),
-            'status' => $this->Reports->status
+            'status' => $this->Reports->status,
         ];
-        $viewVars = array_merge($viewVars, $this->_getSimilarFields($reportId));
+        $viewVars = array_merge($viewVars, $this->getSimilarFields($reportId));
 
         $this->Mailer->sendReportMail($viewVars);
     }
 
-    protected function _getSimilarFields($id)
+    protected function getSimilarFields(int $id): array
     {
         $this->Reports->id = $id;
 
@@ -146,7 +157,7 @@ class IncidentsController extends AppController
         $relatedEntries = [];
 
         foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
-            list($entriesWithCount, $totalEntries) =
+            [$entriesWithCount, $totalEntries] =
                     $this->Reports->getRelatedByField($field, 25, true);
             $relatedEntries[$field] = $entriesWithCount;
             $viewVars["${field}_distinct_count"] = $totalEntries;

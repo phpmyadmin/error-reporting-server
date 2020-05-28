@@ -18,6 +18,7 @@
 
 namespace App\Model\Table;
 
+use Cake\Datasource\EntityInterface;
 use Cake\ORM\Table;
 
 /**
@@ -28,13 +29,13 @@ class DevelopersTable extends Table
     /**
      * creates a developer record given his github info and his access token.
      *
-     * @param array                            $githubInfo  the data gitub has on this developer
-     * @param string                           $accessToken this developer's access token
-     * @param \Cake\Datasource\EntityInterface $developer   the developper
+     * @param array           $githubInfo  the data gitub has on this developer
+     * @param string          $accessToken this developer's access token
+     * @param EntityInterface $developer   the developper
      *
-     * @return bool true if the developer was correctly saved otherwise false
+     * @return int|null The developer Id
      */
-    public function saveFromGithub($githubInfo, $accessToken, $developer)
+    public function saveFromGithub(array $githubInfo, string $accessToken, EntityInterface $developer): ?int
     {
         $developer->full_name = $githubInfo['name'];
         $developer->gravatar_id = $githubInfo['gravatar_id'];
@@ -45,5 +46,7 @@ class DevelopersTable extends Table
         if ($this->save($developer)) {
             return $developer->id;
         }
+
+        return null;
     }
 }

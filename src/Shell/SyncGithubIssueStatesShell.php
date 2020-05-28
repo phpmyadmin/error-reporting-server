@@ -20,23 +20,20 @@ namespace App\Shell;
 
 use Cake\Console\Shell;
 use Cake\Core\Configure;
-use Cake\Log\Log;
-use Cake\Http\ServerRequest;
 use Cake\Http\Response;
+use Cake\Http\ServerRequest;
+use Cake\Log\Log;
 use Cake\Routing\DispatcherFactory;
 use Cake\Routing\Router;
+use const PHP_SAPI;
+use function date;
 
 /**
  * Sync Github issue states Shell.
  */
 class SyncGithubIssueStatesShell extends Shell
 {
-    public function initialize()
-    {
-        parent::initialize();
-    }
-
-    public function main()
+    public function main(): void
     {
         Log::debug(
             'STARTED: Job "'
@@ -46,25 +43,24 @@ class SyncGithubIssueStatesShell extends Shell
             ['scope' => 'cron_jobs']
         );
 
-
         Configure::write('CronDispatcher', true);
-        if (PHP_SAPI === 'cli') {
-            $dispatcher = DispatcherFactory::create();
-
-            $request = new ServerRequest('github/sync_issue_status');
-            $request = $request->addParams(
-                Router::parse(
-                    $request->getPath(),
-                    ''
-                )
-            );
-            $dispatcher->dispatch(
-                $request,
-                new Response()
-            );
-        } else {
+        if (PHP_SAPI !== 'cli') {
             exit;
         }
+
+        $dispatcher = DispatcherFactory::create();
+
+        $request = new ServerRequest('github/sync_issue_status');
+        $request = $request->addParams(
+            Router::parse(
+                $request->getPath(),
+                ''
+            )
+        );
+        $dispatcher->dispatch(
+            $request,
+            new Response()
+        );
 
         Log::debug(
             'FINISHED: Job "'

@@ -23,8 +23,10 @@ namespace App\Controller;
 
 use Cake\Controller\Controller;
 use Cake\Event\Event;
+use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
+use function in_array;
 
 /**
  * Application Controller.
@@ -36,20 +38,21 @@ use Cake\Routing\Router;
  */
 class AppController extends Controller
 {
+    /** @var string[] */
     public $uses = [
         'Developer',
         'Notification',
     ];
 
+    /** @var array */
     public $whitelist = [
         'Developers',
         'Pages',
-        'Incidents' => [
-            'create',
-        ],
-        'Events'
+        'Incidents' => ['create'],
+        'Events',
     ];
 
+    /** @var array */
     public $readonly_whitelist = [
         'Developers',
         'Pages',
@@ -58,11 +61,10 @@ class AppController extends Controller
             'view',
             'data_tables',
         ],
-        'Incidents' => [
-            'view'
-        ]
+        'Incidents' => ['view'],
     ];
 
+    /** @var string[] */
     public $css_files = [
         'jquery.dataTables',
         'jquery.dataTables_themeroller',
@@ -73,6 +75,7 @@ class AppController extends Controller
         'custom',
     ];
 
+    /** @var string[] */
     public $js_files = [
         'jquery',
         'jquery.dataTables.min',
@@ -104,9 +107,10 @@ class AppController extends Controller
      * Initialization hook method.
      *
      * Use this method to add common initialization code like loading components.
-     * @return void
+     *
+     * @return void Nothing
      */
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
         $this->loadComponent('Flash');
@@ -127,14 +131,14 @@ class AppController extends Controller
         */
     }
 
-    public function beforeFilter(Event $event)
+    public function beforeFilter(Event $event): void
     {
         $controller = $this->request->controller;
         $this->set('current_controller', $controller);
         $notif_count = 0;
 
         if ($this->request->getSession()->read('Developer.id')) {
-            $this->_checkReadonlyAccess();
+            $this->checkReadonlyAccess();
 
             $current_developer = TableRegistry::getTableLocator()->get('Developers')->
                     findById($this->request->getSession()->read('Developer.id'))->all()->first();
@@ -156,7 +160,7 @@ class AppController extends Controller
         } else {
             $this->set('developer_signed_in', false);
             $this->set('read_only', true);
-            $this->_checkAccess();
+            $this->checkAccess();
         }
         $this->set('notif_count', $notif_count);
         $this->set('js_files', $this->js_files);
@@ -164,18 +168,18 @@ class AppController extends Controller
         $this->set('baseURL', Router::url('/', true));
     }
 
-    protected function _checkAccess()
+    protected function checkAccess(): ?Response
     {
         $controller = $this->request->controller;
         $action = $this->request->getParam('action');
 
         if (in_array($controller, $this->whitelist)) {
-            return;
+            return null;
         }
         if (isset($this->whitelist[$controller])
             && in_array($action, $this->whitelist[$controller])
         ) {
-            return;
+            return null;
         }
         $flash_class = 'alert';
         $this->Flash->default(
@@ -190,7 +194,7 @@ class AppController extends Controller
         return $this->redirect('/');
     }
 
-    protected function _checkReadonlyAccess()
+    protected function checkReadonlyAccess(): void
     {
         $controller = $this->request->controller;
         $action = $this->request->getParam('action');
@@ -218,9 +222,7 @@ class AppController extends Controller
             'You need to have commit access on phpmyadmin/phpmyadmin '
             . 'repository on Github.com to do this',
             [
-                'params' => [
-                    'class' => $flash_class,
-                ],
+                'params' => ['class' => $flash_class],
             ]
         );
 

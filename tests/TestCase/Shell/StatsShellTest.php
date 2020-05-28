@@ -19,39 +19,41 @@
 namespace App\Test\TestCase\Shell;
 
 use App\Shell\StatsShell;
-use Cake\TestSuite\TestCase;
 use Cake\Cache\Cache;
+use Cake\Console\ConsoleIo;
+use Cake\TestSuite\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 
 /**
  * App\Shell\StatsShell Test Case
  */
 class StatsShellTest extends TestCase
 {
-
     /**
      * ConsoleIo mock
      *
-     * @var \Cake\Console\ConsoleIo|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConsoleIo|PHPUnit_Framework_MockObject_MockObject
      */
     public $io;
 
     /**
      * Test subject
      *
-     * @var \App\Shell\StatsShell
+     * @var StatsShell
      */
     public $Stats;
 
-    public $fixtures = [
-        'app.Incidents'
-    ];
+    /**
+     * Fixtures.
+     *
+     * @var array
+     */
+    public $fixtures = ['app.Incidents'];
 
     /**
      * setUp method
-     *
-     * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->io = $this->getMockBuilder('Cake\Console\ConsoleIo')->getMock();
@@ -60,10 +62,8 @@ class StatsShellTest extends TestCase
 
     /**
      * tearDown method
-     *
-     * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Stats);
 
@@ -72,10 +72,8 @@ class StatsShellTest extends TestCase
 
     /**
      * Test main method
-     *
-     * @return void
      */
-    public function testMain()
+    public function testMain(): void
     {
         // Call intialize method to load the models
         $this->Stats->initialize();

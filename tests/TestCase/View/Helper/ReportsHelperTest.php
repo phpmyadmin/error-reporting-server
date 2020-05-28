@@ -8,7 +8,7 @@ use Cake\View\View;
 
 class ReportsHelperTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $View = new View();
@@ -20,7 +20,7 @@ class ReportsHelperTest extends TestCase
      *
      * @return array array data for testLinkToReport
      */
-    public function providerForTestLinkToReport()
+    public function providerForTestLinkToReport(): array
     {
         return [
             [
@@ -34,9 +34,9 @@ class ReportsHelperTest extends TestCase
                     'linenumber' => 154,
                     'sourceforge_bug_id' => null,
                     'related_to' => 12567,
-                    'exception_type' => 'js'
+                    'exception_type' => 'js',
                 ],
-                '<a href=/reports/view/116273>#116273</a>',
+                '<a href="/reports/view/116273">#116273</a>',
             ],
             [
                 [
@@ -49,20 +49,19 @@ class ReportsHelperTest extends TestCase
                     'linenumber' => 154,
                     'sourceforge_bug_id' => null,
                     'related_to' => null,
-                    'exception_type' => 'php'
+                    'exception_type' => 'php',
                 ],
-                '<a href=/reports/view/1879>#1879</a>',
+                '<a href="/reports/view/1879">#1879</a>',
             ],
         ];
     }
 
     /**
      * @dataProvider providerForTestLinkToReport
-     * @param array $report   The report
-     * @param array $expected The expected
-     * @return void
+     * @param array  $report   The report
+     * @param string $expected The expected
      */
-    public function testLinkToReport($report, $expected)
+    public function testLinkToReport(array $report, string $expected): void
     {
         $link = $this->Reports->linkToReport($report);
 
@@ -77,7 +76,7 @@ class ReportsHelperTest extends TestCase
      *
      * @return array array data to testCreateReportsLinks
      */
-    public function providerForTestCreateReportsLinks()
+    public function providerForTestCreateReportsLinks(): array
     {
         return [
             [
@@ -92,7 +91,7 @@ class ReportsHelperTest extends TestCase
                         'linenumber' => 154,
                         'sourceforge_bug_id' => null,
                         'related_to' => 12567,
-                        'exception_type' => 'js'
+                        'exception_type' => 'js',
                     ],
                     [
                         'id' => 1879,
@@ -104,23 +103,21 @@ class ReportsHelperTest extends TestCase
                         'linenumber' => 154,
                         'sourceforge_bug_id' => null,
                         'related_to' => null,
-                        'exception_type' => 'php'
+                        'exception_type' => 'php',
                     ],
                 ],
-                '<a href=/reports/view/116273>#116273</a>, '
-                    . '<a href=/reports/view/1879>#1879</a>',
+                '<a href="/reports/view/116273">#116273</a>, '
+                    . '<a href="/reports/view/1879">#1879</a>',
             ],
         ];
     }
 
-
     /**
      * @dataProvider providerForTestCreateReportsLinks
-     * @param array $reports  The reports
-     * @param array $expected The expected reports
-     * @return void
+     * @param array  $reports  The reports
+     * @param string $expected The expected reports
      */
-    public function testCreateReportsLinks($reports, $expected)
+    public function testCreateReportsLinks(array $reports, string $expected): void
     {
         $links_str = $this->Reports->createReportsLinks($reports);
 

@@ -4,19 +4,24 @@ namespace App\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
+use function json_encode;
 
 class EventsControllerTest extends IntegrationTestCase
 {
+    /**
+     * Fixtures.
+     *
+     * @var array
+     */
     public $fixtures = ['app.Reports'];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
-
         /* Test case 1 */
         // Invalid User Agent
         $this->configRequest([
@@ -50,9 +55,7 @@ class EventsControllerTest extends IntegrationTestCase
             json_encode(
                 [
                     'action' => 'closed',
-                    'issue' => [
-                        'number' => 4,
-                    ]
+                    'issue' => ['number' => 4],
                 ]
             )
         );
@@ -72,9 +75,7 @@ class EventsControllerTest extends IntegrationTestCase
             json_encode(
                 [
                     'action' => 'anything-invalid',
-                    'issue' => [
-                        'number' => 4,
-                    ]
+                    'issue' => ['number' => 4],
                 ]
             )
         );
@@ -94,9 +95,7 @@ class EventsControllerTest extends IntegrationTestCase
             json_encode(
                 [
                     'action' => 'closed',
-                    'issue' => [
-                        'number' => 1234,
-                    ]
+                    'issue' => ['number' => 1234],
                 ]
             )
         );
@@ -121,16 +120,13 @@ class EventsControllerTest extends IntegrationTestCase
             json_encode(
                 [
                     'action' => 'opened',
-                    'issue' => [
-                        'number' => 4,
-                    ]
+                    'issue' => ['number' => 4],
                 ]
             )
         );
         $this->assertResponseCode(201);
         $report = $this->Reports->get(4);
         $this->assertEquals($report->status, 'forwarded');
-
 
         /* Test case 7 */
         // Event 'closed' for a linked issue
@@ -146,9 +142,7 @@ class EventsControllerTest extends IntegrationTestCase
             json_encode(
                 [
                     'action' => 'closed',
-                    'issue' => [
-                        'number' => 4,
-                    ]
+                    'issue' => ['number' => 4],
                 ]
             )
         );
@@ -175,9 +169,7 @@ class EventsControllerTest extends IntegrationTestCase
             json_encode(
                 [
                     'action' => 'reopened',
-                    'issue' => [
-                        'number' => 4,
-                    ]
+                    'issue' => ['number' => 4],
                 ]
             )
         );

@@ -5,9 +5,18 @@ namespace App\Test\TestCase\Controller;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
+use const DS;
+use function count;
+use function file_get_contents;
+use function json_decode;
 
 class IncidentsControllerTest extends IntegrationTestCase
 {
+    /**
+     * Fixtures.
+     *
+     * @var array
+     */
     public $fixtures = [
         'app.Notifications',
         'app.Developers',
@@ -15,7 +24,7 @@ class IncidentsControllerTest extends IntegrationTestCase
         'app.Incidents',
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->Incidents = TableRegistry::getTableLocator()->get('Incidents');
         //$Session = new SessionComponent(new ComponentRegistry());
@@ -23,7 +32,7 @@ class IncidentsControllerTest extends IntegrationTestCase
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
-    public function testView()
+    public function testView(): void
     {
         $this->get('/incidents/view/1');
 
@@ -38,7 +47,7 @@ class IncidentsControllerTest extends IntegrationTestCase
         );
     }
 
-    public function testJson()
+    public function testJson(): void
     {
         $this->get('/incidents/json/1');
         $incident = json_decode($this->_response->body(), true);
@@ -78,7 +87,7 @@ class IncidentsControllerTest extends IntegrationTestCase
         $this->assertEquals($expected, $incident);
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
         $bugReportDecoded = json_decode($bugReport, true);

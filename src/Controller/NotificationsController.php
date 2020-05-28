@@ -19,44 +19,53 @@
 namespace App\Controller;
 
 use Cake\Event\Event;
+use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
+use function array_push;
+use function intval;
+use function json_encode;
 
 /**
  * Notifications Controller.
  */
 class NotificationsController extends AppController
 {
+    /** @var string */
     public $components = [
         'RequestHandler',
         'OrderSearch',
     ];
 
+    /** @var string */
     public $helpers = [
         'Html',
         'Form',
         'Reports',
     ];
 
+    /** @var string */
     public $uses = [
         'Notification',
         'Developer',
         'Report',
     ];
 
-    public function beforeFilter(Event $event)
+    public function beforeFilter(Event $event): void
     {
-        if ($this->request->getParam('action') != 'clean_old_notifs') {
-            parent::beforeFilter($event);
+        if ($this->request->getParam('action') === 'clean_old_notifs') {
+            return;
         }
+
+        parent::beforeFilter($event);
     }
 
-    public function index()
+    public function index(): void
     {
         // no need to do anything here. Just render the view.
     }
 
-    public function data_tables()
+    public function data_tables(): Response
     {
         $current_developer = TableRegistry::getTableLocator()->get('Developers')->
                     findById($this->request->getSession()->read('Developer.id'))->all()->first();
@@ -121,7 +130,7 @@ class NotificationsController extends AppController
             $tmp_row[2] = $row['error_name'];
             $tmp_row[3] = $row['error_message'];
             $tmp_row[4] = $row['pma_version'];
-            $tmp_row[5] = ($row['exception_type']) ? ('php') : ('js');
+            $tmp_row[5] = $row['exception_type'] ? 'php' : 'js';
             $tmp_row[6] = $row['created_time'];
             array_push($dispRows, $tmp_row);
         }
@@ -143,9 +152,10 @@ class NotificationsController extends AppController
      * Currently it deletes them (marks them "read").
      * Can be Extended for other mass operations as well.
      * Expects an array of Notification Ids as a POST parameter.
-     * @return void
+     *
+     * @return void Nothing
      */
-    public function mass_action()
+    public function mass_action(): void
     {
         $msg = 'Selected Notifications have been marked \'Read\'!';
         $flash_class = 'alert alert-success';

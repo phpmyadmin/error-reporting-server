@@ -4,9 +4,21 @@ namespace App\Test\TestCase\Model\Table;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+use ReflectionMethod;
+use const DS;
+use function count;
+use function file_get_contents;
+use function in_array;
+use function json_decode;
+use function json_encode;
 
 class IncidentsTableTest extends TestCase
 {
+    /**
+     * Fixtures.
+     *
+     * @var array
+     */
     public $fixtures = [
         'app.Notifications',
         'app.Developers',
@@ -14,13 +26,13 @@ class IncidentsTableTest extends TestCase
         'app.Incidents',
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->Incidents = TableRegistry::getTableLocator()->get('Incidents');
     }
 
-    public function testGetStackHash()
+    public function testGetStackHash(): void
     {
         //$method = new ReflectionMethod('Incident', 'getStackHash');
         //$method->setAccessible(true);
@@ -54,9 +66,9 @@ class IncidentsTableTest extends TestCase
         $this->assertEquals('a441639902837d88db25214812c0cd83', $result);
     }
 
-    public function testGetServer()
+    public function testGetServer(): void
     {
-        $method = new \ReflectionMethod($this->Incidents, '_getServer');
+        $method = new ReflectionMethod($this->Incidents, 'getServer');
         $method->setAccessible(true);
 
         $result = $method->invoke(
@@ -84,9 +96,9 @@ class IncidentsTableTest extends TestCase
         $this->assertEquals('UNKNOWN', $result);
     }
 
-    public function testGetSimpleVersion()
+    public function testGetSimpleVersion(): void
     {
-        $method = new \ReflectionMethod($this->Incidents, '_getSimpleVersion');
+        $method = new ReflectionMethod($this->Incidents, 'getSimpleVersion');
         $method->setAccessible(true);
 
         $result = $method->invoke(
@@ -125,9 +137,9 @@ class IncidentsTableTest extends TestCase
         $this->assertEquals('15', $result);
     }
 
-    public function testGetIdentifyingLocation()
+    public function testGetIdentifyingLocation(): void
     {
-        $method = new \ReflectionMethod($this->Incidents, '_getIdentifyingLocation');
+        $method = new ReflectionMethod($this->Incidents, 'getIdentifyingLocation');
         $method->setAccessible(true);
 
         $stacktrace = [
@@ -203,9 +215,9 @@ class IncidentsTableTest extends TestCase
         $this->assertEquals(['file2', 200], $result);
     }
 
-    public function testGetSchematizedIncident()
+    public function testGetSchematizedIncident(): void
     {
-        $method = new \ReflectionMethod($this->Incidents, '_getSchematizedIncidents');
+        $method = new ReflectionMethod($this->Incidents, 'getSchematizedIncidents');
         $method->setAccessible(true);
 
         // Case-1: JavaScript Report
@@ -302,9 +314,9 @@ class IncidentsTableTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetReportDetails()
+    public function testGetReportDetails(): void
     {
-        $method = new \ReflectionMethod($this->Incidents, '_getReportDetails');
+        $method = new ReflectionMethod($this->Incidents, 'getReportDetails');
         $method->setAccessible(true);
 
         // case-1: JavaScript BugReport
@@ -350,9 +362,9 @@ class IncidentsTableTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetClosestReport()
+    public function testGetClosestReport(): void
     {
-        $method = new \ReflectionMethod($this->Incidents, '_getClosestReport');
+        $method = new ReflectionMethod($this->Incidents, 'getClosestReport');
         $method->setAccessible(true);
 
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
@@ -368,7 +380,7 @@ class IncidentsTableTest extends TestCase
         $this->assertEquals($returnedReport, $result);
     }
 
-    public function testCreateIncidentFromBugReport()
+    public function testCreateIncidentFromBugReport(): void
     {
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
         $bugReport = json_decode($bugReport, true);
@@ -459,7 +471,6 @@ class IncidentsTableTest extends TestCase
 
         $this->assertEquals(true, in_array(false, $result['incidents']));
 
-
         // Case 3.4: Long error_message in JS report submission
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
         $bugReport = json_decode($bugReport, true);
@@ -478,14 +489,13 @@ class IncidentsTableTest extends TestCase
      * @dataProvider versionsStripping
      * @param string $version  The version
      * @param string $expected The expected version
-     * @return void
      */
-    public function testStripversion($version, $expected)
+    public function testStripversion(string $version, string $expected): void
     {
         $this->assertEquals($expected, $this->Incidents->getStrippedPmaVersion($version));
     }
 
-    public function versionsStripping()
+    public function versionsStripping(): array
     {
         return [
             [

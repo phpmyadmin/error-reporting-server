@@ -20,6 +20,9 @@
 namespace App\Controller\Component;
 
 use Cake\Controller\Component;
+use function array_keys;
+use function count;
+use function intval;
 
 /**
  * Github api component handling comunication with github.
@@ -34,25 +37,31 @@ class OrderSearchComponent extends Component
      *
      * @return array
      */
-    public function getSearchConditions($aColumns)
+    public function getSearchConditions(array $aColumns): array
     {
         $searchConditions = ['OR' => []];
         $keys = array_keys($aColumns);
         $columnsCount = count($aColumns);
 
-        if ($this->request->query('sSearch') != '') {
+        $sSearch = $this->request->query('sSearch');
+        if ($sSearch !== '' && $sSearch !== null) {
             for ($i = 0; $i < $columnsCount; ++$i) {
-                if ($this->request->query('bSearchable_' . ($i + 1)) == 'true') {
-                    $searchConditions['OR'][] = [$aColumns[$keys[$i]] . ' LIKE' => '%' . $this->request->query('sSearch') . '%'];
+                if ($this->request->query('bSearchable_' . ($i + 1)) !== 'true') {
+                    continue;
                 }
+
+                $searchConditions['OR'][] = [$aColumns[$keys[$i]] . ' LIKE' => '%' . $sSearch . '%'];
             }
         }
 
         /* Individual column filtering */
         for ($i = 0; $i < $columnsCount; ++$i) {
-            if ($this->request->query('sSearch_' . ($i + 1)) != '') {
-                $searchConditions[] = [$aColumns[$keys[$i]] . ' LIKE' => $this->request->query('sSearch_' . ($i + 1))];
+            $searchTerm = $this->request->query('sSearch_' . ($i + 1));
+            if ($searchTerm === '' || $searchTerm === null) {
+                continue;
             }
+
+            $searchConditions[] = [$aColumns[$keys[$i]] . ' LIKE' => $searchTerm];
         }
 
         return $searchConditions;
@@ -61,11 +70,11 @@ class OrderSearchComponent extends Component
     /**
      * @param string[] $aColumns The columns
      *
-     * @return array
+     * @return array|null
      */
-    public function getOrder($aColumns)
+    public function getOrder(array $aColumns): ?array
     {
-        if ($this->request->query('iSortCol_0') != null) {
+        if ($this->request->query('iSortCol_0') !== null) {
             $order = [];
             //Seems like we need to sort with only one column each time, so no need to loop
             $sort_column_index = intval($this->request->query('iSortCol_0'));
@@ -73,7 +82,7 @@ class OrderSearchComponent extends Component
             $keys = array_keys($aColumns);
 
             if ($sort_column_index > 0
-                && $this->request->query('bSortable_' . $sort_column_index) == 'true'
+                && $this->request->query('bSortable_' . $sort_column_index) === 'true'
             ) {
                 $order[$aColumns[$keys[$sort_column_index - 1]]] = $this->request->query('sSortDir_0');
             }

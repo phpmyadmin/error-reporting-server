@@ -10,27 +10,12 @@ use Cake\TestSuite\Fixture\TestFixture;
 class DevelopersFixture extends TestFixture
 {
     /**
-     * Fields.
+     * Imports.
      *
      * @var array
      */
-    /*public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'key' => 'primary'),
-        'github_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10, 'key' => 'unique'),
-        'full_name' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 50, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
-        'email' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 70, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
-        'gravatar_id' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 100, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
-        'access_token' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 100, 'collate' => 'utf8_general_ci', 'charset' => 'utf8'),
-        'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'has_commit_access' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
-        'indexes' => array(
-            'PRIMARY' => array('column' => 'id', 'unique' => 1),
-            'github_id' => array('column' => 'github_id', 'unique' => 1)
-        ),
-        'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_general_ci', 'engine' => 'InnoDB')
-    );*/
     public $import = ['table' => 'developers'];
+
     /**
      * Records.
      *

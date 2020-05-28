@@ -20,19 +20,21 @@ namespace App\Shell;
 
 use Cake\Console\Shell;
 use Cake\Log\Log;
+use function date;
+use function time;
 
 /**
  * Clean old Notifications shell.
  */
 class CleanOldNotifsShell extends Shell
 {
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
         $this->loadModel('Notifications');
     }
 
-    public function main()
+    public function main(): void
     {
         $XTime = time() - 60 * 24 * 3600;
         $conditions = ['Notifications.created <' => date('Y-m-d H:i:s', $XTime)];

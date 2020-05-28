@@ -85,7 +85,7 @@ define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . 'vendor' . DS . 'cakephp' . DS . 'c
 /**
  * base directory in which application reside if not webroot.
  */
-define("BASE_DIR", "");
+define('BASE_DIR', '');
 
 /**
  * Path to the cake directory.

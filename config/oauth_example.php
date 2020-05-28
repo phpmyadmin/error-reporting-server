@@ -3,6 +3,7 @@
  * Configures github application details for authentication. You can get them
  * from the application configuration page on github.
  */
+
 namespace App\Config;
 
 use Cake\Core\Configure;

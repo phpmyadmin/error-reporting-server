@@ -15,21 +15,25 @@
  *
  * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Test\TestCase\Controller;
 
-use App\Controller\DevelopersController;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
+use phpmock\phpunit\PHPMock;
+use const DS;
+use function file_get_contents;
+use function json_encode;
 
 /**
  * App\Controller\DevelopersController Test Case
  */
 class DevelopersControllerTest extends IntegrationTestCase
 {
-    use \phpmock\phpunit\PHPMock;
+    use PHPMock;
 
     /**
-     * Fixtures
+     * Fixtures.
      *
      * @var array
      */
@@ -38,17 +42,15 @@ class DevelopersControllerTest extends IntegrationTestCase
         'app.Notifications',
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->Developers = TableRegistry::getTableLocator()->get('Developers');
     }
 
     /**
      * Test login method
-     *
-     * @return void
      */
-    public function testLogin()
+    public function testLogin(): void
     {
         // Empty session during initiation
         $this->session([]);
@@ -60,10 +62,8 @@ class DevelopersControllerTest extends IntegrationTestCase
 
     /**
      * Test callback method
-     *
-     * @return void
      */
-    public function testCallback()
+    public function testCallback(): void
     {
         // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
         // so that we don't actually hit the Github Api
@@ -109,7 +109,7 @@ class DevelopersControllerTest extends IntegrationTestCase
             [
                 'last_page' => [
                     'controller' => 'notifications',
-                    'action' => 'index'
+                    'action' => 'index',
                 ],
             ]
         );
@@ -122,13 +122,12 @@ class DevelopersControllerTest extends IntegrationTestCase
             [
                 'last_page' => [
                     'controller' => 'reports',
-                    'action' => 'index'
+                    'action' => 'index',
                 ],
             ]
         );
         $this->get('developers/callback/?code=123123123');
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
-
 
         // Case 3. Successful response code (new user), check whether session variables are init
         $this->get('developers/callback/?code=123123123');
@@ -155,10 +154,8 @@ class DevelopersControllerTest extends IntegrationTestCase
 
     /**
      * Test logout method
-     *
-     * @return void
      */
-    public function testLogout()
+    public function testLogout(): void
     {
         $this->session(['Developer.id' => 1]);
 

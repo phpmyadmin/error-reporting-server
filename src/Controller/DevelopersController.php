@@ -20,65 +20,40 @@ namespace App\Controller;
 
 use Cake\Core\Configure;
 use Cake\Event\Event;
+use Cake\Http\Response;
 
 /**
  * Developer controller handling developer login/logout/register.
  */
 class DevelopersController extends AppController
 {
+    /** @var string */
     public $helpers = [
         'Html',
         'Form',
     ];
 
-    public $components = [
-        'GithubApi',
-    ];
+    /** @var string */
+    public $components = ['GithubApi'];
 
-    public function beforeFilter(Event $event)
+    public function beforeFilter(Event $event): void
     {
         parent::beforeFilter($event);
         $this->GithubApi->githubConfig = Configure::read('GithubConfig');
         $this->GithubApi->githubRepo = Configure::read('GithubRepoPath');
     }
 
-    public function login()
+    public function login(): void
     {
         $url = $this->GithubApi->getRedirectUrl('user:email,public_repo');
         $this->redirect($url);
     }
 
-    public function callback()
+    public function callback(): ?Response
     {
         $code = $this->request->query('code');
         $accessToken = $this->GithubApi->getAccessToken($code);
-        if ($code && $accessToken) {
-            list($userInfo, $status) = $this->GithubApi->getUserInfo($accessToken);
-            if ($status != 200) {
-                $flash_class = 'alert alert-error';
-                $this->Flash->default(
-                    $userInfo['message'],
-                    ['params' => ['class' => $flash_class]]
-                );
-
-                $this->redirect('/');
-                return;
-            } else {
-                $userInfo['has_commit_access'] = $this->GithubApi->canCommitTo(
-                    $userInfo['login'],
-                    $this->GithubApi->githubRepo,
-                    Configure::read('GithubAccessToken')
-                );
-
-                $this->_authenticateDeveloper($userInfo, $accessToken);
-
-                $flash_class = 'alert alert-success';
-                $this->Flash->default(
-                    'You have been logged in successfully',
-                    ['params' => ['class' => $flash_class]]
-                );
-            }
-        } else {
+        if (empty($code) || empty($accessToken)) {
             $flash_class = 'alert alert-error';
             $this->Flash->default(
                 'We were not able to authenticate you.'
@@ -86,21 +61,46 @@ class DevelopersController extends AppController
                 ['params' => ['class' => $flash_class]]
             );
 
-            $this->redirect('/');
-            return;
+            return $this->redirect('/');
         }
+
+        [$userInfo, $status] = $this->GithubApi->getUserInfo($accessToken);
+        if ($status !== 200) {
+            $flash_class = 'alert alert-error';
+            $this->Flash->default(
+                $userInfo['message'],
+                ['params' => ['class' => $flash_class]]
+            );
+
+            return $this->redirect('/');
+        }
+
+        $userInfo['has_commit_access'] = $this->GithubApi->canCommitTo(
+            $userInfo['login'],
+            $this->GithubApi->githubRepo,
+            Configure::read('GithubAccessToken')
+        );
+
+        $this->authenticateDeveloper($userInfo, $accessToken);
+
+        $flash_class = 'alert alert-success';
+        $this->Flash->default(
+            'You have been logged in successfully',
+            ['params' => ['class' => $flash_class]]
+        );
 
         $last_page = $this->request->getSession()->read('last_page');
         if (empty($last_page)) {
             $last_page = [
                 'controller' => 'reports',
-                'action' => 'index'
+                'action' => 'index',
             ];
         }
-        $this->redirect($last_page);
+
+        return $this->redirect($last_page);
     }
 
-    public function logout()
+    public function logout(): void
     {
         $this->request->getSession()->destroy();
 
@@ -112,7 +112,7 @@ class DevelopersController extends AppController
         $this->redirect('/');
     }
 
-    protected function _authenticateDeveloper($userInfo, $accessToken)
+    protected function authenticateDeveloper(array $userInfo, string $accessToken): void
     {
         $developers = $this->Developers->findByGithubId($userInfo['id']);
         $developer = $developers->all()->first();
@@ -124,6 +124,6 @@ class DevelopersController extends AppController
         $this->Developers->id = $this->Developers->saveFromGithub($userInfo, $accessToken, $developer);
         $this->request->getSession()->write('Developer.id', $this->Developers->id);
         $this->request->getSession()->write('access_token', $accessToken);
-        $this->request->getSession()->write('read_only', ! ($userInfo['has_commit_access']));
+        $this->request->getSession()->write('read_only', ! $userInfo['has_commit_access']);
     }
 }

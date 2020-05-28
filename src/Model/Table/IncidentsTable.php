@@ -22,6 +22,20 @@ use Cake\Log\Log;
 use Cake\Model\Model;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
+use function array_merge;
+use function array_push;
+use function array_slice;
+use function count;
+use function date;
+use function hash_final;
+use function hash_init;
+use function hash_update;
+use function in_array;
+use function json_encode;
+use function mb_strlen;
+use function preg_match;
+use function strtotime;
+use function time;
 
 /**
  * An incident a representing a single incident of a submited bug.
@@ -114,9 +128,9 @@ class IncidentsTable extends Table
         'configuration_storage',
     ];
 
-    public function __construct($id = false)
+    public function __construct(array $data)
     {
-        parent::__construct($id);
+        parent::__construct($data);
 
         $this->filterTimes = [
             'all_time' => [
@@ -154,7 +168,7 @@ class IncidentsTable extends Table
      * yet been santized. It either adds it as an incident to another report or
      * creates a new report if nothing matches.
      *
-     * @param array $bugReport the bug report being submitted
+     * @param array|null $bugReport the bug report being submitted
      *
      * @return array of:
      *          1. array of inserted incident ids. If the report/incident was not
@@ -162,12 +176,12 @@ class IncidentsTable extends Table
      *          2. array of newly created report ids. If no new report was created,
      *               an empty array is returned
      */
-    public function createIncidentFromBugReport($bugReport)
+    public function createIncidentFromBugReport(?array $bugReport): array
     {
-        if ($bugReport == null) {
+        if ($bugReport === null) {
             return [
                 'incidents' => [false],
-                'reports' => []
+                'reports' => [],
             ];
         }
         $incident_ids = [];    // array to hold ids of all the inserted incidents
@@ -182,27 +196,27 @@ class IncidentsTable extends Table
         }
 
         // Also sanitizes the bug report
-        $schematizedIncidents = $this->_getSchematizedIncidents($bugReport);
+        $schematizedIncidents = $this->getSchematizedIncidents($bugReport);
         $incidentsTable = TableRegistry::getTableLocator()->get('Incidents');
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         foreach ($schematizedIncidents as $index => $si) {
             // find closest report. If not found, create a new report.
-            $closestReport = $this->_getClosestReport($bugReport, $index);
+            $closestReport = $this->getClosestReport($bugReport, $index);
             if ($closestReport) {
                 $si['report_id'] = $closestReport['id'];
                 $si = $incidentsTable->newEntity($si);
                 $si->created = date('Y-m-d H:i:s', time());
                 $si->modified = date('Y-m-d H:i:s', time());
 
-                $this->_logLongIncidentSubmissions($si, $incident_ids);
+                $this->logLongIncidentSubmissions($si, $incident_ids);
                 if (in_array(false, $incident_ids)) {
                     break;
                 }
             } else {
                 // no close report. Create a new report.
-                $report = $this->_getReportDetails($bugReport, $index);
+                $report = $this->getReportDetails($bugReport, $index);
 
-                $this->_logLongIncidentSubmissions($si, $incident_ids);
+                $this->logLongIncidentSubmissions($si, $incident_ids);
                 if (in_array(false, $incident_ids)) {
                     break;
                 }
@@ -225,7 +239,7 @@ class IncidentsTable extends Table
                 if (! $closestReport) {
                     // add notifications entry
                     $tmpIncident = $incidentsTable->findById($si->id)->all()->first();
-                    if (! TableRegistry::getTableLocator()->get('Notifications')->addNotifications(intval($tmpIncident['report_id']))) {
+                    if (! TableRegistry::getTableLocator()->get('Notifications')->addNotifications((int) $tmpIncident['report_id'])) {
                         Log::write(
                             'error',
                             'ERRORED: Notification::addNotifications() failed on Report#'
@@ -241,7 +255,7 @@ class IncidentsTable extends Table
 
         return [
             'incidents' => $incident_ids,
-            'reports' => $new_report_ids
+            'reports' => $new_report_ids,
         ];
     }
 
@@ -255,26 +269,25 @@ class IncidentsTable extends Table
      *                         Integer $index: for php exception type
      * @param int   $index     The report index
      *
-     * @return array the first similar report or null
+     * @return object|null the first similar report or null
      */
-    protected function _getClosestReport($bugReport, $index = 0)
+    protected function getClosestReport(array $bugReport, int $index = 0): ?object
     {
         if (isset($bugReport['exception_type'])
-            && $bugReport['exception_type'] == 'php'
+            && $bugReport['exception_type'] === 'php'
         ) {
             $location = $bugReport['errors'][$index]['file'];
             $linenumber = $bugReport['errors'][$index]['lineNum'];
         } else {
-            list($location, $linenumber) =
-                    $this->_getIdentifyingLocation($bugReport['exception']['stack']);
+            [$location, $linenumber] =
+                    $this->getIdentifyingLocation($bugReport['exception']['stack']);
         }
-        $report = TableRegistry::getTableLocator()->get('Reports')->findByLocationAndLinenumberAndPmaVersion(
+
+        return TableRegistry::getTableLocator()->get('Reports')->findByLocationAndLinenumberAndPmaVersion(
             $location,
             $linenumber,
             $this->getStrippedPmaVersion($bugReport['pma_version'])
         )->all()->first();
-
-        return $report;
     }
 
     /**
@@ -286,10 +299,10 @@ class IncidentsTable extends Table
      *
      * @return array an array with the report fields can be used with Report->save
      */
-    protected function _getReportDetails($bugReport, $index = 0)
+    protected function getReportDetails(array $bugReport, int $index = 0): array
     {
         if (isset($bugReport['exception_type'])
-            && $bugReport['exception_type'] == 'php'
+            && $bugReport['exception_type'] === 'php'
         ) {
             $location = $bugReport['errors'][$index]['file'];
             $linenumber = $bugReport['errors'][$index]['lineNum'];
@@ -299,8 +312,8 @@ class IncidentsTable extends Table
             ];
             $exception_type = 1;
         } else {
-            list($location, $linenumber) =
-                $this->_getIdentifyingLocation($bugReport['exception']['stack']);
+            [$location, $linenumber] =
+                $this->getIdentifyingLocation($bugReport['exception']['stack']);
 
             $reportDetails = [
                 'error_message' => $bugReport['exception']['message'],
@@ -314,7 +327,7 @@ class IncidentsTable extends Table
             [
                 'status' => 'new',
                 'location' => $location,
-                'linenumber' => is_null($linenumber) ? 0 : $linenumber,
+                'linenumber' => $linenumber ?? 0,
                 'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
                 'exception_type' => $exception_type,
             ]
@@ -331,24 +344,24 @@ class IncidentsTable extends Table
      * @return array an array of schematized incident.
      *               Can be used with Incident->save
      */
-    protected function _getSchematizedIncidents($bugReport)
+    protected function getSchematizedIncidents(array $bugReport): array
     {
         //$bugReport = Sanitize::clean($bugReport, array('escape' => false));
         $schematizedReports = [];
         $schematizedCommonReport = [
             'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
-            'php_version' => $this->_getSimpleVersion($bugReport['php_version'], 2),
+            'php_version' => $this->getSimpleVersion($bugReport['php_version'], 2),
             'browser' => $bugReport['browser_name'] . ' '
-                    . $this->_getSimpleVersion($bugReport['browser_version'], 1),
+                    . $this->getSimpleVersion($bugReport['browser_version'], 1),
             'user_os' => $bugReport['user_os'],
             'locale' => $bugReport['locale'],
             'configuration_storage' => $bugReport['configuration_storage'],
-            'server_software' => $this->_getServer($bugReport['server_software']),
+            'server_software' => $this->getServer($bugReport['server_software']),
             'full_report' => json_encode($bugReport),
         ];
 
         if (isset($bugReport['exception_type'])
-            && $bugReport['exception_type'] == 'php'
+            && $bugReport['exception_type'] === 'php'
         ) {
             // for each "errors"
             foreach ($bugReport['errors'] as $error) {
@@ -403,7 +416,7 @@ class IncidentsTable extends Table
      * @return array an array with the filename/scriptname and linenumber of the
      *               error
      */
-    protected function _getIdentifyingLocation($stacktrace)
+    protected function getIdentifyingLocation(array $stacktrace): array
     {
         $fallback = [
             'UNKNOWN',
@@ -414,10 +427,12 @@ class IncidentsTable extends Table
                 // ignore unrelated files that sometimes appear in the error report
                 if ($level['filename'] === 'tracekit/tracekit.js') {
                     continue;
-                } elseif ($level['filename'] === 'error_report.js') {
+                }
+
+                if ($level['filename'] === 'error_report.js') {
                     // in case the error really is in the error_report.js file save it for
                     // later
-                    if ($fallback[0] == 'UNKNOWN') {
+                    if ($fallback[0] === 'UNKNOWN') {
                         $fallback = [
                             $level['filename'],
                             $level['line'],
@@ -430,7 +445,9 @@ class IncidentsTable extends Table
                     $level['filename'],
                     $level['line'],
                 ];
-            } elseif (isset($level['scriptname'])) {
+            }
+
+            if (isset($level['scriptname'])) {
                 return [
                     $level['scriptname'],
                     $level['line'],
@@ -452,7 +469,7 @@ class IncidentsTable extends Table
      *
      * @return string the major and minor version part
      */
-    protected function _getSimpleVersion($versionString, $versionLength)
+    protected function getSimpleVersion(string $versionString, string $versionLength): string
     {
         $versionLength = (int) $versionLength;
         if ($versionLength < 1) {
@@ -464,14 +481,12 @@ class IncidentsTable extends Table
          * int
          */
         $result = preg_match(
-            "/^(\d+\.){" . ($versionLength - 1) . "}\d+/",
+            '/^(\d+\.){' . ($versionLength - 1) . '}\d+/',
             $versionString,
             $matches
         );
         if ($result) {
-            $simpleVersion = $matches[0];
-
-            return $simpleVersion;
+            return $matches[0];
         }
 
         return $versionString;
@@ -485,7 +500,7 @@ class IncidentsTable extends Table
      *
      * @return string stripped phpMyAdmin version
      */
-    public function getStrippedPmaVersion($versionString)
+    public function getStrippedPmaVersion(string $versionString): string
     {
         $allowedRegexp = '/^(\d+)(\.\d+){0,3}(\-.*)?/';
         $matches = [];
@@ -508,11 +523,11 @@ class IncidentsTable extends Table
      *
      * @return string the server name and version or UNKNOWN
      */
-    protected function _getServer($signature)
+    protected function getServer(string $signature): string
     {
         if (preg_match(
-            "/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)"
-                . "|(lighttpd\/\d+\.\d+)/i",
+            '/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)'
+                . '|(lighttpd\/\d+\.\d+)/i',
             $signature,
             $matches
         )) {
@@ -529,7 +544,7 @@ class IncidentsTable extends Table
      *
      * @return string the hash string of the stacktrace
      */
-    public function getStackHash($stacktrace)
+    public function getStackHash(array $stacktrace): string
     {
         $handle = hash_init('md5');
         foreach ($stacktrace as $level) {
@@ -555,35 +570,35 @@ class IncidentsTable extends Table
      * Checks the length of stacktrace and full_report
      * and logs if it is greater than what it can hold
      *
-     * @param array $si           submitted incident
-     * @param array $incident_ids incident IDs
-     *
-     * @return array $incident_ids
+     * @param object $si           submitted incident
+     * @param array  $incident_ids incident IDs
+     * @return void Nothing
      */
-    private function _logLongIncidentSubmissions($si, &$incident_ids)
+    private function logLongIncidentSubmissions($si, array &$incident_ids): void// phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
     {
-
         $stacktraceLength = mb_strlen($si['stacktrace']);
         $fullReportLength = mb_strlen($si['full_report']);
         $errorMessageLength = mb_strlen($si['error_message']);
 
-        if ($stacktraceLength > 65535
-            || $fullReportLength > 65535
-            || $errorMessageLength > 200 // length of field in 'incidents' table
+        if ($stacktraceLength <= 65535
+            && $fullReportLength <= 65535
+            && $errorMessageLength <= 200 // length of field in 'incidents' table
         ) {
-            // If length of report is longer than
-            // what can fit in the table field,
-            // we log it and don't save it in the database
-            Log::error(
-                'Too long data submitted in the incident. The length of stacktrace: '
-                . $stacktraceLength . ', the length of bug report: '
-                . $fullReportLength . ', the length of error message: '
-                . $errorMessageLength . '. The full incident reported was as follows: '
-                . json_encode($si)
-            );
-
-            // add a 'false' to the return array
-            array_push($incident_ids, false);
+            return;
         }
+
+        // If length of report is longer than
+        // what can fit in the table field,
+        // we log it and don't save it in the database
+        Log::error(
+            'Too long data submitted in the incident. The length of stacktrace: '
+            . $stacktraceLength . ', the length of bug report: '
+            . $fullReportLength . ', the length of error message: '
+            . $errorMessageLength . '. The full incident reported was as follows: '
+            . json_encode($si)
+        );
+
+        // add a 'false' to the return array
+        array_push($incident_ids, false);
     }
 }

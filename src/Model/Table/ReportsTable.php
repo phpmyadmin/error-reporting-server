@@ -18,7 +18,9 @@
 
 namespace App\Model\Table;
 
+use Cake\Datasource\EntityInterface;
 use Cake\Model\Model;
+use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
@@ -35,9 +37,7 @@ class ReportsTable extends Table
      * @see Cake::Model::$hasMany
      */
     public $hasMany = [
-        'Incidents' => [
-            'dependant' => true,
-        ],
+        'Incidents' => ['dependant' => true],
     ];
 
     /**
@@ -78,38 +78,34 @@ class ReportsTable extends Table
         'forwarded' => 'Forwarded',
     ];
 
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
-        $this->hasMany('Incidents', [
-            'dependent' => true,
-        ]);
+        $this->hasMany('Incidents', ['dependent' => true]);
     }
 
     /**
      * Retrieves the incident records that are related to the current report.
      *
-     * @return array the list of incidents ordered by creation date desc
+     * @return Query the list of incidents ordered by creation date desc
      */
-    public function getIncidents()
+    public function getIncidents(): Query
     {
-        $incidents = TableRegistry::getTableLocator()->get('Incidents')->find('all', [
+        return TableRegistry::getTableLocator()->get('Incidents')->find('all', [
             'limit' => 50,
-            'conditions' => $this->_relatedIncidentsConditions(),
+            'conditions' => $this->relatedIncidentsConditions(),
             'order' => 'Incidents.created desc',
         ]);
-
-        return $incidents;
     }
 
     /**
      * Retrieves the report records that are related to the current report.
      *
-     * @return array the list of related reports
+     * @return Query the list of related reports
      */
-    public function getRelatedReports()
+    public function getRelatedReports(): Query
     {
         return $this->find('all', [
-            'conditions' => $this->_relatedReportsConditions(),
+            'conditions' => $this->relatedReportsConditions(),
         ]);
     }
 
@@ -117,16 +113,14 @@ class ReportsTable extends Table
      * Retrieves the incident records that are related to the current report that
      * also have a description.
      *
-     * @return array the list of incidents ordered by description lenght desc
+     * @return Query the list of incidents ordered by description lenght desc
      */
-    public function getIncidentsWithDescription()
+    public function getIncidentsWithDescription(): Query
     {
         return TableRegistry::getTableLocator()->get('Incidents')->find('all', [
             'conditions' => [
-                'NOT' => [
-                    'Incidents.steps is null',
-                ],
-                $this->_relatedIncidentsConditions(),
+                'NOT' => ['Incidents.steps is null'],
+                $this->relatedIncidentsConditions(),
             ],
             'order' => 'Incidents.steps desc',
         ]);
@@ -136,9 +130,9 @@ class ReportsTable extends Table
      * Retrieves the incident records that are related to the current report that
      * that have a different stacktrace.
      *
-     * @return array the list of incidents
+     * @return Query the list of incidents
      */
-    public function getIncidentsWithDifferentStacktrace()
+    public function getIncidentsWithDifferentStacktrace(): Query
     {
         return TableRegistry::getTableLocator()->get('Incidents')->find('all', [
             'fields' => [
@@ -147,7 +141,7 @@ class ReportsTable extends Table
                 'Incidents.full_report',
                 'Incidents.exception_type',
             ],
-            'conditions' => $this->_relatedIncidentsConditions(),
+            'conditions' => $this->relatedIncidentsConditions(),
             'group' => 'Incidents.stackhash',
         ]);
     }
@@ -155,10 +149,10 @@ class ReportsTable extends Table
     /**
      * Removes a report from a group of related reports.
      *
-     * @param \Cake\Datasource\EntityInterface $report The report instance
-     * @return void
+     * @param EntityInterface $report The report instance
+     * @return void Nothing
      */
-    public function removeFromRelatedGroup($report)
+    public function removeFromRelatedGroup(EntityInterface $report): void
     {
         $report->related_to = null;
         $this->save($report);
@@ -181,11 +175,11 @@ class ReportsTable extends Table
     /**
      * Adds a report to a group of related reports.
      *
-     * @param \Cake\Datasource\EntityInterface $report     The report instance
-     * @param int                              $related_to The report Id
-     * @return void
+     * @param EntityInterface $report     The report instance
+     * @param int             $related_to The report Id
+     * @return void Nothing
      */
-    public function addToRelatedGroup($report, $related_to)
+    public function addToRelatedGroup(EntityInterface $report, int $related_to): void
     {
         $dup_report = $this->get($related_to);
 
@@ -204,7 +198,7 @@ class ReportsTable extends Table
      *
      * @return string url
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return Router::url(['controller' => 'reports', 'action' => 'view',
             $this->id,
@@ -223,34 +217,30 @@ class ReportsTable extends Table
      * @param bool   $related   whether to limit the search to only related incidents
      * @param string $timeLimit the date at which to start the search
      *
-     * @return array the groups with the count of each group and possibly the number
+     * @return array|object the groups with the count of each group and possibly the number
      *               of groups. Ex: array('Apache' => 2) or array(array('Apache' => 2), 1)
      */
     public function getRelatedByField(
-        $fieldName,
-        $limit = 10,
-        $count = false,
-        $related = true,
-        $timeLimit = null
+        string $fieldName,
+        int $limit = 10,
+        bool $count = false,
+        bool $related = true,
+        ?string $timeLimit = null
     ) {
-        $fieldAlias = "Incidents__$fieldName";
+        $fieldAlias = 'Incidents__' . $fieldName;
         $queryDetails = [
             'conditions' => [
-                'NOT' => [
-                    "Incidents.$fieldName is null",
-                ],
+                'NOT' => ['Incidents.' . $fieldName . ' is null'],
             ],
             'limit' => $limit,
         ];
 
         if ($related) {
-            $queryDetails['conditions'][] = $this->_relatedIncidentsConditions();
+            $queryDetails['conditions'][] = $this->relatedIncidentsConditions();
         }
 
         if ($timeLimit) {
-            $queryDetails['conditions'][] = [
-                'Incidents.created >=' => $timeLimit,
-            ];
+            $queryDetails['conditions'][] = ['Incidents.created >=' => $timeLimit];
         }
 
         $groupedCount = TableRegistry::getTableLocator()->get('Incidents')->find('all', $queryDetails);
@@ -286,13 +276,13 @@ class ReportsTable extends Table
         $groupedCount->select([
             'count' => $groupedCount->func()->count('*'),
             $fieldAlias => $field,
-        ])->group($fieldAlias)->distinct(["$fieldAlias"])
+        ])->group($fieldAlias)->distinct(['' . $fieldAlias . ''])
           ->order('count')->toArray();
 
         if ($count) {
-            $queryDetails['fields'] = ["$fieldName"];
+            $queryDetails['fields'] = ['' . $fieldName . ''];
             $queryDetails['limit'] = null;
-            $queryDetails['group'] = "Incidents.$fieldName";
+            $queryDetails['group'] = 'Incidents.' . $fieldName;
             $totalCount = TableRegistry::getTableLocator()->get('Incidents')->find('all', $queryDetails)->count();
 
             return [
@@ -312,14 +302,10 @@ class ReportsTable extends Table
      *
      * @return int Number of Linked reports updated
      */
-    public function setLinkedReportStatus($issueNumber, $status)
+    public function setLinkedReportStatus(string $issueNumber, string $status): int
     {
-        $conditions = [
-            'sourceforge_bug_id' =>  $issueNumber,
-        ];
-        $fields = [
-            'status' => $status,
-        ];
+        $conditions = ['sourceforge_bug_id' => $issueNumber];
+        $fields = ['status' => $status];
 
         return $this->updateAll($fields, $conditions);
     }
@@ -330,7 +316,7 @@ class ReportsTable extends Table
      *
      * @return array the related incidents conditions
      */
-    protected function _relatedIncidentsConditions()
+    protected function relatedIncidentsConditions(): array
     {
         $conditions = [
             ['Incidents.report_id = ' . $this->id],
@@ -349,7 +335,7 @@ class ReportsTable extends Table
      *
      * @return array the related reports conditions
      */
-    protected function _relatedReportsConditions()
+    protected function relatedReportsConditions(): array
     {
         $conditions = [['related_to' => $this->id]];
         $report = $this->get($this->id);

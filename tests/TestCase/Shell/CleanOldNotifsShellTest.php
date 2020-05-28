@@ -19,28 +19,34 @@
 namespace App\Test\TestCase\Shell;
 
 use App\Shell\CleanOldNotifsShell;
+use Cake\Console\ConsoleIo;
 use Cake\TestSuite\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 
 /**
  * App\Shell\CleanOldNotifsShell Test Case
  */
 class CleanOldNotifsShellTest extends TestCase
 {
-
     /**
      * ConsoleIo mock
      *
-     * @var \Cake\Console\ConsoleIo|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConsoleIo|PHPUnit_Framework_MockObject_MockObject
      */
     public $io;
 
     /**
      * Test subject
      *
-     * @var \App\Shell\CleanOldNotifsShell
+     * @var CleanOldNotifsShell
      */
     public $CleanOldNotifs;
 
+    /**
+     * Fixtures.
+     *
+     * @var array
+     */
     public $fixtures = [
         'app.Notifications',
         'app.Developers',
@@ -48,10 +54,8 @@ class CleanOldNotifsShellTest extends TestCase
 
     /**
      * setUp method
-     *
-     * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->io = $this->getMockBuilder('Cake\Console\ConsoleIo')->getMock();
@@ -60,10 +64,8 @@ class CleanOldNotifsShellTest extends TestCase
 
     /**
      * tearDown method
-     *
-     * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->CleanOldNotifs);
 
@@ -72,17 +74,13 @@ class CleanOldNotifsShellTest extends TestCase
 
     /**
      * Test main method
-     *
-     * @return void
      */
-    public function testMain()
+    public function testMain(): void
     {
         // Call intialize method to load the models
         $this->CleanOldNotifs->initialize();
 
-        $conditions = [
-            'developer_id' => 1,
-        ];
+        $conditions = ['developer_id' => 1];
         $currentNotificationCount
             = $this->CleanOldNotifs->Notifications->find('all')->where($conditions)->count();
         $this->assertEquals(2, $currentNotificationCount);

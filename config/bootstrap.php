@@ -40,8 +40,8 @@ use Cake\Http\ServerRequest;
 use Cake\Log\Log;
 use Cake\Mailer\Email;
 use Cake\Mailer\TransportFactory;
-use Cake\Utility\Inflector;
 use Cake\Utility\Security;
+use Detection\MobileDetect;
 
 /**
  * Uncomment block of code below if you want to use `.env` file during development.
@@ -71,7 +71,7 @@ use Cake\Utility\Security;
 try {
     Configure::config('default', new PhpConfig());
     Configure::load('app', 'default', false);
-} catch (\Exception $e) {
+} catch (Throwable $e) {
     exit($e->getMessage() . "\n");
 }
 
@@ -163,13 +163,13 @@ Security::setSalt(Configure::consume('Security.salt'));
 /*
  * Setup detectors for mobile and tablet.
  */
-ServerRequest::addDetector('mobile', function ($request) {
-    $detector = new \Detection\MobileDetect();
+ServerRequest::addDetector('mobile', static function ($request) {
+    $detector = new MobileDetect();
 
     return $detector->isMobile();
 });
-ServerRequest::addDetector('tablet', function ($request) {
-    $detector = new \Detection\MobileDetect();
+ServerRequest::addDetector('tablet', static function ($request) {
+    $detector = new MobileDetect();
 
     return $detector->isTablet();
 });

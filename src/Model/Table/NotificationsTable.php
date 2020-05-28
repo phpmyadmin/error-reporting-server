@@ -18,9 +18,12 @@
 
 namespace App\Model\Table;
 
-use Cake\Model\Model;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
+use InvalidArgumentException;
+use function date;
+use function is_int;
+use function time;
 
 /**
  * Notification Model.
@@ -61,9 +64,9 @@ class NotificationsTable extends Table
      * belongsTo associations.
      *
      * @param array $config Config array
-     * @return void
+     * @return void Nothing
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         $this->belongsTo('Reports', [
             'className' => 'Reports',
@@ -76,12 +79,12 @@ class NotificationsTable extends Table
      *
      * @param int $report_id id of the new Report
      *
-     * @return bool value. True on success. False on any type of failure.
+     * @return bool|object value. True on success. False on any type of failure.
      */
-    public static function addNotifications($report_id)
+    public static function addNotifications(int $report_id)
     {
         if (! is_int($report_id)) {
-            throw new \InvalidArgumentException('Invalid Argument "$report_id"! Integer Expected.');
+            throw new InvalidArgumentException('Invalid Argument "$report_id"! Integer Expected.');
         }
         $devs = TableRegistry::getTableLocator()->get('Developers')->find('all');
         $notoficationTable = TableRegistry::getTableLocator()->get('Notifications');

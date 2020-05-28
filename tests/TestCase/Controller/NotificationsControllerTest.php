@@ -4,6 +4,7 @@ namespace App\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
+use function json_decode;
 
 /**
  * NotificationsController Test Case.
@@ -22,13 +23,13 @@ class NotificationsControllerTest extends IntegrationTestCase
         'app.Incidents',
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->Notifications = TableRegistry::getTableLocator()->get('Notifications');
         $this->session(['Developer.id' => 1, 'read_only' => true]);
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->get('notifications');
 
@@ -36,7 +37,7 @@ class NotificationsControllerTest extends IntegrationTestCase
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
     }
 
-    public function testMassAction()
+    public function testMassAction(): void
     {
         $this->session(['Developer.id' => 1, 'read_only' => false]);
 
@@ -55,12 +56,9 @@ class NotificationsControllerTest extends IntegrationTestCase
         $this->assertInstanceOf('Cake\ORM\Query', $notifications);
         $actual = $notifications->hydrate(false)->toArray();
         $expected = [
-            [
-                'id' => '2',
-            ],
+            ['id' => '2'],
         ];
         $this->assertEquals($actual, $expected);
-
 
         /* Test case 2 */
         $this->post(
@@ -75,7 +73,7 @@ class NotificationsControllerTest extends IntegrationTestCase
         $this->assertEquals($actual, $expected);
     }
 
-    public function testDataTables()
+    public function testDataTables(): void
     {
         $this->session(['Developer.id' => 1, 'read_only' => false]);
 

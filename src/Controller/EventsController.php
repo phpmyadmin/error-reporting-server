@@ -20,16 +20,22 @@ namespace App\Controller;
 
 use Cake\Core\Configure;
 use Cake\Event\Event;
+use Cake\Http\Response;
+use Cake\Http\ServerRequest;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
+use function count;
+use function explode;
+use function file_get_contents;
+use function hash_hmac;
+use function strpos;
 
 /**
  * Events controller Github webhook events
  */
 class EventsController extends AppController
 {
-
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
         $this->loadComponent('Csrf');
@@ -37,18 +43,19 @@ class EventsController extends AppController
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
-    public function beforeFilter(Event $event)
+    public function beforeFilter(Event $event): void
     {
         $this->eventManager()->off($this->Csrf);
     }
 
-    public function index()
+    public function index(): ?Response
     {
         // Only allow POST requests
         $this->request->allowMethod(['post']);
 
         // Validate request
-        if (($statusCode = $this->_validateRequest($this->request)) !== 201) {
+        $statusCode = $this->validateRequest($this->request);
+        if ($statusCode !== 201) {
             Log::error(
                 'Could not validate the request. Sending a '
                     . $statusCode . ' response.'
@@ -59,7 +66,9 @@ class EventsController extends AppController
             $this->response->statusCode($statusCode);
 
             return $this->response;
-        } elseif ($statusCode === 200) {
+        }
+
+        if ($statusCode === 200) {
            // Send a success response to ping event
             $this->auto_render = false;
             $this->response->statusCode($statusCode);
@@ -75,9 +84,9 @@ class EventsController extends AppController
             || $eventAction === 'opened'
             || $eventAction === 'reopened'
         ) {
-            $status = $this->_getAppropriateStatus($eventAction);
-
-            if (($reportsUpdated = $this->Reports->setLinkedReportStatus($issueNumber, $status)) > 0) {
+            $status = $this->getAppropriateStatus($eventAction);
+            $reportsUpdated = $this->Reports->setLinkedReportStatus($issueNumber, $status);
+            if ($reportsUpdated > 0) {
                 Log::debug(
                     $reportsUpdated . ' linked reports to issue number '
                         . $issueNumber . ' were updated according to received action '
@@ -105,15 +114,14 @@ class EventsController extends AppController
         return $this->response;
     }
 
-
     /**
      * Validate HTTP Request received
      *
-     * @param \Cake\Http\Client\Request $request Request object
+     * @param ServerRequest $request Request object
      *
      * @return int status code based on if this is a valid request
      */
-    protected function _validateRequest($request)
+    protected function validateRequest(ServerRequest $request): int
     {
         // Default $statusCode
         $statusCode = 201;
@@ -132,7 +140,7 @@ class EventsController extends AppController
             }
         }
 
-        $expectedHash = $this->_getHash(file_get_contents('php://input'), $algo);
+        $expectedHash = $this->getHash(file_get_contents('php://input'), $algo);
 
         if ($userAgent !== null && strpos($userAgent, 'GitHub-Hookshot') !== 0) {
             // Check if the User-agent is Github
@@ -142,20 +150,22 @@ class EventsController extends AppController
                 'Invalid User agent: ' . $userAgent
                 . '. Ignoring the event.'
             );
-            $statusCode = 403;
 
-            return $statusCode;
-        } elseif ($eventType !== null && $eventType === 'ping') {
+            return 403;
+        }
+
+        if ($eventType !== null && $eventType === 'ping') {
             // Check if the request is based on 'issues' event
             // Otherwise, Send a '400: Bad Request'
 
             Log::info(
                 'Ping event type received.'
             );
-            $statusCode = 200;
 
-            return $statusCode;
-        } elseif ($eventType !== null && $eventType !== 'issues') {
+            return 200;
+        }
+
+        if ($eventType !== null && $eventType !== 'issues') {
             // Check if the request is based on 'issues' event
             // Otherwise, Send a '400: Bad Request'
 
@@ -163,10 +173,11 @@ class EventsController extends AppController
                 'Unexpected event type: ' . $eventType
                 . '. Ignoring the event.'
             );
-            $statusCode = 400;
 
-            return $statusCode;
-        } elseif ($receivedHash !== $expectedHash) {
+            return 400;
+        }
+
+        if ($receivedHash !== $expectedHash) {
             // Check if hash matches
             // Otherwise, Send a '401: Unauthorized'
 
@@ -175,9 +186,8 @@ class EventsController extends AppController
                 . ' expected hash ' . $expectedHash
                 . '. Ignoring the event.'
             );
-            $statusCode = 401;
 
-            return $statusCode;
+            return 401;
         }
 
         return $statusCode;
@@ -191,7 +201,7 @@ class EventsController extends AppController
      *
      * @return string Hmac Digest-based hash of payload
      */
-    protected function _getHash($payload, $algo)
+    protected function getHash(string $payload, string $algo): string
     {
         if ($algo === '') {
             return '';
@@ -208,7 +218,7 @@ class EventsController extends AppController
      *
      * @return string Appropriate new status for the related reports
      */
-    protected function _getAppropriateStatus($action)
+    protected function getAppropriateStatus(string $action): string
     {
         $status = 'forwarded';
 

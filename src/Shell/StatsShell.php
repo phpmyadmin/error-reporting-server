@@ -20,20 +20,21 @@ namespace App\Shell;
 
 use Cake\Cache\Cache;
 use Cake\Console\Shell;
+use function json_encode;
 
 /**
  * Stats shell.
  */
 class StatsShell extends Shell
 {
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
         $this->loadModel('Incidents');
         $this->loadModel('Reports');
     }
 
-    public function main()
+    public function main(): void
     {
         foreach ($this->Incidents->filterTimes as $filter_string => $filter) {
             foreach ($this->Incidents->summarizableFields as $field) {

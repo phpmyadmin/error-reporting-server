@@ -20,20 +20,14 @@
  *
  * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Controller;
 
-use App\Controller\AppController;
 use Cake\Event\Event;
 
 class ErrorController extends AppController
 {
-
-    public function beforeFilter(Event $event)
-    {
-        parent::beforeFilter($event);
-    }
-
-    public function beforeRender(Event $event)
+    public function beforeRender(Event $event): void
     {
         parent::beforeRender($event);
         $this->viewBuilder()->templatePath('Error');

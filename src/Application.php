@@ -12,14 +12,18 @@
  * @since     3.3.0
  * @license   https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace App;
 
 use Cake\Core\Configure;
 use Cake\Core\Exception\MissingPluginException;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Http\BaseApplication;
+use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use DebugKit\Plugin;
+use const PHP_SAPI;
 
 /**
  * Application setup class.
@@ -31,6 +35,7 @@ class Application extends BaseApplication
 {
     /**
      * {@inheritDoc}
+     *
      * @return void
      */
     public function bootstrap()
@@ -47,7 +52,7 @@ class Application extends BaseApplication
          * Debug Kit should not be installed on a production system
          */
         if (Configure::read('debug')) {
-            $this->addPlugin(\DebugKit\Plugin::class);
+            $this->addPlugin(Plugin::class);
         }
 
         // Load more plugins here
@@ -56,10 +61,10 @@ class Application extends BaseApplication
     /**
      * Setup the middleware queue your application will use.
      *
-     * @param \Cake\Http\MiddlewareQueue $middlewareQueue The middleware queue to setup.
-     * @return \Cake\Http\MiddlewareQueue The updated middleware queue.
+     * @param MiddlewareQueue $middlewareQueue The middleware queue to setup.
+     * @return MiddlewareQueue The updated middleware queue.
      */
-    public function middleware($middlewareQueue)
+    public function middleware($middlewareQueue)// phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint, SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint
     {
         $middlewareQueue
             // Catch any exceptions in the lower layers,
@@ -82,10 +87,7 @@ class Application extends BaseApplication
         return $middlewareQueue;
     }
 
-    /**
-     * @return void
-     */
-    protected function bootstrapCli()
+    protected function bootstrapCli(): void
     {
         try {
             $this->addPlugin('Bake');

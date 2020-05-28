@@ -9,6 +9,11 @@ use Cake\TestSuite\Fixture\TestFixture;
 
 class IncidentsFixture extends TestFixture
 {
+    /**
+     * Imports.
+     *
+     * @var array
+     */
     public $import = ['table' => 'incidents'];
 
     /**

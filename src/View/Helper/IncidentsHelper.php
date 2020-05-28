@@ -18,39 +18,50 @@
 
 namespace App\View\Helper;
 
-use App\View\Helper\AppHelper;
-use Cake\View\View;
+use function count;
+use function gettype;
+use function htmlspecialchars;
+use function implode;
+use function is_string;
+use function json_decode;
+use function strlen;
+use function substr;
 
 /**
  * Incidents View helper.
  */
 class IncidentsHelper extends AppHelper
 {
-    public function __construct(View $view, $settings = [])
-    {
-        parent::__construct($view, $settings);
-    }
-
-    public function createIncidentsLinks($incidents)
+    /**
+     * @param mixed $incidents
+     * @return string comma separated list
+     */
+    public function createIncidentsLinks($incidents): string
     {
         $links = [];
         foreach ($incidents as $incident) {
             $links[] = $this->linkToIncident($incident);
         }
-        $string = implode(', ', $links);
 
-        return $string;
+        return implode(', ', $links);
     }
 
-    public function linkToIncident($incident)
+    /**
+     * @param mixed $incident The incident
+     * @return string HTML <a> code
+     */
+    public function linkToIncident($incident): string
     {
         $incidentId = $incident['id'];
-        $link = "<a href='/" . BASE_DIR . "incidents/view/$incidentId'>#$incidentId</a>";
 
-        return $link;
+        return '<a href="/' . BASE_DIR . 'incidents/view/' . $incidentId . '">#' . $incidentId . '</a>';
     }
 
-    public function incidentsDescriptions($incidents)
+    /**
+     * @param mixed $incidents The incidents
+     * @return string HTML code
+     */
+    public function incidentsDescriptions($incidents): string
     {
         $descriptions = '';
         foreach ($incidents as $incident) {
@@ -65,10 +76,15 @@ class IncidentsHelper extends AppHelper
         return $descriptions;
     }
 
-    public function getStacktrace($incident, $divClass)
+    /**
+     * @param mixed  $incident The incident
+     * @param stirng $divClass A class for the div
+     * @return string HTML code
+     */
+    public function getStacktrace($incident, string $divClass): string
     {
         $html = '';
-        $html .= "<div class='$divClass'>";
+        $html .= '<div class="' . $divClass . '">';
 
         if (is_string($incident['stacktrace'])) {
             $incident['stacktrace'] =
@@ -76,8 +92,8 @@ class IncidentsHelper extends AppHelper
         }
 
         foreach ($incident['stacktrace'] as $level) {
-            $exception_type = (($incident['exception_type']) ? ('php') : ('js'));
-            $html .= $this->_getStackLevelInfo($level, $exception_type);
+            $exception_type = ($incident['exception_type'] ? 'php' : 'js');
+            $html .= $this->getStackLevelInfo($level, $exception_type);
             $html .= "<pre class='brush: "
                 . $exception_type
                 . '; tab-size: 2';
@@ -91,9 +107,9 @@ class IncidentsHelper extends AppHelper
             }
             $html .= "'>";
 
-            if ($exception_type == 'js') {
+            if ($exception_type === 'js') {
                 if (isset($level['context'])) {
-                    $html .= htmlspecialchars(join("\n", $level['context']));
+                    $html .= htmlspecialchars(implode("\n", $level['context']));
                 }
             } else {
                 $html .= htmlspecialchars($level['function']);
@@ -120,10 +136,15 @@ class IncidentsHelper extends AppHelper
         return $html;
     }
 
-    protected function _getStackLevelInfo($level, $exception_type = 'js')
+    /**
+     * @param mixed  $level          The level
+     * @param string $exception_type The execption type (php/js)
+     * @return string HTML code
+     */
+    protected function getStackLevelInfo($level, string $exception_type = 'js'): string
     {
         $html = '<span>';
-        if ($exception_type == 'js') {
+        if ($exception_type === 'js') {
             $elements = [
                 'filename',
                 'scriptname',
@@ -140,9 +161,11 @@ class IncidentsHelper extends AppHelper
             ];
         }
         foreach ($elements as $element) {
-            if (isset($level[$element])) {
-                $html .= "$element: " . $level[$element] . '; ';
+            if (! isset($level[$element])) {
+                continue;
             }
+
+            $html .= $element . ': ' . $level[$element] . '; ';
         }
         $html .= '</span>';
 

@@ -15,9 +15,10 @@
  *
  * @see      https://www.phpmyadmin.net/
  */
+
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\DevelopersTable;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
@@ -26,29 +27,24 @@ use Cake\TestSuite\TestCase;
  */
 class DevelopersTableTest extends TestCase
 {
-
     /**
      * Test subject
      *
-     * @var \App\Model\Table\DevelopersTable
+     * @var DevelopersTable
      */
     public $Developers;
 
     /**
-     * Fixtures
+     * Fixtures.
      *
      * @var array
      */
-    public $fixtures = [
-        'app.Developers'
-    ];
+    public $fixtures = ['app.Developers'];
 
     /**
      * setUp method
-     *
-     * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->Developers = TableRegistry::getTableLocator()->get('Developers');
@@ -56,10 +52,8 @@ class DevelopersTableTest extends TestCase
 
     /**
      * tearDown method
-     *
-     * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Developers);
 
@@ -68,17 +62,15 @@ class DevelopersTableTest extends TestCase
 
     /**
      * Test saveFromGithub method
-     *
-     * @return void
      */
-    public function testSaveFromGithub()
+    public function testSaveFromGithub(): void
     {
         $i = 0;
         while (1) {
             try {
                 $i++;
                 $savedDeveloper = $this->Developers->get($i);
-            } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+            } catch (RecordNotFoundException $e) {
                 break;
             }
         }

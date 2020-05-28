@@ -1,42 +1,50 @@
 <?php
+
 namespace App\Test\TestCase\Shell;
 
 use App\Shell\SyncGithubIssueStatesShell;
+use Cake\Console\ConsoleIo;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+use phpmock\phpunit\PHPMock;
+use PHPUnit_Framework_MockObject_MockObject;
+use const DS;
+use function file_get_contents;
+use function json_decode;
+use function json_encode;
 
 /**
  * App\Shell\SyncGithubIssueStatesShell Test Case
  */
 class SyncGithubIssueStatesShellTest extends TestCase
 {
-
-    use \phpmock\phpunit\PHPMock;
+    use PHPMock;
 
     /**
      * ConsoleIo mock
      *
-     * @var \Cake\Console\ConsoleIo|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConsoleIo|PHPUnit_Framework_MockObject_MockObject
      */
     public $io;
 
     /**
      * Test subject
      *
-     * @var \App\Shell\SyncGithubIssueStatesShell
+     * @var SyncGithubIssueStatesShell
      */
     public $SyncGithubIssueStates;
 
-    public $fixtures = [
-        'app.Reports',
-    ];
+    /**
+     * Fixtures.
+     *
+     * @var array
+     */
+    public $fixtures = ['app.Reports'];
 
     /**
      * setUp method
-     *
-     * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->io = $this->getMockBuilder('Cake\Console\ConsoleIo')->getMock();
@@ -46,10 +54,8 @@ class SyncGithubIssueStatesShellTest extends TestCase
 
     /**
      * tearDown method
-     *
-     * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->SyncGithubIssueStates);
 
@@ -58,10 +64,8 @@ class SyncGithubIssueStatesShellTest extends TestCase
 
     /**
      * Test main method
-     *
-     * @return void
      */
-    public function testMain()
+    public function testMain(): void
     {
         // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
         // so that we don't actually hit the Github Api
@@ -90,9 +94,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
             [
                 'conditions' => [
                     'sourceforge_bug_id IS NOT NULL',
-                    'NOT' => [
-                        'status' => 'resolved',
-                    ]
+                    'NOT' => ['status' => 'resolved'],
                 ],
             ]
         );
@@ -106,9 +108,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
             [
                 'conditions' => [
                     'sourceforge_bug_id IS NOT NULL',
-                    'NOT' => [
-                        'status' => 'resolved',
-                    ]
+                    'NOT' => ['status' => 'resolved'],
                 ],
             ]
         );
@@ -120,7 +120,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
             [
                 'conditions' => [
                     'sourceforge_bug_id IS NOT NULL',
-                    'status' => 'resolved'
+                    'status' => 'resolved',
                 ],
             ]
         );

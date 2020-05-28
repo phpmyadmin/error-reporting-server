@@ -18,20 +18,24 @@
 
 namespace App\Test\TestCase\Controller;
 
-use App\Controller\GithubController;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestCase;
+use phpmock\phpunit\PHPMock;
+use const DS;
+use function file_get_contents;
+use function json_decode;
+use function json_encode;
 
 /**
  * App\Controller\GithubController Test Case
  */
 class GithubControllerTest extends IntegrationTestCase
 {
+    use PHPMock;
 
-    use \phpmock\phpunit\PHPMock;
     /**
-     * Fixtures
+     * Fixtures.
      *
      * @var array
      */
@@ -42,7 +46,7 @@ class GithubControllerTest extends IntegrationTestCase
         'app.Notifications',
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->session(['Developer.id' => 1, 'access_token' => 'abc']);
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
@@ -50,10 +54,8 @@ class GithubControllerTest extends IntegrationTestCase
 
     /**
      * Test create_issue method
-     *
-     * @return void
      */
-    public function testCreateIssue()
+    public function testCreateIssue(): void
     {
         // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
         // so that we don't actually hit the Github Api
@@ -87,7 +89,7 @@ class GithubControllerTest extends IntegrationTestCase
                 'summary' => 'Error testing',
                 'milestone' => '3.8',
                 'description' => 'Lorem ipsum dolor sit amet',
-                'labels' => 'test-pma'
+                'labels' => 'test-pma',
             ]
         );
 
@@ -108,7 +110,7 @@ class GithubControllerTest extends IntegrationTestCase
                 'summary' => 'Error testing',
                 'milestone' => '3.8',
                 'description' => 'Lorem ipsum dolor sit amet',
-                'labels' => 'test-pma'
+                'labels' => 'test-pma',
             ]
         );
 
@@ -119,10 +121,8 @@ class GithubControllerTest extends IntegrationTestCase
 
     /**
      * Test link_issue method
-     *
-     * @return void
      */
-    public function testLinkIssue()
+    public function testLinkIssue(): void
     {
         // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
         // so that we don't actually hit the Github Api
@@ -194,10 +194,8 @@ class GithubControllerTest extends IntegrationTestCase
 
     /**
      * Test unlink_issue method
-     *
-     * @return void
      */
-    public function testUnlinkIssue()
+    public function testUnlinkIssue(): void
     {
         // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
         // so that we don't actually hit the Github Api
@@ -256,10 +254,8 @@ class GithubControllerTest extends IntegrationTestCase
 
     /**
      * Test sync_issue_status method
-     *
-     * @return void
      */
-    public function testSyncIssueStatus()
+    public function testSyncIssueStatus(): void
     {
         // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
         // so that we don't actually hit the Github Api

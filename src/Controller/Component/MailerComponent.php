@@ -19,9 +19,9 @@
 namespace App\Controller\Component;
 
 use Cake\Controller\Component;
-use Cake\ORM\TableRegistry;
-use Cake\Mailer\Email;
 use Cake\Core\Configure;
+use Cake\Mailer\Email;
+use function sprintf;
 
 /**
  * Mailer component handling report notification emails.
@@ -33,9 +33,9 @@ class MailerComponent extends Component
      *
      * @param array $viewVars Array of View Variables
      *
-     * @return boolean if Email was sent
+     * @return bool if Email was sent
      */
-    public function sendReportMail($viewVars)
+    public function sendReportMail(array $viewVars): bool
     {
         $email = new Email('default');
         $emailTo = Configure::read('NotificationEmailsTo');

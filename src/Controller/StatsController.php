@@ -20,23 +20,27 @@ namespace App\Controller;
 
 use Cake\Cache\Cache;
 use Cake\ORM\TableRegistry;
+use function json_decode;
+use function json_encode;
 
 /**
  * Stats controller handling stats preview.
  */
 class StatsController extends AppController
 {
+    /** @var string[] */
     public $uses = [
         'Report',
         'Incident',
         'Notification',
     ];
 
+    /** @var string[] */
     public $helper = ['Reports'];
 
-    public function stats()
+    public function stats(): void
     {
-        $filter = $this->_getTimeFilter();
+        $filter = $this->getTimeFilter();
         $relatedEntries = [];
         $filter_string = $this->request->query('filter');
         if (! $filter_string) {
@@ -45,7 +49,8 @@ class StatsController extends AppController
         $entriesWithCount = [];
         //Cache::clear(false);
         foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
-            if (($entriesWithCount = Cache::read($field . '_' . $filter_string)) === false) {
+            $entriesWithCount = Cache::read($field . '_' . $filter_string);
+            if ($entriesWithCount === false) {
                 $entriesWithCount = TableRegistry::getTableLocator()->get('Reports')->
                         getRelatedByField($field, 25, false, false, $filter['limit']);
                 $entriesWithCount = json_encode($entriesWithCount);
@@ -70,8 +75,8 @@ class StatsController extends AppController
         }
 
         TableRegistry::getTableLocator()->get('Incidents')->recursive = -1;
-        $downloadStats = [];
-        if (($downloadStats = Cache::read('downloadStats_' . $filter_string)) === false) {
+        $downloadStats = Cache::read('downloadStats_' . $filter_string);
+        if ($downloadStats === false) {
             $downloadStats = TableRegistry::getTableLocator()->get('Incidents')->find('all', $query);
             $downloadStats->select([
                 'grouped_by' => $filter['group'],
@@ -84,7 +89,10 @@ class StatsController extends AppController
         $this->set('download_stats', json_decode($downloadStats, true));
     }
 
-    protected function _getTimeFilter()
+    /**
+     * @return mixed I am not sure about the type
+     */
+    protected function getTimeFilter()
     {
         if ($this->request->query('filter')) {
             $filter = TableRegistry::getTableLocator()->get('Incidents')->filterTimes[$this->request->query('filter')];

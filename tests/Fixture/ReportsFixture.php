@@ -6,9 +6,17 @@ use Cake\TestSuite\Fixture\TestFixture;
 
 class ReportsFixture extends TestFixture
 {
+    /** @var string */
     public $connection = 'test';
+
+    /**
+     * Imports.
+     *
+     * @var array
+     */
     public $import = ['table' => 'reports'];
 
+    /** @var array */
     public $records = [
         [
             'id' => 1,

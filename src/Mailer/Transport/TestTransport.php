@@ -5,20 +5,21 @@ namespace App\Mailer\Transport;
 use Cake\Core\Configure;
 use Cake\Mailer\AbstractTransport;
 use Cake\Mailer\Email;
+use function implode;
+use function trim;
 
 /**
  * Test environment Email Transport
- *
  */
 class TestTransport extends AbstractTransport
 {
     /**
      * Send mail.
      *
-     * @param \Cake\Mailer\Email $email Cake Email
-     * @return array
+     * @param Email $email Cake Email
+     * @return string[]
      */
-    public function send(Email $email)
+    public function send(Email $email): array
     {
         $headers = $email->getHeaders(
             [

@@ -1,9 +1,10 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
 
 class Initial extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $table = $this->table('developers');
         $table
@@ -48,9 +49,7 @@ class Initial extends AbstractMigration
                 'null' => false,
             ])
             ->addIndex(
-                [
-                    'github_id',
-                ],
+                ['github_id'],
                 ['unique' => true]
             )
             ->create();
@@ -142,9 +141,7 @@ class Initial extends AbstractMigration
                 'null' => true,
             ])
             ->addIndex(
-                [
-                    'created',
-                ]
+                ['created']
             )
             ->create();
         $table = $this->table('notifications');
@@ -271,7 +268,7 @@ class Initial extends AbstractMigration
             ->create();
     }
 
-    public function down()
+    public function down(): void
     {
         $this->table('developers')->drop()->save();
         $this->table('incidents')->drop()->save();

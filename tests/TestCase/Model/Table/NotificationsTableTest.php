@@ -4,6 +4,7 @@ namespace App\Test\TestCase\Model\Table;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+use function count;
 
 /**
  * Notification Test Case.
@@ -24,15 +25,14 @@ class NotificationsTableTest extends TestCase
 
     /**
      * setUp method.
-     * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->Notifications = TableRegistry::getTableLocator()->get('Notifications');
     }
 
-    public function testAddNotifications()
+    public function testAddNotifications(): void
     {
         $report_id = 2;
         $developer = TableRegistry::getTableLocator()->get('Developers');

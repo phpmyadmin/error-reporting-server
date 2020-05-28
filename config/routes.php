@@ -18,9 +18,9 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-use Cake\Routing\Router;
-use Cake\Routing\Route\Route;
 use Cake\Routing\Route\InflectedRoute;
+use Cake\Routing\Route\Route;
+use Cake\Routing\Router;
 
 /**
  * The default class to use for all routes
@@ -41,12 +41,11 @@ use Cake\Routing\Route\InflectedRoute;
  *
  * Cache: Routes are cached to improve performance, check the RoutingMiddleware
  * constructor in your `src/Application.php` file to change this behavior.
- *
  */
 Router::defaultRouteClass(Route::class);
 
 
-Router::scope('/', function ($routes) {
+Router::scope('/', static function ($routes): void {
     /**
      * Here, we are connecting '/' (base path) to a controller called 'Pages',
      * its action called 'display', and we pass a param to select the view file

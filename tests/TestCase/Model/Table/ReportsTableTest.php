@@ -4,9 +4,15 @@ namespace App\Test\TestCase\Model\Table;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+use function count;
 
 class ReportsTableTest extends TestCase
 {
+    /**
+     * Fixtures.
+     *
+     * @var array
+     */
     public $fixtures = [
         'app.Notifications',
         'app.Developers',
@@ -14,13 +20,13 @@ class ReportsTableTest extends TestCase
         'app.Incidents',
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
-    public function testGetIncidents()
+    public function testGetIncidents(): void
     {
         $this->Reports->id = 4;
         $incidents = $this->Reports->getIncidents();
@@ -45,9 +51,9 @@ class ReportsTableTest extends TestCase
     //}
 
     /**
-     * @return void
+     * Test for getIncidentsWithDescription
      */
-    public function testGetIncidentsWithDescription()
+    public function testGetIncidentsWithDescription(): void
     {
         $this->Reports->id = 4;
         $incidents = $this->Reports->getIncidentsWithDescription();
@@ -56,7 +62,7 @@ class ReportsTableTest extends TestCase
         $this->assertEquals(count($result), 1);
     }
 
-    public function testGetIncidentsWithDifferentStacktrace()
+    public function testGetIncidentsWithDifferentStacktrace(): void
     {
         $this->Reports->id = 4;
         $incidents = $this->Reports->getIncidentsWithDifferentStacktrace();
@@ -74,9 +80,9 @@ class ReportsTableTest extends TestCase
     //    }
 
     /**
-     * @return void
+     * Test for getUrl
      */
-    public function testGetUrl()
+    public function testGetUrl(): void
     {
         $this->Reports->id = 1;
         $this->assertStringEndsWith(
@@ -102,9 +108,9 @@ class ReportsTableTest extends TestCase
     //}
 
     /**
-     * @return void
+     * Test for getRelatedByField
      */
-    public function testGetRelatedByField()
+    public function testGetRelatedByField(): void
     {
         $this->Reports->id = 1;
         $result = $this->Reports->getRelatedByField('php_version');

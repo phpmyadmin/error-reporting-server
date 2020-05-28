@@ -10,22 +10,12 @@ use Cake\TestSuite\Fixture\TestFixture;
 class NotificationsFixture extends TestFixture
 {
     /**
-     * Fields.
+     * Imports.
      *
      * @var array
      */
-    /*public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'unsigned' => false, 'key' => 'primary'),
-        'developer_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'unsigned' => false),
-        'report_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'unsigned' => false),
-        'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'indexes' => array(
-            'PRIMARY' => array('column' => 'id', 'unique' => 1)
-        ),
-        'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_general_ci', 'engine' => 'InnoDB')
-    );*/
     public $import = ['table' => 'notifications'];
+
     /**
      * Records.
      *

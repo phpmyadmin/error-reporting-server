@@ -21,6 +21,9 @@ use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Shell;
 use Cake\Log\Log;
 use Psy\Shell as PsyShell;
+use function class_exists;
+use function restore_error_handler;
+use function restore_exception_handler;
 
 /**
  * Simple console wrapper around Psy\Shell.
@@ -64,9 +67,9 @@ class ConsoleShell extends Shell
     /**
      * Display help for this console.
      *
-     * @return ConsoleOptionParser
+     * @return ConsoleOptionParser The console option
      */
-    public function getOptionParser()
+    public function getOptionParser(): ConsoleOptionParser
     {
         $parser = new ConsoleOptionParser('console', false);
         $parser->setDescription(
