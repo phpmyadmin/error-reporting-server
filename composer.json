@@ -52,7 +52,7 @@
             "@phpcs"
         ],
         "phpcs": "phpcs",
-        "phpcs-fix": "phpcbf",
+        "phpcbf": "phpcbf",
         "test": "phpunit --coverage-clover build/logs/clover.xml -c phpunit.xml.dist --colors=always",
         "phpstan": "phpstan analyse ./src"
     },
