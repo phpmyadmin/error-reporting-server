@@ -20,6 +20,7 @@ namespace App\Model\Table;
 
 use Cake\Log\Log;
 use Cake\Model\Model;
+use Cake\ORM\Entity;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use function array_merge;
@@ -269,9 +270,9 @@ class IncidentsTable extends Table
      *                         Integer $index: for php exception type
      * @param int   $index     The report index
      *
-     * @return object|null the first similar report or null
+     * @return Entity|null the first similar report or null
      */
-    protected function getClosestReport(array $bugReport, int $index = 0): ?object
+    protected function getClosestReport(array $bugReport, int $index = 0): ?Entity
     {
         if (isset($bugReport['exception_type'])
             && $bugReport['exception_type'] === 'php'
