@@ -123,7 +123,7 @@ class IncidentsHelper extends AppHelper
                             . $arg;
                         $argList .= ',';
                     }
-                    $argList = substr($argList, 0, (strlen($argList) - 1));
+                    $argList = substr($argList, 0, strlen($argList) - 1);
                     $argList .= "\n";
                 }
                 $html .= htmlspecialchars($argList);
