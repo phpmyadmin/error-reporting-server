@@ -1,15 +1,19 @@
 <?php
 
-?> "
+use Cake\Routing\Router;
+
+$reportsUrl = Router::url(
+    [
+        'controller' => 'reports',
+        'action' => 'data_tables',
+    ]
+);
+?>
+<h1>Reports</h1>
+<form class="form-inline" id="state-form"
+        action=" <?= Router::url('/reports/mass_action/'); ?> "
         method="post">
-    <table id="reports_table" data-ajax-url="<?=
-            Router::url(
-                [
-                    'controller' => 'reports',
-                    'action' => 'data_tables',
-                ]
-            );
-?>">
+    <table id="reports_table" data-ajax-url="<?= $reportsUrl ?>">
         <thead>
             <tr>
                 <th>Select</th>

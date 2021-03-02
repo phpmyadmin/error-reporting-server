@@ -158,8 +158,8 @@ class ReportsController extends AppController
             'inci_count' => 'inci_count',
         ];
 
-        $searchConditions = $this->OrderSearch->getSearchConditions($aColumns);
-        $orderConditions = $this->OrderSearch->getOrder($aColumns);
+        $searchConditions = $this->OrderSearch->getSearchConditions($aColumns, $this->request);
+        $orderConditions = $this->OrderSearch->getOrder($aColumns, $this->request);
 
         $params = [
             'fields' => $aColumns,

@@ -81,8 +81,8 @@ class NotificationsController extends AppController
             'created_time' => 'Notifications.created',
         ];
 
-        $orderConditions = $this->OrderSearch->getOrder($aColumns);
-        $searchConditions = $this->OrderSearch->getSearchConditions($aColumns);
+        $orderConditions = $this->OrderSearch->getOrder($aColumns, $this->request);
+        $searchConditions = $this->OrderSearch->getSearchConditions($aColumns, $this->request);
 
         $aColumns['id'] = 'Notifications.id';
         $params = [

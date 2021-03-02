@@ -20,6 +20,8 @@
 namespace App\Controller\Component;
 
 use Cake\Controller\Component;
+use Cake\Http\ServerRequest;
+
 use function array_keys;
 use function count;
 use function intval;
@@ -37,16 +39,16 @@ class OrderSearchComponent extends Component
      *
      * @return array
      */
-    public function getSearchConditions(array $aColumns): array
+    public function getSearchConditions(array $aColumns, ServerRequest $request): array
     {
         $searchConditions = ['OR' => []];
         $keys = array_keys($aColumns);
         $columnsCount = count($aColumns);
 
-        $sSearch = $this->request->getQuery('sSearch');
+        $sSearch = $request->getQuery('sSearch');
         if ($sSearch !== '' && $sSearch !== null) {
             for ($i = 0; $i < $columnsCount; ++$i) {
-                if ($this->request->getQuery('bSearchable_' . ($i + 1)) !== 'true') {
+                if ($request->getQuery('bSearchable_' . ($i + 1)) !== 'true') {
                     continue;
                 }
 
@@ -56,7 +58,7 @@ class OrderSearchComponent extends Component
 
         /* Individual column filtering */
         for ($i = 0; $i < $columnsCount; ++$i) {
-            $searchTerm = $this->request->getQuery('sSearch_' . ($i + 1));
+            $searchTerm = $request->getQuery('sSearch_' . ($i + 1));
             if ($searchTerm === '' || $searchTerm === null) {
                 continue;
             }
@@ -72,19 +74,19 @@ class OrderSearchComponent extends Component
      *
      * @return array|null
      */
-    public function getOrder(array $aColumns): ?array
+    public function getOrder(array $aColumns, ServerRequest $request): ?array
     {
-        if ($this->request->getQuery('iSortCol_0') !== null) {
+        if ($request->getQuery('iSortCol_0') !== null) {
             $order = [];
             //Seems like we need to sort with only one column each time, so no need to loop
-            $sort_column_index = intval($this->request->getQuery('iSortCol_0'));
+            $sort_column_index = intval($request->getQuery('iSortCol_0'));
 
             $keys = array_keys($aColumns);
 
             if ($sort_column_index > 0
-                && $this->request->getQuery('bSortable_' . $sort_column_index) === 'true'
+                && $request->getQuery('bSortable_' . $sort_column_index) === 'true'
             ) {
-                $order[$aColumns[$keys[$sort_column_index - 1]]] = $this->request->getQuery('sSortDir_0');
+                $order[$aColumns[$keys[$sort_column_index - 1]]] = $request->getQuery('sSortDir_0');
             }
 
             return $order;
