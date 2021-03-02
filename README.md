@@ -1,7 +1,7 @@
 phpMyAdmin's Error Reporting Server
 ===================================
 
-[![Build Status](https://travis-ci.org/phpmyadmin/error-reporting-server.png?branch=master)](https://travis-ci.org/phpmyadmin/error-reporting-server)
+[![Test-suite](https://github.com/phpmyadmin/error-reporting-server/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/phpmyadmin/error-reporting-server/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/phpmyadmin/error-reporting-server/branch/master/graph/badge.svg)](https://codecov.io/gh/phpmyadmin/error-reporting-server)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/badges/quality-score.png?s=9d696be27235e042548ad09e1002841b532ee6bb)](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/)
 
