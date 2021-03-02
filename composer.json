@@ -52,7 +52,7 @@
         ],
         "phpcs": "phpcs",
         "phpcbf": "phpcbf",
-        "test": "phpunit --coverage-clover build/logs/clover.xml -c phpunit.xml.dist --colors=always",
+        "test": "phpunit",
         "phpstan": "phpstan analyse ./src"
     },
     "prefer-stable": true,
