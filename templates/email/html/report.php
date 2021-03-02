@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Report Notification Email Template
  *
@@ -14,11 +15,9 @@
  *
  * @see          https://www.phpmyadmin.net/
  */
-?>
-<?php
+use Cake\Routing\Router;
 
 ?>
-
 <p>
     A new error report has been added on the phpMyAdmin's Error Reporting System.
 </p>
@@ -160,6 +159,9 @@
 
 <p>
     You can view the detailed report at
-    <a href="<?= Router::url('/reports/view/' . $report['id'], true) ?>">
+    <a href="<?= Router::url([
+    '_name' => 'reports:view',
+    'id' => $report['id'],
+], true) ?>">
         #<?= $report['id'] ?></a>.
 </p>

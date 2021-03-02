@@ -76,7 +76,10 @@ use Cake\Routing\Router;
                 ?>
                 <?=
                     '<form action="'
-                        . Router::url('/github/unlink_issue/', true) . $report[0]['id']
+                        . Router::url([
+                            '_name' => 'github:unlink_issue',
+                            'id' => $report[0]['id'],
+                        ])
                         . '" method="GET" class="form-horizontal" style="margin-bottom:5px;"'
                         . ' onclick="return window.confirm(\'Are you sure you want to unlink this report?\');" >';
                 ?>
@@ -94,19 +97,20 @@ use Cake\Routing\Router;
                     style="width:300px; margin-bottom:5px;">
                     <tr>
                         <td style="min-width:130px;">
-                        <?=
-                            $this->Html->link(
-                                'Create new issue',
-                                '/github/create_issue/' . $report[0]['id'],
-                                ['class' => 'btn btn-primary']
-                            );
+                        <?php
+                            echo Router::url([
+                                '_name' => 'github:create_issue',
+                                'id' => $report[0]['id'],
+                            ]);
                         ?>
                         </td>
                         <td style="min-width:130px;">
                             <?=
                                 '<form action="'
-                                    . Router::url('/', true) . 'github/link_issue/'
-                                    . $report[0]['id'] . '" method="GET" '
+                                    . Router::url([
+                                        '_name' => 'github:link_issue',
+                                        'id' => $report[0]['id'],
+                                    ]) . '" method="GET" '
                                     . 'class="form-horizontal" style="margin-bottom:5px;">';
                             ?>
 

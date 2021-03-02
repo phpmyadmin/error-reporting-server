@@ -200,16 +200,14 @@ class ReportsTable extends Table
      */
     public function getUrl(): string
     {
-        return Router::url(['controller' => 'reports', 'action' => 'view',
-            $this->id,
-        ], true);
+        return Router::url(['_name' => 'reports:view', 'id' => $this->id], true);
     }
 
     /**
      * groups related incidents by distinct values of a field. It may also provide
      * the number of groups, whether to only include incidents that are related
      * to the current report and also to only limit the search to incidents
-     * submited after a certain date.
+     * submitted after a certain date.
      *
      * @param string $fieldName the name of the field to group by
      * @param int    $limit     the max number of groups to return

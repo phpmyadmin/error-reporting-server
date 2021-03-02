@@ -59,6 +59,51 @@ Router::scope('/', static function ($routes): void {
     $routes->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
 
     $routes->connect('/stats', ['controller' => 'Stats', 'action' => 'stats']);
+
+    $routes->connect(
+        '/reports/view/{id}',
+        ['controller' => 'Reports', 'action' => 'view'],
+        ['_name' => 'reports:view']
+    )
+            ->setPass(['id', 'reportId'])
+            ->setPatterns([
+                'id' => '[0-9]+',
+            ]);
+
+    $routes->connect(
+        '/github/sync_issue_status',
+        ['controller' => 'Github', 'action' => 'sync_issue_status']
+    );
+
+    $routes->connect(
+        '/github/create_issue/{id}',
+        ['controller' => 'Github', 'action' => 'create_issue'],
+        ['_name' => 'github:create_issue']
+    )
+            ->setPass(['id', 'reportId'])
+            ->setPatterns([
+                'id' => '[0-9]+',
+            ]);
+
+    $routes->connect(
+        '/github/unlink_issue/{id}',
+        ['controller' => 'Github', 'action' => 'unlink_issue'],
+        ['_name' => 'github:unlink_issue']
+    )
+            ->setPass(['id', 'reportId'])
+            ->setPatterns([
+                'id' => '[0-9]+',
+            ]);
+
+    $routes->connect(
+        '/github/link_issue/{id}',
+        ['controller' => 'Github', 'action' => 'link_issue'],
+        ['_name' => 'github:link_issue']
+    )
+            ->setPass(['id', 'reportId'])
+            ->setPatterns([
+                'id' => '[0-9]+',
+            ]);
     /**
      * Connect catchall routes for all controllers.
      *

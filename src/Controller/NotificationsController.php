@@ -121,9 +121,8 @@ class NotificationsController extends AppController
             $tmp_row[1] = '<a href="'
                 . Router::url(
                     [
-                        'controller' => 'reports',
-                        'action' => 'view',
-                        $row['report_id'],
+                        '_name' => 'reports:view',
+                        'id' => $row['report_id'],
                     ]
                 )
                 . '">'

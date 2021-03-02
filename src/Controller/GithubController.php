@@ -115,8 +115,9 @@ class GithubController extends AppController
             $report->status = $this->getReportStatusFromIssueState($issueDetails['state']);
             $reportsTable->save($report);
 
-            $this->redirect(['controller' => 'reports', 'action' => 'view',
-                $reportId,
+            $this->redirect([
+                '_name' => 'reports:view',
+                'id' => $reportId,
             ]);
         } else {
             $flash_class = 'alert alert-error';
@@ -192,8 +193,9 @@ class GithubController extends AppController
             );
         }
 
-        $this->redirect(['controller' => 'reports', 'action' => 'view',
-            $reportId,
+        $this->redirect([
+            '_name' => 'reports:view',
+            'id' => $reportId,
         ]);
     }
 
@@ -227,8 +229,10 @@ class GithubController extends AppController
         $commentText = 'This Issue is no longer associated with [Report#'
             . $reportId
             . ']('
-            . Router::url('/reports/view/' . $reportId, true)
-            . ')'
+            . Router::url([
+                '_name' => 'reports:view',
+                'id' => $reportId,
+            ], true) . ')'
             . "\n\n*This comment is posted automatically by phpMyAdmin's "
             . '[error-reporting-server](https://reports.phpmyadmin.net).*';
 
@@ -251,8 +255,9 @@ class GithubController extends AppController
             );
         }
 
-        $this->redirect(['controller' => 'reports', 'action' => 'view',
-            $reportId,
+        $this->redirect([
+            '_name' => 'reports:view',
+            'id' => $reportId,
         ]);
     }
 
@@ -302,7 +307,10 @@ class GithubController extends AppController
             . "\n Link | [Report#"
                 . $reportId
                 . ']('
-                . Router::url('/reports/view/' . $reportId, true)
+                . Router::url([
+                    '_name' => 'reports:view',
+                    'id' => $reportId,
+                ], true)
                 . ')'
             . "\n\n*This comment is posted automatically by phpMyAdmin's "
             . '[error-reporting-server](https://reports.phpmyadmin.net).*';
