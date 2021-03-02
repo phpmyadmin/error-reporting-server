@@ -92,7 +92,7 @@ class GithubApiComponent extends Component
         );
         $decodedResponse = $this->sendRequest($url, http_build_query($data), 'POST');
 
-        return $decodedResponse['access_token'];
+        return $decodedResponse['access_token'] ?? null;
     }
 
     /**
