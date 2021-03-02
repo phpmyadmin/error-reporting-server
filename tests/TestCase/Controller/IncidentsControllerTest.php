@@ -37,12 +37,10 @@ class IncidentsControllerTest extends IntegrationTestCase
         $this->get('/incidents/view/1');
 
         $this->assertNotEmpty($this->viewVariable('incident'));
-        $this->assertInternalType(
-            'array',
+        $this->assertIsArray(
             $this->viewVariable('incident')['stacktrace']
         );
-        $this->assertInternalType(
-            'array',
+        $this->assertIsArray(
             $this->viewVariable('incident')['full_report']
         );
     }
@@ -139,6 +137,7 @@ class IncidentsControllerTest extends IntegrationTestCase
         $this->configRequest(['input' => '']);
         $this->post('/incidents/create');
         $result = json_decode($this->_response->getBody(), true);
+        $this->assertNotNull($result);
         $this->assertEquals(false, $result['success']);
 
         // Test invalid Notification email configuration
