@@ -86,7 +86,7 @@ class DevelopersTableTest extends TestCase
             'email' => 'pma-bot@phpmyadmin.net',
             'has_commit_access' => 0,
         ];
-        $developer = $this->Developers->newEntity();
+        $developer = $this->Developers->newEmptyEntity();
         $access_token = 'abc';
 
         $this->Developers->saveFromGithub($githubInfo, $access_token, $developer);

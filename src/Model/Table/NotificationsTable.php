@@ -90,7 +90,7 @@ class NotificationsTable extends Table
         $notoficationTable = TableRegistry::getTableLocator()->get('Notifications');
         $res = true;
         foreach ($devs as $dev) {
-            $notification = $notoficationTable->newEntity();
+            $notification = $notoficationTable->newEmptyEntity();
             $notification->developer_id = $dev['id'];
             $notification->report_id = $report_id;
             $notification->created = date('Y-m-d H:i:s', time());

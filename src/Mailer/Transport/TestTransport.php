@@ -4,8 +4,7 @@ namespace App\Mailer\Transport;
 
 use Cake\Core\Configure;
 use Cake\Mailer\AbstractTransport;
-use Cake\Mailer\Email;
-use function implode;
+use Cake\Mailer\Message;
 use function trim;
 
 /**
@@ -14,14 +13,15 @@ use function trim;
 class TestTransport extends AbstractTransport
 {
     /**
-     * Send mail.
+     * Send mail
      *
-     * @param Email $email Cake Email
-     * @return string[]
+     * @param Message $message Email mesage.
+     * @return array
+     * @psalm-return array{headers: string, message: string}
      */
-    public function send(Email $email): array
+    public function send(Message $message): array
     {
-        $headers = $email->getHeaders(
+        $headers = $message->getHeaders(
             [
                 'from',
                 'sender',
@@ -34,7 +34,7 @@ class TestTransport extends AbstractTransport
             ]
         );
 
-        $message = trim(implode("\r\n", (array) $email->message()));
+        $message = trim($message->getBodyString());
         $result = [
             'headers' => $headers,
             'message' => $message,

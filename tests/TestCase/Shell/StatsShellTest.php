@@ -75,7 +75,7 @@ class StatsShellTest extends TestCase
      */
     public function testMain(): void
     {
-        // Call intialize method to load the models
+        // Call initialize method to load the models
         $this->Stats->initialize();
 
         // Clear the existing cache

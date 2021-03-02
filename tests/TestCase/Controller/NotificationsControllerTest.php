@@ -54,7 +54,7 @@ class NotificationsControllerTest extends IntegrationTestCase
 
         $notifications = $this->Notifications->find('all', ['fields' => ['Notifications.id']]);
         $this->assertInstanceOf('Cake\ORM\Query', $notifications);
-        $actual = $notifications->hydrate(false)->toArray();
+        $actual = $notifications->enableHydration(false)->toArray();
         $expected = [
             ['id' => '2'],
         ];
@@ -68,7 +68,7 @@ class NotificationsControllerTest extends IntegrationTestCase
 
         $notifications = $this->Notifications->find('all', ['fields' => ['Notifications.id']]);
         $this->assertInstanceOf('Cake\ORM\Query', $notifications);
-        $actual = $notifications->hydrate(false)->toArray();
+        $actual = $notifications->enableHydration(false)->toArray();
         $expected = [];
         $this->assertEquals($actual, $expected);
     }
@@ -106,6 +106,6 @@ class NotificationsControllerTest extends IntegrationTestCase
         ];
 
         $this->assertResponseOk();
-        $this->assertEquals($expected, json_decode($this->_response->body(), true));
+        $this->assertEquals($expected, json_decode($this->_response->getBody(), true));
     }
 }

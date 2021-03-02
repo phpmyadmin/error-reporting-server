@@ -78,7 +78,7 @@ class IncidentsHelper extends AppHelper
 
     /**
      * @param mixed  $incident The incident
-     * @param stirng $divClass A class for the div
+     * @param string $divClass A class for the div
      * @return string HTML code
      */
     public function getStacktrace($incident, string $divClass): string

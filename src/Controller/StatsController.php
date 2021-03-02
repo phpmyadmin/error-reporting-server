@@ -28,21 +28,27 @@ use function json_encode;
  */
 class StatsController extends AppController
 {
-    /** @var string[] */
-    public $uses = [
-        'Report',
-        'Incident',
-        'Notification',
-    ];
-
-    /** @var string[] */
-    public $helper = ['Reports'];
+    /**
+     * Initialization hook method.
+     *
+     * Use this method to add common initialization code like loading components.
+     *
+     * @return void Nothing
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->viewBuilder()->setHelpers(['Reports']);
+        $this->loadModel('Notification');
+        $this->loadModel('Incident');
+        $this->loadModel('Report');
+    }
 
     public function stats(): void
     {
         $filter = $this->getTimeFilter();
         $relatedEntries = [];
-        $filter_string = $this->request->query('filter');
+        $filter_string = $this->request->getQuery('filter');
         if (! $filter_string) {
             $filter_string = 'all_time';
         }
@@ -61,7 +67,7 @@ class StatsController extends AppController
         $this->set('related_entries', $relatedEntries);
         $this->set('columns', TableRegistry::getTableLocator()->get('Incidents')->summarizableFields);
         $this->set('filter_times', TableRegistry::getTableLocator()->get('Incidents')->filterTimes);
-        $this->set('selected_filter', $this->request->query('filter'));
+        $this->set('selected_filter', $this->request->getQuery('filter'));
 
         $query = [
             'group' => 'grouped_by',
@@ -94,8 +100,8 @@ class StatsController extends AppController
      */
     protected function getTimeFilter()
     {
-        if ($this->request->query('filter')) {
-            $filter = TableRegistry::getTableLocator()->get('Incidents')->filterTimes[$this->request->query('filter')];
+        if ($this->request->getQuery('filter')) {
+            $filter = TableRegistry::getTableLocator()->get('Incidents')->filterTimes[$this->request->getQuery('filter')];
         }
         if (isset($filter)) {
             return $filter;

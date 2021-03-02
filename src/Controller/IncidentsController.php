@@ -36,12 +36,6 @@ use function json_encode;
  */
 class IncidentsController extends AppController
 {
-    /** @var string[] */
-    public $uses = [
-        'Incident',
-        'Notification',
-    ];
-
     /**
      * Initialization hook method.
      *
@@ -53,6 +47,8 @@ class IncidentsController extends AppController
     {
         parent::initialize();
         $this->loadComponent('Mailer');
+        $this->loadModel('Notification');
+        $this->loadModel('Incident');
     }
 
     public function create(): ?Response
@@ -78,11 +74,9 @@ class IncidentsController extends AppController
             ];
         }
         $this->autoRender = false;
-        $this->response->header([
-            'Content-Type' => 'application/json',
-            'X-Content-Type-Options' => 'nosniff',
-        ]);
-        $this->response->body(
+        $this->response->withHeader('Content-Type', 'application/json');
+        $this->response->withHeader('X-Content-Type-Options', 'nosniff');
+        $this->response->withStringBody(
             json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
 
@@ -113,7 +107,7 @@ class IncidentsController extends AppController
             json_decode($incident['stacktrace'], true);
 
         $this->autoRender = false;
-        $this->response->body(json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $this->response->withStringBody(json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         return $this->response;
     }

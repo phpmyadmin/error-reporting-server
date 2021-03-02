@@ -37,10 +37,10 @@ class NotificationsTableTest extends TestCase
         $report_id = 2;
         $developer = TableRegistry::getTableLocator()->get('Developers');
         $devs = $developer->find('all');
-        $devs = $devs->hydrate(false)->toArray();
+        $devs = $devs->enableHydration(false)->toArray();
         $this->Notifications->addNotifications($report_id);
         $notifs = $this->Notifications->find('all', ['conditions' => ['report_id' => $report_id]]);
-        $notifs = $notifs->hydrate(false)->toArray();
+        $notifs = $notifs->enableHydration(false)->toArray();
         $this->assertEquals(count($notifs), count($devs));
     }
 }

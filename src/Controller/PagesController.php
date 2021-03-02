@@ -45,13 +45,6 @@ class PagesController extends AppController
     public $name = 'Pages';
 
     /**
-     * This controller does not use a model.
-     *
-     * @var array
-     */
-    public $uses = [];
-
-    /**
      * Displays a view.
      *
      * @throws NotFoundException when the view file could not be found

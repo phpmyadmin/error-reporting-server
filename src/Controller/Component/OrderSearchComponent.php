@@ -31,7 +31,7 @@ class OrderSearchComponent extends Component
 {
     /**
      * Indexes are +1'ed because first column is of checkboxes
-     * and hence it should be ingnored.
+     * and hence it should be ignored.
      *
      * @param string[] $aColumns The columns
      *
@@ -43,10 +43,10 @@ class OrderSearchComponent extends Component
         $keys = array_keys($aColumns);
         $columnsCount = count($aColumns);
 
-        $sSearch = $this->request->query('sSearch');
+        $sSearch = $this->request->getQuery('sSearch');
         if ($sSearch !== '' && $sSearch !== null) {
             for ($i = 0; $i < $columnsCount; ++$i) {
-                if ($this->request->query('bSearchable_' . ($i + 1)) !== 'true') {
+                if ($this->request->getQuery('bSearchable_' . ($i + 1)) !== 'true') {
                     continue;
                 }
 
@@ -56,7 +56,7 @@ class OrderSearchComponent extends Component
 
         /* Individual column filtering */
         for ($i = 0; $i < $columnsCount; ++$i) {
-            $searchTerm = $this->request->query('sSearch_' . ($i + 1));
+            $searchTerm = $this->request->getQuery('sSearch_' . ($i + 1));
             if ($searchTerm === '' || $searchTerm === null) {
                 continue;
             }
@@ -74,17 +74,17 @@ class OrderSearchComponent extends Component
      */
     public function getOrder(array $aColumns): ?array
     {
-        if ($this->request->query('iSortCol_0') !== null) {
+        if ($this->request->getQuery('iSortCol_0') !== null) {
             $order = [];
             //Seems like we need to sort with only one column each time, so no need to loop
-            $sort_column_index = intval($this->request->query('iSortCol_0'));
+            $sort_column_index = intval($this->request->getQuery('iSortCol_0'));
 
             $keys = array_keys($aColumns);
 
             if ($sort_column_index > 0
-                && $this->request->query('bSortable_' . $sort_column_index) === 'true'
+                && $this->request->getQuery('bSortable_' . $sort_column_index) === 'true'
             ) {
-                $order[$aColumns[$keys[$sort_column_index - 1]]] = $this->request->query('sSortDir_0');
+                $order[$aColumns[$keys[$sort_column_index - 1]]] = $this->request->getQuery('sSortDir_0');
             }
 
             return $order;

@@ -38,12 +38,6 @@ use function in_array;
  */
 class AppController extends Controller
 {
-    /** @var string[] */
-    public $uses = [
-        'Developer',
-        'Notification',
-    ];
-
     /** @var array */
     public $whitelist = [
         'Developers',
@@ -114,6 +108,8 @@ class AppController extends Controller
     {
         parent::initialize();
         $this->loadComponent('Flash');
+        $this->loadModel('Notification');
+        $this->loadModel('Developers');
         /*  $this->loadComponent(
                 'Auth', [
                     'loginAction' => [
@@ -137,11 +133,12 @@ class AppController extends Controller
         $this->set('current_controller', $controllerName);
         $notif_count = 0;
 
-        if ($this->request->getSession()->read('Developer.id')) {
+        $devId = $this->request->getSession()->read('Developer.id');
+        if ($devId) {
             $this->checkReadonlyAccess();
 
             $current_developer = TableRegistry::getTableLocator()->get('Developers')->
-                    findById($this->request->getSession()->read('Developer.id'))->all()->first();
+                    findById($devId)->all()->first();
 
             $notif_count = TableRegistry::getTableLocator()->get('Notifications')->find(
                 'all',
@@ -170,19 +167,19 @@ class AppController extends Controller
 
     protected function checkAccess(): ?Response
     {
-        $controller = $this->request->controller;
+        $controllerName = $this->request->getParam('controller');
         $action = $this->request->getParam('action');
 
-        if (in_array($controller, $this->whitelist)) {
+        if (in_array($controllerName, $this->whitelist)) {
             return null;
         }
-        if (isset($this->whitelist[$controller])
-            && in_array($action, $this->whitelist[$controller])
+        if (isset($this->whitelist[$controllerName])
+            && in_array($action, $this->whitelist[$controllerName])
         ) {
             return null;
         }
         $flash_class = 'alert';
-        $this->Flash->default(
+        $this->Flash->set(
             'You need to be signed in to do this',
             ['params' => ['class' => $flash_class]]
         );
@@ -218,7 +215,7 @@ class AppController extends Controller
         $this->request->getSession()->write('last_page', '');
 
         $flash_class = 'alert';
-        $this->Flash->default(
+        $this->Flash->set(
             'You need to have commit access on phpmyadmin/phpmyadmin '
             . 'repository on Github.com to do this',
             [

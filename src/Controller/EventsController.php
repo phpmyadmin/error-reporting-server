@@ -45,7 +45,7 @@ class EventsController extends AppController
 
     public function beforeFilter(EventInterface $event)
     {
-        $this->eventManager()->off($this->Csrf);
+        $this->getEventManager()->off($this->Csrf);
     }
 
     public function index(): ?Response
@@ -62,16 +62,16 @@ class EventsController extends AppController
             );
 
             // Send a response
-            $this->auto_render = false;
-            $this->response->statusCode($statusCode);
+            $this->autoRender = false;
+            $this->response->withStatus($statusCode);
 
             return $this->response;
         }
 
         if ($statusCode === 200) {
            // Send a success response to ping event
-            $this->auto_render = false;
-            $this->response->statusCode($statusCode);
+            $this->autoRender = false;
+            $this->response->withStatus($statusCode);
 
             return $this->response;
         }
@@ -108,8 +108,8 @@ class EventsController extends AppController
         }
 
         // Send a response
-        $this->auto_render = false;
-        $this->response->statusCode($statusCode);
+        $this->autoRender = false;
+        $this->response->withStatus($statusCode);
 
         return $this->response;
     }

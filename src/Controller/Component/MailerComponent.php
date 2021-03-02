@@ -20,7 +20,7 @@ namespace App\Controller\Component;
 
 use Cake\Controller\Component;
 use Cake\Core\Configure;
-use Cake\Mailer\Email;
+use Cake\Mailer\Mailer;
 use function sprintf;
 
 /**
@@ -37,7 +37,7 @@ class MailerComponent extends Component
      */
     public function sendReportMail(array $viewVars): bool
     {
-        $email = new Email('default');
+        $email = new Mailer('default');
         $emailTo = Configure::read('NotificationEmailsTo');
         $emailFrom = Configure::read('NotificationEmailsFrom');
         $emailTransport = Configure::read('NotificationEmailsTransport');

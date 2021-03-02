@@ -31,7 +31,7 @@ class ReportsTableTest extends TestCase
         $this->Reports->id = 4;
         $incidents = $this->Reports->getIncidents();
         $this->assertInstanceOf('Cake\ORM\Query', $incidents);
-        $result = $incidents->hydrate(false)->toArray();
+        $result = $incidents->enableHydration(false)->toArray();
         $this->assertEquals(count($result), 2);
 
         //$this->Reports->saveField("related_to", null); TODO: fix related to issue
@@ -58,7 +58,7 @@ class ReportsTableTest extends TestCase
         $this->Reports->id = 4;
         $incidents = $this->Reports->getIncidentsWithDescription();
         $this->assertInstanceOf('Cake\ORM\Query', $incidents);
-        $result = $incidents->hydrate(false)->toArray();
+        $result = $incidents->enableHydration(false)->toArray();
         $this->assertEquals(count($result), 1);
     }
 
@@ -67,7 +67,7 @@ class ReportsTableTest extends TestCase
         $this->Reports->id = 4;
         $incidents = $this->Reports->getIncidentsWithDifferentStacktrace();
         $this->assertInstanceOf('Cake\ORM\Query', $incidents);
-        $result = $incidents->hydrate(false)->toArray();
+        $result = $incidents->enableHydration(false)->toArray();
         $this->assertEquals(count($result), 1);
     }
 
@@ -115,7 +115,7 @@ class ReportsTableTest extends TestCase
         $this->Reports->id = 1;
         $result = $this->Reports->getRelatedByField('php_version');
         $this->assertInstanceOf('Cake\ORM\Query', $result);
-        $result = $result->hydrate(false)->toArray();
+        $result = $result->enableHydration(false)->toArray();
         $expected = [
             [
                 'php_version' => '5.5',
@@ -126,7 +126,7 @@ class ReportsTableTest extends TestCase
         $this->Reports->id = 4;
         $result = $this->Reports->getRelatedByField('php_version', 1);
         $this->assertInstanceOf('Cake\ORM\Query', $result);
-        $result = $result->hydrate(false)->toArray();
+        $result = $result->enableHydration(false)->toArray();
         $expected = [
             [
                 'php_version' => '5.3',
@@ -143,7 +143,7 @@ class ReportsTableTest extends TestCase
             '2013-08-29 18:10:01'
         );
         $this->assertInstanceOf('Cake\ORM\Query', $result);
-        $result = $result->hydrate(false)->toArray();
+        $result = $result->enableHydration(false)->toArray();
         $expected = [
             [
                 'php_version' => '5.5',
@@ -154,7 +154,7 @@ class ReportsTableTest extends TestCase
 
         $result = $this->Reports->getRelatedByField('php_version', 10, false, false);
         $this->assertInstanceOf('Cake\ORM\Query', $result);
-        $result = $result->hydrate(false)->toArray();
+        $result = $result->enableHydration(false)->toArray();
         $expected = [
             [
                 'php_version' => '5.5',
@@ -168,7 +168,7 @@ class ReportsTableTest extends TestCase
         $this->assertEquals($expected, $result);
         $result = $this->Reports->getRelatedByField('php_version', 10, true);
         $this->assertInstanceOf('Cake\ORM\Query', $result[0]);
-        $result[0] = $result[0]->hydrate(false)->toArray();
+        $result[0] = $result[0]->enableHydration(false)->toArray();
         $expected = [
             [
                 [

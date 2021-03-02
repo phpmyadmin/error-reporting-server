@@ -44,9 +44,10 @@ class ReportsControllerTest extends IntegrationTestCase
     public function testView(): void
     {
         $this->get('/reports/view/1');
-
-        $this->assertEquals(1, $this->viewVariable('report')[0]['id']);
-        $this->assertEquals('error2', $this->viewVariable('report')[0]['error_name']);
+        $report = $this->viewVariable('report');
+        $this->assertNotEmpty($report);
+        $this->assertEquals(1, $report[0]['id']);
+        $this->assertEquals('error2', $report[0]['error_name']);
 
         $this->assertNotEmpty($this->viewVariable('project_name'));
         $this->assertNotEmpty($this->viewVariable('columns'));
@@ -133,7 +134,7 @@ class ReportsControllerTest extends IntegrationTestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, json_decode($this->_response->body(), true));
+        $this->assertEquals($expected, json_decode($this->_response->getBody(), true));
 
         $this->get('/reports/data_tables?sEcho=1&sSearch=error2&bSearchable_2=true&iSortCol_0=0&sSortDir_0=desc&bSortable_0=true&iSortingCols=2&iDisplayLength=25');
         $expected = [
@@ -165,7 +166,7 @@ class ReportsControllerTest extends IntegrationTestCase
                 ],
             ],
         ];
-        $result = json_decode($this->_response->body(), true);
+        $result = json_decode($this->_response->getBody(), true);
         $this->assertEquals($expected, $result);
 
         $this->get('/reports/data_tables?sEcho=1&sSearch_1=1&iDisplayLength=25');
@@ -187,7 +188,7 @@ class ReportsControllerTest extends IntegrationTestCase
                 ],
             ],
         ];
-        $result = json_decode($this->_response->body(), true);
+        $result = json_decode($this->_response->getBody(), true);
         $this->assertEquals($expected, $result);
 
         $this->get('/reports/data_tables?sEcho=1&sSearch_1=0&iDisplayLength=25');
@@ -197,7 +198,7 @@ class ReportsControllerTest extends IntegrationTestCase
             'sEcho' => 1,
             'aaData' => [],
         ];
-        $result = json_decode($this->_response->body(), true);
+        $result = json_decode($this->_response->getBody(), true);
         $this->assertEquals($expected, $result);
     }
 

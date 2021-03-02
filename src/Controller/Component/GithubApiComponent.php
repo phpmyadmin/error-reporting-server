@@ -83,7 +83,7 @@ class GithubApiComponent extends Component
     {
         $url = 'https://github.com/login/oauth/access_token';
         $data = array_merge(
-            $this->githubConfig,
+            $this->getConfig('githubConfig', []),
             ['code' => $code]
         );
         $decodedResponse = $this->sendRequest($url, http_build_query($data), 'POST');
@@ -164,7 +164,7 @@ class GithubApiComponent extends Component
     {
         $url = 'https://github.com/login/oauth/authorize';
         $data = [
-            'client_id' => $this->githubConfig['client_id'],
+            'client_id' => $this->getConfig('githubConfig', ['client_id' => ''])['client_id'],
             'redirect_uri' => Router::url(
                 [
                     'controller' => 'developers',

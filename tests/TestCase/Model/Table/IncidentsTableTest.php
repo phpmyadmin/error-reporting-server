@@ -405,7 +405,7 @@ class IncidentsTableTest extends TestCase
         $incident = $this->Incidents->get($result['incidents'][0]);
         // check the incident has been reported under the same 'Report'
         $result = TableRegistry::getTableLocator()->get('Incidents')->find('all', ['conditions' => ['report_id = ' . $incident->report_id]]);
-        $result = $result->hydrate(false)->toArray();
+        $result = $result->enableHydration(false)->toArray();
         $this->assertEquals(2, count($result));
 
         // Case-2: for 'php' reports
@@ -429,7 +429,7 @@ class IncidentsTableTest extends TestCase
         // check the incidents have been reported under the same 'Report's
         $incident = $this->Incidents->get($result['incidents'][0]);
         $result = TableRegistry::getTableLocator()->get('Incidents')->find('all', ['conditions' => ['report_id = ' . $incident->report_id]]);
-        $result = $result->hydrate(false)->toArray();
+        $result = $result->enableHydration(false)->toArray();
         $this->assertEquals(2, count($result));
 
         // Case 3.1: Long PHP report submission

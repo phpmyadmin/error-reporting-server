@@ -59,11 +59,11 @@ class DevelopersController extends AppController
 
     public function callback(): ?Response
     {
-        $code = $this->request->query('code');
+        $code = $this->request->getQuery('code');
         $accessToken = $this->GithubApi->getAccessToken($code);
         if (empty($code) || empty($accessToken)) {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(
+            $this->Flash->set(
                 'We were not able to authenticate you.'
                     . ' Please try again later',
                 ['params' => ['class' => $flash_class]]
@@ -75,7 +75,7 @@ class DevelopersController extends AppController
         [$userInfo, $status] = $this->GithubApi->getUserInfo($accessToken);
         if ($status !== 200) {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(
+            $this->Flash->set(
                 $userInfo['message'],
                 ['params' => ['class' => $flash_class]]
             );
@@ -92,7 +92,7 @@ class DevelopersController extends AppController
         $this->authenticateDeveloper($userInfo, $accessToken);
 
         $flash_class = 'alert alert-success';
-        $this->Flash->default(
+        $this->Flash->set(
             'You have been logged in successfully',
             ['params' => ['class' => $flash_class]]
         );
@@ -113,7 +113,7 @@ class DevelopersController extends AppController
         $this->request->getSession()->destroy();
 
         $flash_class = 'alert alert-success';
-        $this->Flash->default(
+        $this->Flash->set(
             'You have been logged out successfully',
             ['params' => ['class' => $flash_class]]
         );
@@ -125,7 +125,7 @@ class DevelopersController extends AppController
         $developers = $this->Developers->findByGithubId($userInfo['id']);
         $developer = $developers->all()->first();
         if (! $developer) {
-            $developer = $this->Developers->newEntity();
+            $developer = $this->Developers->newEmptyEntity();
         } else {
             $this->Developers->id = $developer['id'];
         }

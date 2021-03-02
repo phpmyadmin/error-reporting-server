@@ -120,7 +120,7 @@ class GithubController extends AppController
             ]);
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(
+            $this->Flash->set(
                 $this->getErrors($issueDetails, $status),
                 ['params' => ['class' => $flash_class]]
             );
@@ -146,7 +146,7 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid report'));
         }
 
-        $ticket_id = intval($this->request->query['ticket_id']);
+        $ticket_id = intval($this->request->getQuery('ticket_id'));
         if (! $ticket_id) {
             throw new NotFoundException(__('Invalid Ticket ID!!'));
         }
@@ -186,7 +186,7 @@ class GithubController extends AppController
             $reportsTable->save($report);
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(
+            $this->Flash->set(
                 $this->getErrors($commentDetails, $status),
                 ['params' => ['class' => $flash_class]]
             );
@@ -245,7 +245,7 @@ class GithubController extends AppController
             $reportsTable->save($report);
         } else {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(
+            $this->Flash->set(
                 $this->getErrors($commentDetails, $status),
                 ['params' => ['class' => $flash_class]]
             );
@@ -364,7 +364,7 @@ class GithubController extends AppController
 
             if ($msg !== '') {
                 $flash_class = 'alert alert-success';
-                $this->Flash->default(
+                $this->Flash->set(
                     $msg,
                     ['params' => ['class' => $flash_class]]
                 );
@@ -375,7 +375,7 @@ class GithubController extends AppController
 
         if ($response === 403) {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(
+            $this->Flash->set(
                 'Unauthorised access to Github. github'
                     . ' credentials may be out of date. Please check and try again'
                     . ' later.',
@@ -389,7 +389,7 @@ class GithubController extends AppController
             && $type === 2
         ) {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(
+            $this->Flash->set(
                 'Bug Issue not found on Github.'
                     . ' Are you sure the issue number is correct? Please check and try again!',
                 ['params' => ['class' => $flash_class]]
@@ -400,7 +400,7 @@ class GithubController extends AppController
 
         // unknown response code
         $flash_class = 'alert alert-error';
-        $this->Flash->default(
+        $this->Flash->set(
             'Unhandled response code received: ' . $response,
             ['params' => ['class' => $flash_class]]
         );
@@ -479,7 +479,7 @@ class GithubController extends AppController
     {
         if (! Configure::read('CronDispatcher')) {
             $flash_class = 'alert alert-error';
-            $this->Flash->default(
+            $this->Flash->set(
                 'Unauthorised action! This action is not available on Web interface',
                 ['params' => ['class' => $flash_class]]
             );

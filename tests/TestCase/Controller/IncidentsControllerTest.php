@@ -50,7 +50,7 @@ class IncidentsControllerTest extends IntegrationTestCase
     public function testJson(): void
     {
         $this->get('/incidents/json/1');
-        $incident = json_decode($this->_response->body(), true);
+        $incident = json_decode($this->_response->getBody(), true);
         $expected = [
             'id' => 1,
             'error_name' => 'Lorem ipsum dolor sit amet',
@@ -121,7 +121,7 @@ class IncidentsControllerTest extends IntegrationTestCase
         )->all()->first();
         $this->Reports->id = $report['id'];
         $incidents = $this->Reports->getIncidents();
-        $incidents = $incidents->hydrate(false)->toArray();
+        $incidents = $incidents->enableHydration(false)->toArray();
         $this->assertEquals(2, count($incidents));
         $this->assertEquals(
             $bugReportDecoded['exception']['message'],
@@ -138,7 +138,7 @@ class IncidentsControllerTest extends IntegrationTestCase
 
         $this->configRequest(['input' => '']);
         $this->post('/incidents/create');
-        $result = json_decode($this->_response->body(), true);
+        $result = json_decode($this->_response->getBody(), true);
         $this->assertEquals(false, $result['success']);
 
         // Test invalid Notification email configuration

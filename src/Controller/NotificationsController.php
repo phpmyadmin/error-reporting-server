@@ -31,13 +31,6 @@ use function json_encode;
  */
 class NotificationsController extends AppController
 {
-    /** @var string */
-    public $uses = [
-        'Notification',
-        'Developer',
-        'Report',
-    ];
-
     /**
      * Initialization hook method.
      *
@@ -55,6 +48,9 @@ class NotificationsController extends AppController
             'Form',
             'Reports',
         ]);
+        $this->loadModel('Notification');
+        $this->loadModel('Developer');
+        $this->loadModel('Report');
     }
 
     public function beforeFilter(EventInterface $event)
@@ -102,8 +98,8 @@ class NotificationsController extends AppController
         ];
 
         $pagedParams = $params;
-        $pagedParams['limit'] = intval($this->request->query('iDisplayLength'));
-        $pagedParams['offset'] = intval($this->request->query('iDisplayStart'));
+        $pagedParams['limit'] = intval($this->request->getQuery('iDisplayLength'));
+        $pagedParams['offset'] = intval($this->request->getQuery('iDisplayStart'));
 
         $rows = $this->Notifications->find('all', $pagedParams);
         $totalFiltered = $this->Notifications->find(
@@ -144,11 +140,11 @@ class NotificationsController extends AppController
         $response = [
             'iTotalDisplayRecords' => $totalFiltered,
             'iTotalRecords' => $this->Notifications->find('all', $params)->count(),
-            'sEcho' => intval($this->request->query('sEcho')),
+            'sEcho' => intval($this->request->getQuery('sEcho')),
             'aaData' => $dispRows,
         ];
         $this->autoRender = false;
-        $this->response->body(json_encode($response));
+        $this->response->withStringBody(json_encode($response));
 
         return $this->response;
     }
@@ -184,7 +180,7 @@ class NotificationsController extends AppController
                 }
             }
         }
-        $this->Flash->default(
+        $this->Flash->set(
             $msg,
             ['params' => ['class' => $flash_class]]
         );

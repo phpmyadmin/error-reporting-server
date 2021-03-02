@@ -20,10 +20,7 @@ namespace App\Shell;
 
 use Cake\Console\Shell;
 use Cake\Core\Configure;
-use Cake\Http\Response;
-use Cake\Http\ServerRequest;
 use Cake\Log\Log;
-use Cake\Routing\DispatcherFactory;
 use Cake\Routing\Router;
 use const PHP_SAPI;
 use function date;
@@ -48,19 +45,8 @@ class SyncGithubIssueStatesShell extends Shell
             exit;
         }
 
-        $dispatcher = DispatcherFactory::create();
-
-        $request = new ServerRequest('github/sync_issue_status');
-        $request = $request->addParams(
-            Router::parse(
-                $request->getPath(),
-                ''
-            )
-        );
-        $dispatcher->dispatch(
-            $request,
-            new Response()
-        );
+        //TODO: check if works
+        Router::connect('github/sync_issue_status');
 
         Log::debug(
             'FINISHED: Job "'

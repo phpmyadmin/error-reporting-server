@@ -35,14 +35,6 @@ use function json_encode;
  */
 class ReportsController extends AppController
 {
-    /** @var string */
-    public $uses = [
-        'Incidents',
-        'Reports',
-        'Notifications',
-        'Developers',
-    ];
-
     /**
      * Initialization hook method.
      *
@@ -61,6 +53,10 @@ class ReportsController extends AppController
             'Reports',
             'Incidents',
         ]);
+        $this->loadModel('Incident');
+        $this->loadModel('Report');
+        $this->loadModel('Notification');
+        $this->loadModel('Developer');
     }
 
     public function index(): void
@@ -175,8 +171,8 @@ class ReportsController extends AppController
         ];
 
         $pagedParams = $params;
-        $pagedParams['limit'] = (int) $this->request->query('iDisplayLength');
-        $pagedParams['offset'] = (int) $this->request->query('iDisplayStart');
+        $pagedParams['limit'] = (int) $this->request->getQuery('iDisplayLength');
+        $pagedParams['offset'] = (int) $this->request->getQuery('iDisplayStart');
 
         $rows = $this->findAllDataTable(
             $this->Reports->find('all', $pagedParams)->innerJoin(
@@ -226,11 +222,11 @@ class ReportsController extends AppController
         $response = [
             'iTotalRecords' => $this->Reports->find('all')->count(),
             'iTotalDisplayRecords' => $totalFiltered,
-            'sEcho' => (int) $this->request->query('sEcho'),
+            'sEcho' => (int) $this->request->getQuery('sEcho'),
             'aaData' => $dispRows,
         ];
         $this->autoRender = false;
-        $this->response->body(json_encode($response));
+        $this->response->withStringBody(json_encode($response));
 
         return $this->response;
     }
@@ -256,7 +252,7 @@ class ReportsController extends AppController
         $this->Reports->addToRelatedGroup($report, $relatedTo);
 
         $flash_class = 'alert alert-success';
-        $this->Flash->default(
+        $this->Flash->set(
             'This report has been marked the same as #'
                 . $relatedTo,
             ['params' => ['class' => $flash_class]]
@@ -281,7 +277,7 @@ class ReportsController extends AppController
         $this->Reports->removeFromRelatedGroup($report);
 
         $flash_class = 'alert alert-success';
-        $this->Flash->default(
+        $this->Flash->set(
             'This report has been marked as different.',
             ['params' => ['class' => $flash_class]]
         );
@@ -312,7 +308,7 @@ class ReportsController extends AppController
         $this->Reports->save($report);
 
         $flash_class = 'alert alert-success';
-        $this->Flash->default(
+        $this->Flash->set(
             'The state has been successfully changed.',
             ['params' => ['class' => $flash_class]]
         );
@@ -367,7 +363,7 @@ class ReportsController extends AppController
             }
         }
 
-        $this->Flash->default(
+        $this->Flash->set(
             $msg,
             ['params' => ['class' => $flash_class]]
         );
