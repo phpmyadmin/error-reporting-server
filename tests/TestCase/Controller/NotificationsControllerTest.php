@@ -3,14 +3,17 @@
 namespace App\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
-use Cake\TestSuite\IntegrationTestCase;
+use Cake\TestSuite\IntegrationTestTrait;
+use Cake\TestSuite\TestCase;
 use function json_decode;
 
 /**
  * NotificationsController Test Case.
  */
-class NotificationsControllerTest extends IntegrationTestCase
+class NotificationsControllerTest extends TestCase
 {
+    use IntegrationTestTrait;
+
     /**
      * Fixtures.
      *

@@ -3,11 +3,14 @@
 namespace App\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
-use Cake\TestSuite\IntegrationTestCase;
+use Cake\TestSuite\IntegrationTestTrait;
+use Cake\TestSuite\TestCase;
 use function json_encode;
 
-class EventsControllerTest extends IntegrationTestCase
+class EventsControllerTest extends TestCase
 {
+    use IntegrationTestTrait;
+
     /**
      * Fixtures.
      *

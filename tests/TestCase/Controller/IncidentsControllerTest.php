@@ -4,14 +4,17 @@ namespace App\Test\TestCase\Controller;
 
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
-use Cake\TestSuite\IntegrationTestCase;
+use Cake\TestSuite\IntegrationTestTrait;
+use Cake\TestSuite\TestCase;
 use const DS;
 use function count;
 use function file_get_contents;
 use function json_decode;
 
-class IncidentsControllerTest extends IntegrationTestCase
+class IncidentsControllerTest extends TestCase
 {
+    use IntegrationTestTrait;
+
     /**
      * Fixtures.
      *

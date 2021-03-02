@@ -20,7 +20,8 @@ namespace App\Test\TestCase\Controller;
 
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
-use Cake\TestSuite\IntegrationTestCase;
+use Cake\TestSuite\IntegrationTestTrait;
+use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
 use const DS;
 use function file_get_contents;
@@ -30,9 +31,10 @@ use function json_encode;
 /**
  * App\Controller\GithubController Test Case
  */
-class GithubControllerTest extends IntegrationTestCase
+class GithubControllerTest extends TestCase
 {
     use PHPMock;
+    use IntegrationTestTrait;
 
     /**
      * Fixtures.

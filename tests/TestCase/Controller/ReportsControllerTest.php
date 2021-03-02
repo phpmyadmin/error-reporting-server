@@ -3,12 +3,15 @@
 namespace App\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
-use Cake\TestSuite\IntegrationTestCase;
+use Cake\TestSuite\IntegrationTestTrait;
+use Cake\TestSuite\TestCase;
 use function count;
 use function json_decode;
 
-class ReportsControllerTest extends IntegrationTestCase
+class ReportsControllerTest extends TestCase
 {
+    use IntegrationTestTrait;
+
     /**
      * Fixtures.
      *
