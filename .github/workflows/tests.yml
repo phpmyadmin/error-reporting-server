@@ -1,0 +1,84 @@
+name: Run tests
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - master
+
+jobs:
+    test-php:
+        name: Test on php ${{ matrix.php-version }} and ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
+        services:
+          database-server:
+            image: ${{ matrix.db-server }}
+            env:
+              MYSQL_ROOT_PASSWORD: testbench
+            ports:
+              - "3306:3306"
+            options: >-
+              --health-cmd="mysqladmin ping"
+              --health-interval=10s
+              --health-timeout=5s
+              --health-retries=3
+        strategy:
+            matrix:
+                php-version: ["7.1", "7.2", "7.3", "7.4"]
+                db-server: ["mysql:5.7"]
+                os: [ubuntu-latest]
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use php ${{ matrix.php-version }}
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-version }}
+                  extensions: mbstring,mysql
+                  coverage: xdebug
+                  ini-values: xdebug.mode="develop,coverage"
+            - name: Cache module
+              uses: actions/cache@v2
+              with:
+                  path: ~/.composer/cache/
+                  key: composer-cache
+            - name: Install dependencies
+              run: composer install --no-interaction
+            - name: Copy config files
+              run: |
+                cp config/app_ci.php config/app.php
+                cp config/oauth_example.php config/oauth.php
+            - name: Prepare the test database
+              run: |
+                mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" -P"$MYSQL_PORT" -e 'create database pmaerr;'
+                mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" -P"$MYSQL_PORT" -e 'SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode, "ONLY_FULL_GROUP_BY", ""));'
+              env:
+                MYSQL_HOST: "127.0.0.1"
+                MYSQL_USER: root
+                MYSQL_PASSWORD: testbench
+                MYSQL_PORT: ${{ job.services.database-server.ports['3306'] }}
+            - name: Run the migrations
+              run: bin/cake migrations migrate
+              env:
+                TEST_MYSQL_HOST: "127.0.0.1"
+                TEST_MYSQL_USER: root
+                TEST_MYSQL_PASS: testbench
+                TEST_MYSQL_PORT: ${{ job.services.database-server.ports['3306'] }}
+            - name: Run php tests
+              run: composer run test --timeout=0
+              env:
+                TEST_MYSQL_HOST: "127.0.0.1"
+                TEST_MYSQL_USER: root
+                TEST_MYSQL_PASS: testbench
+                TEST_MYSQL_PORT: ${{ job.services.database-server.ports['3306'] }}
+            - name: Send coverage
+              uses: codecov/codecov-action@v1
+              with:
+                flags: unit-${{ matrix.php-version }}-${{ matrix.os }}
+                name: phpunit-${{ matrix.php-version }}-${{ matrix.os }}
+            - name: Send coverage to Scrutinizer
+              uses: sudo-bot/action-scrutinizer@latest
+              # Upload can fail on forks
+              continue-on-error: true
+              with:
+                  cli-args: "--format=php-clover build/logs/clover.xml"
