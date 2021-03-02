@@ -1,16 +1,15 @@
-<?php use Cake\Routing\Router ?>
-<h1>Reports</h1>
-<form class="form-inline" id="state-form" style=""
-        action=" <?= Router::url('/reports/mass_action/'); ?> "
+<?php
+
+?> "
         method="post">
     <table id="reports_table" data-ajax-url="<?=
             Router::url(
                 [
                     'controller' => 'reports',
-                    'action' => 'data_tables'
+                    'action' => 'data_tables',
                 ]
             );
-    ?>">
+?>">
         <thead>
             <tr>
                 <th>Select</th>
@@ -32,8 +31,8 @@
                 <th>
                     <select id="error_name_filter" style="width:100%">
                         <option></option>
-                        <?php foreach ($distinct_error_names as $id => $name): ?>
-                            <?= "<option value='$name'>$name</option>"; ?>
+                        <?php foreach ($distinct_error_names as $id => $name) : ?>
+                            <?= '<option value="' . $name . '">' . $name . '</option>'; ?>
                         <?php endforeach; ?>
                     </select>
                 </th>
@@ -41,24 +40,24 @@
                 <th>
                     <select id="location_filter" style="width:100%">
                         <option></option>
-                        <?php foreach ($distinct_locations as $id => $location): ?>
-                            <?= "<option value='$location'>$location</option>"; ?>
+                        <?php foreach ($distinct_locations as $id => $location) : ?>
+                            <?= '<option value="' . $location . '">' . $location . '</option>'; ?>
                         <?php endforeach; ?>
                     </select>
                 </th>
                 <th>
                     <select id="pma_version_filter" style="width:100%">
                         <option></option>
-                        <?php foreach ($distinct_versions as $id => $version): ?>
-                            <?= "<option value='$version'>$version</option>"; ?>
+                        <?php foreach ($distinct_versions as $id => $version) : ?>
+                            <?= '<option value="' . $version . '">' . $version . '</option>'; ?>
                         <?php endforeach; ?>
                     </select>
                 </th>
                 <th>
                     <select id="status_filter" style="width:100%">
                         <option></option>
-                        <?php foreach ($distinct_statuses as $id => $status): ?>
-                            <?= "<option value='$status'>$statuses[$status]</option>"; ?>
+                        <?php foreach ($distinct_statuses as $id => $status) : ?>
+                            <?= '<option value="' . $status . '">' . $statuses[$status] . '</option>'; ?>
                         <?php endforeach; ?>
                     </select>
                 </th>
@@ -92,7 +91,7 @@
     </table>
 
     <!-- Show this only if Developer has commit access -->
-    <?php if (!$read_only): ?>
+    <?php if (! $read_only) : ?>
         <div style="margin:10px; clear:both;">
             <input type="checkbox" id="resultsForm_checkall"
                 class="checkall_box" title="Check All"
@@ -107,9 +106,7 @@
                 $this->Form->select(
                     'state',
                     $statuses,
-                    array(
-                        'empty' => false
-                    )
+                    ['empty' => false]
                 );
             ?>
             <input type="submit" value="Change" class="btn btn-primary" />

@@ -2,9 +2,9 @@
 <div class="span12">
     <form>
         <select class="pull-right" name="filter" onchange="this.parentElement.submit()">
-            <?php foreach($filter_times as $key => $value): ?>
-                <?= "<option value='$key'"; ?>
-                <?php if ($selected_filter === $key): ?>
+            <?php foreach ($filter_times as $key => $value) : ?>
+                <?= '<option value="' . $key . '" '; ?>
+                <?php if ($selected_filter === $key) : ?>
                     <?= 'selected' ?>
                 <?php endif; ?>
                 <?= '>' . $value['label'] . '</option>'; ?>
@@ -21,14 +21,14 @@
 <script type="text/javascript">
     var no_data = true;
     <?= $this->Reports->getChartArray(
-            'chartArray',
-            $columns,
-            $related_entries
-        ) . "\n";
-    ?>
+        'chartArray',
+        $columns,
+        $related_entries
+    ) . "\n";
+?>
     <?= $this->Reports->getLineChartData('linechart_data', $download_stats); ?>
 
-    <?php if (count($download_stats) > 0): ?>
+    <?php if (count($download_stats) > 0) : ?>
         no_data = false;
     <?php endif; ?>
 

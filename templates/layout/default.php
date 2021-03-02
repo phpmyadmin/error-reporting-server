@@ -40,56 +40,54 @@ use Cake\Utility\Inflector;
         <?=
             $this->Html->scriptBlock(
                 'var notifications_count = ' . $notif_count . ';',
-                array(
-                    'inline' => true
-                )
+                ['inline' => true]
             );
-        ?>
+?>
     </head>
 
     <body>
         <div class="navbar">
             <div class="navbar-inner">
                 <a class="brand" href="<?= $baseURL; ?>">phpMyAdmin</a>
-                <?php if ($developer_signed_in): ?>
+                <?php if ($developer_signed_in) : ?>
                     <ul class="nav">
                         <?php
-                            $controllers = array('reports');
+                            $controllers = ['reports'];
 
                             // Show these only if Developer has commit access
-                            if (! $read_only) {
-                                $controllers[] = 'stats';
-                                $controllers[] = 'notifications';
+                        if (! $read_only) {
+                            $controllers[] = 'stats';
+                            $controllers[] = 'notifications';
+                        }
+                        foreach ($controllers as $controller) {
+                            $class = '';
+                            if ($current_controller === $controller) {
+                                $class = 'active';
                             }
-                            foreach ($controllers as $controller) {
-                                $class = '';
-                                if ($current_controller === $controller) {
-                                    $class = 'active';
-                                }
-                                echo "<li class='$class' id='nav_"
-                                    . $controller . "'><a href='"
-                                    . $baseURL . $controller . "'>";
-                                echo Inflector::humanize($controller);
-                                echo "</a></li>";
-                            }
+                            echo '<li class="' . $class . '" id="nav_'
+                                . $controller . '"><a href="'
+                                . $baseURL . $controller . '">';
+                            echo Inflector::humanize($controller);
+                            echo '</a></li>';
+                        }
                         ?>
                     </ul>
                 <?php endif; ?>
                 <ul class="nav pull-right">
-                    <?php if ($developer_signed_in): ?>
+                    <?php if ($developer_signed_in) : ?>
                         <li>
                             <p class="navbar-text">
                                 Hello, <?= $current_developer['full_name']; ?>
                             </p>
                         </li>
                         <li>
-                            <a href="<?= $baseURL.'developers/logout'; ?>">
+                            <a href="<?= $baseURL . 'developers/logout'; ?>">
                                 Logout
                             </a>
                         </li>
-                    <?php else: ?>
+                    <?php else : ?>
                         <li>
-                            <a href="<?= $baseURL.'developers/login'; ?>">
+                            <a href="<?= $baseURL . 'developers/login'; ?>">
                                 Login with Github
                             </a>
                         </li>

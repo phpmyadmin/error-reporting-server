@@ -15,13 +15,15 @@
  * @see          https://www.phpmyadmin.net/
  */
 ?>
-<?php use Cake\Routing\Router; ?>
+<?php
+
+?>
 
 <p>
-	A new error report has been added on the phpMyAdmin's Error Reporting System.
+    A new error report has been added on the phpMyAdmin's Error Reporting System.
 </p>
 <p>
-	The details of the report are as follows:
+    The details of the report are as follows:
 </p>
 
 <table cellspacing="0" style="border:1px solid #333">
@@ -58,7 +60,7 @@
                     $php_version_distinct_count,
                     'php_version'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -70,10 +72,10 @@
                     $browser_distinct_count,
                     'browser'
                 );
-            ?>
+?>
         </td>
     </tr>
-    <?php if ($incidents[0]['exception_type']): // php ?>
+    <?php if ($incidents[0]['exception_type']) : // php ?>
         <tr>
             <td>Location</td>
             <td><?= $report['location']; ?></td>
@@ -82,7 +84,7 @@
             <td>Line Number</td>
             <td><?= $report['linenumber']; ?></td>
         </tr>
-    <?php else: ?>
+    <?php else : ?>
         <tr>
             <td>Script Name</td>
             <td>
@@ -105,7 +107,7 @@
                     $configuration_storage_distinct_count,
                     'configuration_storage'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -117,7 +119,7 @@
                     $server_software_distinct_count,
                     'server_software'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -129,7 +131,7 @@
                     $user_os_distinct_count,
                     'user_os'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -141,7 +143,7 @@
                     $locale_distinct_count,
                     'locale'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -157,7 +159,7 @@
 </table>
 
 <p>
-	You can view the detailed report at
-	<a href="<?= Router::url('/reports/view/' . $report['id'], true) ?>">
-		#<?= $report['id'] ?></a>.
+    You can view the detailed report at
+    <a href="<?= Router::url('/reports/view/' . $report['id'], true) ?>">
+        #<?= $report['id'] ?></a>.
 </p>

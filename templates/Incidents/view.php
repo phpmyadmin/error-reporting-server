@@ -80,9 +80,9 @@
     <tr>
         <td>URI</td>
         <td>
-            <?php if ($incident['exception_type']): ?>
+            <?php if ($incident['exception_type']) : ?>
                 <?= 'NA'; ?>
-            <?php else: ?>
+            <?php else : ?>
                 <?= $incident['full_report']['exception']['uri']; ?>
             <?php endif; ?>
         </td>
@@ -95,7 +95,7 @@
     </tr>
 </table>
 
-<?php if (! empty($incident['steps'])): ?>
+<?php if (! empty($incident['steps'])) : ?>
     <h4>Description submited by user:</h4>
     <pre>
         <?= nl2br($incident['steps']); ?>
@@ -105,12 +105,12 @@
 <h4>Stacktrace:</h4>
 <?= $this->Incidents->getStacktrace($incident, 'well'); ?>
 
-<?php if (isset($incident['full_report']['microhistory'])): ?>
+<?php if (isset($incident['full_report']['microhistory'])) : ?>
 <h4>Microhistory:</h4>
 <pre>
-    <?php if (($incident['exception_type'])): ?>
+    <?php if ($incident['exception_type']) : ?>
         <?= 'NA'; ?>
-    <?php else: ?>
+    <?php else : ?>
         <?=
             json_encode(
                 $incident['full_report']['microhistory'],

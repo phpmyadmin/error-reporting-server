@@ -1,4 +1,8 @@
-<?php use Cake\Routing\Router; ?>
+<?php
+
+use Cake\Routing\Router;
+
+?>
 <div>
     <h1 style="display: inline">Error Report #<?= $report[0]['id'] ?>
             <small>[<?= $status[$report[0]['status']]; ?>]</small>
@@ -16,26 +20,26 @@
         <span>Change state to:</span>
         <?=
             $this->Form->select(
-                    'state',
-                    $status,
-                    array(
-                        'value' => $report[0]['status'],
-                        'empty' => false
-                    )
+                'state',
+                $status,
+                [
+                    'value' => $report[0]['status'],
+                    'empty' => false,
+                ]
             );
         ?>
         <input type="submit" value="Change" class="btn btn-primary" />
     </form>
 <?php endif; ?>
 
-<?php if ($related_reports->isEmpty() && !$read_only): ?>
+<?php if ($related_reports->isEmpty() && ! $read_only) : ?>
     <form class="form-inline" action="/<?= BASE_DIR ?>reports/mark_related_to/<?=
         $report[0]['id']; ?>" method="post">
         <span>Mark the same as:</span>
         <input type="number" min="1" name="related_to" />
         <input type="submit" value="Submit" class="btn btn-primary" />
     </form>
-<?php elseif (! $related_reports->isEmpty()): ?>
+<?php elseif (! $related_reports->isEmpty()) : ?>
     <p>
         This report has been marked the same as the following reports:
         (<?= $this->Reports->createReportsLinks($related_reports); ?>).
@@ -65,7 +69,7 @@
                 <?=
                     $this->Html->link(
                         '#' . $report[0]['sourceforge_bug_id'],
-                        "https://github.com/$project_name/issues/"
+                        'https://github.com/' . $project_name . '/issues/'
                             . $report[0]['sourceforge_bug_id'],
                         ['target' => '_blank']
                     );
@@ -78,15 +82,14 @@
                 ?>
 
                 <?=
-                    $this->Form->input('Unlink from issue', array(
+                    $this->Form->input('Unlink from issue', [
                         'type' => 'submit',
                         'label' => false,
-                        'class'=>'btn btn-primary'
-                        )
-                    )
+                        'class' => 'btn btn-primary',
+                    ])
                     . '</form>';
                 ?>
-            <?php elseif (! $read_only): ?>
+            <?php elseif (! $read_only) : ?>
                 <table cellspacing="0" class="table table-bordered error-report"
                     style="width:300px; margin-bottom:5px;">
                     <tr>
@@ -95,9 +98,7 @@
                             $this->Html->link(
                                 'Create new issue',
                                 '/github/create_issue/' . $report[0]['id'],
-                                array(
-                                    'class'=>'btn btn-primary'
-                                )
+                                ['class' => 'btn btn-primary']
                             );
                         ?>
                         </td>
@@ -112,33 +113,33 @@
                             <?=
                                 $this->Form->input(
                                     'ticket_id',
-                                    array(
+                                    [
                                         'placeholder' => 'Issue Number',
                                         'type' => 'text',
                                         'label' => false,
                                         'div' => true,
                                         'class' => 'input-large',
-                                        'name' => 'ticket_id'
-                                    )
+                                        'name' => 'ticket_id',
+                                    ]
                                 );
                             ?>
                             <?=
                                 $this->Form->input(
                                     'Link with existing Issue',
-                                    array(
+                                    [
                                         'placeholder' => 'Ticket Number',
                                         'type' => 'submit',
                                         'label' => false,
                                         'div' => '',
-                                        'class'=>'btn btn-primary'
-                                    )
+                                        'class' => 'btn btn-primary',
+                                    ]
                                 );
                             ?>
                             </form>
                         </td>
                     </tr>
                 </table>
-            <?php else: ?>
+            <?php else : ?>
                 This report is not linked to any Github issue.
             <?php endif; ?>
         </td>
@@ -152,7 +153,7 @@
                     $pma_version_distinct_count,
                     'pma_version'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -164,7 +165,7 @@
                     $php_version_distinct_count,
                     'php_version'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -176,10 +177,10 @@
                     $browser_distinct_count,
                     'browser'
                 );
-            ?>
+?>
         </td>
     </tr>
-    <?php if ($incidents[0]['exception_type']): // php ?>
+    <?php if ($incidents[0]['exception_type']) : // php ?>
         <tr>
             <td>Location</td>
             <td><?= $report[0]['location']; ?></td>
@@ -188,7 +189,7 @@
             <td>Line Number</td>
             <td><?= $report[0]['linenumber']; ?></td>
         </tr>
-    <?php else: ?>
+    <?php else : ?>
         <tr>
             <td>Script Name</td>
             <td>
@@ -211,7 +212,7 @@
                     $configuration_storage_distinct_count,
                     'configuration_storage'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -223,7 +224,7 @@
                     $server_software_distinct_count,
                     'server_software'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -235,7 +236,7 @@
                     $user_os_distinct_count,
                     'user_os'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -247,7 +248,7 @@
                     $locale_distinct_count,
                     'locale'
                 );
-            ?>
+?>
         </td>
     </tr>
     <tr>
@@ -271,10 +272,10 @@
 
 <?php if (! $read_only) : ?>
 <h4>Stacktraces:</h4>
-<?= $this->Reports->getStacktracesForIncidents($incidents_with_stacktrace); ?>
+    <?= $this->Reports->getStacktracesForIncidents($incidents_with_stacktrace); ?>
 <?php endif; ?>
 
-<?php if ($incidents_with_description->count() > 0): ?>
+<?php if ($incidents_with_description->count() > 0) : ?>
     <h4>Descriptions submitted by users:</h4>
     <?= $this->Incidents->incidentsDescriptions($incidents_with_description); ?>
 <?php endif; ?>
@@ -289,7 +290,7 @@
             $columns,
             $related_entries
         );
-    ?>
+?>
 
     window.onload = function () {
         chartArray.forEach(function(chart) {

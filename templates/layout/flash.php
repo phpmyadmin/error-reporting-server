@@ -1,7 +1,5 @@
 <?php
 /**
- *
- *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -22,7 +20,7 @@
 <?php echo $this->Html->charset(); ?>
 <title><?php echo $page_title; ?></title>
 
-<?php if (Configure::read('debug') == 0): ?>
+<?php if (Configure::read('debug') === 0) : ?>
 <meta http-equiv="Refresh" content="<?php echo $pause; ?>;url=<?php echo $url; ?>"/>
 <?php endif; ?>
 <style><!--

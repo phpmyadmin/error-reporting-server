@@ -1,13 +1,16 @@
-<?php use Cake\Routing\Router; ?>
+<?php
+
+use Cake\Routing\Router;
+
+?>
 <div class="notifications index">
     <h2><?= __('Notifications'); ?></h2>
     <form name="notif_mass_action" method="post" action="<?=
-        Router::url(array(
+        Router::url([
             'controller' => 'notifications',
-            'action' => 'mass_action'
-            )
-        );
-    ?>">
+            'action' => 'mass_action',
+        ]);
+?>">
         <div style="margin-bottom:10px;">
             <input type="checkbox" id="notificationsForm_checkall"
                 class="checkall_box" title="Check All"
@@ -22,10 +25,10 @@
         </div>
         <table id="notifications_table" class="hover" data-ajax-url="<?=
             Router::url(
-                array(
+                [
                     'controller' => 'notifications',
-                    'action' => 'data_tables'
-                )
+                    'action' => 'data_tables',
+                ]
             );?>"
         >
             <thead>

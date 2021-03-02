@@ -1,17 +1,14 @@
 <?=
     $this->Form->create(
-        'Ticket', array(
-            'label' => array(
-                'class' => 'control-label'
-            ),
-            'div' => array(
-                'class' => 'control-group'
-            ),
+        'Ticket',
+        [
+            'label' => ['class' => 'control-label'],
+            'div' => ['class' => 'control-group'],
             'class' => 'input-xxlarge',
             'between' => '<div class="controls">',
             'after' => '</div>',
             'class' => 'form-horizontal',
-        )
+        ]
     );
 ?>
     <fieldset>
@@ -19,23 +16,23 @@
         <?=
             $this->Form->input(
                 'summary',
-                array(
+                [
                     'placeholder' => 'Summary',
-                    'value' => $error_name
-                )
+                    'value' => $error_name,
+                ]
             );
         ?>
         <?=
             $this->Form->input(
                 'description',
-                array(
+                [
                     'placeholder' => 'Description',
                     'rows' => 10,
-                    'value' => $error_message
-                )
+                    'value' => $error_message,
+                ]
             );
         ?>
-        <?= $this->Form->input('labels', array('placeholder' => 'Labels')); ?>
+        <?= $this->Form->input('labels', ['placeholder' => 'Labels']); ?>
 
         <div class="control-group row">
             <div class="span3">
