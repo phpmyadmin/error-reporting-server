@@ -32,24 +32,30 @@ use function json_encode;
 class NotificationsController extends AppController
 {
     /** @var string */
-    public $components = [
-        'RequestHandler',
-        'OrderSearch',
-    ];
-
-    /** @var string */
-    public $helpers = [
-        'Html',
-        'Form',
-        'Reports',
-    ];
-
-    /** @var string */
     public $uses = [
         'Notification',
         'Developer',
         'Report',
     ];
+
+    /**
+     * Initialization hook method.
+     *
+     * Use this method to add common initialization code like loading components.
+     *
+     * @return void Nothing
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('OrderSearch');
+        $this->viewBuilder()->setHelpers([
+            'Html',
+            'Form',
+            'Reports',
+        ]);
+    }
 
     public function beforeFilter(EventInterface $event)
     {

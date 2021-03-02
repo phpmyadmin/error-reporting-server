@@ -42,8 +42,18 @@ class IncidentsController extends AppController
         'Notification',
     ];
 
-    /** @var string */
-    public $components = ['Mailer'];
+    /**
+     * Initialization hook method.
+     *
+     * Use this method to add common initialization code like loading components.
+     *
+     * @return void Nothing
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('Mailer');
+    }
 
     public function create(): ?Response
     {

@@ -36,26 +36,32 @@ use function json_encode;
 class ReportsController extends AppController
 {
     /** @var string */
-    public $components = [
-        'RequestHandler',
-        'OrderSearch',
-    ];
-
-    /** @var string */
-    public $helpers = [
-        'Html',
-        'Form',
-        'Reports',
-        'Incidents',
-    ];
-
-    /** @var string */
     public $uses = [
         'Incidents',
         'Reports',
         'Notifications',
         'Developers',
     ];
+
+    /**
+     * Initialization hook method.
+     *
+     * Use this method to add common initialization code like loading components.
+     *
+     * @return void Nothing
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('OrderSearch');
+        $this->viewBuilder()->setHelpers([
+            'Html',
+            'Form',
+            'Reports',
+            'Incidents',
+        ]);
+    }
 
     public function index(): void
     {

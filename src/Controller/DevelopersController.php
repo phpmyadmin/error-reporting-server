@@ -27,14 +27,22 @@ use Cake\Http\Response;
  */
 class DevelopersController extends AppController
 {
-    /** @var string */
-    public $helpers = [
-        'Html',
-        'Form',
-    ];
-
-    /** @var string */
-    public $components = ['GithubApi'];
+    /**
+     * Initialization hook method.
+     *
+     * Use this method to add common initialization code like loading components.
+     *
+     * @return void Nothing
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('GithubApi');
+        $this->viewBuilder()->setHelpers([
+            'Html',
+            'Form',
+        ]);
+    }
 
     public function beforeFilter(EventInterface $event)
     {

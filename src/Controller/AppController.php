@@ -133,8 +133,8 @@ class AppController extends Controller
 
     public function beforeFilter(EventInterface $event)
     {
-        $controller = $this->request->controller;
-        $this->set('current_controller', $controller);
+        $controllerName = $this->request->getParam('controller');
+        $this->set('current_controller', $controllerName);
         $notif_count = 0;
 
         if ($this->request->getSession()->read('Developer.id')) {
@@ -196,7 +196,7 @@ class AppController extends Controller
 
     protected function checkReadonlyAccess(): void
     {
-        $controller = $this->request->controller;
+        $controllerName = $this->request->getParam('controller');
         $action = $this->request->getParam('action');
         $read_only = $this->request->getSession()->read('read_only');
 
@@ -205,11 +205,11 @@ class AppController extends Controller
             return;
         }
 
-        if (in_array($controller, $this->readonly_whitelist)) {
+        if (in_array($controllerName, $this->readonly_whitelist)) {
             return;
         }
-        if (isset($this->readonly_whitelist[$controller])
-            && in_array($action, $this->readonly_whitelist[$controller])
+        if (isset($this->readonly_whitelist[$controllerName])
+            && in_array($action, $this->readonly_whitelist[$controllerName])
         ) {
             return;
         }

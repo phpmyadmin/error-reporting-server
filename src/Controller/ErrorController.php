@@ -23,12 +23,10 @@
 
 namespace App\Controller;
 
-use App\Controller\AppController;
 use Cake\Event\EventInterface;
 
 class ErrorController extends AppController
 {
-
     public function beforeRender(EventInterface $event)
     {
         parent::beforeRender($event);
