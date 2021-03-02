@@ -20,8 +20,10 @@ namespace App\Shell;
 
 use Cake\Console\Shell;
 use Cake\Core\Configure;
+use Cake\Core\HttpApplicationInterface;
+use Cake\Http\Server;
+use Cake\Http\ServerRequest;
 use Cake\Log\Log;
-use Cake\Routing\Router;
 use const PHP_SAPI;
 use function date;
 
@@ -30,6 +32,23 @@ use function date;
  */
 class SyncGithubIssueStatesShell extends Shell
 {
+    /**
+     * The application that is being dispatched.
+     *
+     * @var HttpApplicationInterface
+     */
+    protected $app;
+
+    /**
+     * Constructor
+     *
+     * @param HttpApplicationInterface $app The test case to run.
+     */
+    public function __construct(HttpApplicationInterface $app)
+    {
+        $this->app = $app;
+    }
+
     public function main(): void
     {
         Log::debug(
@@ -45,8 +64,16 @@ class SyncGithubIssueStatesShell extends Shell
             exit;
         }
 
-        //TODO: check if works
-        Router::connect('github/sync_issue_status');
+        $request = new ServerRequest([
+            'url' => '/github/sync_issue_status',
+            'params' => [
+                'controller' => 'Github',
+                'action' => 'sync_issue_status',
+            ],
+        ]);
+
+        $server = new Server($this->app);
+        $server->run($request);
 
         Log::debug(
             'FINISHED: Job "'

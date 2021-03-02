@@ -79,7 +79,7 @@ class StatsShellTest extends TestCase
         $this->Stats->initialize();
 
         // Clear the existing cache
-        Cache::clear(false);
+        Cache::clear();
 
         // Run the shell command
         $this->Stats->main();

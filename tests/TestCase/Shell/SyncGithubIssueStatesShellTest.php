@@ -4,6 +4,7 @@ namespace App\Test\TestCase\Shell;
 
 use App\Shell\SyncGithubIssueStatesShell;
 use Cake\Console\ConsoleIo;
+use Cake\Http\BaseApplication;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
@@ -48,7 +49,12 @@ class SyncGithubIssueStatesShellTest extends TestCase
     {
         parent::setUp();
         $this->io = $this->getMockBuilder('Cake\Console\ConsoleIo')->getMock();
-        $this->SyncGithubIssueStates = new SyncGithubIssueStatesShell($this->io);
+        /** @var BaseApplication $app */
+        $app = $this->getMockForAbstractClass(
+            BaseApplication::class,
+            [__DIR__ . '/../../../config']
+        );
+        $this->SyncGithubIssueStates = new SyncGithubIssueStatesShell($app);
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 

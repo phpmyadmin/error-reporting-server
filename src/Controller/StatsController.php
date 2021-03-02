@@ -53,7 +53,7 @@ class StatsController extends AppController
             $filter_string = 'all_time';
         }
         $entriesWithCount = [];
-        //Cache::clear(false);
+        //Cache::clear();
         foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
             $entriesWithCount = Cache::read($field . '_' . $filter_string);
             if ($entriesWithCount === false) {
