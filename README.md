@@ -3,13 +3,13 @@ phpMyAdmin's Error Reporting Server
 
 [![Test-suite](https://github.com/phpmyadmin/error-reporting-server/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/phpmyadmin/error-reporting-server/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/phpmyadmin/error-reporting-server/branch/master/graph/badge.svg)](https://codecov.io/gh/phpmyadmin/error-reporting-server)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/badges/quality-score.png?s=9d696be27235e042548ad09e1002841b532ee6bb)](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/?branch=master)
 
 phpMyAdmin server side component for the error reporting system. It uses
 CakePHP with some extra plugins like migrations, debugkit and OAuth
 component.
 
-# How To deploy #
+# How to deploy
 
 In order to deploy the app in this repo you need to follow these steps:
 
@@ -44,12 +44,13 @@ In order to deploy the app in this repo you need to follow these steps:
 	- For new system: just run migration
 	 `bin/cake migrations migrate`
 
-## Requirements ##
- - php >= 7.1
- - MySQL
+## Requirements
+
+- php >= 7.1
+- MySQL
 
 
-## Web server setup ##
+## Web server setup
 
 - Configuration for Apache (this will run the server on port 80, if you
   already have services on port 80 you may wish to use a different port
@@ -105,9 +106,9 @@ server {
 }
 ```
 
-## OAuth configuration setup ##
+## OAuth configuration setup
 
-### Creating the GitHub app ###
+### Creating the GitHub app
 
 The application relies on authentication using GitHub. To obtain the client ID
 and key, visit [application settings in your Github profile][gh-oauth] and
@@ -115,12 +116,12 @@ register an application there.
 
 The callback for the github app should be ``<http://YOUR_PREFERRED_DOMAIN>/developers/callback`` where ``YOUR_PREFERRED_DOMAIN`` is the URL you wish to access the local instance on.
 
-Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth.php`` and replace the dummy credentials with the obtained cliend ID and secret.
+Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth.php`` and replace the dummy credentials with the obtained client ID and secret.
 
 [gh-oauth]: https://github.com/settings/developers
 
+## Github Events
 
-## Github Events ##
 - Add a [webhook](https://developer.github.com/webhooks/creating/) at your [target repository](https://github.com/phpmyadmin/phpmyadmin) with payload URL as `https://<host>:<port>/events`
   - Select content-type as `application/json`
   - Select `Issues` events from available events
@@ -129,41 +130,52 @@ Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth
 - Set the appropriate value of secret token in app.php (same as what you set while setting up the webhook)
 
 
-## Sync Github Issue state ##
+## Sync Github Issue state
+
 - Get a Github Personal Access token as explained [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
 - Set value of obtained `GithubAccessToken` in config/oauth.php
 - After setting value of GithubAccessToken in config/oauth.php as explained above, you can run the synchronization action as
-```shell
+
+```sh
 ./bin/cake sync_github_issue_states
 ```
+
 - This can be scheduled as a cron job too.
 
-# How to run the test suite #
+# How to run the test suite
 
 If you are on a development machine you can use the webrunner at `/test.php`
 However if you need a command line runner. You can use:
-```shell
+
+```sh
 composer run test --timeout=0
 ```
 
-# Running the stackhash update shell #
+# Running the stackhash update shell
 
 There is a new way of finding unique stacktraces that uses hashes that did not
 exist previously. I created a shell to calculate those hashes for old records so
 that they can work with the new code. To use the shell you can just type:
-```shell
+
+```sh
 Console/cake custom addHashesToOldRecords
 ```
 
-# Cron Jobs #
+# Cron Jobs
+
 To Schedule & run cron jobs cakephp provides a console tool. We need to create shell for use in console. We can run the created shell as cron job.
-### Execute an Action as Cron Job ###
+
+### Execute an Action as Cron Job
 For example, following is the command to execute the shell src/Shell/StatsShell.php which cache the error reporting statistics for later use.
-```shell
+
+```sh
 bin/cake stats
 ```
+
 stats cache will expire in one day so we need to schedule this command to run everyday as cron job.
 
 We need to create new shells to schedule and run different tasks.
-### Cron Job Logging ###
+
+### Cron Job Logging
+
 A separate log file named `cron_jobs` is maintained for all the cron jobs. All the logging is done via `CakeLog` interface. All the failures and other activity relating to cron jobs should be reported there only. That would make debugging easier in case of failure.
