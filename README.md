@@ -46,7 +46,7 @@ In order to deploy the app in this repo you need to follow these steps:
 
 ## Requirements
 
-- php >= 7.1
+- php >= 7.2
 - MySQL
 
 

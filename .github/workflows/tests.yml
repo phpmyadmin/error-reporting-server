@@ -25,7 +25,7 @@ jobs:
               --health-retries=3
         strategy:
             matrix:
-                php-version: ["7.1", "7.2", "7.3", "7.4"]
+                php-version: ["7.2", "7.3", "7.4"]
                 db-server: ["mysql:5.7"]
                 os: [ubuntu-latest]
         steps:
