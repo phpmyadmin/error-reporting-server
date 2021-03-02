@@ -19,6 +19,8 @@
 namespace App\Controller\Component;
 
 use Cake\Controller\Component;
+use Cake\Core\Configure;
+use Cake\Log\Log;
 use Cake\Routing\Router;
 use const CURLINFO_HTTP_CODE;
 use const CURLOPT_CUSTOMREQUEST;
@@ -33,6 +35,8 @@ use function http_build_query;
 use function json_decode;
 use function json_encode;
 use function strtoupper;
+use function curl_error;
+use function curl_close;
 
 /**
  * Github api component handling comunication with github.
@@ -83,7 +87,7 @@ class GithubApiComponent extends Component
     {
         $url = 'https://github.com/login/oauth/access_token';
         $data = array_merge(
-            $this->getConfig('githubConfig', []),
+            Configure::read('GithubConfig', []),
             ['code' => $code]
         );
         $decodedResponse = $this->sendRequest($url, http_build_query($data), 'POST');
@@ -138,16 +142,24 @@ class GithubApiComponent extends Component
         curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data);
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($curlHandle);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
+        if ($response === false) {
+            Log::error('Curl error: ' . curl_error($curlHandle));
+            curl_close($curlHandle);
+
+            return [];
+        }
         $decodedResponse = json_decode($response, true);
         if ($returnCode) {
             $status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
             // phpcs ignored patterns for mock testing reasons
+            curl_close($curlHandle);
 
             return [
                 $decodedResponse,
                 $status,
             ];
         }
+        curl_close($curlHandle);
 
         return $decodedResponse;
     }
@@ -164,7 +176,7 @@ class GithubApiComponent extends Component
     {
         $url = 'https://github.com/login/oauth/authorize';
         $data = [
-            'client_id' => $this->getConfig('githubConfig', ['client_id' => ''])['client_id'],
+            'client_id' => Configure::read('GithubConfig', ['client_id' => ''])['client_id'],
             'redirect_uri' => Router::url(
                 [
                     'controller' => 'developers',
@@ -185,7 +197,7 @@ class GithubApiComponent extends Component
      * @param string $repoPath     the repo path of the repo to check for
      * @param string $access_token the github access token
      *
-     * @return bool true if the user is a collaborator and false if they arent
+     * @return bool true if the user is a collaborator and false if they are not
      */
     public function canCommitTo(string $username, string $repoPath, string $access_token): bool
     {
