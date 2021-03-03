@@ -295,7 +295,7 @@ class ReportsController extends AppController
             throw new NotFoundException(__('Invalid Report'));
         }
 
-        $state = $this->request->data['state'];
+        $state = $this->request->getData('state');
         $newState = null;
 
         if (array_key_exists($state, $this->Reports->status)) {
@@ -326,7 +326,7 @@ class ReportsController extends AppController
     public function mass_action(): void
     {
         $flash_class = 'alert alert-error';
-        $state = $this->request->data['state'];
+        $state = $this->request->getData('state');
         $newState = null;
         if (array_key_exists($state, $this->Reports->status)) {
             $newState = $this->Reports->status[$state];
@@ -339,14 +339,14 @@ class ReportsController extends AppController
                 'alert'
             );
             $msg = 'ERROR: Invalid State!!';
-        } elseif (count($this->request->data['reports']) === 0) {
+        } elseif (count($this->request->getData('reports')) === 0) {
             $msg = 'No Reports Selected!! Please Select Reports and try again.';
         } else {
             $msg = "Status has been changed to '"
-                . $this->request->data['state']
+                . $this->request->getData('state')
                 . "' for selected Reports!";
             $flash_class = 'alert alert-success';
-            foreach ($this->request->data['reports'] as $report_id) {
+            foreach ($this->request->getData('reports') as $report_id) {
                 $report = $this->Reports->get($report_id);
                 if (! $report) {
                     Log::write(

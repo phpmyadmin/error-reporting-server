@@ -83,7 +83,7 @@ class GithubController extends AppController
         }
 
         $reportArray = $report->toArray();
-        if (empty($this->request->data)) {
+        if (empty($this->request->getParsedBody())) {
             $this->set('error_name', $reportArray['error_name']);
             $this->set('error_message', $reportArray['error_message']);
 
@@ -92,13 +92,13 @@ class GithubController extends AppController
 
         $this->autoRender = false;
         $data = [
-            'title' => $this->request->data['summary'],
-            'labels' => $this->request->data['labels'] ? explode(',', $this->request->data['labels']) : [],
+            'title' => $this->request->getData('summary'),
+            'labels' => $this->request->getData('labels') ? explode(',', $this->request->getData('labels')) : [],
         ];
         $incidents_query = TableRegistry::getTableLocator()->get('Incidents')->findByReportId($reportId)->all();
         $incident = $incidents_query->first();
         $reportArray['exception_type'] = $incident['exception_type'] ? 'php' : 'js';
-        $reportArray['description'] = $this->request->data['description'];
+        $reportArray['description'] = $this->request->getData('description');
 
         $data['body']
             = $this->getReportDescriptionText($reportId, $reportArray);

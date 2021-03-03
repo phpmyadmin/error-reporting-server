@@ -169,7 +169,7 @@ class NotificationsController extends AppController
 
             $msg = 'All your notifications have been marked \'Read\'';
         } else {
-            foreach ($this->request->data['notifs'] as $notif_id) {
+            foreach ($this->request->getData('notifs') as $notif_id) {
                 if (! $this->Notifications->delete($this->Notifications->get(intval($notif_id)))) {
                     $msg = '<b>ERROR</b>: There was some problem in deleting Notification(ID:'
                         . $notif_id
