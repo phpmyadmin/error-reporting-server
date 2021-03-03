@@ -19,13 +19,15 @@
 namespace App\Shell;
 
 use Cake\Cache\Cache;
-use Cake\Console\Shell;
+use Cake\Command\Command;
+use Cake\Console\Arguments;
+use Cake\Console\ConsoleIo;
 use function json_encode;
 
 /**
  * Stats shell.
  */
-class StatsShell extends Shell
+class StatsShell extends Command
 {
     public function initialize(): void
     {
@@ -34,11 +36,11 @@ class StatsShell extends Shell
         $this->loadModel('Reports');
     }
 
-    public function main(): void
+    public function execute(Arguments $args, ConsoleIo $io)
     {
         foreach ($this->Incidents->filterTimes as $filter_string => $filter) {
             foreach ($this->Incidents->summarizableFields as $field) {
-                $this->out('processing ' . $filter_string . ':' . $field);
+                $io->out('processing ' . $filter_string . ':' . $field);
                 $entriesWithCount = $this->Reports->
                         getRelatedByField($field, 25, false, false, $filter['limit']);
                 $entriesWithCount = json_encode($entriesWithCount);

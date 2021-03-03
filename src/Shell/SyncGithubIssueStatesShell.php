@@ -18,7 +18,9 @@
 
 namespace App\Shell;
 
-use Cake\Console\Shell;
+use Cake\Command\Command;
+use Cake\Console\Arguments;
+use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
 use Cake\Core\HttpApplicationInterface;
 use Cake\Http\Server;
@@ -30,7 +32,7 @@ use function date;
 /**
  * Sync Github issue states Shell.
  */
-class SyncGithubIssueStatesShell extends Shell
+class SyncGithubIssueStatesShell extends Command
 {
     /**
      * The application that is being dispatched.
@@ -49,7 +51,7 @@ class SyncGithubIssueStatesShell extends Shell
         $this->app = $app;
     }
 
-    public function main(): void
+    public function execute(Arguments $args, ConsoleIo $io)
     {
         Log::debug(
             'STARTED: Job "'

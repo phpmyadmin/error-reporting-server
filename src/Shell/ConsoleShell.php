@@ -17,8 +17,10 @@
 
 namespace App\Shell;
 
+use Cake\Command\Command;
+use Cake\Console\Arguments;
+use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
-use Cake\Console\Shell;
 use Cake\Log\Log;
 use Psy\Shell as PsyShell;
 use function class_exists;
@@ -28,35 +30,35 @@ use function restore_exception_handler;
 /**
  * Simple console wrapper around Psy\Shell.
  */
-class ConsoleShell extends Shell
+class ConsoleShell extends Command
 {
     /**
      * Start the shell and interactive console.
      *
      * @return int|void
      */
-    public function main()
+    public function execute(Arguments $args, ConsoleIo $io)
     {
-        if (! class_exists('Psy\Shell')) {
-            $this->err('<error>Unable to load Psy\Shell.</error>');
-            $this->err('');
-            $this->err('Make sure you have installed psysh as a dependency,');
-            $this->err('and that Psy\Shell is registered in your autoloader.');
-            $this->err('');
-            $this->err('If you are using composer run');
-            $this->err('');
-            $this->err('<info>$ php composer.phar require --dev psy/psysh</info>');
-            $this->err('');
+        if (! class_exists(PsyShell::class)) {
+            $io->err('<error>Unable to load Psy\Shell.</error>');
+            $io->err('');
+            $io->err('Make sure you have installed psysh as a dependency,');
+            $io->err('and that Psy\Shell is registered in your autoloader.');
+            $io->err('');
+            $io->err('If you are using composer run');
+            $io->err('');
+            $io->err('<info>$ php composer.phar require --dev psy/psysh</info>');
+            $io->err('');
 
             return 1;
         }
 
-        $this->out('You can exit with <info>`CTRL-C`</info> or <info>`exit`</info>');
-        $this->out('');
+        $io->out('You can exit with <info>`CTRL-C`</info> or <info>`exit`</info>');
+        $io->out('');
 
         Log::drop('debug');
         Log::drop('error');
-        $this->_io->setLoggers(false);
+        $io->setLoggers(false);
         restore_error_handler();
         restore_exception_handler();
 
