@@ -63,17 +63,15 @@ class EventsController extends AppController
 
             // Send a response
             $this->disableAutoRender();
-            $this->response->withStatus($statusCode);
 
-            return $this->response;
+            return $this->response->withStatus($statusCode);
         }
 
         if ($statusCode === 200) {
            // Send a success response to ping event
             $this->disableAutoRender();
-            $this->response->withStatus($statusCode);
 
-            return $this->response;
+            return $this->response->withStatus($statusCode);
         }
 
         $issuesData = $this->request->input('json_decode', true);
@@ -109,9 +107,8 @@ class EventsController extends AppController
 
         // Send a response
         $this->disableAutoRender();
-        $this->response->withStatus($statusCode);
 
-        return $this->response;
+        return $this->response->withStatus($statusCode);
     }
 
     /**

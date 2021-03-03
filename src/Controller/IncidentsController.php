@@ -74,11 +74,13 @@ class IncidentsController extends AppController
             ];
         }
         $this->disableAutoRender();
-        $this->response->withHeader('Content-Type', 'application/json');
-        $this->response->withHeader('X-Content-Type-Options', 'nosniff');
-        $this->response->withStringBody(
-            json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-        );
+
+        $this->response = $this->response
+            ->withHeader('Content-Type', 'application/json')
+            ->withHeader('X-Content-Type-Options', 'nosniff')
+            ->withStringBody(
+                json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
 
         // For all the newly added reports,
         // send notification emails
@@ -107,9 +109,10 @@ class IncidentsController extends AppController
             json_decode($incident['stacktrace'], true);
 
         $this->disableAutoRender();
-        $this->response->withStringBody(json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-        return $this->response;
+        return $this->response
+            ->withType('application/json')
+            ->withStringBody(json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
     public function view(?string $incidentId): void

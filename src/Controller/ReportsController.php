@@ -226,9 +226,10 @@ class ReportsController extends AppController
             'aaData' => $dispRows,
         ];
         $this->disableAutoRender();
-        $this->response->withStringBody(json_encode($response));
 
-        return $this->response;
+        return $this->response
+            ->withType('application/json')
+            ->withStringBody(json_encode($response));
     }
 
     public function mark_related_to(?string $reportId): void

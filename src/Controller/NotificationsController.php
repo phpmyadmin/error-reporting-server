@@ -143,9 +143,10 @@ class NotificationsController extends AppController
             'aaData' => $dispRows,
         ];
         $this->disableAutoRender();
-        $this->response->withStringBody(json_encode($response));
 
-        return $this->response;
+        return $this->response
+            ->withType('application/json')
+            ->withStringBody(json_encode($response));
     }
 
     /**
