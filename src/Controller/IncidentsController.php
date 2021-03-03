@@ -73,7 +73,7 @@ class IncidentsController extends AppController
                 'message' => 'There was a problem with your submission.',
             ];
         }
-        $this->autoRender = false;
+        $this->disableAutoRender();
         $this->response->withHeader('Content-Type', 'application/json');
         $this->response->withHeader('X-Content-Type-Options', 'nosniff');
         $this->response->withStringBody(
@@ -106,7 +106,7 @@ class IncidentsController extends AppController
         $incident['stacktrace'] =
             json_decode($incident['stacktrace'], true);
 
-        $this->autoRender = false;
+        $this->disableAutoRender();
         $this->response->withStringBody(json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         return $this->response;

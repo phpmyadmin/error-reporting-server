@@ -90,7 +90,7 @@ class GithubController extends AppController
             return;
         }
 
-        $this->autoRender = false;
+        $this->disableAutoRender();
         $data = [
             'title' => $this->request->getData('summary'),
             'labels' => $this->request->getData('labels') ? explode(',', $this->request->getData('labels')) : [],
@@ -497,7 +497,7 @@ class GithubController extends AppController
             return;
         }
 
-        $this->autoRender = false;
+        $this->disableAutoRender();
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
 
         // Fetch all linked reports

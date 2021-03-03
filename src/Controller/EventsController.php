@@ -62,7 +62,7 @@ class EventsController extends AppController
             );
 
             // Send a response
-            $this->autoRender = false;
+            $this->disableAutoRender();
             $this->response->withStatus($statusCode);
 
             return $this->response;
@@ -70,7 +70,7 @@ class EventsController extends AppController
 
         if ($statusCode === 200) {
            // Send a success response to ping event
-            $this->autoRender = false;
+            $this->disableAutoRender();
             $this->response->withStatus($statusCode);
 
             return $this->response;
@@ -108,7 +108,7 @@ class EventsController extends AppController
         }
 
         // Send a response
-        $this->autoRender = false;
+        $this->disableAutoRender();
         $this->response->withStatus($statusCode);
 
         return $this->response;

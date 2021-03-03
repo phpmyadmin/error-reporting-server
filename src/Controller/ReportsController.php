@@ -225,7 +225,7 @@ class ReportsController extends AppController
             'sEcho' => (int) $this->request->getQuery('sEcho'),
             'aaData' => $dispRows,
         ];
-        $this->autoRender = false;
+        $this->disableAutoRender();
         $this->response->withStringBody(json_encode($response));
 
         return $this->response;
