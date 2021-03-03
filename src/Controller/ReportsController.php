@@ -53,10 +53,10 @@ class ReportsController extends AppController
             'Reports',
             'Incidents',
         ]);
-        $this->loadModel('Incident');
-        $this->loadModel('Report');
-        $this->loadModel('Notification');
-        $this->loadModel('Developer');
+        $this->loadModel('Incidents');
+        $this->loadModel('Reports');
+        $this->loadModel('Notifications');
+        $this->loadModel('Developers');
     }
 
     public function index(): void

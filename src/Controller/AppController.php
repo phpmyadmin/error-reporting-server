@@ -108,7 +108,7 @@ class AppController extends Controller
     {
         parent::initialize();
         $this->loadComponent('Flash');
-        $this->loadModel('Notification');
+        $this->loadModel('Notifications');
         $this->loadModel('Developers');
         /*  $this->loadComponent(
                 'Auth', [

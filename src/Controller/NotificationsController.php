@@ -48,9 +48,9 @@ class NotificationsController extends AppController
             'Form',
             'Reports',
         ]);
-        $this->loadModel('Notification');
-        $this->loadModel('Developer');
-        $this->loadModel('Report');
+        $this->loadModel('Notifications');
+        $this->loadModel('Developers');
+        $this->loadModel('Reports');
     }
 
     public function beforeFilter(EventInterface $event)

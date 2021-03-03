@@ -47,8 +47,8 @@ class IncidentsController extends AppController
     {
         parent::initialize();
         $this->loadComponent('Mailer');
-        $this->loadModel('Notification');
-        $this->loadModel('Incident');
+        $this->loadModel('Notifications');
+        $this->loadModel('Incidents');
     }
 
     public function create(): ?Response

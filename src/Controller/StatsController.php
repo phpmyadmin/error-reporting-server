@@ -39,9 +39,9 @@ class StatsController extends AppController
     {
         parent::initialize();
         $this->viewBuilder()->setHelpers(['Reports']);
-        $this->loadModel('Notification');
-        $this->loadModel('Incident');
-        $this->loadModel('Report');
+        $this->loadModel('Notifications');
+        $this->loadModel('Incidents');
+        $this->loadModel('Reports');
     }
 
     public function stats(): void

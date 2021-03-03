@@ -113,7 +113,7 @@ class ReportsTable extends Table
      * Retrieves the incident records that are related to the current report that
      * also have a description.
      *
-     * @return Query the list of incidents ordered by description lenght desc
+     * @return Query the list of incidents ordered by description length desc
      */
     public function getIncidentsWithDescription(): Query
     {
