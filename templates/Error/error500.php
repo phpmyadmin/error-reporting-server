@@ -24,9 +24,9 @@ if (Configure::read('debug')) :
     <?php
     echo $this->element('auto_table_warning');
 
-    if (extension_loaded('xdebug')) :
+    if (extension_loaded('xdebug') && stripos((string) ini_get('xdebug.mode'), 'coverage') !== false) {
         xdebug_print_function_stack();
-    endif;
+    }
 
     $this->end();
 endif;

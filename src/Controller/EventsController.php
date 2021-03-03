@@ -38,14 +38,15 @@ class EventsController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-        $this->loadComponent('Csrf');
+        //FIXME: it got deprecated and does not work anymore
+        //$this->loadComponent('Csrf');
 
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
     public function beforeFilter(EventInterface $event)
     {
-        $this->getEventManager()->off($this->Csrf);
+        //$this->getEventManager()->off($this->Csrf);
     }
 
     public function index(): ?Response
