@@ -133,6 +133,7 @@ Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth
 ## Sync Github Issue state
 
 - Get a Github Personal Access token as explained [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
+- You need to set the `repo` scope for this token.
 - Set value of obtained `GithubAccessToken` in config/oauth.php
 - After setting value of GithubAccessToken in config/oauth.php as explained above, you can run the synchronization action as
 
