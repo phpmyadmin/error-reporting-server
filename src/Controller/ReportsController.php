@@ -95,11 +95,11 @@ class ReportsController extends AppController
     public function view(?string $reportId): void
     {
         if (empty($reportId)) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException(__('Invalid report Id.'));
         }
         $report = $this->Reports->findById($reportId)->toArray();
         if (! $report) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException(__('The report does not exist.'));
         }
 
         $this->set('report', $report);
@@ -247,7 +247,7 @@ class ReportsController extends AppController
 
         $report = $this->Reports->get($reportId);
         if (! $report) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException(__('The report does not exist.'));
         }
 
         $this->Reports->addToRelatedGroup($report, $relatedTo);
@@ -272,7 +272,7 @@ class ReportsController extends AppController
 
         $report = $this->Reports->get($reportId);
         if (! $report) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException(__('The report does not exist.'));
         }
 
         $this->Reports->removeFromRelatedGroup($report);
@@ -293,7 +293,7 @@ class ReportsController extends AppController
 
         $report = $this->Reports->get($reportId);
         if (! $report) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException(__('The report does not exist.'));
         }
 
         $state = $this->request->getData('state');

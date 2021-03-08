@@ -17,7 +17,7 @@ end_of_line = crlf
 indent_style = space
 indent_size = 2
 
-[*.ctp]
+[templates/**/*.php]
 insert_final_newline = false
 
 [Makefile]

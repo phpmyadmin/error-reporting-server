@@ -2,11 +2,11 @@
 
 use Cake\Core\Configure;
 
-if (Configure::read('debug')) :
+if (Configure::read('debug')) {
     $this->layout = 'dev_error';
 
     $this->assign('title', $message);
-    $this->assign('templateName', 'error400.ctp');
+    //$this->assign('templateName', 'error400');
 
     $this->start('file');
     ?>
@@ -22,12 +22,13 @@ if (Configure::read('debug')) :
     <?php endif; ?>
     <?= $this->element('auto_table_warning') ?>
     <?php
-    if (extension_loaded('xdebug')) :
+
+    if (extension_loaded('xdebug') && stripos((string) ini_get('xdebug.mode'), 'coverage') !== false) {
         xdebug_print_function_stack();
-    endif;
+    }
 
     $this->end();
-endif;
+}
 ?>
 <h2><?= h($message) ?></h2>
 <p class="error">

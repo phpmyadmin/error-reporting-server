@@ -72,14 +72,14 @@ class GithubController extends AppController
     public function create_issue($reportId): void
     {
         if (! isset($reportId) || ! $reportId) {
-            throw new NotFoundException(__('Invalid report'));
+            throw new NotFoundException(__('Invalid report Id.'));
         }
 
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
         if (! $report) {
-            throw new NotFoundException(__('Invalid report'));
+            throw new NotFoundException(__('The report does not exist.'));
         }
 
         $reportArray = $report->toArray();
@@ -137,14 +137,14 @@ class GithubController extends AppController
     public function link_issue($reportId): void
     {
         if (! isset($reportId) || ! $reportId) {
-            throw new NotFoundException(__('Invalid reportId'));
+            throw new NotFoundException(__('Invalid report Id.'));
         }
 
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
         if (! $report) {
-            throw new NotFoundException(__('Invalid report'));
+            throw new NotFoundException(__('The report does not exist.'));
         }
 
         $ticket_id = intval($this->request->getQuery('ticket_id'));
@@ -208,14 +208,14 @@ class GithubController extends AppController
     public function unlink_issue($reportId): void
     {
         if (! isset($reportId) || ! $reportId) {
-            throw new NotFoundException(__('Invalid reportId'));
+            throw new NotFoundException(__('Invalid report Id.'));
         }
 
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
         if (! $report) {
-            throw new NotFoundException(__('Invalid report'));
+            throw new NotFoundException(__('The report does not exist.'));
         }
 
         $reportArray = $report->toArray();
