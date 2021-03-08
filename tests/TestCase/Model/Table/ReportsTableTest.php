@@ -2,6 +2,8 @@
 
 namespace App\Test\TestCase\Model\Table;
 
+use Cake\ORM\Query;
+use Cake\ORM\ResultSet;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use function count;
@@ -102,7 +104,7 @@ class ReportsTableTest extends TestCase
     {
         $this->Reports->id = 1;
         $result = $this->Reports->getRelatedByField('php_version');
-        $this->assertInstanceOf('Cake\ORM\Query', $result);
+        $this->assertInstanceOf(Query::class, $result);
         $result = $result->enableHydration(false)->toArray();
         $expected = [
             [
@@ -113,7 +115,7 @@ class ReportsTableTest extends TestCase
         $this->assertEquals($expected, $result);
         $this->Reports->id = 4;
         $result = $this->Reports->getRelatedByField('php_version', 1);
-        $this->assertInstanceOf('Cake\ORM\Query', $result);
+        $this->assertInstanceOf(Query::class, $result);
         $result = $result->enableHydration(false)->toArray();
         $expected = [
             [
@@ -130,7 +132,7 @@ class ReportsTableTest extends TestCase
             true,
             '2013-08-29 18:10:01'
         );
-        $this->assertInstanceOf('Cake\ORM\Query', $result);
+        $this->assertInstanceOf(Query::class, $result);
         $result = $result->enableHydration(false)->toArray();
         $expected = [
             [
@@ -141,7 +143,7 @@ class ReportsTableTest extends TestCase
         $this->assertEquals($expected, $result);
 
         $result = $this->Reports->getRelatedByField('php_version', 10, false, false);
-        $this->assertInstanceOf('Cake\ORM\Query', $result);
+        $this->assertInstanceOf(Query::class, $result);
         $result = $result->enableHydration(false)->toArray();
         $expected = [
             [
@@ -155,8 +157,9 @@ class ReportsTableTest extends TestCase
         ];
         $this->assertEquals($expected, $result);
         $result = $this->Reports->getRelatedByField('php_version', 10, true);
-        $this->assertInstanceOf('Cake\ORM\Query', $result[0]);
-        $result[0] = $result[0]->enableHydration(false)->toArray();
+        $this->assertInstanceOf(ResultSet::class, $result[0]);
+        $result[0] = $result[0]->toArray();
+        $result[0][0] = $result[0][0]->toArray();
         $expected = [
             [
                 [
