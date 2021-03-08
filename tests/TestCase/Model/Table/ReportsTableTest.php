@@ -79,18 +79,6 @@ class ReportsTableTest extends TestCase
     //        $this->assertEquals(count($incidents), 1);
     //    }
 
-    /**
-     * Test for getUrl
-     */
-    public function testGetUrl(): void
-    {
-        $this->Reports->id = 1;
-        $this->assertStringEndsWith(
-            '/reports/view/1',
-            $this->Reports->getUrl()
-        );
-    }
-
     // TODO: will do after realted to fix
     //public function testAddToRelatedGroup() {
     //    $this->Report->read(null, 2);

@@ -23,7 +23,6 @@ use Cake\Model\Model;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
-use Cake\Routing\Router;
 
 /**
  * A report a representing a group of incidents.
@@ -191,16 +190,6 @@ class ReportsTable extends Table
         $report->status = $dup_report->status;
 
         $this->save($report);
-    }
-
-    /**
-     * Returns the full url to the current report.
-     *
-     * @return string url
-     */
-    public function getUrl(): string
-    {
-        return Router::url(['_name' => 'reports:view', 'id' => $this->id], true);
     }
 
     /**
