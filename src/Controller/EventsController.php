@@ -29,6 +29,7 @@ use function explode;
 use function file_get_contents;
 use function hash_hmac;
 use function strpos;
+use function json_decode;
 
 /**
  * Events controller Github webhook events
@@ -75,7 +76,7 @@ class EventsController extends AppController
             return $this->response->withStatus($statusCode);
         }
 
-        $issuesData = $this->request->input('json_decode', true);
+        $issuesData = json_decode((string) $this->request->getBody(), true);
         $eventAction = $issuesData['action'];
         $issueNumber = $issuesData['issue'] ? $issuesData['issue']['number'] : '';
 

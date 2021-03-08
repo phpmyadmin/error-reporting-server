@@ -56,7 +56,7 @@ class IncidentsController extends AppController
         // Only allow POST requests
         $this->request->allowMethod(['post']);
 
-        $bugReport = $this->request->input('json_decode', true);
+        $bugReport = json_decode((string) $this->request->getBody(), true);
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
 
         if (count($result['incidents']) > 0
