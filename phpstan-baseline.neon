@@ -560,3 +560,18 @@ parameters:
 			count: 1
 			path: src/View/Helper/ReportsHelper.php
 
+		-
+			message: "#^Method App\\\\View\\\\Helper\\\\ReportsHelper\\:\\:getChartArray\\(\\) has parameter \\$columns with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/View/Helper/ReportsHelper.php
+
+		-
+			message: "#^Method App\\\\View\\\\Helper\\\\ReportsHelper\\:\\:getChartArray\\(\\) has parameter \\$relatedEntries with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/View/Helper/ReportsHelper.php
+
+		-
+			message: "#^Method App\\\\View\\\\Helper\\\\ReportsHelper\\:\\:getLineChartData\\(\\) has parameter \\$entries with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/View/Helper/ReportsHelper.php
+

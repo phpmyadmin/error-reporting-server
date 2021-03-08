@@ -3,12 +3,12 @@
 namespace App\View\Helper;
 
 use Cake\Utility\Inflector;
-use const ENT_HTML5;
-use const ENT_QUOTES;
 use function count;
-use function htmlspecialchars;
 use function implode;
 use function is_array;
+use function json_encode;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
 
 class ReportsHelper extends AppHelper
 {
@@ -104,48 +104,47 @@ class ReportsHelper extends AppHelper
     }
 
     /**
-     * @param mixed $columns
-     * @param mixed $relatedEntries
      * @return string HTML code
      */
-    public function getChartArray(string $arrayName, $columns, $relatedEntries): string
+    public function getChartArray(string $arrayName, array $columns, array $relatedEntries): string
     {
-        $html = 'var ' . $arrayName . ' = [], chart = {};';
+        $finalData = [];
         foreach ($columns as $column) {
-            $column = htmlspecialchars($column, ENT_QUOTES | ENT_HTML5);
-            $html .= 'chart = {};';
-            $html .= 'chart.name = "' . $column . '";';
-            $html .= 'chart.title = "' . Inflector::humanize($column) . '";';
-            $html .= 'chart.labels = []; chart.values = [];';
-            if (! is_array($relatedEntries)) {
-                $relatedEntries = [];
-            }
-            if (! is_array($relatedEntries[$column])) {
-                $relatedEntries[$column] = [];
-            }
+            $data = [
+                'name' => $column,
+                'title' => Inflector::humanize($column),
+                'labels' => [],
+                'values' => [],
+            ];
             foreach ($relatedEntries[$column] as $entry) {
                 $count = $entry['count'];
-                $html .= 'chart.labels.push("' . $entry[$column] . ' (' . $count . ')");';
-                $html .= 'chart.values.push(' . $count . ');';
+                $data['labels'][] = $entry[$column] . ' (' . $count . ')';
+                $data['values'][] = $count;
             }
-            $html .= $arrayName . '.push(chart);';
+            $finalData[] = $data;
         }
 
-        return $html;
+        return 'var ' . $arrayName . ' = '
+            . json_encode(
+                $finalData,
+                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            ) . ';';
     }
 
     /**
-     * @param mixed $entries
      * @return string HTML
      */
-    public function getLineChartData(string $arrayName, $entries): string
+    public function getLineChartData(string $arrayName, array $entries): string
     {
-        $html = 'var $arrayName = [];';
+        $data = [];
         foreach ($entries as $entry) {
-            $html .= $arrayName . '.push(["' . $entry['date'] . '", '
-                    . $entry['count'] . ']);';
+            $data[] = [$entry['date'], $entry['count']];
         }
 
-        return $html;
+        return 'var ' . $arrayName . ' = '
+        . json_encode(
+            $data,
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        ) . ';';
     }
 }

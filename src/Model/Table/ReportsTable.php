@@ -23,8 +23,6 @@ use Cake\Model\Model;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
-use function is_object;
-use stdClass;
 
 /**
  * A report a representing a group of incidents.
@@ -274,11 +272,8 @@ class ReportsTable extends Table
             $queryDetails['group'] = 'Incidents.' . $fieldName;
             $totalCount = TableRegistry::getTableLocator()->get('Incidents')->find('all', $queryDetails)->count();
 
-            /** @var stdClass|null $firstCount */
-            $firstCount = $groupedCount->first();
-
             return [
-                is_object($firstCount) ? $firstCount->count : 0,
+                $groupedCount->all(),
                 $totalCount,
             ];
         }
