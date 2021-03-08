@@ -42,9 +42,7 @@ class MailerComponent extends Component
         $emailFrom = Configure::read('NotificationEmailsFrom');
         $emailTransport = Configure::read('NotificationEmailsTransport');
 
-        if (! $emailTo || $emailTo === ''
-            || ! $emailFrom || $emailFrom === ''
-        ) {
+        if (empty($emailFrom) || empty($emailTo)) {
             return false;
         }
         $email->viewBuilder()->setLayout('default');
