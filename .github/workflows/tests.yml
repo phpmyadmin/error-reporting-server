@@ -57,6 +57,8 @@ jobs:
                 MYSQL_USER: root
                 MYSQL_PASSWORD: testbench
                 MYSQL_PORT: ${{ job.services.database-server.ports['3306'] }}
+            - name: Create the logs folder
+              run: mkdir logs
             - name: Run the migrations
               run: bin/cake migrations migrate
               env:
