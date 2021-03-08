@@ -135,14 +135,14 @@ class ReportsTable extends Table
     {
         return TableRegistry::getTableLocator()->get('Incidents')->find('all', [
             'fields' => [
-                'DISTINCT Incidents.stackhash',
+                'Incidents.stackhash',
                 'Incidents.stacktrace',
                 'Incidents.full_report',
                 'Incidents.exception_type',
             ],
             'conditions' => $this->relatedIncidentsConditions(),
             'group' => 'Incidents.stackhash',
-        ]);
+        ])->distinct(['Incidents.stackhash']);
     }
 
     /**
