@@ -1,0 +1,567 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\$arr1 of function array_diff expects array, array\\<int, string\\>\\|false given\\.$#"
+			count: 1
+			path: src/Console/Installer.php
+
+		-
+			message: "#^Parameter \\#3 \\$subject of function str_replace expects array\\|string, string\\|false given\\.$#"
+			count: 2
+			path: src/Console/Installer.php
+
+		-
+			message: "#^Property App\\\\Controller\\\\AppController\\:\\:\\$whitelist type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/AppController.php
+
+		-
+			message: "#^Property App\\\\Controller\\\\AppController\\:\\:\\$readonly_whitelist type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/AppController.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:apiRequest\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:apiRequest\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$querydata of function http_build_query expects array\\|object, array\\|string given\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:getUserInfo\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:sendRequest\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:sendRequest\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$ch of function curl_setopt expects resource, resource\\|false given\\.$#"
+			count: 5
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$ch of function curl_exec expects resource, resource\\|false given\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$ch of function curl_error expects resource, resource\\|false given\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$ch of function curl_close expects resource, resource\\|false given\\.$#"
+			count: 3
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|true given\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$ch of function curl_getinfo expects resource, resource\\|false given\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:createIssue\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:createIssue\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Parameter \\#2 \\$data of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:apiRequest\\(\\) expects array\\|string, string\\|false given\\.$#"
+			count: 2
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:createComment\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:createComment\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:getIssue\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:getIssue\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\MailerComponent\\:\\:sendReportMail\\(\\) has parameter \\$viewVars with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/MailerComponent.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between mixed and '' will always evaluate to false\\.$#"
+			count: 2
+			path: src/Controller/Component/MailerComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\OrderSearchComponent\\:\\:getSearchConditions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/OrderSearchComponent.php
+
+		-
+			message: "#^Binary operation \"\\.\" between '%%' and array\\|string results in an error\\.$#"
+			count: 1
+			path: src/Controller/Component/OrderSearchComponent.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\OrderSearchComponent\\:\\:getOrder\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/OrderSearchComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$code of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:getAccessToken\\(\\) expects string\\|null, array\\|string\\|null given\\.$#"
+			count: 1
+			path: src/Controller/DevelopersController.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\DevelopersController\\:\\:authenticateDeveloper\\(\\) has parameter \\$userInfo with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/DevelopersController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Model\\\\Table\\\\DevelopersTable\\:\\:\\$id\\.$#"
+			count: 2
+			path: src/Controller/DevelopersController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Controller\\\\EventsController\\:\\:\\$Reports\\.$#"
+			count: 2
+			path: src/Controller/EventsController.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between 201 and 200 will always evaluate to false\\.$#"
+			count: 1
+			path: src/Controller/EventsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$payload of method App\\\\Controller\\\\EventsController\\:\\:getHash\\(\\) expects string, string\\|false given\\.$#"
+			count: 1
+			path: src/Controller/EventsController.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\GithubController\\:\\:getErrors\\(\\) has parameter \\$response with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\GithubController\\:\\:getReportDescriptionText\\(\\) has parameter \\$report with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^If condition is always true\\.$#"
+			count: 1
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$sourceforge_bug_id\\.$#"
+			count: 1
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$status\\.$#"
+			count: 1
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of method Cake\\\\Http\\\\Response\\:\\:withStringBody\\(\\) expects string\\|null, string\\|false given\\.$#"
+			count: 2
+			path: src/Controller/IncidentsController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:\\$recursive\\.$#"
+			count: 1
+			path: src/Controller/IncidentsController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Model\\\\Table\\\\ReportsTable\\:\\:\\$id\\.$#"
+			count: 2
+			path: src/Controller/IncidentsController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Controller\\\\IncidentsController\\:\\:\\$Mailer\\.$#"
+			count: 1
+			path: src/Controller/IncidentsController.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\IncidentsController\\:\\:getSimilarFields\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/IncidentsController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Controller\\\\NotificationsController\\:\\:\\$OrderSearch\\.$#"
+			count: 2
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of method Cake\\\\Http\\\\Response\\:\\:withStringBody\\(\\) expects string\\|null, string\\|false given\\.$#"
+			count: 1
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Model\\\\Table\\\\ReportsTable\\:\\:\\$recursive\\.$#"
+			count: 1
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Model\\\\Table\\\\ReportsTable\\:\\:\\$id\\.$#"
+			count: 2
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Controller\\\\ReportsController\\:\\:\\$OrderSearch\\.$#"
+			count: 2
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Cannot cast array\\|string\\|null to int\\.$#"
+			count: 3
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of method Cake\\\\Http\\\\Response\\:\\:withStringBody\\(\\) expects string\\|null, string\\|false given\\.$#"
+			count: 1
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 4
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$status\\.$#"
+			count: 2
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\ReportsController\\:\\:findArrayList\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Method App\\\\Controller\\\\ReportsController\\:\\:findAllDataTable\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Binary operation \"\\.\" between string and \\(array&nonEmpty\\)\\|string results in an error\\.$#"
+			count: 2
+			path: src/Controller/StatsController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:\\$recursive\\.$#"
+			count: 1
+			path: src/Controller/StatsController.php
+
+		-
+			message: "#^Binary operation \"\\.\" between 'downloadStats_' and \\(array&nonEmpty\\)\\|string results in an error\\.$#"
+			count: 2
+			path: src/Controller/StatsController.php
+
+		-
+			message: "#^Possibly invalid array key type array\\|string\\|null\\.$#"
+			count: 1
+			path: src/Controller/StatsController.php
+
+		-
+			message: "#^Method App\\\\Mailer\\\\Transport\\\\TestTransport\\:\\:send\\(\\) should return array\\('headers' \\=\\> string, 'message' \\=\\> string\\) but returns array\\('headers' \\=\\> array\\<string\\>, 'message' \\=\\> string\\)\\.$#"
+			count: 1
+			path: src/Mailer/Transport/TestTransport.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\DevelopersTable\\:\\:saveFromGithub\\(\\) has parameter \\$githubInfo with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/DevelopersTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$full_name\\.$#"
+			count: 1
+			path: src/Model/Table/DevelopersTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$gravatar_id\\.$#"
+			count: 1
+			path: src/Model/Table/DevelopersTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$email\\.$#"
+			count: 1
+			path: src/Model/Table/DevelopersTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$github_id\\.$#"
+			count: 1
+			path: src/Model/Table/DevelopersTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$access_token\\.$#"
+			count: 1
+			path: src/Model/Table/DevelopersTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$has_commit_access\\.$#"
+			count: 1
+			path: src/Model/Table/DevelopersTable.php
+
+		-
+			message: "#^Property App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:\\$actsAs type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Property App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:\\$validate type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Property App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:\\$summarizableFields type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:__construct\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:createIncidentFromBugReport\\(\\) has parameter \\$bugReport with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:createIncidentFromBugReport\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$created\\.$#"
+			count: 3
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$modified\\.$#"
+			count: 3
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:getClosestReport\\(\\) has parameter \\$bugReport with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:getReportDetails\\(\\) has parameter \\$bugReport with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:getReportDetails\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:getSchematizedIncidents\\(\\) has parameter \\$bugReport with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:getSchematizedIncidents\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Parameter \\#2 \\$versionLength of method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:getSimpleVersion\\(\\) expects string, int given\\.$#"
+			count: 2
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:getIdentifyingLocation\\(\\) has parameter \\$stacktrace with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:getIdentifyingLocation\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:getStackHash\\(\\) has parameter \\$stacktrace with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:logLongIncidentSubmissions\\(\\) has parameter \\$incident_ids with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Cannot access offset 'stacktrace' on object\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Cannot access offset 'full_report' on object\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Cannot access offset 'error_message' on object\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Property App\\\\Model\\\\Table\\\\NotificationsTable\\:\\:\\$validate type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/NotificationsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\NotificationsTable\\:\\:initialize\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/NotificationsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$developer_id\\.$#"
+			count: 1
+			path: src/Model/Table/NotificationsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$report_id\\.$#"
+			count: 1
+			path: src/Model/Table/NotificationsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$created\\.$#"
+			count: 1
+			path: src/Model/Table/NotificationsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$modified\\.$#"
+			count: 1
+			path: src/Model/Table/NotificationsTable.php
+
+		-
+			message: "#^Property App\\\\Model\\\\Table\\\\ReportsTable\\:\\:\\$hasMany type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Property App\\\\Model\\\\Table\\\\ReportsTable\\:\\:\\$validate type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Property App\\\\Model\\\\Table\\\\ReportsTable\\:\\:\\$findMethods type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Property App\\\\Model\\\\Table\\\\ReportsTable\\:\\:\\$status type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:initialize\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getIncidents\\(\\) return type has no value type specified in iterable type Cake\\\\ORM\\\\Query\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getRelatedReports\\(\\) return type has no value type specified in iterable type Cake\\\\ORM\\\\Query\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getIncidentsWithDescription\\(\\) return type has no value type specified in iterable type Cake\\\\ORM\\\\Query\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getIncidentsWithDifferentStacktrace\\(\\) return type has no value type specified in iterable type Cake\\\\ORM\\\\Query\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$related_to\\.$#"
+			count: 6
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Left side of && is always true\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$status\\.$#"
+			count: 2
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getRelatedByField\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Call to an undefined method Cake\\\\Database\\\\FunctionsBuilder\\:\\:substring\\(\\)\\.$#"
+			count: 2
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:relatedIncidentsConditions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Model\\\\Table\\\\ReportsTable\\:\\:\\$id\\.$#"
+			count: 5
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:relatedReportsConditions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Property App\\\\View\\\\Helper\\\\ReportsHelper\\:\\:\\$helpers \\(string\\) does not accept default value of type array\\<int, string\\>\\.$#"
+			count: 1
+			path: src/View/Helper/ReportsHelper.php
+
+		-
+			message: "#^Access to an undefined property App\\\\View\\\\Helper\\\\ReportsHelper\\:\\:\\$Incidents\\.$#"
+			count: 1
+			path: src/View/Helper/ReportsHelper.php
+
