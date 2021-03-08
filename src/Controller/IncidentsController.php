@@ -107,7 +107,7 @@ class IncidentsController extends AppController
         $this->Incidents->recursive = -1;
         $incident = $this->Incidents->findById($id)->all()->first();
         if (! $incident) {
-            throw new NotFoundException(__('Invalid Incident'));
+            throw new NotFoundException(__('The incident does not exist.'));
         }
 
         $incident['full_report'] =
@@ -128,9 +128,11 @@ class IncidentsController extends AppController
             throw new NotFoundException(__('Invalid Incident'));
         }
 
+        $incidentId = (int) $incidentId;
+
         $incident = $this->Incidents->findById($incidentId)->all()->first();
         if (! $incident) {
-            throw new NotFoundException(__('Invalid Incident'));
+            throw new NotFoundException(__('The incident does not exist.'));
         }
 
         $incident['full_report'] =
