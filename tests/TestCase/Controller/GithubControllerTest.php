@@ -66,7 +66,7 @@ class GithubControllerTest extends TestCase
 
         // Case 1. Test with an invalid reportId
         $this->get('github/create_issue/123');
-        $this->assertResponseContains('Invalid report');
+        $this->assertResponseContains('The report does not exist.');
 
         // Case 2. Test form with valid reportId
         $this->get('github/create_issue/5');
@@ -133,7 +133,7 @@ class GithubControllerTest extends TestCase
 
         // Case 1.1 Test with an invalid reportId
         $this->get('github/link_issue/123?ticket_id=1');
-        $this->assertResponseContains('Invalid report');
+        $this->assertResponseContains('The report does not exist.');
 
         // Case 1.2 Test with an invalid ticketId
         $this->get('github/link_issue/5?ticket_id=');
@@ -206,7 +206,7 @@ class GithubControllerTest extends TestCase
 
         // Case 1.1 Test with an invalid reportId
         $this->get('github/unlink_issue/123');
-        $this->assertResponseContains('Invalid report');
+        $this->assertResponseContains('The report does not exist.');
 
         // Case 1.2 Test unlinked with an already unlinked issue
         $this->get('github/unlink_issue/5');

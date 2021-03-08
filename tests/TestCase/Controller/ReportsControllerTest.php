@@ -79,7 +79,7 @@ class ReportsControllerTest extends TestCase
         //$this->assertEquals(1, count($this->viewVariable('related_reports')->toList()));
 
         $this->get('/reports/view/3');
-        $this->assertResponseContains('Invalid Report');
+        $this->assertResponseContains('The report does not exist.');
         $this->assertResponseContains('/reports/view/3');
     }
 
