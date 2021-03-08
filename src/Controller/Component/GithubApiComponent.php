@@ -146,7 +146,7 @@ class GithubApiComponent extends Component
             Log::error('Curl error: ' . curl_error($curlHandle));
             curl_close($curlHandle);
 
-            return [];
+            return ['', 0];
         }
         $decodedResponse = json_decode($response, true);
         if ($returnCode) {
@@ -208,6 +208,9 @@ class GithubApiComponent extends Component
             true,
             $access_token
         );
+        if ($status !== 204 && $status !== 404) {
+            Log::error('Collaborators call ended in a status code: ' . $status);
+        }
 
         return $status === 204;
     }
