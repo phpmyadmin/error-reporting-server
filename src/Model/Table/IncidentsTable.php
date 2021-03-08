@@ -316,12 +316,13 @@ class IncidentsTable extends Table
             ];
             $exception_type = 1;
         } else {
+            $exception = $bugReport['exception'] ?? [];
             [$location, $linenumber] =
-                $this->getIdentifyingLocation($bugReport['exception']['stack'] ?? []);
+                $this->getIdentifyingLocation($exception['stack'] ?? []);
 
             $reportDetails = [
-                'error_message' => $bugReport['exception']['message'],
-                'error_name' => $bugReport['exception']['name'],
+                'error_message' => $exception['message'] ?? '',
+                'error_name' => $exception['name'] ?? '',
             ];
             $exception_type = 0;
         }
@@ -355,11 +356,11 @@ class IncidentsTable extends Table
         $schematizedCommonReport = [
             'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
             'php_version' => $this->getSimpleVersion($bugReport['php_version'] ?? '', 2),
-            'browser' => $bugReport['browser_name'] . ' '
+            'browser' => ($bugReport['browser_name'] ?? '') . ' '
                     . $this->getSimpleVersion($bugReport['browser_version'] ?? '', 1),
-            'user_os' => $bugReport['user_os'],
-            'locale' => $bugReport['locale'],
-            'configuration_storage' => $bugReport['configuration_storage'],
+            'user_os' => $bugReport['user_os'] ?? '',
+            'locale' => $bugReport['locale'] ?? '',
+            'configuration_storage' => $bugReport['configuration_storage'] ?? '',
             'server_software' => $this->getServer($bugReport['server_software'] ?? ''),
             'full_report' => json_encode($bugReport),
         ];
@@ -383,14 +384,19 @@ class IncidentsTable extends Table
                 array_push($schematizedReports, $tmpReport);
             }
         } else {
+            $exception = $bugReport['exception'] ?? [
+                'name' => '',
+                'message' => '',
+                'stack' => [],
+            ];
             $tmpReport = array_merge(
                 $schematizedCommonReport,
                 [
-                    'error_name' => $bugReport['exception']['name'],
-                    'error_message' => $bugReport['exception']['message'],
+                    'error_name' => $exception['name'],
+                    'error_message' => $exception['message'],
                     'script_name' => $bugReport['script_name'],
-                    'stacktrace' => json_encode($bugReport['exception']['stack'] ?? []),
-                    'stackhash' => $this->getStackHash($bugReport['exception']['stack'] ?? []),
+                    'stacktrace' => json_encode($exception['stack'] ?? []),
+                    'stackhash' => $this->getStackHash($exception['stack'] ?? []),
                     'exception_type' => 0,     //'js'
                 ]
             );

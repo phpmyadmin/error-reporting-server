@@ -8,6 +8,7 @@ use const ENT_QUOTES;
 use function count;
 use function htmlspecialchars;
 use function implode;
+use function is_array;
 
 class ReportsHelper extends AppHelper
 {
@@ -22,6 +23,10 @@ class ReportsHelper extends AppHelper
      */
     public function entriesFromIncidents($entries, int $totalCount, string $key): string
     {
+        if (! is_array($entries)) {
+            $entries = [];
+        }
+
         //$entries = Sanitize::clean($entries);
         $values = [];
         foreach ($entries as $entry) {
@@ -112,6 +117,12 @@ class ReportsHelper extends AppHelper
             $html .= 'chart.name = "' . $column . '";';
             $html .= 'chart.title = "' . Inflector::humanize($column) . '";';
             $html .= 'chart.labels = []; chart.values = [];';
+            if (! is_array($relatedEntries)) {
+                $relatedEntries = [];
+            }
+            if (! is_array($relatedEntries[$column])) {
+                $relatedEntries[$column] = [];
+            }
             foreach ($relatedEntries[$column] as $entry) {
                 $count = $entry['count'];
                 $html .= 'chart.labels.push("' . $entry[$column] . ' (' . $count . ')");';
