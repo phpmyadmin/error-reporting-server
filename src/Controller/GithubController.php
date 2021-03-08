@@ -69,7 +69,7 @@ class GithubController extends AppController
      * @throws NotFoundException
      * @return void Nothing
      */
-    public function create_issue(int $reportId): void
+    public function create_issue($reportId): void
     {
         if (! isset($reportId) || ! $reportId) {
             throw new NotFoundException(__('Invalid report'));
@@ -134,7 +134,7 @@ class GithubController extends AppController
      * @param int $reportId The report Id
      * @return void Nothing
      */
-    public function link_issue(int $reportId): void
+    public function link_issue($reportId): void
     {
         if (! isset($reportId) || ! $reportId) {
             throw new NotFoundException(__('Invalid reportId'));
@@ -205,7 +205,7 @@ class GithubController extends AppController
      * @param int $reportId The report Id
      * @return void Nothing
      */
-    public function unlink_issue(int $reportId): void
+    public function unlink_issue($reportId): void
     {
         if (! isset($reportId) || ! $reportId) {
             throw new NotFoundException(__('Invalid reportId'));
