@@ -27,6 +27,8 @@ use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 use function in_array;
+use App\Model\Table\NotificationsTable;
+use App\Model\Table\DevelopersTable;
 
 /**
  * Application Controller.
@@ -35,6 +37,9 @@ use function in_array;
  * will inherit them.
  *
  * @see    http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
+ *
+ * @property NotificationsTable $Notifications
+ * @property DevelopersTable $Developers
  */
 class AppController extends Controller
 {

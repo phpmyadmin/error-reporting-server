@@ -30,9 +30,16 @@ use function count;
 use function in_array;
 use function json_decode;
 use function json_encode;
+use App\Model\Table\NotificationsTable;
+use App\Model\Table\IncidentsTable;
+use App\Model\Table\ReportsTable;
 
 /**
  * Incidents controller handling incident creation and rendering.
+ *
+ * @property NotificationsTable $Notifications
+ * @property IncidentsTable $Incidents
+ * @property ReportsTable $Reports
  */
 class IncidentsController extends AppController
 {

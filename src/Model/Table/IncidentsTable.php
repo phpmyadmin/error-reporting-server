@@ -129,6 +129,9 @@ class IncidentsTable extends Table
         'configuration_storage',
     ];
 
+    /** @var array[] */
+    public $filterTimes = [];
+
     public function __construct(array $data)
     {
         parent::__construct($data);

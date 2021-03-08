@@ -134,7 +134,7 @@ class GithubApiComponent extends Component
         $curlHandle = curl_init($url);
         curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $method);
         $header = ['Accept: application/json'];
-        if (isset($access_token) && $access_token !== '') {
+        if ($access_token !== '') {
             $header[] = 'Authorization: token ' . $access_token;
         }
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $header);

@@ -19,11 +19,13 @@
 namespace App\Controller;
 
 use Cake\Core\Configure;
-use Cake\Event\EventInterface;
 use Cake\Http\Response;
+use App\Controller\Component\GithubApiComponent;
 
 /**
  * Developer controller handling developer login/logout/register.
+ *
+ * @property GithubApiComponent $GithubApi
  */
 class DevelopersController extends AppController
 {
@@ -42,13 +44,6 @@ class DevelopersController extends AppController
             'Html',
             'Form',
         ]);
-    }
-
-    public function beforeFilter(EventInterface $event)
-    {
-        parent::beforeFilter($event);
-        $this->GithubApi->githubConfig = Configure::read('GithubConfig');
-        $this->GithubApi->githubRepo = Configure::read('GithubRepoPath');
     }
 
     public function login(): void
@@ -85,7 +80,7 @@ class DevelopersController extends AppController
 
         $userInfo['has_commit_access'] = $this->GithubApi->canCommitTo(
             $userInfo['login'],
-            $this->GithubApi->githubRepo,
+            Configure::read('GithubRepoPath'),
             Configure::read('GithubAccessToken')
         );
 

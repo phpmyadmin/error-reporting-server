@@ -25,9 +25,12 @@ use Cake\Console\ConsoleOptionParser;
 use Cake\Log\Log;
 use function date;
 use function time;
+use App\Model\Table\NotificationsTable;
 
 /**
  * Clean old Notifications shell.
+ *
+ * @property NotificationsTable $Notifications
  */
 class CleanOldNotifsShell extends Command
 {

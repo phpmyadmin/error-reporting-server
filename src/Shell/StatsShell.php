@@ -25,9 +25,14 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 
 use function json_encode;
+use App\Model\Table\IncidentsTable;
+use App\Model\Table\ReportsTable;
 
 /**
  * Stats shell.
+ *
+ * @property IncidentsTable $Incidents
+ * @property ReportsTable $Reports
  */
 class StatsShell extends Command
 {

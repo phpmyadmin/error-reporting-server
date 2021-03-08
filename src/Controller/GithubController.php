@@ -19,7 +19,6 @@
 namespace App\Controller;
 
 use Cake\Core\Configure;
-use Cake\Event\EventInterface;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
@@ -31,9 +30,12 @@ use function explode;
 use function in_array;
 use function intval;
 use function print_r;
+use App\Controller\Component\GithubApiComponent;
 
 /**
  * Github controller handling github issue submission and creation.
+ *
+ * @property GithubApiComponent $GithubApi
  */
 class GithubController extends AppController
 {
@@ -54,13 +56,6 @@ class GithubController extends AppController
         ]);
     }
 
-    public function beforeFilter(EventInterface $event)
-    {
-        parent::beforeFilter($event);
-        $this->GithubApi->githubConfig = Configure::read('GithubConfig');
-        $this->GithubApi->githubRepo = Configure::read('GithubRepoPath');
-    }
-
     /**
      * create Github Issue.
      *
@@ -71,7 +66,7 @@ class GithubController extends AppController
      */
     public function create_issue($reportId): void
     {
-        if (! isset($reportId) || ! $reportId) {
+        if (empty($reportId)) {
             throw new NotFoundException(__('Invalid report Id.'));
         }
 
@@ -139,7 +134,7 @@ class GithubController extends AppController
      */
     public function link_issue($reportId): void
     {
-        if (! isset($reportId) || ! $reportId) {
+        if (empty($reportId)) {
             throw new NotFoundException(__('Invalid report Id.'));
         }
 
@@ -213,7 +208,7 @@ class GithubController extends AppController
      */
     public function unlink_issue($reportId): void
     {
-        if (! isset($reportId) || ! $reportId) {
+        if (empty($reportId)) {
             throw new NotFoundException(__('Invalid report Id.'));
         }
 

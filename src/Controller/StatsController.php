@@ -22,9 +22,12 @@ use Cake\Cache\Cache;
 use Cake\ORM\TableRegistry;
 use function json_decode;
 use function json_encode;
+use App\Model\Table\IncidentsTable;
 
 /**
  * Stats controller handling stats preview.
+ *
+ * @property IncidentsTable $Incidents
  */
 class StatsController extends AppController
 {
@@ -39,9 +42,7 @@ class StatsController extends AppController
     {
         parent::initialize();
         $this->viewBuilder()->setHelpers(['Reports']);
-        $this->loadModel('Notifications');
         $this->loadModel('Incidents');
-        $this->loadModel('Reports');
     }
 
     public function stats(): void
@@ -54,7 +55,7 @@ class StatsController extends AppController
         }
         $entriesWithCount = [];
         //Cache::clear();
-        foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
+        foreach ($this->Incidents->summarizableFields as $field) {
             $entriesWithCount = Cache::read($field . '_' . $filter_string);
             if ($entriesWithCount === false) {
                 $entriesWithCount = TableRegistry::getTableLocator()->get('Reports')->
@@ -65,8 +66,8 @@ class StatsController extends AppController
             $relatedEntries[$field] = json_decode($entriesWithCount, true);
         }
         $this->set('related_entries', $relatedEntries);
-        $this->set('columns', TableRegistry::getTableLocator()->get('Incidents')->summarizableFields);
-        $this->set('filter_times', TableRegistry::getTableLocator()->get('Incidents')->filterTimes);
+        $this->set('columns', $this->Incidents->summarizableFields);
+        $this->set('filter_times', $this->Incidents->filterTimes);
         $this->set('selected_filter', $this->request->getQuery('filter'));
 
         $query = [
@@ -80,10 +81,10 @@ class StatsController extends AppController
             ];
         }
 
-        TableRegistry::getTableLocator()->get('Incidents')->recursive = -1;
+        $this->Incidents->recursive = -1;
         $downloadStats = Cache::read('downloadStats_' . $filter_string);
         if ($downloadStats === false) {
-            $downloadStats = TableRegistry::getTableLocator()->get('Incidents')->find('all', $query);
+            $downloadStats = $this->Incidents->find('all', $query);
             $downloadStats->select([
                 'grouped_by' => $filter['group'],
                 'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
@@ -101,12 +102,12 @@ class StatsController extends AppController
     protected function getTimeFilter()
     {
         if ($this->request->getQuery('filter')) {
-            $filter = TableRegistry::getTableLocator()->get('Incidents')->filterTimes[$this->request->getQuery('filter')];
+            $filter = $this->Incidents->filterTimes[$this->request->getQuery('filter')];
         }
         if (isset($filter)) {
             return $filter;
         }
 
-        return TableRegistry::getTableLocator()->get('Incidents')->filterTimes['all_time'];
+        return $this->Incidents->filterTimes['all_time'];
     }
 }

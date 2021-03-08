@@ -29,9 +29,12 @@ use function array_push;
 use function array_unshift;
 use function count;
 use function json_encode;
+use App\Model\Table\ReportsTable;
 
 /**
  * Reports controller handling reports modification and rendering.
+ *
+ * @property ReportsTable $Reports
  */
 class ReportsController extends AppController
 {
@@ -133,8 +136,7 @@ class ReportsController extends AppController
             [
                 'developer_id' => $current_developer['Developer']['id'],
                 'report_id' => $reportId,
-            ],
-            false
+            ]
         );
     }
 
