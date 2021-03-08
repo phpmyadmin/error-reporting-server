@@ -284,7 +284,7 @@ class IncidentsTable extends Table
             $linenumber = $bugReport['errors'][$index]['lineNum'];
         } else {
             [$location, $linenumber] =
-                    $this->getIdentifyingLocation($bugReport['exception']['stack']);
+                    $this->getIdentifyingLocation($bugReport['exception']['stack'] ?? []);
         }
 
         return TableRegistry::getTableLocator()->get('Reports')->findByLocationAndLinenumberAndPmaVersion(
@@ -317,7 +317,7 @@ class IncidentsTable extends Table
             $exception_type = 1;
         } else {
             [$location, $linenumber] =
-                $this->getIdentifyingLocation($bugReport['exception']['stack']);
+                $this->getIdentifyingLocation($bugReport['exception']['stack'] ?? []);
 
             $reportDetails = [
                 'error_message' => $bugReport['exception']['message'],
@@ -354,13 +354,13 @@ class IncidentsTable extends Table
         $schematizedReports = [];
         $schematizedCommonReport = [
             'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
-            'php_version' => $this->getSimpleVersion($bugReport['php_version'], 2),
+            'php_version' => $this->getSimpleVersion($bugReport['php_version'] ?? '', 2),
             'browser' => $bugReport['browser_name'] . ' '
-                    . $this->getSimpleVersion($bugReport['browser_version'], 1),
+                    . $this->getSimpleVersion($bugReport['browser_version'] ?? '', 1),
             'user_os' => $bugReport['user_os'],
             'locale' => $bugReport['locale'],
             'configuration_storage' => $bugReport['configuration_storage'],
-            'server_software' => $this->getServer($bugReport['server_software']),
+            'server_software' => $this->getServer($bugReport['server_software'] ?? ''),
             'full_report' => json_encode($bugReport),
         ];
 
@@ -375,7 +375,7 @@ class IncidentsTable extends Table
                         'error_name' => $error['type'],
                         'error_message' => $error['msg'],
                         'script_name' => $error['file'],
-                        'stacktrace' => json_encode($error['stackTrace']),
+                        'stacktrace' => json_encode($error['stackTrace'] ?? []),
                         'stackhash' => $error['stackhash'],
                         'exception_type' => 1,         // 'php'
                     ]
@@ -389,8 +389,8 @@ class IncidentsTable extends Table
                     'error_name' => $bugReport['exception']['name'],
                     'error_message' => $bugReport['exception']['message'],
                     'script_name' => $bugReport['script_name'],
-                    'stacktrace' => json_encode($bugReport['exception']['stack']),
-                    'stackhash' => $this->getStackHash($bugReport['exception']['stack']),
+                    'stacktrace' => json_encode($bugReport['exception']['stack'] ?? []),
+                    'stackhash' => $this->getStackHash($bugReport['exception']['stack'] ?? []),
                     'exception_type' => 0,     //'js'
                 ]
             );
