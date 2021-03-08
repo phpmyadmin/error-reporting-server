@@ -32,6 +32,27 @@ use function restore_exception_handler;
  */
 class ConsoleShell extends Command
 {
+    protected const NAME = 'console';
+
+    /**
+     * The name of this command.
+     *
+     * @var string
+     */
+    protected $name = self::NAME;
+
+    public static function defaultName(): string
+    {
+        return self::NAME;
+    }
+
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
+    {
+        return $parser
+            ->setCommand($this->name)
+            ->setDescription('Open an interactive console');
+    }
+
     /**
      * Start the shell and interactive console.
      *
@@ -73,7 +94,7 @@ class ConsoleShell extends Command
      */
     public function getOptionParser(): ConsoleOptionParser
     {
-        $parser = new ConsoleOptionParser('console', false);
+        $parser = new ConsoleOptionParser($this->name, false);
         $parser->setDescription(
             'This shell provides a REPL that you can use to interact ' .
             'with your application in an interactive fashion. You can use ' .

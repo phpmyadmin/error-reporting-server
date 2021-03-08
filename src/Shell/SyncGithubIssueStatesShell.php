@@ -18,12 +18,12 @@
 
 namespace App\Shell;
 
+use App\Application;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
+use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
-use Cake\Core\HttpApplicationInterface;
-use Cake\Http\Server;
 use Cake\Http\ServerRequest;
 use Cake\Log\Log;
 use const PHP_SAPI;
@@ -34,21 +34,25 @@ use function date;
  */
 class SyncGithubIssueStatesShell extends Command
 {
-    /**
-     * The application that is being dispatched.
-     *
-     * @var HttpApplicationInterface
-     */
-    protected $app;
+    protected const NAME = 'sync_github_issue_states';
 
     /**
-     * Constructor
+     * The name of this command.
      *
-     * @param HttpApplicationInterface $app The test case to run.
+     * @var string
      */
-    public function __construct(HttpApplicationInterface $app)
+    protected $name = self::NAME;
+
+    public static function defaultName(): string
     {
-        $this->app = $app;
+        return self::NAME;
+    }
+
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
+    {
+        return $parser
+            ->setCommand($this->name)
+            ->setDescription('Sync GitHub issues states');
     }
 
     public function execute(Arguments $args, ConsoleIo $io)
@@ -74,8 +78,8 @@ class SyncGithubIssueStatesShell extends Command
             ],
         ]);
 
-        $server = new Server($this->app);
-        $server->run($request);
+        $server = new Application('');
+        $server->handle($request);
 
         Log::debug(
             'FINISHED: Job "'

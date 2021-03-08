@@ -22,6 +22,8 @@ use Cake\Cache\Cache;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
+use Cake\Console\ConsoleOptionParser;
+
 use function json_encode;
 
 /**
@@ -29,6 +31,27 @@ use function json_encode;
  */
 class StatsShell extends Command
 {
+    protected const NAME = 'stats';
+
+    /**
+     * The name of this command.
+     *
+     * @var string
+     */
+    protected $name = self::NAME;
+
+    public static function defaultName(): string
+    {
+        return self::NAME;
+    }
+
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
+    {
+        return $parser
+            ->setCommand($this->name)
+            ->setDescription('Build stats');
+    }
+
     public function initialize(): void
     {
         parent::initialize();

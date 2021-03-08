@@ -18,74 +18,38 @@
 
 namespace App\Test\TestCase\Shell;
 
-use App\Shell\StatsShell;
 use Cake\Cache\Cache;
-use Cake\Console\ConsoleIo;
+use Cake\Command\Command;
+use Cake\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 
 /**
  * App\Shell\StatsShell Test Case
  */
 class StatsShellTest extends TestCase
 {
-    /**
-     * ConsoleIo mock
-     *
-     * @var ConsoleIo|PHPUnit_Framework_MockObject_MockObject
-     */
-    public $io;
+    use ConsoleIntegrationTestTrait;
 
-    /**
-     * Test subject
-     *
-     * @var StatsShell
-     */
-    public $Stats;
-
-    /**
-     * Fixtures.
-     *
-     * @var array
-     */
-    public $fixtures = ['app.Incidents'];
-
-    /**
-     * setUp method
-     */
     public function setUp(): void
     {
         parent::setUp();
-        $this->io = $this->getMockBuilder('Cake\Console\ConsoleIo')->getMock();
-        $this->Stats = new StatsShell($this->io);
+        $this->useCommandRunner();
     }
 
     /**
-     * tearDown method
+     * Test execute method
      */
-    public function tearDown(): void
+    public function testExecute(): void
     {
-        unset($this->Stats);
-
-        parent::tearDown();
-    }
-
-    /**
-     * Test main method
-     */
-    public function testMain(): void
-    {
-        // Call initialize method to load the models
-        $this->Stats->initialize();
-
         // Clear the existing cache
         Cache::clear();
 
         // Run the shell command
-        $this->Stats->main();
-
-        foreach ($this->Stats->Incidents->filterTimes as $filter_string => $filter) {
-            foreach ($this->Stats->Incidents->summarizableFields as $field) {
+        $this->exec('stats');
+        $this->assertExitCode(Command::CODE_SUCCESS);
+        $Incidents = $this->getTableLocator()->get('Incidents');
+        foreach ($Incidents->filterTimes as $filter_string => $filter) {
+            foreach ($Incidents->summarizableFields as $field) {
                 // Make sure all the fields are covered
                 $this->assertNotEquals(
                     false,

@@ -21,6 +21,7 @@ namespace App\Shell;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
+use Cake\Console\ConsoleOptionParser;
 use Cake\Log\Log;
 use function date;
 use function time;
@@ -30,6 +31,27 @@ use function time;
  */
 class CleanOldNotifsShell extends Command
 {
+    protected const NAME = 'clean_old_notifs';
+
+    /**
+     * The name of this command.
+     *
+     * @var string
+     */
+    protected $name = self::NAME;
+
+    public static function defaultName(): string
+    {
+        return self::NAME;
+    }
+
+    protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
+    {
+        return $parser
+            ->setCommand($this->name)
+            ->setDescription('Clean old notifications');
+    }
+
     public function initialize(): void
     {
         parent::initialize();

@@ -2,13 +2,10 @@
 
 namespace App\Test\TestCase\Shell;
 
-use App\Shell\SyncGithubIssueStatesShell;
-use Cake\Console\ConsoleIo;
-use Cake\Http\BaseApplication;
-use Cake\ORM\TableRegistry;
+use Cake\Command\Command;
+use Cake\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
-use PHPUnit_Framework_MockObject_MockObject;
 use const DS;
 use function file_get_contents;
 use function json_decode;
@@ -19,21 +16,8 @@ use function json_encode;
  */
 class SyncGithubIssueStatesShellTest extends TestCase
 {
+    use ConsoleIntegrationTestTrait;
     use PHPMock;
-
-    /**
-     * ConsoleIo mock
-     *
-     * @var ConsoleIo|PHPUnit_Framework_MockObject_MockObject
-     */
-    public $io;
-
-    /**
-     * Test subject
-     *
-     * @var SyncGithubIssueStatesShell
-     */
-    public $SyncGithubIssueStates;
 
     /**
      * Fixtures.
@@ -42,37 +26,18 @@ class SyncGithubIssueStatesShellTest extends TestCase
      */
     public $fixtures = ['app.Reports'];
 
-    /**
-     * setUp method
-     */
     public function setUp(): void
     {
         parent::setUp();
-        $this->io = $this->getMockBuilder('Cake\Console\ConsoleIo')->getMock();
-        /** @var BaseApplication $app */
-        $app = $this->getMockForAbstractClass(
-            BaseApplication::class,
-            [__DIR__ . '/../../../config']
-        );
-        $this->SyncGithubIssueStates = new SyncGithubIssueStatesShell($app);
-        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
+        $this->useCommandRunner();
     }
 
     /**
-     * tearDown method
+     * Test execute method
      */
-    public function tearDown(): void
+    public function testExecute(): void
     {
-        unset($this->SyncGithubIssueStates);
-
-        parent::tearDown();
-    }
-
-    /**
-     * Test main method
-     */
-    public function testMain(): void
-    {
+        $Reports = $this->getTableLocator()->get('Reports');
         // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
         // so that we don't actually hit the Github Api
         $curlExecMock = $this->getFunctionMock('\App\Controller\Component', 'curl_exec');
@@ -95,7 +60,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
         );
 
         // Fetch all linked reports
-        $reports = $this->Reports->find(
+        $reports = $Reports->find(
             'all',
             [
                 'conditions' => [
@@ -106,10 +71,12 @@ class SyncGithubIssueStatesShellTest extends TestCase
         );
         $this->assertEquals(3, $reports->count());
 
-        $this->SyncGithubIssueStates->main();
+        // Run the shell command
+        $this->exec('sync_github_issue_states');
+        $this->assertExitCode(Command::CODE_SUCCESS);
 
         // Fetch all linked reports
-        $reports = $this->Reports->find(
+        $reports = $Reports->find(
             'all',
             [
                 'conditions' => [
@@ -121,7 +88,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
         $this->assertEquals(2, $reports->count());
 
         // Fetch all closed reports
-        $reports = $this->Reports->find(
+        $reports = $Reports->find(
             'all',
             [
                 'conditions' => [
@@ -131,7 +98,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
             ]
         );
         $this->assertEquals(1, $reports->count());
-        $report5 = $this->Reports->get(4);
+        $report5 = $Reports->get(4);
         $this->assertEquals('resolved', $report5->status);
     }
 }

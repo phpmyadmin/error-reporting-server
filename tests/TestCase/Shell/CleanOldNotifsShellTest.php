@@ -18,29 +18,16 @@
 
 namespace App\Test\TestCase\Shell;
 
-use App\Shell\CleanOldNotifsShell;
-use Cake\Console\ConsoleIo;
+use Cake\Command\Command;
+use Cake\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 
 /**
  * App\Shell\CleanOldNotifsShell Test Case
  */
 class CleanOldNotifsShellTest extends TestCase
 {
-    /**
-     * ConsoleIo mock
-     *
-     * @var ConsoleIo|PHPUnit_Framework_MockObject_MockObject
-     */
-    public $io;
-
-    /**
-     * Test subject
-     *
-     * @var CleanOldNotifsShell
-     */
-    public $CleanOldNotifs;
+    use ConsoleIntegrationTestTrait;
 
     /**
      * Fixtures.
@@ -52,47 +39,34 @@ class CleanOldNotifsShellTest extends TestCase
         'app.Developers',
     ];
 
-    /**
-     * setUp method
-     */
     public function setUp(): void
     {
         parent::setUp();
-        $this->io = $this->getMockBuilder('Cake\Console\ConsoleIo')->getMock();
-        $this->CleanOldNotifs = new CleanOldNotifsShell($this->io);
+        $this->useCommandRunner();
     }
 
     /**
-     * tearDown method
+     * Test execute method
      */
-    public function tearDown(): void
+    public function testExecute(): void
     {
-        unset($this->CleanOldNotifs);
-
-        parent::tearDown();
-    }
-
-    /**
-     * Test main method
-     */
-    public function testMain(): void
-    {
-        // Call intialize method to load the models
-        $this->CleanOldNotifs->initialize();
+        $Notifications = $this->getTableLocator()->get('Notifications');
 
         $conditions = ['developer_id' => 1];
         $currentNotificationCount
-            = $this->CleanOldNotifs->Notifications->find('all')->where($conditions)->count();
+            = $Notifications->find('all')->where($conditions)->count();
         $this->assertEquals(2, $currentNotificationCount);
 
-        // Run shell command
-        $this->CleanOldNotifs->main();
+        // Run the shell command
+        $this->exec('clean_old_notifs');
+        $this->assertExitCode(Command::CODE_SUCCESS);
 
         $newNotificationCount
-            = $this->CleanOldNotifs->Notifications->find('all')->where($conditions)->count();
+            = $Notifications->find('all')->where($conditions)->count();
         $this->assertEquals(0, $newNotificationCount);
 
         // Run shell command to generate zero notifications error
-        $this->CleanOldNotifs->main();
+        $this->exec('clean_old_notifs');
+        $this->assertExitCode(Command::CODE_SUCCESS);
     }
 }
