@@ -29,7 +29,9 @@
         <?php echo $this->Html->meta('icon'); ?>
 
         <!-- CSS Files -->
-        <?php echo $this->Html->css($css_files); ?>
+        <?php if (isset($css_files)) {
+            echo $this->Html->css($css_files);
+        } ?>
     </head>
 
     <body>
