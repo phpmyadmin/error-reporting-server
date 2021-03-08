@@ -97,6 +97,9 @@ class ReportsController extends AppController
         if (empty($reportId)) {
             throw new NotFoundException(__('Invalid report Id.'));
         }
+
+        $reportId = (int) $reportId;
+
         $report = $this->Reports->findById($reportId)->toArray();
         if (! $report) {
             throw new NotFoundException(__('The report does not exist.'));

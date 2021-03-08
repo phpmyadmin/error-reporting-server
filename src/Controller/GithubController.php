@@ -75,6 +75,8 @@ class GithubController extends AppController
             throw new NotFoundException(__('Invalid report Id.'));
         }
 
+        $reportId = (int) $reportId;
+
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
@@ -132,6 +134,7 @@ class GithubController extends AppController
      * Links error report to existing issue on Github.
      *
      * @param int $reportId The report Id
+     * @throws NotFoundException
      * @return void Nothing
      */
     public function link_issue($reportId): void
@@ -139,6 +142,8 @@ class GithubController extends AppController
         if (! isset($reportId) || ! $reportId) {
             throw new NotFoundException(__('Invalid report Id.'));
         }
+
+        $reportId = (int) $reportId;
 
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
@@ -203,6 +208,7 @@ class GithubController extends AppController
      * Un-links error report to associated issue on Github.
      *
      * @param int $reportId The report Id
+     * @throws NotFoundException
      * @return void Nothing
      */
     public function unlink_issue($reportId): void
@@ -210,6 +216,8 @@ class GithubController extends AppController
         if (! isset($reportId) || ! $reportId) {
             throw new NotFoundException(__('Invalid report Id.'));
         }
+
+        $reportId = (int) $reportId;
 
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
