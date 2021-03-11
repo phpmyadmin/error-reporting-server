@@ -88,7 +88,7 @@ use Cake\Utility\Inflector;
                     <?php else : ?>
                         <li>
                             <a href="<?= $baseURL . 'developers/login'; ?>">
-                                Login with Github
+                                Login with GitHub
                             </a>
                         </li>
                     <?php endif; ?>

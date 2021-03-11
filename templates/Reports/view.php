@@ -144,7 +144,7 @@ use Cake\Routing\Router;
                     </tr>
                 </table>
             <?php else : ?>
-                This report is not linked to any Github issue.
+                This report is not linked to any GitHub issue.
             <?php endif; ?>
         </td>
     </tr>

@@ -12,7 +12,7 @@
     );
 ?>
     <fieldset>
-        <legend>Github Issue</legend>
+        <legend>GitHub Issue</legend>
         <?=
             $this->Form->input(
                 'summary',
