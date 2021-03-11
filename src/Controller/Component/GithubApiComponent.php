@@ -131,6 +131,7 @@ class GithubApiComponent extends Component
         bool $returnCode = false,
         string $access_token = ''
     ): array {
+        Log::debug('Request-url: ' . $url);
         $curlHandle = curl_init($url);
         curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $method);
         $header = ['Accept: application/json'];
@@ -143,7 +144,7 @@ class GithubApiComponent extends Component
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($curlHandle);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
         if ($response === false) {
-            Log::error('Curl error: ' . curl_error($curlHandle));
+            Log::error('Curl error: "' . curl_error($curlHandle) . '" for: ' . $url);
             curl_close($curlHandle);
 
             return ['', 0];
@@ -153,6 +154,7 @@ class GithubApiComponent extends Component
             $status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
             // phpcs ignored patterns for mock testing reasons
             curl_close($curlHandle);
+            Log::debug('Response-code: ' . $status . ' for: ' . $url);
 
             return [
                 $decodedResponse,
