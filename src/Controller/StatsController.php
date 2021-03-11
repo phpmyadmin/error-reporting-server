@@ -57,7 +57,7 @@ class StatsController extends AppController
         //Cache::clear();
         foreach ($this->Incidents->summarizableFields as $field) {
             $entriesWithCount = Cache::read($field . '_' . $filter_string);
-            if ($entriesWithCount === false) {
+            if ($entriesWithCount === null) {
                 $entriesWithCount = TableRegistry::getTableLocator()->get('Reports')->
                         getRelatedByField($field, 25, false, false, $filter['limit']);
                 $entriesWithCount = json_encode($entriesWithCount);
@@ -83,7 +83,7 @@ class StatsController extends AppController
 
         $this->Incidents->recursive = -1;
         $downloadStats = Cache::read('downloadStats_' . $filter_string);
-        if ($downloadStats === false) {
+        if ($downloadStats === null) {
             $downloadStats = $this->Incidents->find('all', $query);
             $downloadStats->select([
                 'grouped_by' => $filter['group'],
