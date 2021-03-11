@@ -37,6 +37,8 @@ use function json_encode;
 use function strtoupper;
 use function curl_error;
 use function curl_close;
+use const CURLOPT_HTTP_VERSION;
+use const CURL_HTTP_VERSION_1_1;
 
 /**
  * Github api component handling comunication with github.
@@ -141,6 +143,7 @@ class GithubApiComponent extends Component
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $header);
         curl_setopt($curlHandle, CURLOPT_USERAGENT, 'phpMyAdmin - Error Reporting Server');
         curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curlHandle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($curlHandle);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
         if ($response === false) {
