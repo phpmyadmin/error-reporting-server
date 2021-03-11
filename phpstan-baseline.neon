@@ -51,32 +51,7 @@ parameters:
 			path: src/Controller/Component/GithubApiComponent.php
 
 		-
-			message: "#^Parameter \\#1 \\$ch of function curl_setopt expects resource, resource\\|false given\\.$#"
-			count: 5
-			path: src/Controller/Component/GithubApiComponent.php
-
-		-
-			message: "#^Parameter \\#1 \\$ch of function curl_exec expects resource, resource\\|false given\\.$#"
-			count: 1
-			path: src/Controller/Component/GithubApiComponent.php
-
-		-
-			message: "#^Parameter \\#1 \\$ch of function curl_error expects resource, resource\\|false given\\.$#"
-			count: 1
-			path: src/Controller/Component/GithubApiComponent.php
-
-		-
-			message: "#^Parameter \\#1 \\$ch of function curl_close expects resource, resource\\|false given\\.$#"
-			count: 3
-			path: src/Controller/Component/GithubApiComponent.php
-
-		-
 			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|true given\\.$#"
-			count: 1
-			path: src/Controller/Component/GithubApiComponent.php
-
-		-
-			message: "#^Parameter \\#1 \\$ch of function curl_getinfo expects resource, resource\\|false given\\.$#"
 			count: 1
 			path: src/Controller/Component/GithubApiComponent.php
 

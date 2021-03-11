@@ -135,6 +135,11 @@ class GithubApiComponent extends Component
     ): array {
         Log::debug('Request-url: ' . $url);
         $curlHandle = curl_init($url);
+        if ($curlHandle === false) {
+            Log::error('Curl init error for: ' . $url);
+
+            return ['', 0];
+        }
         curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $method);
         $header = ['Accept: application/json'];
         if ($access_token !== '') {
