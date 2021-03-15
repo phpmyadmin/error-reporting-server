@@ -42,6 +42,10 @@ class MailerComponent extends Component
         $emailFrom = Configure::read('NotificationEmailsFrom');
         $emailTransport = Configure::read('NotificationEmailsTransport');
 
+        if ($emailTransport === null) {
+            return false;
+        }
+
         if (empty($emailFrom) || empty($emailTo)) {
             return false;
         }
