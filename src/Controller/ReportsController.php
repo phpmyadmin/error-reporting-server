@@ -386,7 +386,7 @@ class ReportsController extends AppController
         foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
             [$entriesWithCount, $totalEntries] =
                     $this->Reports->getRelatedByField($field, 25, true);
-            $relatedEntries[$field] = $entriesWithCount;
+            $relatedEntries[$field] = $entriesWithCount->toArray();
             $this->set("${field}_distinct_count", $totalEntries);
         }
         //error_log(json_encode($relatedEntries));

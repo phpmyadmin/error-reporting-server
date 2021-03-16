@@ -5,7 +5,6 @@ namespace App\View\Helper;
 use Cake\Utility\Inflector;
 use function count;
 use function implode;
-use function is_array;
 use function json_encode;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
@@ -16,21 +15,17 @@ class ReportsHelper extends AppHelper
     public $helpers = ['Incidents'];
 
     /**
-     * @param mixed  $entries    Entries
-     * @param int    $totalCount Total count
-     * @param string $key        Key
+     * @param array[] $entries    Entries
+     * @param int     $totalCount Total count
+     * @param string  $key        Key
      * @return string HTML
      */
-    public function entriesFromIncidents($entries, int $totalCount, string $key): string
+    public function entriesFromIncidents(array $entries, int $totalCount, string $key): string
     {
-        if (! is_array($entries)) {
-            $entries = [];
-        }
-
         //$entries = Sanitize::clean($entries);
         $values = [];
         foreach ($entries as $entry) {
-            $values[] = $entry . '[' . $key . '] <span class="count">('
+            $values[] = $entry[$key] . ' <span class="count">('
                 . $entry['count'] . ')</span>';
         }
         $fullString = implode(', ', $values);

@@ -175,7 +175,7 @@ class IncidentsController extends AppController
         foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
             [$entriesWithCount, $totalEntries] =
                     $this->Reports->getRelatedByField($field, 25, true);
-            $relatedEntries[$field] = $entriesWithCount;
+            $relatedEntries[$field] = $entriesWithCount->toArray();
             $viewVars["${field}_distinct_count"] = $totalEntries;
         }
 
