@@ -24,7 +24,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = ['app.Reports'];
+    public $fixtures = ['app.Reports', 'app.Developers', 'app.Notifications'];
 
     public function setUp(): void
     {

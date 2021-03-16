@@ -132,6 +132,9 @@ class AppController extends Controller
         */
     }
 
+    /**
+     * @return Response|void Returns a Response if a redirect is needed
+     */
     public function beforeFilter(EventInterface $event)
     {
         $controllerName = $this->request->getParam('controller');
@@ -140,7 +143,12 @@ class AppController extends Controller
 
         $devId = $this->request->getSession()->read('Developer.id');
         if ($devId) {
-            $this->checkReadonlyAccess();
+            $response = $this->checkReadonlyAccess();
+            if ($response !== null) {
+                // This is a security check
+                // The response can be printed if you remove this line
+                return $response;
+            }
 
             $current_developer = TableRegistry::getTableLocator()->get('Developers')->
                     findById($devId)->all()->first();
@@ -162,7 +170,12 @@ class AppController extends Controller
         } else {
             $this->set('developer_signed_in', false);
             $this->set('read_only', true);
-            $this->checkAccess();
+            $response = $this->checkAccess();
+            if ($response !== null) {
+                // This is a security check
+                // The response can be printed if you remove this line
+                return $response;
+            }
         }
         $this->set('notif_count', $notif_count);
         $this->set('js_files', $this->js_files);
@@ -196,7 +209,7 @@ class AppController extends Controller
         return $this->redirect('/');
     }
 
-    protected function checkReadonlyAccess(): void
+    protected function checkReadonlyAccess(): ?Response
     {
         $controllerName = $this->request->getParam('controller');
         $action = $this->request->getParam('action');
@@ -204,16 +217,16 @@ class AppController extends Controller
 
         // If developer has commit access on phpmyadmin/phpmyadmin
         if (! $read_only) {
-            return;
+            return null;
         }
 
         if (in_array($controllerName, $this->readonly_whitelist)) {
-            return;
+            return null;
         }
         if (isset($this->readonly_whitelist[$controllerName])
             && in_array($action, $this->readonly_whitelist[$controllerName])
         ) {
-            return;
+            return null;
         }
 
         $this->request->getSession()->destroy();
@@ -228,6 +241,6 @@ class AppController extends Controller
             ]
         );
 
-        $this->redirect('/');
+        return $this->redirect('/');
     }
 }

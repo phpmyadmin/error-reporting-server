@@ -25,6 +25,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
 use Cake\Http\ServerRequest;
+use Cake\Http\Session;
 use Cake\Log\Log;
 use const PHP_SAPI;
 use function date;
@@ -55,6 +56,9 @@ class SyncGithubIssueStatesShell extends Command
             ->setDescription('Sync GitHub issues states');
     }
 
+    /**
+     * @return int
+     */
     public function execute(Arguments $args, ConsoleIo $io)
     {
         Log::debug(
@@ -70,23 +74,40 @@ class SyncGithubIssueStatesShell extends Command
             exit;
         }
 
+        $session = Session::create();
+        $session->write('Developer.id', 1);
         $request = new ServerRequest([
             'url' => '/github/sync_issue_status',
             'params' => [
                 'controller' => 'Github',
                 'action' => 'sync_issue_status',
             ],
+            'session' => $session,
         ]);
 
         $server = new Application('');
-        $server->handle($request);
+        $response = $server->handle($request);
+        if ($response->getStatusCode() === 200) {
+            Log::debug(
+                'FINISHED: Job "'
+                    . 'github/sync_issue_status'
+                    . '" at '
+                    . date('d-m-Y G:i:s (e)'),
+                ['scope' => 'cron_jobs']
+            );
 
-        Log::debug(
-            'FINISHED: Job "'
+            return 0;
+        }
+
+        Log::error(
+            'ERROR: Job "'
                 . 'github/sync_issue_status'
                 . '" at '
-                . date('d-m-Y G:i:s (e)'),
+                . date('d-m-Y G:i:s (e)')
+                . ' response code: ' . $response->getStatusCode(),
             ['scope' => 'cron_jobs']
         );
+
+        return 1;
     }
 }
