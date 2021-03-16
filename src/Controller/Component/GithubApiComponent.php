@@ -39,6 +39,7 @@ use function curl_error;
 use function curl_close;
 use const CURLOPT_HTTP_VERSION;
 use const CURL_HTTP_VERSION_1_1;
+use const CURLOPT_FOLLOWLOCATION;
 
 /**
  * Github api component handling comunication with github.
@@ -149,6 +150,7 @@ class GithubApiComponent extends Component
         curl_setopt($curlHandle, CURLOPT_USERAGENT, 'phpMyAdmin - Error Reporting Server');
         curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data);
         curl_setopt($curlHandle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($curlHandle, CURLOPT_FOLLOWLOCATION, 1);// Issues moved to another repo have redirects
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($curlHandle);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
         if ($response === false) {
