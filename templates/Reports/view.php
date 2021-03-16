@@ -101,8 +101,8 @@ use Cake\Routing\Router;
                             echo $this->Html->link(
                                 'Create new issue',
                                 Router::url([
-                                '_name' => 'github:create_issue',
-                                'id' => $report[0]['id'],
+                                    '_name' => 'github:create_issue',
+                                    'id' => $report[0]['id'],
                                 ]),
                                 ['class' => 'btn btn-primary']
                             );
