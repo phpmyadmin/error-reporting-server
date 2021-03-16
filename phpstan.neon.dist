@@ -5,3 +5,5 @@ parameters:
     level: max
     scanFiles:
         - config/paths.php
+    paths:
+        - src

@@ -54,7 +54,7 @@
         "phpcs": "phpcs",
         "phpcbf": "phpcbf",
         "test": "phpunit",
-        "phpstan": "phpstan analyse ./src"
+        "phpstan": "phpstan analyse"
     },
     "prefer-stable": true,
     "config": {
