@@ -98,10 +98,14 @@ use Cake\Routing\Router;
                     <tr>
                         <td style="min-width:130px;">
                         <?php
-                            echo Router::url([
+                            echo $this->Html->link(
+                                'Create new issue',
+                                Router::url([
                                 '_name' => 'github:create_issue',
                                 'id' => $report[0]['id'],
-                            ]);
+                                ]),
+                                ['class' => 'btn btn-primary']
+                            );
                         ?>
                         </td>
                         <td style="min-width:130px;">
