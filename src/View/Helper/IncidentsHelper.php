@@ -115,7 +115,7 @@ class IncidentsHelper extends AppHelper
                 $html .= htmlspecialchars($level['function']);
                 $html .= '(';
                 $argList = '';
-                if (count($level['args']) > 0) {
+                if (isset($level['args']) && is_array($level['args']) && count($level['args']) > 0) {
                     foreach ($level['args'] as $arg) {
                         $argList .= "\n"
                             . gettype($arg)
