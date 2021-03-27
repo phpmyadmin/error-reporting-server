@@ -26,6 +26,7 @@ use function is_string;
 use function json_decode;
 use function strlen;
 use function substr;
+use function is_array;
 
 /**
  * Incidents View helper.

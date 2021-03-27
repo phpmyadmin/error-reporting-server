@@ -512,7 +512,7 @@ class IncidentsTable extends Table
      */
     public function getStrippedPmaVersion(string $versionString): string
     {
-        $allowedRegexp = '/^(\d+)(\.\d+){0,3}(\-.*)?/';
+        $allowedRegexp = '/^((\d+)(\.\d+){0,3}(\-[a-z0-9]+){0,1})/';
         $matches = [];
 
         // Check if $versionString matches the regexp
