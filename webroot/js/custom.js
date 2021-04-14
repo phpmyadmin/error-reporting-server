@@ -1,33 +1,32 @@
 $(document).ready(function () {
 	oTable = $('#reports_table').dataTable({
-		"bSortCellsTop": true,
-		"bProcessing": true,
-		"bServerSide": true,
-        "bStateSave": true,
+		"orderCellsTop": true,
+		"processing": true,
+		"serverSide": true,
+        "stateSave": true,
         "lengthMenu": [10, 25, 50, 100, 200, 300, 400, 500, 1000],
-		"sAjaxSource": $('#reports_table').data('ajax-url'),
-		"aoColumnDefs": [
-			{ "bSearchable": false, "aTargets": [ 1, 7, 8 ] },
-			{ "sClass": "center", "aTargets": [ 0, 1, 5, 6, 7, 8] },
-			{ "fnRender": function (oObj) {
-					return '<a class="block" href="/reports/view/' + oObj.aData[1] +
-						'">' + oObj.aData[1] + '</a>';
-				},
-				"aTargets": [ 1 ]
-			}
+		"sAjaxSource": $('#reports_table').data('ajax-url'),// TODO: https://datatables.net/upgrade/1.10-convert#Options
+        "columnDefs": [
+            {
+                "targets": 1,
+                "render": function ( data, type, row, meta) {
+                    return '<a class="block row_edit_link" href="/reports/view/' + row[1] +
+                            '">' + row[1] + '</a>';
+                }
+            }
+        ],
+		"columns": [
+			{ "width": "1%" },
+			{ "width": "10%" },
+			{ "width": "15%" },
+			{ "width": "40%" },
+			{ "width": "5%" },
+			{ "width": "15%" },
+			{ "width": "10%" },
+			{ "width": "10%" },
+			{ "width": "5%" }
 		],
-		"aoColumns": [
-			{ "sWidth": "1%" },
-			{ "sWidth": "10%" },
-			{ "sWidth": "15%" },
-			{ "sWidth": "40%" },
-			{ "sWidth": "5%" },
-			{ "sWidth": "15%" },
-			{ "sWidth": "10%" },
-			{ "sWidth": "10%" },
-			{ "sWidth": "5%" }
-		],
-		"fnServerData": function (sSource, aoData, fnCallback) {
+		"fnServerData": function (sSource, aoData, fnCallback) {// TODO: https://datatables.net/upgrade/1.10-convert#Options
 			$.getJSON(sSource, aoData, function (json) {
 				fnCallback(json);
 				// setup necessary CSS for linkable rows.
@@ -42,19 +41,19 @@ $(document).ready(function () {
 				});
 			});
 		},
-		"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+		"rowCallback": function( nRow, aData, iDisplayIndex ) {
 			// click on the row anywhere to go to the report.
 			$(nRow).click(function (event) {
 				if (event.ctrlKey || event.which == 2) {
 					event.stopPropagation();
 				} else {
 					// extract the href from the anchor string
-					var url = $($.parseHTML(aData[1])).attr('href');
+					var url = $(nRow).find('.row_edit_link').attr('href');
 					document.location.href = url;
 				}
 			});
 		},
-		"fnInitComplete": function(oSettings) {
+		"initComplete": function(oSettings) {
 			$(this.find("select")).each( function(index) {
 				if (index == 0 && oSettings.aoPreSearchCols[index+2].sSearch.length>0) {
 					// Exception Name selector
@@ -68,24 +67,24 @@ $(document).ready(function () {
 	});
 
 	$('#notifications_table').dataTable({
-		"bSortCellsTop": true,
-		"bProcessing": true,
-		"bServerSide": true,
-		"sAjaxSource": $('#notifications_table').data('ajax-url'),
-		"aoColumnDefs": [
-			{ "bSearchable": false, "aTargets": [ 1, 6 ] },
-			{ "sClass": "center", "aTargets": [ 0, 1, 2, 3, 4, 5 ] }
+		"orderCellsTop": true,
+		"processing": true,
+		"serverSide": true,
+		"sAjaxSource": $('#notifications_table').data('ajax-url'),// TODO: https://datatables.net/upgrade/1.10-convert#Options
+		"columnDefs": [
+			{ "searchable": false, "targets": [ 1, 6 ] },
+			{ "className": "center", "targets": [ 0, 1, 2, 3, 4, 5 ] }
 		],
-		"aoColumns": [
-			{ "sWidth": "5%" },
-			{ "sWidth": "10%" },
-			{ "sWidth": "15%" },
-			{ "sWidth": "30%" },
-			{ "sWidth": "10%" },
-			{ "sWidth": "10%" },
-			{ "sWidth": "10%" }
+		"columns": [
+			{ "width": "5%" },
+			{ "width": "10%" },
+			{ "width": "15%" },
+			{ "width": "30%" },
+			{ "width": "10%" },
+			{ "width": "10%" },
+			{ "width": "10%" }
 		],
-		"fnServerData": function (sSource, aoData, fnCallback) {
+		"fnServerData": function (sSource, aoData, fnCallback) {// TODO: https://datatables.net/upgrade/1.10-convert#Options
 			$.getJSON(sSource, aoData, function (json) {
 				fnCallback(json);
 				// setup necessary CSS for linkable rows.
@@ -100,7 +99,7 @@ $(document).ready(function () {
 				});
 			});
 		},
-		"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+		"rowCallback": function( nRow, aData, iDisplayIndex ) {
 			// click on the row anywhere to go to the report.
 			$(nRow).click(function () {
 				// extract the href from the anchor string
