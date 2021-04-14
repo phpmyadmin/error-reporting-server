@@ -194,9 +194,9 @@ class ReportsController extends AppController
         foreach ($rows as $row) {
             $row[5] = $this->Reports->status[$row[5]];
             $row[6] = (int) $row[6] ? 'php' : 'js';
-            $input_elem = "<input type='checkbox' name='reports[]' value='"
+            $input_elem = '<input type="checkbox" name="reports[]" value="'
                 . $row[0]
-                . "'/>";
+                . '"/>';
 
             $subquery_params_count = [
                 'fields' => ['report_id' => 'report_id'],
