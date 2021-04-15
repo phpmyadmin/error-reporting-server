@@ -7,6 +7,8 @@ $(document).ready(function () {
         "lengthMenu": [10, 25, 50, 100, 200, 300, 400, 500, 1000],
 		"sAjaxSource": $('#reports_table').data('ajax-url'),// TODO: https://datatables.net/upgrade/1.10-convert#Options
         "columnDefs": [
+            { "searchable": true, "targets": [ 3, 4 ] }, // Only error_message and location
+            { "searchable": false, "targets": [ 0, 1, 2, 5, 6, 7, 8 ] },
             {
                 "targets": 1,
                 "render": function ( data, type, row, meta) {
