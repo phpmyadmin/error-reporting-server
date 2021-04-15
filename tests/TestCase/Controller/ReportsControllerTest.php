@@ -92,7 +92,7 @@ class ReportsControllerTest extends TestCase
             'sEcho' => 1,
             'aaData' => [
                 [
-                    "<input type='checkbox' name='reports[]' value='1'/>",
+                    '<input type="checkbox" name="reports[]" value="1"/>',
                     1,
                     'error2',
                     'Lorem ipsum dolor sit amet',
@@ -103,7 +103,7 @@ class ReportsControllerTest extends TestCase
                     '1',
                 ],
                 [
-                    "<input type='checkbox' name='reports[]' value='2'/>",
+                    '<input type="checkbox" name="reports[]" value="2"/>',
                     2,
                     'error2',
                     'Lorem ipsum dolor sit amet',
@@ -114,7 +114,7 @@ class ReportsControllerTest extends TestCase
                     '1',
                 ],
                 [
-                    "<input type='checkbox' name='reports[]' value='4'/>",
+                    '<input type="checkbox" name="reports[]" value="4"/>',
                     4,
                     'error1',
                     'Lorem ipsum dolor sit amet',
@@ -125,7 +125,7 @@ class ReportsControllerTest extends TestCase
                     '2',
                 ],
                 [
-                    "<input type='checkbox' name='reports[]' value='5'/>",
+                    '<input type="checkbox" name="reports[]" value="5"/>',
                     5,
                     'error1',
                     'Lorem ipsum dolor sit amet',
@@ -146,7 +146,7 @@ class ReportsControllerTest extends TestCase
             'sEcho' => 1,
             'aaData' => [
                 [
-                    "<input type='checkbox' name='reports[]' value='1'/>",
+                    '<input type="checkbox" name="reports[]" value="1"/>',
                     1,
                     'error2',
                     'Lorem ipsum dolor sit amet',
@@ -157,7 +157,7 @@ class ReportsControllerTest extends TestCase
                     '1',
                 ],
                 [
-                    "<input type='checkbox' name='reports[]' value='2'/>",
+                    '<input type="checkbox" name="reports[]" value="2"/>',
                     2,
                     'error2',
                     'Lorem ipsum dolor sit amet',
@@ -179,7 +179,7 @@ class ReportsControllerTest extends TestCase
             'sEcho' => 1,
             'aaData' => [
                 [
-                    "<input type='checkbox' name='reports[]' value='1'/>",
+                    '<input type="checkbox" name="reports[]" value="1"/>',
                     1,
                     'error2',
                     'Lorem ipsum dolor sit amet',

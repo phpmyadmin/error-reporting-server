@@ -389,7 +389,6 @@ class ReportsController extends AppController
             $relatedEntries[$field] = $entriesWithCount->toArray();
             $this->set("${field}_distinct_count", $totalEntries);
         }
-        //error_log(json_encode($relatedEntries));
         $this->set('related_entries', $relatedEntries);
     }
 
