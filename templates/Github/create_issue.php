@@ -1,6 +1,6 @@
 <?=
     $this->Form->create(
-        'Ticket',
+        null,
         [
             'label' => ['class' => 'control-label'],
             'div' => ['class' => 'control-group'],
