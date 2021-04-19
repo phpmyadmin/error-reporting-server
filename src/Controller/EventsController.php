@@ -24,12 +24,13 @@ use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
+
 use function count;
 use function explode;
 use function file_get_contents;
 use function hash_hmac;
-use function strpos;
 use function json_decode;
+use function strpos;
 
 /**
  * Events controller Github webhook events
@@ -80,7 +81,8 @@ class EventsController extends AppController
         $eventAction = $issuesData['action'];
         $issueNumber = $issuesData['issue'] ? $issuesData['issue']['number'] : '';
 
-        if ($eventAction === 'closed'
+        if (
+            $eventAction === 'closed'
             || $eventAction === 'opened'
             || $eventAction === 'reopened'
         ) {
@@ -205,6 +207,7 @@ class EventsController extends AppController
         if ($algo === '') {
             return '';
         }
+
         $key = Configure::read('GithubWebhookSecret');
 
         return hash_hmac($algo, $payload, $key);

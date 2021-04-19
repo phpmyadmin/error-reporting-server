@@ -37,7 +37,9 @@ $reportsUrl = Router::url(
                         <option></option>
                         <?php foreach ($distinct_error_names as $id => $name) : ?>
                             <?= '<option value="' . $name . '">' . $name . '</option>'; ?>
-                        <?php endforeach; ?>
+                        <?php endforeach;
+
+                        ?>
                     </select>
                 </th>
                 <th></th>
@@ -46,7 +48,9 @@ $reportsUrl = Router::url(
                         <option></option>
                         <?php foreach ($distinct_locations as $id => $location) : ?>
                             <?= '<option value="' . $location . '">' . $location . '</option>'; ?>
-                        <?php endforeach; ?>
+                        <?php endforeach;
+
+                        ?>
                     </select>
                 </th>
                 <th>
@@ -54,7 +58,9 @@ $reportsUrl = Router::url(
                         <option></option>
                         <?php foreach ($distinct_versions as $id => $version) : ?>
                             <?= '<option value="' . $version . '">' . $version . '</option>'; ?>
-                        <?php endforeach; ?>
+                        <?php endforeach;
+
+                        ?>
                     </select>
                 </th>
                 <th>
@@ -62,7 +68,9 @@ $reportsUrl = Router::url(
                         <option></option>
                         <?php foreach ($distinct_statuses as $id => $status) : ?>
                             <?= '<option value="' . $status . '">' . $statuses[$status] . '</option>'; ?>
-                        <?php endforeach; ?>
+                        <?php endforeach;
+
+                        ?>
                     </select>
                 </th>
                 <th>

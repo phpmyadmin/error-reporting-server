@@ -8,7 +8,9 @@
                     <?= 'selected' ?>
                 <?php endif; ?>
                 <?= '>' . $value['label'] . '</option>'; ?>
-            <?php endforeach; ?>
+            <?php endforeach;
+
+            ?>
         </select>
     </form>
 </div>

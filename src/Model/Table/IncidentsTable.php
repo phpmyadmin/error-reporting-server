@@ -23,6 +23,7 @@ use Cake\Model\Model;
 use Cake\ORM\Entity;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
+
 use function array_merge;
 use function array_push;
 use function array_slice;
@@ -188,6 +189,7 @@ class IncidentsTable extends Table
                 'reports' => [],
             ];
         }
+
         $incident_ids = [];    // array to hold ids of all the inserted incidents
         $new_report_ids = []; // array to hold ids of all newly created reports
 
@@ -195,6 +197,7 @@ class IncidentsTable extends Table
         if (isset($bugReport['errors']) && count($bugReport['errors']) > 40) {
             $bugReport['errors'] = array_slice($bugReport['errors'], 0, 40);
         }
+
         if (isset($bugReport['exception']['stack']) && count($bugReport['exception']['stack']) > 40) {
             $bugReport['exception']['stack'] = array_slice($bugReport['exception']['stack'], 0, 40);
         }
@@ -277,7 +280,8 @@ class IncidentsTable extends Table
      */
     protected function getClosestReport(array $bugReport, int $index = 0): ?Entity
     {
-        if (isset($bugReport['exception_type'])
+        if (
+            isset($bugReport['exception_type'])
             && $bugReport['exception_type'] === 'php'
         ) {
             $location = $bugReport['errors'][$index]['file'];
@@ -305,7 +309,8 @@ class IncidentsTable extends Table
      */
     protected function getReportDetails(array $bugReport, int $index = 0): array
     {
-        if (isset($bugReport['exception_type'])
+        if (
+            isset($bugReport['exception_type'])
             && $bugReport['exception_type'] === 'php'
         ) {
             $location = $bugReport['errors'][$index]['file'];
@@ -365,7 +370,8 @@ class IncidentsTable extends Table
             'full_report' => json_encode($bugReport),
         ];
 
-        if (isset($bugReport['exception_type'])
+        if (
+            isset($bugReport['exception_type'])
             && $bugReport['exception_type'] === 'php'
         ) {
             // for each "errors"
@@ -404,6 +410,7 @@ class IncidentsTable extends Table
             if (isset($bugReport['steps'])) {
                 $tmpReport['steps'] = $bugReport['steps'];
             }
+
             array_push($schematizedReports, $tmpReport);
         }
 
@@ -448,6 +455,7 @@ class IncidentsTable extends Table
                             $level['line'],
                         ];
                     }
+
                     continue;
                 }
 
@@ -463,6 +471,7 @@ class IncidentsTable extends Table
                     $level['line'],
                 ];
             }
+
             continue;
         }
 
@@ -485,6 +494,7 @@ class IncidentsTable extends Table
         if ($versionLength < 1) {
             $versionLength = 1;
         }
+
         /* modify the re to accept a variable number of version components. I
          * atleast take one component and optionally get more components if need be.
          * previous code makes sure that the $versionLength variable is a positive
@@ -535,12 +545,14 @@ class IncidentsTable extends Table
      */
     protected function getServer(string $signature): string
     {
-        if (preg_match(
-            '/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)'
+        if (
+            preg_match(
+                '/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)'
                 . '|(lighttpd\/\d+\.\d+)/i',
-            $signature,
-            $matches
-        )) {
+                $signature,
+                $matches
+            )
+        ) {
             return $matches[0];
         }
 
@@ -569,6 +581,7 @@ class IncidentsTable extends Table
                 if (! isset($level[$element])) {
                     continue;
                 }
+
                 hash_update($handle, $level[$element]);
             }
         }
@@ -590,7 +603,8 @@ class IncidentsTable extends Table
         $fullReportLength = mb_strlen($si['full_report']);
         $errorMessageLength = mb_strlen($si['error_message']);
 
-        if ($stacktraceLength <= 65535
+        if (
+            $stacktraceLength <= 65535
             && $fullReportLength <= 65535
             && $errorMessageLength <= 200 // length of field in 'incidents' table
         ) {

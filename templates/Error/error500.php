@@ -30,6 +30,7 @@ if (Configure::read('debug')) {
 
     $this->end();
 }
+
 ?>
 <h2><?= __d('cake', 'An Internal Error has occurred') ?></h2>
 <p class="error">

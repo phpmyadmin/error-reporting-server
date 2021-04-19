@@ -22,11 +22,11 @@ use function count;
 use function gettype;
 use function htmlspecialchars;
 use function implode;
+use function is_array;
 use function is_string;
 use function json_decode;
 use function strlen;
 use function substr;
-use function is_array;
 
 /**
  * Incidents View helper.
@@ -104,8 +104,10 @@ class IncidentsHelper extends AppHelper
                 } elseif ((int) $level['line'] > 5) {
                     $html .= '; first-line: ' . ((int) $level['line'] - 5);
                 }
+
                 $html .= '; highlight: [' . (int) $level['line'] . ']';
             }
+
             $html .= "'>";
 
             if ($exception_type === 'js') {
@@ -125,14 +127,18 @@ class IncidentsHelper extends AppHelper
                             . $arg;
                         $argList .= ',';
                     }
+
                     $argList = substr($argList, 0, strlen($argList) - 1);
                     $argList .= "\n";
                 }
+
                 $html .= htmlspecialchars($argList);
                 $html .= ')';
             }
+
             $html .= '</pre>';
         }
+
         $html .= '</div>';
 
         return $html;
@@ -162,6 +168,7 @@ class IncidentsHelper extends AppHelper
                 'class',
             ];
         }
+
         foreach ($elements as $element) {
             if (! isset($level[$element])) {
                 continue;
@@ -169,6 +176,7 @@ class IncidentsHelper extends AppHelper
 
             $html .= $element . ': ' . $level[$element] . '; ';
         }
+
         $html .= '</span>';
 
         return $html;

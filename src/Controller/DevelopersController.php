@@ -18,9 +18,9 @@
 
 namespace App\Controller;
 
+use App\Controller\Component\GithubApiComponent;
 use Cake\Core\Configure;
 use Cake\Http\Response;
-use App\Controller\Component\GithubApiComponent;
 
 /**
  * Developer controller handling developer login/logout/register.
@@ -124,6 +124,7 @@ class DevelopersController extends AppController
         } else {
             $this->Developers->id = $developer['id'];
         }
+
         $this->Developers->id = $this->Developers->saveFromGithub($userInfo, $accessToken, $developer);
         $this->request->getSession()->write('Developer.id', $this->Developers->id);
         $this->request->getSession()->write('access_token', $accessToken);

@@ -31,7 +31,9 @@
         <!-- CSS Files -->
         <?php if (isset($css_files)) {
             echo $this->Html->css($css_files);
-        } ?>
+        }
+
+        ?>
     </head>
 
     <body>
@@ -48,7 +50,9 @@
                 <strong>Url:</strong> <?php echo $url; ?><br>
                 <?php if (isset($developer_signed_in) && $developer_signed_in) { ?>
                     <br><pre><?php echo $error; ?></pre>
-                <?php } ?>
+                <?php }
+
+                ?>
             </div>
             <div id="footer"></div>
         </div>

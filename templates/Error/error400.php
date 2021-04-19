@@ -29,6 +29,7 @@ if (Configure::read('debug')) {
 
     $this->end();
 }
+
 ?>
 <h2><?= h($message) ?></h2>
 <p class="error">

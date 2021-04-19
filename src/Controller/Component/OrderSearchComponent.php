@@ -83,7 +83,8 @@ class OrderSearchComponent extends Component
 
             $keys = array_keys($aColumns);
 
-            if ($sort_column_index > 0
+            if (
+                $sort_column_index > 0
                 && $request->getQuery('bSortable_' . $sort_column_index) === 'true'
             ) {
                 $order[$aColumns[$keys[$sort_column_index - 1]]] = $request->getQuery('sSortDir_0');

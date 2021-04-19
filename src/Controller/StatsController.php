@@ -18,11 +18,12 @@
 
 namespace App\Controller;
 
+use App\Model\Table\IncidentsTable;
 use Cake\Cache\Cache;
 use Cake\ORM\TableRegistry;
+
 use function json_decode;
 use function json_encode;
-use App\Model\Table\IncidentsTable;
 
 /**
  * Stats controller handling stats preview.
@@ -53,6 +54,7 @@ class StatsController extends AppController
         if (! $filter_string) {
             $filter_string = 'all_time';
         }
+
         $entriesWithCount = [];
         //Cache::clear();
         foreach ($this->Incidents->summarizableFields as $field) {
@@ -63,8 +65,10 @@ class StatsController extends AppController
                 $entriesWithCount = json_encode($entriesWithCount);
                 Cache::write($field . '_' . $filter_string, $entriesWithCount);
             }
+
             $relatedEntries[$field] = json_decode($entriesWithCount, true);
         }
+
         $this->set('related_entries', $relatedEntries);
         $this->set('columns', $this->Incidents->summarizableFields);
         $this->set('filter_times', $this->Incidents->filterTimes);
@@ -93,6 +97,7 @@ class StatsController extends AppController
             $downloadStats = json_encode($downloadStats->toArray());
             Cache::write('downloadStats_' . $filter_string, $downloadStats);
         }
+
         $this->set('download_stats', json_decode($downloadStats, true));
     }
 
@@ -104,6 +109,7 @@ class StatsController extends AppController
         if ($this->request->getQuery('filter')) {
             $filter = $this->Incidents->filterTimes[$this->request->getQuery('filter')];
         }
+
         if (isset($filter)) {
             return $filter;
         }

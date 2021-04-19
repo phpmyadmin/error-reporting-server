@@ -5,12 +5,14 @@ namespace App\Test\TestCase\Model\Table;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use ReflectionMethod;
-use const DS;
+
 use function count;
 use function file_get_contents;
 use function in_array;
 use function json_decode;
 use function json_encode;
+
+use const DS;
 
 class IncidentsTableTest extends TestCase
 {
@@ -440,6 +442,7 @@ class IncidentsTableTest extends TestCase
         for ($i = 0; $i < 2000; $i++) {
             $bugReport['errors'][] = $bugReport['errors'][0];
         }
+
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
         $this->assertEquals(40, count($result['incidents']));
         // No new report added (closest report found)
@@ -453,6 +456,7 @@ class IncidentsTableTest extends TestCase
         for ($i = 0; $i < 1500; $i++) {
             $bugReport['exception']['stack'][] = $bugReport['exception']['stack'][0];
         }
+
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
         $this->assertEquals(1, count($result['incidents']));
         // No new report added (closest report found)

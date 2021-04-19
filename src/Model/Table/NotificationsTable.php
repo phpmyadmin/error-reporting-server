@@ -21,6 +21,7 @@ namespace App\Model\Table;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use InvalidArgumentException;
+
 use function date;
 use function is_int;
 use function time;
@@ -86,6 +87,7 @@ class NotificationsTable extends Table
         if (! is_int($report_id)) {
             throw new InvalidArgumentException('Invalid Argument "$report_id"! Integer Expected.');
         }
+
         $devs = TableRegistry::getTableLocator()->get('Developers')->find('all');
         $notoficationTable = TableRegistry::getTableLocator()->get('Notifications');
         $res = true;

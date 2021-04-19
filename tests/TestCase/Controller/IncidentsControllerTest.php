@@ -6,10 +6,12 @@ use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
-use const DS;
+
 use function count;
 use function file_get_contents;
 use function json_decode;
+
+use const DS;
 
 class IncidentsControllerTest extends TestCase
 {

@@ -18,14 +18,15 @@
 
 namespace App\Shell;
 
+use App\Model\Table\NotificationsTable;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Log\Log;
+
 use function date;
 use function time;
-use App\Model\Table\NotificationsTable;
 
 /**
  * Clean old Notifications shell.

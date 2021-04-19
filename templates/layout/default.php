@@ -59,17 +59,20 @@ use Cake\Utility\Inflector;
                             $controllers[] = 'stats';
                             $controllers[] = 'notifications';
                         }
+
                         foreach ($controllers as $controller) {
                             $class = '';
                             if ($current_controller === $controller) {
                                 $class = 'active';
                             }
+
                             echo '<li class="' . $class . '" id="nav_'
                                 . $controller . '"><a href="'
                                 . $baseURL . $controller . '">';
                             echo Inflector::humanize($controller);
                             echo '</a></li>';
                         }
+
                         ?>
                     </ul>
                 <?php endif; ?>

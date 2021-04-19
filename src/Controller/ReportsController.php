@@ -18,18 +18,19 @@
 
 namespace App\Controller;
 
+use App\Model\Table\ReportsTable;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
+
 use function __;
 use function array_key_exists;
 use function array_push;
 use function array_unshift;
 use function count;
 use function json_encode;
-use App\Model\Table\ReportsTable;
 
 /**
  * Reports controller handling reports modification and rendering.
@@ -243,7 +244,8 @@ class ReportsController extends AppController
         $this->request->allowMethod(['post']);
 
         $relatedTo = $this->request->getData('related_to');
-        if (! $reportId
+        if (
+            ! $reportId
             || ! $relatedTo
             || $reportId === $relatedTo
         ) {
@@ -307,9 +309,11 @@ class ReportsController extends AppController
         if (array_key_exists($state, $this->Reports->status)) {
             $newState = $this->Reports->status[$state];
         }
+
         if (! $newState) {
             throw new NotFoundException(__('Invalid State'));
         }
+
         $report->status = $state;
         $this->Reports->save($report);
 
@@ -364,6 +368,7 @@ class ReportsController extends AppController
                     $flash_class = 'alert alert-error';
                     break;
                 }
+
                 $report->status = $state;
                 $this->Reports->save($report);
             }
@@ -389,6 +394,7 @@ class ReportsController extends AppController
             $relatedEntries[$field] = $entriesWithCount->toArray();
             $this->set("${field}_distinct_count", $totalEntries);
         }
+
         $this->set('related_entries', $relatedEntries);
     }
 
@@ -420,6 +426,7 @@ class ReportsController extends AppController
             foreach ($row as $key => $value) {
                 $output_row[] = $value;
             }
+
             $output[] = $output_row;
         }
 

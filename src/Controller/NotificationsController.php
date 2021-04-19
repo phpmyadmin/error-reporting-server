@@ -22,6 +22,7 @@ use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
+
 use function array_push;
 use function intval;
 use function json_encode;
@@ -180,6 +181,7 @@ class NotificationsController extends AppController
                 }
             }
         }
+
         $this->Flash->set(
             $msg,
             ['params' => ['class' => $flash_class]]

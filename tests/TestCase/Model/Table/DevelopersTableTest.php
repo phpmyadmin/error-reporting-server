@@ -18,10 +18,10 @@
 
 namespace App\Test\TestCase\Model\Table;
 
+use App\Model\Table\DevelopersTable;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
-use App\Model\Table\DevelopersTable;
 
 /**
  * App\Model\Table\DevelopersTable Test Case

@@ -6,10 +6,12 @@ use Cake\Command\Command;
 use Cake\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
-use const DS;
+
 use function file_get_contents;
 use function json_decode;
 use function json_encode;
+
+use const DS;
 
 /**
  * App\Shell\SyncGithubIssueStatesShell Test Case

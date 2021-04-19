@@ -23,6 +23,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Log\Log;
 use Psy\Shell as PsyShell;
+
 use function class_exists;
 use function restore_error_handler;
 use function restore_exception_handler;

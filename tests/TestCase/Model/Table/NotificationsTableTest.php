@@ -4,6 +4,7 @@ namespace App\Test\TestCase\Model\Table;
 
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+
 use function count;
 
 /**

@@ -18,6 +18,8 @@
 
 namespace App\Shell;
 
+use App\Model\Table\IncidentsTable;
+use App\Model\Table\ReportsTable;
 use Cake\Cache\Cache;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
@@ -25,8 +27,6 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 
 use function json_encode;
-use App\Model\Table\IncidentsTable;
-use App\Model\Table\ReportsTable;
 
 /**
  * Stats shell.
@@ -74,6 +74,7 @@ class StatsShell extends Command
                 $entriesWithCount = json_encode($entriesWithCount);
                 Cache::write($field . '_' . $filter_string, $entriesWithCount);
             }
+
             $query = [
                 'group' => 'grouped_by',
                 'order' => 'Incidents.created',
@@ -83,6 +84,7 @@ class StatsShell extends Command
                     'Incidents.created >=' => $filter['limit'],
                 ];
             }
+
             $downloadStats = $this->Incidents->find('all', $query);
             $downloadStats->select([
                 'grouped_by' => $filter['group'],

@@ -22,9 +22,11 @@ use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
-use const DS;
+
 use function file_get_contents;
 use function json_encode;
+
+use const DS;
 
 /**
  * App\Controller\DevelopersController Test Case

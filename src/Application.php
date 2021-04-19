@@ -23,6 +23,7 @@ use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 use DebugKit\Plugin;
+
 use const PHP_SAPI;
 
 /**

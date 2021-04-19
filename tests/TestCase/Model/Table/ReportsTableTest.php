@@ -6,6 +6,7 @@ use Cake\ORM\Query;
 use Cake\ORM\ResultSet;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+
 use function count;
 
 class ReportsTableTest extends TestCase

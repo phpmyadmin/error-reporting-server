@@ -18,19 +18,20 @@
 
 namespace App\Controller;
 
+use App\Controller\Component\GithubApiComponent;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 use InvalidArgumentException;
+
 use function __;
 use function array_key_exists;
 use function explode;
 use function in_array;
 use function intval;
 use function print_r;
-use App\Controller\Component\GithubApiComponent;
 
 /**
  * Github controller handling github issue submission and creation.
@@ -151,6 +152,7 @@ class GithubController extends AppController
         if (! $ticket_id) {
             throw new NotFoundException(__('Invalid Ticket ID!!'));
         }
+
         $reportArray = $report->toArray();
 
         $incidents_query = TableRegistry::getTableLocator()->get('Incidents')->findByReportId($reportId)->all();
@@ -396,7 +398,8 @@ class GithubController extends AppController
             return false;
         }
 
-        if ($response === 404
+        if (
+            $response === 404
             && $type === 2
         ) {
             $flash_class = 'alert alert-error';

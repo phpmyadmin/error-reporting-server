@@ -18,21 +18,23 @@
 
 namespace App\Controller;
 
+use App\Model\Table\IncidentsTable;
+use App\Model\Table\NotificationsTable;
+use App\Model\Table\ReportsTable;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_SLASHES;
+
 use function __;
 use function array_merge;
 use function count;
 use function in_array;
 use function json_decode;
 use function json_encode;
-use App\Model\Table\NotificationsTable;
-use App\Model\Table\IncidentsTable;
-use App\Model\Table\ReportsTable;
+
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
 
 /**
  * Incidents controller handling incident creation and rendering.
@@ -66,7 +68,8 @@ class IncidentsController extends AppController
         $bugReport = json_decode((string) $this->request->getBody(), true);
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
 
-        if (count($result['incidents']) > 0
+        if (
+            count($result['incidents']) > 0
             && ! in_array(false, $result['incidents'])
         ) {
             $response = [
@@ -80,6 +83,7 @@ class IncidentsController extends AppController
                 'message' => 'There was a problem with your submission.',
             ];
         }
+
         $this->disableAutoRender();
 
         $this->response = $this->response

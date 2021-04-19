@@ -27,8 +27,10 @@ use Cake\Core\Configure;
 use Cake\Http\ServerRequest;
 use Cake\Http\Session;
 use Cake\Log\Log;
-use const PHP_SAPI;
+
 use function date;
+
+use const PHP_SAPI;
 
 /**
  * Sync Github issue states Shell.

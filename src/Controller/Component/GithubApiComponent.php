@@ -22,24 +22,26 @@ use Cake\Controller\Component;
 use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\Routing\Router;
-use const CURLINFO_HTTP_CODE;
-use const CURLOPT_CUSTOMREQUEST;
-use const CURLOPT_HTTPHEADER;
-use const CURLOPT_POSTFIELDS;
-use const CURLOPT_RETURNTRANSFER;
-use const CURLOPT_USERAGENT;
+
 use function array_merge;
+use function curl_close;
+use function curl_error;
 use function curl_init;
 use function curl_setopt;
 use function http_build_query;
 use function json_decode;
 use function json_encode;
 use function strtoupper;
-use function curl_error;
-use function curl_close;
-use const CURLOPT_HTTP_VERSION;
+
 use const CURL_HTTP_VERSION_1_1;
+use const CURLINFO_HTTP_CODE;
+use const CURLOPT_CUSTOMREQUEST;
 use const CURLOPT_FOLLOWLOCATION;
+use const CURLOPT_HTTP_VERSION;
+use const CURLOPT_HTTPHEADER;
+use const CURLOPT_POSTFIELDS;
+use const CURLOPT_RETURNTRANSFER;
+use const CURLOPT_USERAGENT;
 
 /**
  * Github api component handling comunication with github.
@@ -141,11 +143,13 @@ class GithubApiComponent extends Component
 
             return ['', 0];
         }
+
         curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $method);
         $header = ['Accept: application/json'];
         if ($access_token !== '') {
             $header[] = 'Authorization: token ' . $access_token;
         }
+
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $header);
         curl_setopt($curlHandle, CURLOPT_USERAGENT, 'phpMyAdmin - Error Reporting Server');
         curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data);
@@ -159,6 +163,7 @@ class GithubApiComponent extends Component
 
             return ['', 0];
         }
+
         $decodedResponse = json_decode($response, true);
         if ($returnCode) {
             $status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
@@ -171,6 +176,7 @@ class GithubApiComponent extends Component
                 $status,
             ];
         }
+
         curl_close($curlHandle);
 
         return $decodedResponse;

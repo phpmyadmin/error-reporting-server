@@ -187,6 +187,7 @@ class ReportsTable extends Table
         } else {
             $report->related_to = $related_to;
         }
+
         $report->status = $dup_report->status;
 
         $this->save($report);
@@ -260,6 +261,7 @@ class ReportsTable extends Table
             default:
                 $field = $fieldName;
         }
+
         $groupedCount->select([
             'count' => $groupedCount->func()->count('*'),
             $fieldAlias => $field,
@@ -330,6 +332,7 @@ class ReportsTable extends Table
             $conditions[] = ['related_to' => $report->related_to];
             $conditions[] = ['id' => $report->related_to];
         }
+
         $conditions = [['OR' => $conditions]];
         $conditions[] = ['Reports.id !=' => $this->id];
 

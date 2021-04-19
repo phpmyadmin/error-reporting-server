@@ -3,9 +3,11 @@
 namespace App\View\Helper;
 
 use Cake\Utility\Inflector;
+
 use function count;
 use function implode;
 use function json_encode;
+
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 
@@ -28,6 +30,7 @@ class ReportsHelper extends AppHelper
             $values[] = $entry[$key] . ' <span class="count">('
                 . $entry['count'] . ')</span>';
         }
+
         $fullString = implode(', ', $values);
         $remaining = $totalCount - count($values);
         if ($remaining) {
@@ -93,6 +96,7 @@ class ReportsHelper extends AppHelper
             $html .= $this->Incidents->getStacktrace($incident, $class);
             ++$count;
         }
+
         $html .= '</div>';
 
         return $html;
@@ -116,6 +120,7 @@ class ReportsHelper extends AppHelper
                 $data['labels'][] = $entry[$column] . ' (' . $count . ')';
                 $data['values'][] = $count;
             }
+
             $finalData[] = $data;
         }
 

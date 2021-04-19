@@ -21,14 +21,15 @@
 
 namespace App\Controller;
 
+use App\Model\Table\DevelopersTable;
+use App\Model\Table\NotificationsTable;
 use Cake\Controller\Controller;
 use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
+
 use function in_array;
-use App\Model\Table\NotificationsTable;
-use App\Model\Table\DevelopersTable;
 
 /**
  * Application Controller.
@@ -166,6 +167,7 @@ class AppController extends Controller
             if ($this->request->getSession()->read('read_only')) {
                 $read_only = true;
             }
+
             $this->set('read_only', $read_only);
         } else {
             $this->set('developer_signed_in', false);
@@ -177,6 +179,7 @@ class AppController extends Controller
                 return $response;
             }
         }
+
         $this->set('notif_count', $notif_count);
         $this->set('js_files', $this->js_files);
         $this->set('css_files', $this->css_files);
@@ -191,11 +194,14 @@ class AppController extends Controller
         if (in_array($controllerName, $this->whitelist)) {
             return null;
         }
-        if (isset($this->whitelist[$controllerName])
+
+        if (
+            isset($this->whitelist[$controllerName])
             && in_array($action, $this->whitelist[$controllerName])
         ) {
             return null;
         }
+
         $flash_class = 'alert';
         $this->Flash->set(
             'You need to be signed in to do this',
@@ -223,7 +229,9 @@ class AppController extends Controller
         if (in_array($controllerName, $this->readonly_whitelist)) {
             return null;
         }
-        if (isset($this->readonly_whitelist[$controllerName])
+
+        if (
+            isset($this->readonly_whitelist[$controllerName])
             && in_array($action, $this->readonly_whitelist[$controllerName])
         ) {
             return null;

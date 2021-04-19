@@ -5,6 +5,7 @@ namespace App\Mailer\Transport;
 use Cake\Core\Configure;
 use Cake\Mailer\AbstractTransport;
 use Cake\Mailer\Message;
+
 use function trim;
 
 /**

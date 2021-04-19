@@ -29,7 +29,7 @@
         "cakephp/bake": "^2.1.1",
         "cakephp/debug_kit": "^4.1.2",
         "php-mock/php-mock-phpunit": "^2.6",
-        "phpmyadmin/coding-standard": "^2.1.1",
+        "phpmyadmin/coding-standard": "^3",
         "phpstan/phpstan": "^0.12",
         "phpunit/phpunit": "^8|^9",
         "psy/psysh": "@stable"

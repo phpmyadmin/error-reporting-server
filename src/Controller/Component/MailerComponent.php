@@ -21,6 +21,7 @@ namespace App\Controller\Component;
 use Cake\Controller\Component;
 use Cake\Core\Configure;
 use Cake\Mailer\Mailer;
+
 use function sprintf;
 
 /**
@@ -49,6 +50,7 @@ class MailerComponent extends Component
         if (empty($emailFrom) || empty($emailTo)) {
             return false;
         }
+
         $email->viewBuilder()->setLayout('default');
         $email->viewBuilder()->setTemplate('report');
 
