@@ -8,7 +8,6 @@ use ReflectionMethod;
 
 use function count;
 use function file_get_contents;
-use function in_array;
 use function json_decode;
 use function json_encode;
 
@@ -472,8 +471,9 @@ class IncidentsTableTest extends TestCase
         }
 
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
-
-        $this->assertEquals(true, in_array(false, $result['incidents']));
+        $this->assertEquals(3, count($result['incidents']));
+        // No new report added (closest report found)
+        $this->assertEquals(0, count($result['reports']));
 
         // Case 3.4: Long error_message in JS report submission
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
@@ -485,8 +485,9 @@ class IncidentsTableTest extends TestCase
         }
 
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
-
-        $this->assertEquals(true, in_array(false, $result['incidents']));
+        $this->assertEquals(1, count($result['incidents']));
+        // No new report added (closest report found)
+        $this->assertEquals(0, count($result['reports']));
     }
 
     /**

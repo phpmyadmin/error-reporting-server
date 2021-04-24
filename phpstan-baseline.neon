@@ -406,11 +406,6 @@ parameters:
 			path: src/Model/Table/IncidentsTable.php
 
 		-
-			message: "#^Cannot access offset 'error_message' on object\\.$#"
-			count: 1
-			path: src/Model/Table/IncidentsTable.php
-
-		-
 			message: "#^Property App\\\\Model\\\\Table\\\\NotificationsTable\\:\\:\\$validate type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Model/Table/NotificationsTable.php
