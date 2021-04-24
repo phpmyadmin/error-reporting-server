@@ -34,6 +34,7 @@ use function hash_init;
 use function hash_update;
 use function in_array;
 use function json_encode;
+use function mb_strimwidth;
 use function mb_strlen;
 use function preg_match;
 use function strtotime;
@@ -211,6 +212,7 @@ class IncidentsTable extends Table
             $closestReport = $this->getClosestReport($bugReport, $index);
             if ($closestReport) {
                 $si['report_id'] = $closestReport['id'];
+                $si['error_message'] = mb_strimwidth($si['error_message'], 0, 200, '...');
                 $si = $incidentsTable->newEntity($si);
                 $si->created = date('Y-m-d H:i:s', time());
                 $si->modified = date('Y-m-d H:i:s', time());
@@ -234,6 +236,7 @@ class IncidentsTable extends Table
                 $reportsTable->save($report);
 
                 $si['report_id'] = $report->id;
+                $si['error_message'] = mb_strimwidth($si['error_message'], 0, 200, '...');
                 $new_report_ids[] = $report->id;
                 $si = $incidentsTable->newEntity($si);
                 $si->created = date('Y-m-d H:i:s', time());
@@ -601,12 +604,10 @@ class IncidentsTable extends Table
     {
         $stacktraceLength = mb_strlen($si['stacktrace']);
         $fullReportLength = mb_strlen($si['full_report']);
-        $errorMessageLength = mb_strlen($si['error_message']);
 
         if (
             $stacktraceLength <= 65535
             && $fullReportLength <= 65535
-            && $errorMessageLength <= 200 // length of field in 'incidents' table
         ) {
             return;
         }
@@ -617,8 +618,7 @@ class IncidentsTable extends Table
         Log::error(
             'Too long data submitted in the incident. The length of stacktrace: '
             . $stacktraceLength . ', the length of bug report: '
-            . $fullReportLength . ', the length of error message: '
-            . $errorMessageLength . '. The full incident reported was as follows: '
+            . $fullReportLength . '. The full incident reported was as follows: '
             . json_encode($si)
         );
 
