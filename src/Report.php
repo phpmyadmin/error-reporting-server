@@ -258,9 +258,9 @@ class Report extends stdClass
             foreach ($error->{'stackTrace'} as $stack) {
                 $trace = [
                     'platform' => 'php',
-                    'function' => $stack->{'function'},
-                    'lineno' => (int) $stack->{'line'},
-                    'filename' => $error->{'file'},
+                    'function' => $stack->{'function'} ?? '',
+                    'lineno' => (int) ($stack->{'line'} ?? 0),
+                    'filename' => $error->{'file'} ?? null,
                 ];
                 if (isset($stack->{'class'})) {
                     $trace['package'] = $stack->{'class'};
