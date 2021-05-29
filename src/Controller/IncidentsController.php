@@ -18,9 +18,11 @@
 
 namespace App\Controller;
 
+use App\Forwarding\Sentry;
 use App\Model\Table\IncidentsTable;
 use App\Model\Table\NotificationsTable;
 use App\Model\Table\ReportsTable;
+use App\Report;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
@@ -65,8 +67,15 @@ class IncidentsController extends AppController
         // Only allow POST requests
         $this->request->allowMethod(['post']);
 
-        $bugReport = json_decode((string) $this->request->getBody(), true);
+        $requestBody = (string) $this->request->getBody();
+        $bugReport = json_decode($requestBody, true);
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $sentryConfig = Configure::read('Forwarding.Sentry');
+        if ($sentryConfig !== null) {
+            $report = Report::fromString($requestBody);
+            Sentry::process($report);
+        }
 
         if (
             count($result['incidents']) > 0

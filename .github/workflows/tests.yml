@@ -48,6 +48,7 @@ jobs:
               run: |
                 cp config/app_ci.php config/app.php
                 cp config/oauth_example.php config/oauth.php
+                cp config/forwarding_example.php config/forwarding.php
             - name: Prepare the test database
               run: |
                 mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" -P"$MYSQL_PORT" -e 'create database pmaerr;'
