@@ -108,11 +108,11 @@ class Sentry
 
         $data = [
             'comments' => $comments,
-            'email' => 'users+' . $userId . '@phpmyadmin.local',
+            'email' => 'u+' . $userId . '@r.local',// 75 chars max (fake hostname to pass email validation rule)
             'name' => 'phpMyAdmin User',
         ];
         $ch = curl_init(
-            $sentryConfig['base_url'] . '/api/embed/error-page/?dsn=' . $sentryConfig['dsn_url'] . '&eventId=' . $eventId
+            $sentryConfig['base_url'] . '/api/embed/error-page/?eventId=' . $eventId . '&dsn=' . $sentryConfig['dsn_url']
         );
         if ($ch === false) {
             throw new Exception('Could not init cURL');
@@ -123,7 +123,28 @@ class Sentry
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
-        curl_exec($ch);
+        $output = curl_exec($ch);
+        if (! is_string($output)) {
+            $error = 'Creating the report feedback failed: ' . json_encode($output);
+            Log::error($error);
+
+            return;
+        }
+
+        $response = json_decode((string) $output, true);
+        if (! is_array($response)) {
+            $error = 'Invalid JSON response: ' . json_encode($output);
+            Log::error($error);
+
+            return;
+        }
+
+        if (isset($response['errors'])) {
+            $error = 'Response has errors: ' . json_encode($response['errors']);
+            Log::error($error);
+
+            return;
+        }
     }
 
     public static function process(Report $report): void
