@@ -96,9 +96,10 @@ class Sentry
      *
      * @param string $eventId  The event ID
      * @param string $comments The comment sent by the user
+     * @param string $userId   The unique user id
      * @return void nothing
      */
-    public static function sendFeedback(string $eventId, string $comments): void
+    public static function sendFeedback(string $eventId, string $comments, string $userId): void
     {
         $sentryConfig = Configure::read('Forwarding.Sentry');
         if ($sentryConfig === null) {
@@ -107,7 +108,7 @@ class Sentry
 
         $data = [
             'comments' => $comments,
-            'email' => 'users@pma.local',
+            'email' => 'users+' . $userId . '@phpmyadmin.local',
             'name' => 'phpMyAdmin User',
         ];
         $ch = curl_init(
@@ -133,7 +134,7 @@ class Sentry
                 continue;
             }
 
-            self::sendFeedback($eventId, $report->getUserFeedback());
+            self::sendFeedback($eventId, $report->getUserFeedback(), $report->getUserId());
         }
     }
 }

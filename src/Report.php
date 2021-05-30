@@ -184,7 +184,7 @@ class Report extends stdClass
         return $userMessage;
     }
 
-    public function getUser(): stdClass
+    public function getUserId(): string
     {
         // Do not use the Ip as real data, protect the user !
         $userIp = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
@@ -201,16 +201,22 @@ class Report extends stdClass
         );// Make finding back the Ip near to impossible
 
         $user = new stdClass();
+
         // A user can be anonymously identified using the hash of the hashed IP + server software
         // + the UA + the locale + is configuration storage enabled + php version
         // Reversing the process would be near to impossible and anyway all the found data would be
         // already known and public data
-        $user->id = Security::hash(
+        return Security::hash(
             $userIp . $serverSoftware . $userAgentString . $locale . $configurationStorage . $phpVersion,
             'sha256',
             true // Enable app security salt
         );
+    }
 
+    public function getUser(): stdClass
+    {
+        $user = new stdClass();
+        $user->id = $this->getUserId();
         $user->ip_address = '0.0.0.0';
 
         return $user;

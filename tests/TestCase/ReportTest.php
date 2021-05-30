@@ -55,6 +55,11 @@ class ReportTest extends TestCase
             $report->getUser()
         );
 
+        $this->assertSame(
+            '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
+            $report->getUserId()
+        );
+
         $oldForwardedValue = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
 
         $_SERVER['HTTP_X_FORWARDED_FOR'] = '1.1.1.1';
