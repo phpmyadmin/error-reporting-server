@@ -1,0 +1,129 @@
+{
+    "pma_version": "5.2.0-dev",
+    "browser_name": "FIREFOX",
+    "browser_version": "90.0",
+    "user_os": "Win",
+    "server_software": "nginx/1.14.2",
+    "user_agent_string": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0",
+    "locale": "en",
+    "configuration_storage": "disabled",
+    "php_version": "7.4.14",
+    "script_name": "index.php",
+    "exception_type": "js",
+    "exception": {
+        "mode": "stack",
+        "name": "TypeError",
+        "message": "can't access property \"transaction\", db is null",
+        "stack": [
+            {
+                "func": "DesignerOfflineDB</designerDB.loadAllObjects",
+                "line": "66",
+                "column": "23",
+                "context": [
+                    "    cursorRequest.onerror = designerDB.onerror;",
+                    "  };",
+                    "",
+                    "  designerDB.loadAllObjects = function (table, callback) {",
+                    "    var db = datastore;",
+                    "    var transaction = db.transaction([table], 'readwrite');",
+                    "    var objStore = transaction.objectStore(table);",
+                    "    var keyRange = IDBKeyRange.lowerBound(0);",
+                    "    var cursorRequest = objStore.openCursor(keyRange);",
+                    "    var results = [];",
+                    ""
+                ],
+                "uri": "js/dist/designer/database.js?v=5.2.0-dev",
+                "scriptname": "js/dist/designer/database.js"
+            },
+            {
+                "func": "DesignerPage.createPageList",
+                "line": "81",
+                "column": "21",
+                "context": [
+                    "DesignerPage.saveTablePositions = function (positions, callback) {",
+                    "  DesignerOfflineDB.addObject('table_coords', positions, callback);",
+                    "};",
+                    "",
+                    "DesignerPage.createPageList = function (db, callback) {",
+                    "  DesignerOfflineDB.loadAllObjects('pdf_pages', function (pages) {",
+                    "    var html = '';",
+                    "",
+                    "    for (var p = 0; p < pages.length; p++) {",
+                    "      var page = pages[p];",
+                    ""
+                ],
+                "uri": "js/dist/designer/page.js?v=5.2.0-dev",
+                "scriptname": "js/dist/designer/page.js"
+            },
+            {
+                "func": "DesignerMove.deletePages/<",
+                "line": "996",
+                "column": "22",
+                "context": [
+                    "      Functions.ajaxShowMessage(data.error, false);",
+                    "    } else {",
+                    "      Functions.ajaxRemoveMessage($msgbox);",
+                    "",
+                    "      if (!designerTablesEnabled) {",
+                    "        DesignerPage.createPageList(db, function (options) {",
+                    "          $('#selected_page').append(options);",
+                    "        });",
+                    "      }",
+                    "",
+                    "      $('<div id=\"page_delete_dialog\"></div>').append(data.message).dialog({"
+                ],
+                "uri": "js/dist/designer/move.js?v=5.2.0-dev",
+                "scriptname": "js/dist/designer/move.js"
+            },
+            {
+                "func": "c",
+                "line": "2",
+                "column": "28327",
+                "context": [
+                    "/*! jQuery v3.6.0 | (c) OpenJS Foundation and other contributors | jquery.o//...",
+                    "!function(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof modul//...",
+                    ""
+                ],
+                "uri": "js/vendor/jquery/jquery.min.js?v=5.2.0-dev",
+                "scriptname": "js/vendor/jquery/jquery.min.js"
+            },
+            {
+                "func": "fireWith",
+                "line": "2",
+                "column": "29072",
+                "context": [
+                    "/*! jQuery v3.6.0 | (c) OpenJS Foundation and other contributors | jquery.o//...",
+                    "!function(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof modul//...",
+                    ""
+                ],
+                "uri": "js/vendor/jquery/jquery.min.js?v=5.2.0-dev",
+                "scriptname": "js/vendor/jquery/jquery.min.js"
+            },
+            {
+                "func": "l",
+                "line": "2",
+                "column": "79901",
+                "context": [
+                    "/*! jQuery v3.6.0 | (c) OpenJS Foundation and other contributors | jquery.o//...",
+                    "!function(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof modul//...",
+                    ""
+                ],
+                "uri": "js/vendor/jquery/jquery.min.js?v=5.2.0-dev",
+                "scriptname": "js/vendor/jquery/jquery.min.js"
+            },
+            {
+                "func": "o/<",
+                "line": "2",
+                "column": "82355",
+                "context": [
+                    "/*! jQuery v3.6.0 | (c) OpenJS Foundation and other contributors | jquery.o//...",
+                    "!function(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof modul//...",
+                    ""
+                ],
+                "uri": "js/vendor/jquery/jquery.min.js?v=5.2.0-dev",
+                "scriptname": "js/vendor/jquery/jquery.min.js"
+            }
+        ],
+        "uri": "index.php?route=%2Fdatabase%2Fdesigner"
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace App\Test\TestCase\Model\Table;
 
+use App\Model\Table\IncidentsTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use ReflectionMethod;
@@ -497,7 +498,7 @@ class IncidentsTableTest extends TestCase
      */
     public function testStripversion(string $version, string $expected): void
     {
-        $this->assertEquals($expected, $this->Incidents->getStrippedPmaVersion($version));
+        $this->assertEquals($expected, IncidentsTable::getStrippedPmaVersion($version));
     }
 
     public function versionsStripping(): array
@@ -546,6 +547,18 @@ class IncidentsTableTest extends TestCase
             [
                 '5.1.1+ubuntu1',
                 '5.1.1',
+            ],
+            [
+                '5.1.1-dev+ubuntu1',// Impossible in theory
+                '5.1.1-dev',
+            ],
+            [
+                '5.1.1-rc1+ubuntu1',
+                '5.1.1-rc1',
+            ],
+            [
+                '5.1.1-rc2-deb2',
+                '5.1.1-rc2',
             ],
             [
                 'zpzefz5.1.1efe',

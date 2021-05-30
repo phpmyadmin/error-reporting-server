@@ -297,7 +297,7 @@ class IncidentsTable extends Table
         return TableRegistry::getTableLocator()->get('Reports')->findByLocationAndLinenumberAndPmaVersion(
             $location,
             $linenumber,
-            $this->getStrippedPmaVersion($bugReport['pma_version'])
+            self::getStrippedPmaVersion($bugReport['pma_version'])
         )->all()->first();
     }
 
@@ -341,7 +341,7 @@ class IncidentsTable extends Table
                 'status' => 'new',
                 'location' => $location,
                 'linenumber' => $linenumber ?? 0,
-                'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
+                'pma_version' => self::getStrippedPmaVersion($bugReport['pma_version']),
                 'exception_type' => $exception_type,
             ]
         );
@@ -362,7 +362,7 @@ class IncidentsTable extends Table
         //$bugReport = Sanitize::clean($bugReport, array('escape' => false));
         $schematizedReports = [];
         $schematizedCommonReport = [
-            'pma_version' => $this->getStrippedPmaVersion($bugReport['pma_version']),
+            'pma_version' => self::getStrippedPmaVersion($bugReport['pma_version']),
             'php_version' => $this->getSimpleVersion($bugReport['php_version'] ?? '', 2),
             'browser' => ($bugReport['browser_name'] ?? '') . ' '
                     . $this->getSimpleVersion($bugReport['browser_version'] ?? '', 1),
@@ -405,7 +405,7 @@ class IncidentsTable extends Table
                     'error_message' => $exception['message'],
                     'script_name' => $bugReport['script_name'],
                     'stacktrace' => json_encode($exception['stack'] ?? []),
-                    'stackhash' => $this->getStackHash($exception['stack'] ?? []),
+                    'stackhash' => self::getStackHash($exception['stack'] ?? []),
                     'exception_type' => 0,     //'js'
                 ]
             );
@@ -523,7 +523,7 @@ class IncidentsTable extends Table
      *
      * @return string stripped phpMyAdmin version
      */
-    public function getStrippedPmaVersion(string $versionString): string
+    public static function getStrippedPmaVersion(string $versionString): string
     {
         $allowedRegexp = '/^((\d+)(\.\d+){0,3}(\-[a-z0-9]+){0,1})/';
         $matches = [];

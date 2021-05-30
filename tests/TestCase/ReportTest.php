@@ -22,6 +22,85 @@ class ReportTest extends TestCase
         $this->assertEquals($report1, $report2);
     }
 
+    public function testReportRoutingSystem(): void
+    {
+        $contents = file_get_contents(
+            __DIR__ . '/../Fixture/report_issue_16853_js.json'
+        );
+        $report = Report::fromString($contents);
+
+        $tags = $report->getTags();
+        $contexts = $report->getContexts();
+        $extras = $report->getExtras();
+        $reports = $report->getReports();
+        $user = $report->getUser();
+        $message = $report->getUserMessage();
+        $toJson = $report->toJson();
+
+        $this->assertEquals((object) [
+            'server_software' => 'nginx/1.14.2',
+            'user_agent_string' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0',
+            'locale' => 'en',
+            'configuration_storage' => false,
+            'php_version' => '7.4.14',
+            'exception_type' => 'js',
+        ], $tags);
+        $this->assertEquals((object) [
+            'os' => (object) ['name' => 'Win'],
+            'browser' => (object) [
+                'name' => 'FIREFOX',
+                'version' => '90.0',
+            ],
+        ], $contexts);
+        $this->assertEquals((object) [], $extras);
+        $this->assertEquals((object) ['message' => ''], $message);
+        $this->assertEquals((object) ['ip_address' => '0.0.0.0'], $user);
+        $this->assertFalse($report->isMultiReports());
+        $this->assertFalse($report->hasUserFeedback());
+        $this->assertEquals([
+            [
+                'sentry.interfaces.Message' => $message,
+                'release' => '5.2.0-dev',
+                'dist' => '5.2.0-dev',
+                'platform' => 'javascript',
+                'environment' => 'development',
+                'transaction' => '/database/designer',
+                'timestamp' => $report->getTimestampUTC(),
+                'tags' => $tags,
+                'contexts' => $contexts,
+                'extra' => $extras,
+                'user' => $user,
+                'exception' => [
+                    'values' => [
+                        (object) [
+                            'type' => 'TypeError',
+                            'value' => 'can\'t access property "transaction", db is null',
+                            'stacktrace' => (object) [
+                                'frames' => $reports[0]['exception']['values'][0]->stacktrace->frames,
+                            ],
+                        ],
+                    ],
+                ],
+                'message' => 'can\'t access property "transaction", db is null',
+                'culprit' => 'index.php',
+                'event_id' => $report->getEventId(),
+            ],
+        ], $reports);
+        $this->assertEquals([
+            'sentry.interfaces.Message' => $message,
+            'release' => '5.2.0-dev',
+            'dist' => '5.2.0-dev',
+            'platform' => 'javascript',
+            'environment' => 'development',
+            'transaction' => '/database/designer',
+            'timestamp' => $report->getTimestampUTC(),
+            'tags' => $tags,
+            'contexts' => $contexts,
+            'extra' => $extras,
+            'user' => $user,
+        ], $toJson);
+    }
+
     public function testReportFromString(): void
     {
         $contents = file_get_contents(
@@ -61,8 +140,10 @@ class ReportTest extends TestCase
         $this->assertEquals([
             [
                 'sentry.interfaces.Message' => $message,
-                'release' => '4.5.4.1deb2ubuntu2',
+                'release' => '4.5.4.1',
+                'dist' => '4.5.4.1deb2ubuntu2',
                 'platform' => 'javascript',
+                'environment' => 'production',
                 'timestamp' => $report->getTimestampUTC(),
                 'tags' => $tags,
                 'contexts' => $contexts,
@@ -103,13 +184,15 @@ class ReportTest extends TestCase
         ], $reports);
         $this->assertEquals([
             'sentry.interfaces.Message' => $message,
-            'release' => '4.5.4.1deb2ubuntu2',
+            'release' => '4.5.4.1',
+            'dist' => '4.5.4.1deb2ubuntu2',
             'platform' => 'javascript',
             'timestamp' => $report->getTimestampUTC(),
             'tags' => $tags,
             'contexts' => $contexts,
             'extra' => $extras,
             'user' => $user,
+            'environment' => 'production',
         ], $toJson);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Test\TestCase\Controller;
 
+use App\Model\Table\IncidentsTable;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
@@ -135,7 +136,7 @@ class IncidentsControllerTest extends TestCase
             $report['error_name']
         );
         $this->assertEquals(
-            $this->Incidents->getStrippedPmaVersion($bugReportDecoded['pma_version']),
+            IncidentsTable::getStrippedPmaVersion($bugReportDecoded['pma_version']),
             $report['pma_version']
         );
 

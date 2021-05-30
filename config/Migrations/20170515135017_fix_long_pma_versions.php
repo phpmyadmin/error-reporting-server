@@ -1,5 +1,6 @@
 <?php
 
+use App\Model\Table\IncidentsTable;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 use Phinx\Migration\AbstractMigration;
@@ -36,7 +37,7 @@ class FixLongPmaVersions extends AbstractMigration
 
         while ($row = $result->fetch()) {
             $strippedVersionString
-                = $incidentsTable->getStrippedPmaVersion(
+                = IncidentsTable::getStrippedPmaVersion(
                     $row['pma_version']
                 );
 

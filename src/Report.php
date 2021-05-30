@@ -2,19 +2,27 @@
 
 namespace App;
 
+use App\Model\Table\IncidentsTable;
+use DateTime;
 use stdClass;
 
+use function array_filter;
 use function array_keys;
 use function array_merge;
 use function bin2hex;
 use function date;
 use function html_entity_decode;
 use function htmlspecialchars_decode;
+use function is_string;
 use function json_decode;
 use function openssl_random_pseudo_bytes;
+use function parse_str;
+use function parse_url;
+use function strpos;
 
 use const ENT_HTML5;
 use const ENT_QUOTES;
+use const PHP_URL_QUERY;
 
 /**
  * Represents an user report
@@ -79,7 +87,7 @@ class Report extends stdClass
 
     public function getTimestampUTC(): string
     {
-        return $this->internal____date ?? date('Y-m-d\TH:i:s');
+        return $this->internal____date ?? date(DateTime::RFC3339);
     }
 
     public function getTags(): stdClass
@@ -104,7 +112,7 @@ class Report extends stdClass
         $tags->server_software = $this->{'server_software'} ?? null;
         $tags->user_agent_string = $this->{'user_agent_string'} ?? null;
         $tags->locale = $this->{'locale'} ?? null;
-        $tags->configuration_storage = $this->{'configuration_storage'} === 'enabled'; // "enabled" or "disabled"
+        $tags->configuration_storage = ($this->{'configuration_storage'} ?? '') === 'enabled'; // "enabled" or "disabled"
         $tags->php_version = $this->{'php_version'} ?? null;
         $tags->exception_type = $this->{'exception_type'} ?? null;// js or php
 
@@ -157,7 +165,7 @@ class Report extends stdClass
                 'values' => [$exception],
             ],
             'message' => $this->decode($this->{'exception'}->message ?? ''),
-            'culprit' => $this->{'script_name'},
+            'culprit' => $this->{'script_name'} ?? $this->{'uri'} ?? null,
         ];
     }
 
@@ -180,6 +188,32 @@ class Report extends stdClass
         $user->ip_address = '0.0.0.0';
 
         return $user;
+    }
+
+    private function findRoute(?string $uri): ?string
+    {
+        if ($uri === null) {
+            return null;
+        }
+
+        $query = parse_url($uri, PHP_URL_QUERY);// foo=bar&a=b
+        if (! is_string($query)) {
+            return null;
+        }
+
+        $output = [];
+        parse_str($query, $output);
+
+        return $output['route'] ?? null;
+    }
+
+    public function getRoute(): ?string
+    {
+        if (isset($this->{'exception'})) {
+            return $this->findRoute($this->{'exception'}->{'uri'} ?? null);
+        }
+
+        return null;
     }
 
     public function isMultiReports(): bool
@@ -298,18 +332,23 @@ class Report extends stdClass
     {
         $exType = $this->{'exception_type'} ?? 'js';
 
-        return [
+        // array_filter removes keys having null values
+        $release = IncidentsTable::getStrippedPmaVersion($this->{'pma_version'} ?? '');
+
+        return array_filter([
             'sentry.interfaces.Message' => $this->getUserMessage(),
-            'release' => $this->{'pma_version'},
+            'release' => $release,
+            'dist' => $this->{'pma_version'} ?? '',
             'platform' => $exType === 'js' ? 'javascript' : 'php',
             'timestamp' => $this->getTimestampUTC(),
             'tags' => $this->getTags(),
             'extra' => $this->getExtras(),
             'contexts' => $this->getContexts(),
             'user' => $this->getUser(),
-            //TODO: 'environment'
+            'transaction' => $this->getRoute(),
+            'environment' => strpos($release, '-dev') === false ? 'production' : 'development',
             //TODO: 'level'
-        ];
+        ]);
     }
 
     /**
