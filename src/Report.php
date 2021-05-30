@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Model\Table\IncidentsTable;
+use Cake\Utility\Security;
 use DateTime;
 use stdClass;
 
@@ -10,6 +11,7 @@ use function array_filter;
 use function array_keys;
 use function array_merge;
 use function bin2hex;
+use function crc32;
 use function date;
 use function html_entity_decode;
 use function htmlspecialchars_decode;
@@ -184,7 +186,31 @@ class Report extends stdClass
 
     public function getUser(): stdClass
     {
+        // Do not use the Ip as real data, protect the user !
+        $userIp = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+        $serverSoftware = $this->{'server_software'} ?? null;
+        $userAgentString = $this->{'user_agent_string'} ?? null;
+        $locale = $this->{'locale'} ?? null;
+        $configurationStorage = $this->{'configuration_storage'} ?? null;
+        $phpVersion = $this->{'php_version'} ?? null;
+
+        $userIp = Security::hash(
+            $userIp . crc32($userIp),
+            'sha256',
+            true // Enable app security salt
+        );// Make finding back the Ip near to impossible
+
         $user = new stdClass();
+        // A user can be anonymously identified using the hash of the hashed IP + server software
+        // + the UA + the locale + is configuration storage enabled + php version
+        // Reversing the process would be near to impossible and anyway all the found data would be
+        // already known and public data
+        $user->id = Security::hash(
+            $userIp . $serverSoftware . $userAgentString . $locale . $configurationStorage . $phpVersion,
+            'sha256',
+            true // Enable app security salt
+        );
+
         $user->ip_address = '0.0.0.0';
 
         return $user;

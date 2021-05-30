@@ -3,6 +3,7 @@
 namespace App\Test;
 
 use App\Report;
+use Cake\Utility\Security;
 use PHPUnit\Framework\TestCase;
 
 use function file_get_contents;
@@ -10,6 +11,13 @@ use function json_decode;
 
 class ReportTest extends TestCase
 {
+    public function setUp(): void
+    {
+        Security::setSalt(
+            'Ue%n8*v*QPejgq*v2^k5JSEMXx9Cer*jConpbjp&&vGK89jGRVBnyWaPBhY5s$87'
+        );
+    }
+
     public function testReportFromObject(): void
     {
         $contents = file_get_contents(
@@ -20,6 +28,63 @@ class ReportTest extends TestCase
         $report2 = Report::fromString($contents);
 
         $this->assertEquals($report1, $report2);
+    }
+
+    public function testUserId(): void
+    {
+        $contents = file_get_contents(
+            __DIR__ . '/../Fixture/report_issue_16853_js.json'
+        );
+        $report = Report::fromString($contents);
+
+        $tags = $report->getTags();
+
+        $this->assertEquals((object) [
+            'server_software' => 'nginx/1.14.2',
+            'user_agent_string' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0',
+            'locale' => 'en',
+            'configuration_storage' => false,
+            'php_version' => '7.4.14',
+            'exception_type' => 'js',
+        ], $tags);
+        $this->assertEquals(
+            (object) [
+                'ip_address' => '0.0.0.0',
+                'id' => '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
+            ],
+            $report->getUser()
+        );
+
+        $oldForwardedValue = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
+
+        $_SERVER['HTTP_X_FORWARDED_FOR'] = '1.1.1.1';
+
+        $this->assertEquals(
+            (object) [
+                'ip_address' => '0.0.0.0',
+                'id' => '747901a7736cb599fefec3b52bb939a511fb7662a66ba30e6049b128f2114cec',
+            ],
+            $report->getUser()
+        );
+        $_SERVER['HTTP_X_FORWARDED_FOR'] = $oldForwardedValue;
+        $this->assertEquals(
+            (object) [
+                'ip_address' => '0.0.0.0',
+                'id' => '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
+            ],
+            $report->getUser()
+        );
+        Security::setSalt(
+            'N8KB3iKch@xT4nP$WcPoF!9fwxtT7pNY5Hm4*Ld6G^Ux3tQ57iJzPYumu@jXVzue'
+        );
+
+        $this->assertEquals(
+            (object) [
+                'ip_address' => '0.0.0.0',
+                'id' => '883a06cb74b037abf70b14ddd6f5518b04c10031648b9af72bc24ddb97fbfd52',
+            ],
+            $report->getUser()
+        );
     }
 
     public function testReportRoutingSystem(): void
@@ -54,7 +119,13 @@ class ReportTest extends TestCase
         ], $contexts);
         $this->assertEquals((object) [], $extras);
         $this->assertEquals((object) ['message' => ''], $message);
-        $this->assertEquals((object) ['ip_address' => '0.0.0.0'], $user);
+        $this->assertEquals(
+            (object) [
+                'ip_address' => '0.0.0.0',
+                'id' => '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
+            ],
+            $user
+        );
         $this->assertFalse($report->isMultiReports());
         $this->assertFalse($report->hasUserFeedback());
         $this->assertEquals([
@@ -133,7 +204,13 @@ class ReportTest extends TestCase
         ], $contexts);
         $this->assertEquals((object) [], $extras);
         $this->assertEquals((object) ['message' => ''], $message);
-        $this->assertEquals((object) ['ip_address' => '0.0.0.0'], $user);
+        $this->assertEquals(
+            (object) [
+                'ip_address' => '0.0.0.0',
+                'id' => '90244836bc888d4b4bb8449010dba862ebc5a8905a79da8269b4e76d08831226',
+            ],
+            $user
+        );
         $this->assertFalse($report->isMultiReports());
         $this->assertTrue($report->hasUserFeedback());
         $this->assertSame('<script>test steps', $report->getUserFeedback());
