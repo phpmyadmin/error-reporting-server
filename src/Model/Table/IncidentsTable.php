@@ -401,9 +401,9 @@ class IncidentsTable extends Table
             $tmpReport = array_merge(
                 $schematizedCommonReport,
                 [
-                    'error_name' => $exception['name'],
-                    'error_message' => $exception['message'],
-                    'script_name' => $bugReport['script_name'],
+                    'error_name' => $exception['name'] ?? '',
+                    'error_message' => $exception['message'] ?? '',
+                    'script_name' => $bugReport['script_name'] ?? '',
                     'stacktrace' => json_encode($exception['stack'] ?? []),
                     'stackhash' => self::getStackHash($exception['stack'] ?? []),
                     'exception_type' => 0,     //'js'
