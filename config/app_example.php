@@ -75,7 +75,7 @@ return [
      *   The salt value is also used as the encryption key.
      *   You should treat it as extremely sensitive data.
      */
-    'Security' => ['salt' => 'ccd56ed92173ab8f7817ecb8121ee09148ec34ecc07ccd6cc58b8c1bd38fb142'],
+    'Security' => ['salt' => '!!REPLACE-ME__REPLACE-ME__!!REPLACE-ME__REPLACE-ME__REPLACE-ME__REPLACE-ME!!'],
 
     /**
      * Apply timestamps with the last modified time to static assets (js, css, images).
