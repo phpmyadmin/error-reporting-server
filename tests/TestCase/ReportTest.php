@@ -46,6 +46,8 @@ class ReportTest extends TestCase
             'configuration_storage' => false,
             'php_version' => '7.4.14',
             'exception_type' => 'js',
+            'version_major' => '5',
+            'version_series' => '5.2',
         ], $tags);
         $this->assertEquals(
             (object) [
@@ -114,6 +116,8 @@ class ReportTest extends TestCase
             'configuration_storage' => false,
             'php_version' => '7.4.14',
             'exception_type' => 'js',
+            'version_major' => '5',
+            'version_series' => '5.2',
         ], $tags);
         $this->assertEquals((object) [
             'os' => (object) ['name' => 'Win'],
@@ -199,6 +203,8 @@ class ReportTest extends TestCase
             'configuration_storage' => true,
             'php_version' => '5.2.2',
             'exception_type' => null,
+            'version_major' => '4',
+            'version_series' => '4.5',
         ], $tags);
         $this->assertEquals((object) [
             'os' => (object) ['name' => 'Windows'],

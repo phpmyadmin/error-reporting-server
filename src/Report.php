@@ -13,6 +13,7 @@ use function array_merge;
 use function bin2hex;
 use function crc32;
 use function date;
+use function explode;
 use function html_entity_decode;
 use function htmlspecialchars_decode;
 use function is_string;
@@ -106,7 +107,11 @@ class Report extends stdClass
             "php_version": "7.2.16-1+ubuntu18.04.1+deb.sury.org+1",
             "exception_type": "php",
         */
+        $release = $this->getPmaVersion();
+        $version = explode('.', $release, 3);
         $tags = new stdClass();
+        $tags->version_major = $version[0];
+        $tags->version_series = $version[0] . '.' . $version[1];
         //$tags->pma_version = $this->{'pma_version'} ?? null;
         //$tags->browser_name = $this->{'browser_name'} ?? null;
         //$tags->browser_version = $this->{'browser_version'} ?? null;
@@ -357,6 +362,11 @@ class Report extends stdClass
         return $reports;
     }
 
+    public function getPmaVersion(): string
+    {
+        return IncidentsTable::getStrippedPmaVersion($this->{'pma_version'} ?? '');
+    }
+
     /**
      * @return array<string,mixed>
      */
@@ -365,7 +375,7 @@ class Report extends stdClass
         $exType = $this->{'exception_type'} ?? 'js';
 
         // array_filter removes keys having null values
-        $release = IncidentsTable::getStrippedPmaVersion($this->{'pma_version'} ?? '');
+        $release = $this->getPmaVersion();
 
         return array_filter([
             'sentry.interfaces.Message' => $this->getUserMessage(),
