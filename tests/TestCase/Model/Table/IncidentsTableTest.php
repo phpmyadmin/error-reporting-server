@@ -576,6 +576,14 @@ class IncidentsTableTest extends TestCase
                 '4.9.0.1deb1',
                 '4.9.0.1',
             ],
+            [// https://bugzilla.redhat.com/show_bug.cgi?id=1932174#c7
+                '5.1.0-3.el7.remi',
+                '5.1.0',
+            ],
+            [// https://bugzilla.redhat.com/show_bug.cgi?id=1932174#c7
+                '5.1.0-3.fc34',
+                '5.1.0',
+            ],
         ];
     }
 }

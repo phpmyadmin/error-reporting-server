@@ -525,7 +525,10 @@ class IncidentsTable extends Table
      */
     public static function getStrippedPmaVersion(string $versionString): string
     {
-        $allowedRegexp = '/^((\d+)(\.\d+){0,3}(\-[a-z0-9]+){0,1})/';
+        // This regex contains a negative lookahead to avoid fedora version suffix
+        // Use: https://regex101.com/
+        // See tests: IncidentsTableTest::versionsStripping
+        $allowedRegexp = '/^((\d+)(\.\d+){0,3}(\-[a-z0-9]+){0,1})(?!\.[a-z]{1,}[0-9]{1,})/';
         $matches = [];
 
         // Check if $versionString matches the regexp
