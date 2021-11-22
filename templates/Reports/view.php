@@ -161,7 +161,7 @@ use Cake\Routing\Router;
                     $pma_version_distinct_count,
                     'pma_version'
                 );
-?>
+                ?>
         </td>
     </tr>
     <tr>
@@ -173,7 +173,7 @@ use Cake\Routing\Router;
                     $php_version_distinct_count,
                     'php_version'
                 );
-?>
+                ?>
         </td>
     </tr>
     <tr>
@@ -185,7 +185,7 @@ use Cake\Routing\Router;
                     $browser_distinct_count,
                     'browser'
                 );
-?>
+                ?>
         </td>
     </tr>
     <?php if ($incidents[0]['exception_type']) : // php ?>
@@ -220,7 +220,7 @@ use Cake\Routing\Router;
                     $configuration_storage_distinct_count,
                     'configuration_storage'
                 );
-?>
+                ?>
         </td>
     </tr>
     <tr>
@@ -232,7 +232,7 @@ use Cake\Routing\Router;
                     $server_software_distinct_count,
                     'server_software'
                 );
-?>
+                ?>
         </td>
     </tr>
     <tr>
@@ -244,7 +244,7 @@ use Cake\Routing\Router;
                     $user_os_distinct_count,
                     'user_os'
                 );
-?>
+                ?>
         </td>
     </tr>
     <tr>
@@ -256,7 +256,7 @@ use Cake\Routing\Router;
                     $locale_distinct_count,
                     'locale'
                 );
-?>
+                ?>
         </td>
     </tr>
     <tr>
@@ -298,7 +298,7 @@ use Cake\Routing\Router;
             $columns,
             $related_entries
         );
-?>
+        ?>
 
     window.onload = function () {
         chartArray.forEach(function(chart) {

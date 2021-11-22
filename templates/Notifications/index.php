@@ -10,7 +10,7 @@ use Cake\Routing\Router;
             'controller' => 'notifications',
             'action' => 'mass_action',
         ]);
-?>">
+        ?>">
         <div style="margin-bottom:10px;">
             <input type="checkbox" id="notificationsForm_checkall"
                 class="checkall_box" title="Check All"

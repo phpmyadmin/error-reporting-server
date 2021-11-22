@@ -42,7 +42,7 @@ use Cake\Utility\Inflector;
                 'var notifications_count = ' . $notif_count . ';',
                 ['inline' => true]
             );
-?>
+            ?>
     </head>
 
     <body>
