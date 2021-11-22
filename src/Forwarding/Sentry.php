@@ -7,9 +7,11 @@ use Cake\Core\Configure;
 use Cake\Log\Log;
 use Exception;
 
+use function curl_errno;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt;
+use function curl_strerror;
 use function date_default_timezone_set;
 use function http_build_query;
 use function is_array;
@@ -66,6 +68,17 @@ class Sentry
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         $output = curl_exec($ch);
+
+        $errNo = curl_errno($ch);
+
+        if ($errNo !== 0) {
+            $errorMessage = curl_strerror($errNo);
+            $error = 'Creating the report failed, cURL error (' . $errNo . '): ' . $errorMessage;
+            Log::error($error);
+
+            throw new Exception($error);
+        }
+
         if (! is_string($output)) {
             $error = 'Creating the report failed: ' . json_encode($output);
             Log::error($error);
