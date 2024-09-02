@@ -1,7 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Parameter \\#1 \\$arr1 of function array_diff expects array, array\\<int, string\\>\\|false given\\.$#"
+			message: "#^Parameter \\#1 \\$errorHandler of class Cake\\\\Error\\\\Middleware\\\\ErrorHandlerMiddleware constructor expects array\\|Cake\\\\Error\\\\ErrorHandler, mixed given\\.$#"
+			count: 1
+			path: src/Application.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of function array_diff expects array, array\\<int, string\\>\\|false given\\.$#"
 			count: 1
 			path: src/Console/Installer.php
 
@@ -19,6 +24,11 @@ parameters:
 			message: "#^Property App\\\\Controller\\\\AppController\\:\\:\\$whitelist type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Controller/AppController.php
+
+		-
+			message: "#^Cannot access offset 'client_id' on mixed\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
 
 		-
 			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:apiRequest\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
@@ -76,12 +86,22 @@ parameters:
 			path: src/Controller/Component/GithubApiComponent.php
 
 		-
+			message: "#^Method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:sendRequest\\(\\) should return array but returns mixed\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$data of function http_build_query expects array\\|object, array\\|string given\\.$#"
+			count: 1
+			path: src/Controller/Component/GithubApiComponent.php
+
+		-
 			message: "#^Parameter \\#1 \\$json of function json_decode expects string, string\\|true given\\.$#"
 			count: 1
 			path: src/Controller/Component/GithubApiComponent.php
 
 		-
-			message: "#^Parameter \\#1 \\$querydata of function http_build_query expects array\\|object, array\\|string given\\.$#"
+			message: "#^Parameter \\#1 \\.\\.\\.\\$arrays of function array_merge expects array, mixed given\\.$#"
 			count: 1
 			path: src/Controller/Component/GithubApiComponent.php
 
@@ -92,6 +112,11 @@ parameters:
 
 		-
 			message: "#^Method App\\\\Controller\\\\Component\\\\MailerComponent\\:\\:sendReportMail\\(\\) has parameter \\$viewVars with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/Component/MailerComponent.php
+
+		-
+			message: "#^Parameter \\#1 \\$name of method Cake\\\\Mailer\\\\Mailer\\:\\:setTransport\\(\\) expects Cake\\\\Mailer\\\\AbstractTransport\\|string, mixed given\\.$#"
 			count: 1
 			path: src/Controller/Component/MailerComponent.php
 
@@ -126,12 +151,47 @@ parameters:
 			path: src/Controller/DevelopersController.php
 
 		-
+			message: "#^Parameter \\#1 \\$url of method Cake\\\\Controller\\\\Controller\\:\\:redirect\\(\\) expects array\\|Psr\\\\Http\\\\Message\\\\UriInterface\\|string, mixed given\\.$#"
+			count: 1
+			path: src/Controller/DevelopersController.php
+
+		-
+			message: "#^Parameter \\#2 \\$repoPath of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:canCommitTo\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: src/Controller/DevelopersController.php
+
+		-
+			message: "#^Parameter \\#3 \\$access_token of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:canCommitTo\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: src/Controller/DevelopersController.php
+
+		-
 			message: "#^Access to an undefined property App\\\\Controller\\\\EventsController\\:\\:\\$Reports\\.$#"
 			count: 2
 			path: src/Controller/EventsController.php
 
 		-
+			message: "#^Cannot access offset 'action' on mixed\\.$#"
+			count: 1
+			path: src/Controller/EventsController.php
+
+		-
+			message: "#^Cannot access offset 'issue' on mixed\\.$#"
+			count: 1
+			path: src/Controller/EventsController.php
+
+		-
+			message: "#^Cannot access offset 'number' on mixed\\.$#"
+			count: 1
+			path: src/Controller/EventsController.php
+
+		-
 			message: "#^Parameter \\#1 \\$payload of method App\\\\Controller\\\\EventsController\\:\\:getHash\\(\\) expects string, string\\|false given\\.$#"
+			count: 1
+			path: src/Controller/EventsController.php
+
+		-
+			message: "#^Parameter \\#3 \\$key of function hash_hmac expects string, mixed given\\.$#"
 			count: 1
 			path: src/Controller/EventsController.php
 
@@ -151,6 +211,11 @@ parameters:
 			path: src/Controller/GithubController.php
 
 		-
+			message: "#^Cannot call method toArray\\(\\) on mixed\\.$#"
+			count: 1
+			path: src/Controller/GithubController.php
+
+		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: src/Controller/GithubController.php
@@ -163,6 +228,41 @@ parameters:
 		-
 			message: "#^Method App\\\\Controller\\\\GithubController\\:\\:getReportDescriptionText\\(\\) has parameter \\$report with no value type specified in iterable type array\\.$#"
 			count: 1
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Parameter \\#1 \\$repoPath of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:createComment\\(\\) expects string, mixed given\\.$#"
+			count: 2
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Parameter \\#1 \\$repoPath of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:createIssue\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Parameter \\#1 \\$repoPath of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:getIssue\\(\\) expects string, mixed given\\.$#"
+			count: 2
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Parameter \\#2 \\$string of function explode expects string, mixed given\\.$#"
+			count: 1
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Parameter \\#3 \\$access_token of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:createIssue\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Parameter \\#4 \\$access_token of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:createComment\\(\\) expects string, mixed given\\.$#"
+			count: 2
+			path: src/Controller/GithubController.php
+
+		-
+			message: "#^Parameter \\#4 \\$access_token of method App\\\\Controller\\\\Component\\\\GithubApiComponent\\:\\:getIssue\\(\\) expects string, mixed given\\.$#"
+			count: 2
 			path: src/Controller/GithubController.php
 
 		-
@@ -181,7 +281,17 @@ parameters:
 			path: src/Controller/IncidentsController.php
 
 		-
+			message: "#^Cannot use array destructuring on array\\|object\\.$#"
+			count: 1
+			path: src/Controller/IncidentsController.php
+
+		-
 			message: "#^Method App\\\\Controller\\\\IncidentsController\\:\\:getSimilarFields\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Controller/IncidentsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$bugReport of method App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:createIncidentFromBugReport\\(\\) expects array\\|null, mixed given\\.$#"
 			count: 1
 			path: src/Controller/IncidentsController.php
 
@@ -196,9 +306,59 @@ parameters:
 			path: src/Controller/NotificationsController.php
 
 		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Cannot access offset 'created_time' on mixed\\.$#"
+			count: 1
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Cannot access offset 'error_message' on mixed\\.$#"
+			count: 1
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Cannot access offset 'error_name' on mixed\\.$#"
+			count: 1
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Cannot access offset 'exception_type' on mixed\\.$#"
+			count: 1
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Cannot access offset 'id' on mixed\\.$#"
+			count: 1
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Cannot access offset 'pma_version' on mixed\\.$#"
+			count: 1
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Cannot access offset 'report_id' on mixed\\.$#"
+			count: 2
+			path: src/Controller/NotificationsController.php
+
+		-
 			message: "#^Parameter \\#1 \\$string of method Cake\\\\Http\\\\Response\\:\\:withStringBody\\(\\) expects string\\|null, string\\|false given\\.$#"
 			count: 1
 			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of function intval expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: src/Controller/NotificationsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of static method Cake\\\\Utility\\\\Inflector\\:\\:humanize\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: src/Controller/PagesController.php
 
 		-
 			message: "#^Access to an undefined property App\\\\Controller\\\\ReportsController\\:\\:\\$OrderSearch\\.$#"
@@ -221,6 +381,26 @@ parameters:
 			path: src/Controller/ReportsController.php
 
 		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 3
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Cannot access offset string on mixed\\.$#"
+			count: 1
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Cannot call method toArray\\(\\) on mixed\\.$#"
+			count: 1
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Cannot use array destructuring on array\\|object\\.$#"
+			count: 1
+			path: src/Controller/ReportsController.php
+
+		-
 			message: "#^Method App\\\\Controller\\\\ReportsController\\:\\:findAllDataTable\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Controller/ReportsController.php
@@ -236,7 +416,22 @@ parameters:
 			path: src/Controller/ReportsController.php
 
 		-
+			message: "#^Parameter \\#1 \\$key of function array_key_exists expects int\\|string, mixed given\\.$#"
+			count: 2
+			path: src/Controller/ReportsController.php
+
+		-
 			message: "#^Parameter \\#1 \\$string of method Cake\\\\Http\\\\Response\\:\\:withStringBody\\(\\) expects string\\|null, string\\|false given\\.$#"
+			count: 1
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of function count expects array\\|Countable, mixed given\\.$#"
+			count: 1
+			path: src/Controller/ReportsController.php
+
+		-
+			message: "#^Parameter \\#2 \\$related_to of method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:addToRelatedGroup\\(\\) expects int, mixed given\\.$#"
 			count: 1
 			path: src/Controller/ReportsController.php
 
@@ -246,22 +441,72 @@ parameters:
 			path: src/Controller/StatsController.php
 
 		-
-			message: "#^Binary operation \"\\.\" between 'downloadStats_' and \\(array&nonEmpty\\)\\|non\\-empty\\-string results in an error\\.$#"
+			message: "#^Binary operation \"\\.\" between 'downloadStats_' and non\\-empty\\-array\\|non\\-falsy\\-string results in an error\\.$#"
 			count: 2
 			path: src/Controller/StatsController.php
 
 		-
-			message: "#^Binary operation \"\\.\" between non\\-empty\\-string and \\(array&nonEmpty\\)\\|non\\-empty\\-string results in an error\\.$#"
+			message: "#^Binary operation \"\\.\" between non\\-falsy\\-string and non\\-empty\\-array\\|non\\-falsy\\-string results in an error\\.$#"
 			count: 2
 			path: src/Controller/StatsController.php
 
 		-
-			message: "#^Possibly invalid array key type array\\|string\\|null\\.$#"
+			message: "#^Cannot access offset 'group' on mixed\\.$#"
 			count: 1
 			path: src/Controller/StatsController.php
 
 		-
-			message: "#^Method App\\\\Mailer\\\\Transport\\\\TestTransport\\:\\:send\\(\\) should return array\\('headers' \\=\\> string, 'message' \\=\\> string\\) but returns array\\('headers' \\=\\> array\\<string\\>, 'message' \\=\\> string\\)\\.$#"
+			message: "#^Cannot access offset 'limit' on mixed\\.$#"
+			count: 2
+			path: src/Controller/StatsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$json of function json_decode expects string, mixed given\\.$#"
+			count: 2
+			path: src/Controller/StatsController.php
+
+		-
+			message: "#^Parameter \\#5 \\$timeLimit of method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getRelatedByField\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: src/Controller/StatsController.php
+
+		-
+			message: "#^Possibly invalid array key type array\\|string\\.$#"
+			count: 1
+			path: src/Controller/StatsController.php
+
+		-
+			message: "#^Cannot access offset 'base_url' on mixed\\.$#"
+			count: 2
+			path: src/Forwarding/Sentry.php
+
+		-
+			message: "#^Cannot access offset 'dsn_url' on mixed\\.$#"
+			count: 1
+			path: src/Forwarding/Sentry.php
+
+		-
+			message: "#^Cannot access offset 'key' on mixed\\.$#"
+			count: 3
+			path: src/Forwarding/Sentry.php
+
+		-
+			message: "#^Cannot access offset 'project_id' on mixed\\.$#"
+			count: 1
+			path: src/Forwarding/Sentry.php
+
+		-
+			message: "#^Cannot access offset 'secret' on mixed\\.$#"
+			count: 1
+			path: src/Forwarding/Sentry.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between CurlHandle and false will always evaluate to false\\.$#"
+			count: 1
+			path: src/Forwarding/Sentry.php
+
+		-
+			message: "#^Method App\\\\Mailer\\\\Transport\\\\TestTransport\\:\\:send\\(\\) should return array\\{headers\\: string, message\\: string\\} but returns array\\{headers\\: array\\<string\\>, message\\: string\\}\\.$#"
 			count: 1
 			path: src/Mailer/Transport/TestTransport.php
 
@@ -296,6 +541,11 @@ parameters:
 			path: src/Model/Table/DevelopersTable.php
 
 		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$id\\.$#"
+			count: 1
+			path: src/Model/Table/DevelopersTable.php
+
+		-
 			message: "#^Method App\\\\Model\\\\Table\\\\DevelopersTable\\:\\:saveFromGithub\\(\\) has parameter \\$githubInfo with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Model/Table/DevelopersTable.php
@@ -303,6 +553,11 @@ parameters:
 		-
 			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$created\\.$#"
 			count: 3
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$id\\.$#"
+			count: 4
 			path: src/Model/Table/IncidentsTable.php
 
 		-
@@ -391,6 +646,11 @@ parameters:
 			path: src/Model/Table/IncidentsTable.php
 
 		-
+			message: "#^Property App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:\\$filterTimes type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
 			message: "#^Property App\\\\Model\\\\Table\\\\IncidentsTable\\:\\:\\$summarizableFields type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Model/Table/IncidentsTable.php
@@ -421,6 +681,11 @@ parameters:
 			path: src/Model/Table/NotificationsTable.php
 
 		-
+			message: "#^Cannot access offset 'id' on mixed\\.$#"
+			count: 1
+			path: src/Model/Table/NotificationsTable.php
+
+		-
 			message: "#^Method App\\\\Model\\\\Table\\\\NotificationsTable\\:\\:initialize\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/Model/Table/NotificationsTable.php
@@ -433,6 +698,11 @@ parameters:
 		-
 			message: "#^Access to an undefined property App\\\\Model\\\\Table\\\\ReportsTable\\:\\:\\$id\\.$#"
 			count: 5
+			path: src/Model/Table/ReportsTable.php
+
+		-
+			message: "#^Access to an undefined property Cake\\\\Datasource\\\\EntityInterface\\:\\:\\$id\\.$#"
+			count: 2
 			path: src/Model/Table/ReportsTable.php
 
 		-
@@ -456,27 +726,7 @@ parameters:
 			path: src/Model/Table/ReportsTable.php
 
 		-
-			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getIncidents\\(\\) return type has no value type specified in iterable type Cake\\\\ORM\\\\Query\\.$#"
-			count: 1
-			path: src/Model/Table/ReportsTable.php
-
-		-
-			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getIncidentsWithDescription\\(\\) return type has no value type specified in iterable type Cake\\\\ORM\\\\Query\\.$#"
-			count: 1
-			path: src/Model/Table/ReportsTable.php
-
-		-
-			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getIncidentsWithDifferentStacktrace\\(\\) return type has no value type specified in iterable type Cake\\\\ORM\\\\Query\\.$#"
-			count: 1
-			path: src/Model/Table/ReportsTable.php
-
-		-
 			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getRelatedByField\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: src/Model/Table/ReportsTable.php
-
-		-
-			message: "#^Method App\\\\Model\\\\Table\\\\ReportsTable\\:\\:getRelatedReports\\(\\) return type has no value type specified in iterable type Cake\\\\ORM\\\\Query\\.$#"
 			count: 1
 			path: src/Model/Table/ReportsTable.php
 
@@ -516,7 +766,127 @@ parameters:
 			path: src/Model/Table/ReportsTable.php
 
 		-
+			message: "#^Method App\\\\Report\\:\\:findRoute\\(\\) should return string\\|null but returns array\\|string\\|null\\.$#"
+			count: 1
+			path: src/Report.php
+
+		-
+			message: "#^Property App\\\\Report\\:\\:\\$internal____date \\(string\\) on left side of \\?\\? is not nullable\\.$#"
+			count: 1
+			path: src/Report.php
+
+		-
+			message: "#^Property App\\\\Report\\:\\:\\$internal____userMessage \\(string\\) on left side of \\?\\? is not nullable\\.$#"
+			count: 1
+			path: src/Report.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Shell\\\\CleanOldNotifsShell\\:\\:\\$Notifications\\.$#"
+			count: 2
+			path: src/Shell/CleanOldNotifsShell.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Shell\\\\StatsShell\\:\\:\\$Incidents\\.$#"
+			count: 3
+			path: src/Shell/StatsShell.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Shell\\\\StatsShell\\:\\:\\$Reports\\.$#"
+			count: 1
+			path: src/Shell/StatsShell.php
+
+		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 3
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot access offset 'args' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot access offset 'class'\\|'column'\\|'file'\\|'filename'\\|'func'\\|'function'\\|'line'\\|'scriptname' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot access offset 'context' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot access offset 'exception_type' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot access offset 'function' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot access offset 'id' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot access offset 'line' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot access offset 'stacktrace' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot access offset 'steps' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 4
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function htmlspecialchars expects string, mixed given\\.$#"
+			count: 2
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Parameter \\#2 \\$array of function implode expects array\\<string\\>, mixed given\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
+			message: "#^Parameter \\#2 \\$array of function implode expects array\\|null, mixed given\\.$#"
+			count: 1
+			path: src/View/Helper/IncidentsHelper.php
+
+		-
 			message: "#^Access to an undefined property App\\\\View\\\\Helper\\\\ReportsHelper\\:\\:\\$Incidents\\.$#"
+			count: 1
+			path: src/View/Helper/ReportsHelper.php
+
+		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 2
+			path: src/View/Helper/ReportsHelper.php
+
+		-
+			message: "#^Cannot access offset 'id' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/ReportsHelper.php
+
+		-
+			message: "#^Cannot access offset 'report_id' on mixed\\.$#"
+			count: 1
+			path: src/View/Helper/ReportsHelper.php
+
+		-
+			message: "#^Method App\\\\View\\\\Helper\\\\ReportsHelper\\:\\:entriesFromIncidents\\(\\) has parameter \\$entries with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: src/View/Helper/ReportsHelper.php
 
@@ -532,6 +902,11 @@ parameters:
 
 		-
 			message: "#^Method App\\\\View\\\\Helper\\\\ReportsHelper\\:\\:getLineChartData\\(\\) has parameter \\$entries with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/View/Helper/ReportsHelper.php
+
+		-
+			message: "#^PHPDoc type string of property App\\\\View\\\\Helper\\\\ReportsHelper\\:\\:\\$helpers is not covariant with PHPDoc type array of overridden property Cake\\\\View\\\\Helper\\:\\:\\$helpers\\.$#"
 			count: 1
 			path: src/View/Helper/ReportsHelper.php
 
