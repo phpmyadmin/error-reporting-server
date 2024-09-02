@@ -47,7 +47,7 @@ In order to deploy the app in this repo you need to follow these steps:
 
 ## Requirements
 
-- php >= 7.2
+- php >= 7.4
 - MySQL
 
 
@@ -99,8 +99,8 @@ server {
 
         location ~ \.php$ {
                 fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        #       # With php5-fpm:
-                fastcgi_pass unix:/var/run/php5-fpm-reports.sock;
+        #       # With php7-fpm:
+                fastcgi_pass unix:/var/run/php7-fpm-reports.sock;
                 fastcgi_index index.php;
                 include fastcgi_params;
         }

@@ -27,8 +27,9 @@ jobs:
               --health-timeout=5s
               --health-retries=3
         strategy:
+            fail-fast: false
             matrix:
-                php-version: ["7.2", "7.3", "7.4", "8.0", "8.1", "8.2", "8.3"]
+                php-version: ["7.4", "8.0", "8.1", "8.2", "8.3"]
                 db-server: ["mysql:5.7"]
                 os: [ubuntu-latest]
         steps:
@@ -44,12 +45,12 @@ jobs:
                   coverage: xdebug
                   ini-values: xdebug.mode="develop,coverage"
             - name: Cache module
-              uses: actions/cache@v3
+              uses: actions/cache@v4
               with:
                   path: ~/.composer/cache/
                   key: composer-cache
             - name: Install dependencies
-              run: composer install --no-interaction
+              run: composer install --no-interaction --ignore-platform-req=php+
             - name: Copy config files
               run: |
                 cp config/app_ci.php config/app.php
