@@ -51,11 +51,22 @@ class Sentry
         }
 
         $data = json_encode($report);
-        $ch = curl_init($sentryConfig['base_url'] . '/api/' . $sentryConfig['project_id'] . '/store/');
+        $ch = curl_init();
         if ($ch === false) {
             throw new Exception('Could not init cURL');
         }
 
+        // Use bundled ca file from composer/ca-bundle instead of the system one
+        $caPathOrFile = \Composer\CaBundle\CaBundle::getBundledCaBundlePath();
+
+        if (is_dir($caPathOrFile)) {
+            curl_setopt($ch, CURLOPT_CAPATH, $caPathOrFile);
+        } else {
+            curl_setopt($ch, CURLOPT_CAINFO, $caPathOrFile);
+        }
+
+        curl_setopt($ch, CURLOPT_URL, $sentryConfig['base_url'] . '/api/' . $sentryConfig['project_id'] . '/store/');
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERPWD, $sentryConfig['key'] . ':');
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
