@@ -1,5 +1,8 @@
 name: Run tests
 
+permissions:
+  contents: read
+
 on:
   push:
   pull_request:
@@ -25,11 +28,14 @@ jobs:
               --health-retries=3
         strategy:
             matrix:
-                php-version: ["7.2", "7.3", "7.4", "8.0"]
+                php-version: ["7.2", "7.3", "7.4", "8.0", "8.1", "8.2", "8.3"]
                 db-server: ["mysql:5.7"]
                 os: [ubuntu-latest]
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
+              with:
+                  # Fetch some commits for Scrutinizer coverage upload
+                  fetch-depth: 15
             - name: Use php ${{ matrix.php-version }}
               uses: shivammathur/setup-php@v2
               with:
@@ -38,7 +44,7 @@ jobs:
                   coverage: xdebug
                   ini-values: xdebug.mode="develop,coverage"
             - name: Cache module
-              uses: actions/cache@v2
+              uses: actions/cache@v3
               with:
                   path: ~/.composer/cache/
                   key: composer-cache
@@ -75,13 +81,13 @@ jobs:
                 TEST_MYSQL_PASS: testbench
                 TEST_MYSQL_PORT: ${{ job.services.database-server.ports['3306'] }}
             - name: Send coverage
-              uses: codecov/codecov-action@v1
+              uses: codecov/codecov-action@v3
               with:
                 flags: unit-${{ matrix.php-version }}-${{ matrix.os }}
                 name: phpunit-${{ matrix.php-version }}-${{ matrix.os }}
             - name: Send coverage to Scrutinizer
               uses: sudo-bot/action-scrutinizer@latest
-              # Upload can fail on forks
-              continue-on-error: true
+              # Do not run this step on forked versions of the main repository (example: contributor forks)
+              if: github.repository == 'phpmyadmin/error-reporting-server'
               with:
-                  cli-args: "--format=php-clover build/logs/clover.xml"
+                  cli-args: "--format=php-clover build/logs/clover.xml --revision=${{ github.event.pull_request.head.sha || github.sha }}"
