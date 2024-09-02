@@ -63,7 +63,7 @@ class ReportsControllerTest extends TestCase
         );
 
         foreach ($this->viewVariable('columns') as $column) {
-            $this->assertNotEmpty($this->viewVariable("${column}_distinct_count"));
+            $this->assertNotEmpty($this->viewVariable($column . '_distinct_count'));
         }
 
         $this->assertNotEmpty($this->viewVariable('incidents'));
