@@ -52,10 +52,10 @@
             "@test",
             "@phpcs"
         ],
-        "phpcs": "phpcs",
-        "phpcbf": "phpcbf",
-        "test": "phpunit",
-        "phpstan": "phpstan analyse"
+        "phpcs": "@php ./vendor/bin/phpcs",
+        "phpcbf": "@php ./vendor/bin/phpcbf",
+        "test": "@php ./vendor/bin/phpunit",
+        "phpstan": "@php ./vendor/bin/phpstan"
     },
     "prefer-stable": true,
     "config": {

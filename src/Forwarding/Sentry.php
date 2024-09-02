@@ -5,6 +5,7 @@ namespace App\Forwarding;
 use App\Report;
 use Cake\Core\Configure;
 use Cake\Log\Log;
+use Composer\CaBundle\CaBundle;
 use Exception;
 
 use function curl_errno;
@@ -15,15 +16,20 @@ use function curl_strerror;
 use function date_default_timezone_set;
 use function http_build_query;
 use function is_array;
+use function is_dir;
 use function is_string;
 use function json_decode;
 use function json_encode;
 use function time;
 
+use const CURLOPT_CAINFO;
+use const CURLOPT_CAPATH;
 use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
+use const CURLOPT_SSL_VERIFYPEER;
+use const CURLOPT_URL;
 use const CURLOPT_USERPWD;
 
 class Sentry
@@ -57,7 +63,7 @@ class Sentry
         }
 
         // Use bundled ca file from composer/ca-bundle instead of the system one
-        $caPathOrFile = \Composer\CaBundle\CaBundle::getBundledCaBundlePath();
+        $caPathOrFile = CaBundle::getBundledCaBundlePath();
 
         if (is_dir($caPathOrFile)) {
             curl_setopt($ch, CURLOPT_CAPATH, $caPathOrFile);
@@ -66,7 +72,7 @@ class Sentry
         }
 
         curl_setopt($ch, CURLOPT_URL, $sentryConfig['base_url'] . '/api/' . $sentryConfig['project_id'] . '/store/');
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERPWD, $sentryConfig['key'] . ':');
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
