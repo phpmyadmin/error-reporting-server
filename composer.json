@@ -18,20 +18,19 @@
         "source": "https://github.com/phpmyadmin/error-reporting-server"
     },
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.3",
         "ext-curl": "*",
-        "cakephp/cakephp": "4.2.x",
+        "cakephp/cakephp": "^4.6",
         "cakephp/migrations": "^3.0.0",
         "cakephp/plugin-installer": "^1.3",
         "composer/ca-bundle": "^1.3"
     },
     "require-dev": {
-        "cakedc/cakephp-phpstan": "^2",
         "cakephp/bake": "^2.1.1",
         "cakephp/debug_kit": "^4.1.2",
         "php-mock/php-mock-phpunit": "^2.6",
         "phpmyadmin/coding-standard": "^3",
-        "phpstan/phpstan": "^1",
+        "phpstan/phpstan": "^2",
         "phpunit/phpunit": "^9",
         "psy/psysh": "@stable"
     },
