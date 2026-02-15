@@ -509,11 +509,9 @@ class GithubController extends AppController
         // Fetch all linked reports
         $reports = $reportsTable->find(
             'all',
-            [
-                'conditions' => [
-                    'sourceforge_bug_id IS NOT NULL',
-                    'NOT' => ['status' => 'resolved'],
-                ],
+            conditions: [
+                'sourceforge_bug_id IS NOT NULL',
+                'NOT' => ['status' => 'resolved'],
             ]
         );
 

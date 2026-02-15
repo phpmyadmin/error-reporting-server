@@ -89,11 +89,12 @@ class ReportsTable extends Table
      */
     public function getIncidents(): Query
     {
-        return TableRegistry::getTableLocator()->get('Incidents')->find('all', [
-            'limit' => 50,
-            'conditions' => $this->relatedIncidentsConditions(),
-            'order' => 'Incidents.created desc',
-        ]);
+        return TableRegistry::getTableLocator()->get('Incidents')->find(
+            'all',
+            limit: 50,
+            conditions: $this->relatedIncidentsConditions(),
+            order: 'Incidents.created desc'
+        );
     }
 
     /**
@@ -103,9 +104,7 @@ class ReportsTable extends Table
      */
     public function getRelatedReports(): Query
     {
-        return $this->find('all', [
-            'conditions' => $this->relatedReportsConditions(),
-        ]);
+        return $this->find('all', conditions: $this->relatedReportsConditions());
     }
 
     /**
@@ -116,13 +115,14 @@ class ReportsTable extends Table
      */
     public function getIncidentsWithDescription(): Query
     {
-        return TableRegistry::getTableLocator()->get('Incidents')->find('all', [
-            'conditions' => [
+        return TableRegistry::getTableLocator()->get('Incidents')->find(
+            'all',
+            conditions: [
                 'NOT' => ['Incidents.steps is null'],
                 $this->relatedIncidentsConditions(),
             ],
-            'order' => 'Incidents.steps desc',
-        ]);
+            order: 'Incidents.steps desc'
+        );
     }
 
     /**
@@ -133,16 +133,17 @@ class ReportsTable extends Table
      */
     public function getIncidentsWithDifferentStacktrace(): Query
     {
-        return TableRegistry::getTableLocator()->get('Incidents')->find('all', [
-            'fields' => [
+        return TableRegistry::getTableLocator()->get('Incidents')->find(
+            'all',
+            fields: [
                 'Incidents.stackhash',
                 'Incidents.stacktrace',
                 'Incidents.full_report',
                 'Incidents.exception_type',
             ],
-            'conditions' => $this->relatedIncidentsConditions(),
-            'group' => 'Incidents.stackhash',
-        ])->distinct(['Incidents.stackhash']);
+            conditions: $this->relatedIncidentsConditions(),
+            group: 'Incidents.stackhash'
+        )->distinct(['Incidents.stackhash']);
     }
 
     /**
@@ -265,8 +266,8 @@ class ReportsTable extends Table
         $groupedCount->select([
             'count' => $groupedCount->func()->count('*'),
             $fieldAlias => $field,
-        ])->group($fieldAlias)->distinct(['' . $fieldAlias . ''])
-          ->order('count')->toArray();
+        ])->groupBy($fieldAlias)->distinct(['' . $fieldAlias . ''])
+          ->orderBy('count')->toArray();
 
         if ($count) {
             $queryDetails['fields'] = ['' . $fieldName . ''];

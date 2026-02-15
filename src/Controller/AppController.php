@@ -156,9 +156,7 @@ class AppController extends Controller
 
             $notif_count = TableRegistry::getTableLocator()->get('Notifications')->find(
                 'all',
-                [
-                    'conditions' => ['developer_id' => (int) isset($current_developer) ? $current_developer['id'] : null],
-                ]
+                conditions: ['developer_id' => (int) isset($current_developer) ? $current_developer['id'] : null]
             )->count();
             $this->set('current_developer', $current_developer);
             $this->set('developer_signed_in', true);

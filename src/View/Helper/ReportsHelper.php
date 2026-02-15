@@ -14,7 +14,7 @@ use const JSON_UNESCAPED_UNICODE;
 class ReportsHelper extends AppHelper
 {
     /** @var string */
-    public $helpers = ['Incidents'];
+    public array $helpers = ['Incidents'];
 
     /**
      * @param array[] $entries    Entries

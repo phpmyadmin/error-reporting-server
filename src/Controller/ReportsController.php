@@ -87,10 +87,11 @@ class ReportsController extends AppController
         );
         $this->set(
             'distinct_error_names',
-            $this->findArrayList($this->Reports->find('all', [
-                'fields' => ['error_name'],
-                'conditions' => ['error_name !=' => ''],
-            ])->distinct(['error_name']), 'error_name')
+            $this->findArrayList($this->Reports->find(
+                'all',
+                fields: ['error_name'],
+                conditions: ['error_name !=' => '']
+            )->distinct(['error_name']), 'error_name')
         );
         $this->set('statuses', $this->Reports->status);
         $this->autoRender = true;

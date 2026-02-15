@@ -67,7 +67,7 @@ class CleanOldNotifsShell extends Command
         $XTime = time() - 60 * 24 * 3600;
         $conditions = ['Notifications.created <' => date('Y-m-d H:i:s', $XTime)];
 
-        if ($this->Notifications->find('all', ['conditions' => $conditions])->count() === 0) {
+        if ($this->Notifications->find('all', conditions: $conditions)->count() === 0) {
             // Check if there are any notifications to delete
             Log::write(
                 'info',

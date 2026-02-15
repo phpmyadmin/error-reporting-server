@@ -40,10 +40,8 @@ class PagesController extends AppController
 {
     /**
      * Controller name.
-     *
-     * @var string
      */
-    public $name = 'Pages';
+    public string $name = 'Pages';
 
     /**
      * Displays a view.

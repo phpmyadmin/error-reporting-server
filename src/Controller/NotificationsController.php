@@ -105,10 +105,8 @@ class NotificationsController extends AppController
         $rows = $this->Notifications->find('all', $pagedParams);
         $totalFiltered = $this->Notifications->find(
             'all',
-            [
-                'conditions' => [
-                    'developer_id' => $current_developer['id'],
-                ],
+            conditions: [
+                'developer_id' => $current_developer['id'],
             ]
         )->count();
 
