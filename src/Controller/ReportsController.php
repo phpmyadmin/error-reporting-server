@@ -18,7 +18,10 @@
 
 namespace App\Controller;
 
+use App\Model\Table\NotificationsTable;
+use App\Model\Table\DevelopersTable;
 use App\Model\Table\ReportsTable;
+use App\Model\Table\IncidentsTable;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
@@ -35,10 +38,14 @@ use function json_encode;
 /**
  * Reports controller handling reports modification and rendering.
  *
- * @property ReportsTable $Reports
  */
 class ReportsController extends AppController
 {
+    protected NotificationsTable $Notifications;
+    protected DevelopersTable $Developers;
+    protected ReportsTable $Reports;
+    protected IncidentsTable $Incidents;
+
     /**
      * Initialization hook method.
      *
@@ -57,10 +64,10 @@ class ReportsController extends AppController
             'Reports',
             'Incidents',
         ]);
-        $this->loadModel('Incidents');
-        $this->loadModel('Reports');
-        $this->loadModel('Notifications');
-        $this->loadModel('Developers');
+        $this->Notifications = $this->fetchTable('Notifications');
+        $this->Developers = $this->fetchTable('Developers');
+        $this->Reports = $this->fetchTable('Reports');
+        $this->Incidents = $this->fetchTable('Incidents');
     }
 
     public function index(): void
@@ -100,14 +107,14 @@ class ReportsController extends AppController
     public function view(?string $reportId): void
     {
         if (empty($reportId)) {
-            throw new NotFoundException(__('Invalid report Id.'));
+            throw new NotFoundException('Invalid report Id.');
         }
 
         $reportId = (int) $reportId;
 
         $report = $this->Reports->findById($reportId)->toArray();
         if (! $report) {
-            throw new NotFoundException(__('The report does not exist.'));
+            throw new NotFoundException('The report does not exist.');
         }
 
         $this->set('report', $report);
@@ -239,7 +246,7 @@ class ReportsController extends AppController
             ->withStringBody(json_encode($response));
     }
 
-    public function mark_related_to(?string $reportId): void
+    public function mark_related_to(?string $reportId): Response
     {
         // Only allow POST requests
         $this->request->allowMethod(['post']);
@@ -250,12 +257,12 @@ class ReportsController extends AppController
             || ! $relatedTo
             || $reportId === $relatedTo
         ) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException('Invalid Report');
         }
 
         $report = $this->Reports->get($reportId);
         if (! $report) {
-            throw new NotFoundException(__('The report does not exist.'));
+            throw new NotFoundException('The report does not exist.');
         }
 
         $this->Reports->addToRelatedGroup($report, $relatedTo);
@@ -266,21 +273,21 @@ class ReportsController extends AppController
                 . $relatedTo,
             ['params' => ['class' => $flash_class]]
         );
-        $this->redirect('/reports/view/' . $reportId);
+        return $this->redirect('/reports/view/' . $reportId);
     }
 
-    public function unmark_related_to(?string $reportId): void
+    public function unmark_related_to(?string $reportId): Response
     {
         // Only allow POST requests
         $this->request->allowMethod(['post']);
 
         if (! $reportId) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException('Invalid Report');
         }
 
         $report = $this->Reports->get($reportId);
         if (! $report) {
-            throw new NotFoundException(__('The report does not exist.'));
+            throw new NotFoundException('The report does not exist.');
         }
 
         $this->Reports->removeFromRelatedGroup($report);
@@ -290,18 +297,18 @@ class ReportsController extends AppController
             'This report has been marked as different.',
             ['params' => ['class' => $flash_class]]
         );
-        $this->redirect('/reports/view/' . $reportId);
+        return $this->redirect('/reports/view/' . $reportId);
     }
 
-    public function change_state(?string $reportId): void
+    public function change_state(?string $reportId): Response
     {
         if (! $reportId) {
-            throw new NotFoundException(__('Invalid Report'));
+            throw new NotFoundException('Invalid Report');
         }
 
         $report = $this->Reports->get($reportId);
         if (! $report) {
-            throw new NotFoundException(__('The report does not exist.'));
+            throw new NotFoundException('The report does not exist.');
         }
 
         $state = $this->request->getData('state');
@@ -312,7 +319,7 @@ class ReportsController extends AppController
         }
 
         if (! $newState) {
-            throw new NotFoundException(__('Invalid State'));
+            throw new NotFoundException('Invalid State');
         }
 
         $report->status = $state;
@@ -323,7 +330,7 @@ class ReportsController extends AppController
             'The state has been successfully changed.',
             ['params' => ['class' => $flash_class]]
         );
-        $this->redirect('/reports/view/' . $reportId);
+        return $this->redirect('/reports/view/' . $reportId);
     }
 
     /**
@@ -332,9 +339,8 @@ class ReportsController extends AppController
      * Can be Extended for other mass operations as well.
      * Expects an array of Report Ids as a POST parameter.
      *
-     * @return void Nothing
      */
-    public function mass_action(): void
+    public function mass_action(): Response
     {
         $flash_class = 'alert alert-error';
         $state = $this->request->getData('state');
@@ -379,7 +385,7 @@ class ReportsController extends AppController
             $msg,
             ['params' => ['class' => $flash_class]]
         );
-        $this->redirect('/reports/');
+        return $this->redirect('/reports/');
     }
 
     protected function setSimilarFields(int $id): void

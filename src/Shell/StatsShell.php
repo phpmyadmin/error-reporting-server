@@ -30,12 +30,12 @@ use function json_encode;
 
 /**
  * Stats shell.
- *
- * @property IncidentsTable $Incidents
- * @property ReportsTable $Reports
  */
 class StatsShell extends Command
 {
+    protected IncidentsTable $Incidents;
+    protected ReportsTable $Reports;
+
     protected const NAME = 'stats';
 
     /**
@@ -60,8 +60,8 @@ class StatsShell extends Command
     public function initialize(): void
     {
         parent::initialize();
-        $this->loadModel('Incidents');
-        $this->loadModel('Reports');
+        $this->Incidents = $this->fetchTable('Incidents');
+        $this->Reports = $this->fetchTable('Reports');
     }
 
     public function execute(Arguments $args, ConsoleIo $io)

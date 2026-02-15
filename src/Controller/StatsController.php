@@ -27,11 +27,11 @@ use function json_encode;
 
 /**
  * Stats controller handling stats preview.
- *
- * @property IncidentsTable $Incidents
  */
 class StatsController extends AppController
 {
+    protected IncidentsTable $Incidents;
+
     /**
      * Initialization hook method.
      *
@@ -43,7 +43,7 @@ class StatsController extends AppController
     {
         parent::initialize();
         $this->viewBuilder()->setHelpers(['Reports']);
-        $this->loadModel('Incidents');
+        $this->Incidents = $this->fetchTable('Incidents');
     }
 
     public function stats(): void

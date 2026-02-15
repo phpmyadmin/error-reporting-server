@@ -39,11 +39,12 @@ use function in_array;
  *
  * @see    http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  *
- * @property NotificationsTable $Notifications
- * @property DevelopersTable $Developers
  */
 class AppController extends Controller
 {
+    protected NotificationsTable $Notifications;
+    protected DevelopersTable $Developers;
+
     /** @var array */
     public $whitelist = [
         'Developers',
@@ -114,8 +115,9 @@ class AppController extends Controller
     {
         parent::initialize();
         $this->loadComponent('Flash');
-        $this->loadModel('Notifications');
-        $this->loadModel('Developers');
+        $this->Notifications = $this->fetchTable('Notifications');
+        $this->Developers = $this->fetchTable('Developers');
+
         /*  $this->loadComponent(
                 'Auth', [
                     'loginAction' => [

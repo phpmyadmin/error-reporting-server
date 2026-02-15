@@ -26,8 +26,9 @@
         "composer/ca-bundle": "^1.3"
     },
     "require-dev": {
+        "cakedc/cakephp-phpstan": "^4",
         "cakephp/bake": "^3.6",
-        "cakephp/debug_kit": "^5.2",
+        "cakephp/debug_kit": "^5.0",
         "php-mock/php-mock-phpunit": "^2.6",
         "phpmyadmin/coding-standard": "^3",
         "phpstan/phpstan": "^2",

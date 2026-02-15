@@ -41,12 +41,13 @@ use const JSON_UNESCAPED_SLASHES;
 /**
  * Incidents controller handling incident creation and rendering.
  *
- * @property NotificationsTable $Notifications
- * @property IncidentsTable $Incidents
- * @property ReportsTable $Reports
  */
 class IncidentsController extends AppController
 {
+    protected NotificationsTable $Notifications;
+    protected IncidentsTable $Incidents;
+    protected ReportsTable $Reports;
+
     /**
      * Initialization hook method.
      *
@@ -58,8 +59,9 @@ class IncidentsController extends AppController
     {
         parent::initialize();
         $this->loadComponent('Mailer');
-        $this->loadModel('Notifications');
-        $this->loadModel('Incidents');
+        $this->Notifications = $this->fetchTable('Notifications');
+        $this->Incidents = $this->fetchTable('Incidents');
+        $this->Reports = $this->fetchTable('Reports');
     }
 
     public function create(): ?Response
@@ -114,13 +116,13 @@ class IncidentsController extends AppController
     public function json(?string $id): ?Response
     {
         if (empty($id)) {
-            throw new NotFoundException(__('Invalid Incident'));
+            throw new NotFoundException('Invalid Incident');
         }
 
         $this->Incidents->recursive = -1;
         $incident = $this->Incidents->findById($id)->all()->first();
         if (! $incident) {
-            throw new NotFoundException(__('The incident does not exist.'));
+            throw new NotFoundException('The incident does not exist.');
         }
 
         $incident['full_report'] =
@@ -138,14 +140,14 @@ class IncidentsController extends AppController
     public function view(?string $incidentId): void
     {
         if (empty($incidentId)) {
-            throw new NotFoundException(__('Invalid Incident'));
+            throw new NotFoundException('Invalid Incident');
         }
 
         $incidentId = (int) $incidentId;
 
         $incident = $this->Incidents->findById($incidentId)->all()->first();
         if (! $incident) {
-            throw new NotFoundException(__('The incident does not exist.'));
+            throw new NotFoundException('The incident does not exist.');
         }
 
         $incident['full_report'] =

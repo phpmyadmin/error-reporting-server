@@ -18,6 +18,9 @@
 
 namespace App\Controller;
 
+use App\Model\Table\NotificationsTable;
+use App\Model\Table\DevelopersTable;
+use App\Model\Table\ReportsTable;
 use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
@@ -32,6 +35,10 @@ use function json_encode;
  */
 class NotificationsController extends AppController
 {
+    protected NotificationsTable $Notifications;
+    protected DevelopersTable $Developers;
+    protected ReportsTable $Reports;
+
     /**
      * Initialization hook method.
      *
@@ -49,9 +56,9 @@ class NotificationsController extends AppController
             'Form',
             'Reports',
         ]);
-        $this->loadModel('Notifications');
-        $this->loadModel('Developers');
-        $this->loadModel('Reports');
+        $this->Notifications = $this->fetchTable('Notifications');
+        $this->Developers = $this->fetchTable('Developers');
+        $this->Reports = $this->fetchTable('Reports');
     }
 
     public function beforeFilter(EventInterface $event)
@@ -153,10 +160,8 @@ class NotificationsController extends AppController
      * Currently it deletes them (marks them "read").
      * Can be Extended for other mass operations as well.
      * Expects an array of Notification Ids as a POST parameter.
-     *
-     * @return void Nothing
      */
-    public function mass_action(): void
+    public function mass_action(): Response
     {
         $msg = 'Selected Notifications have been marked \'Read\'!';
         $flash_class = 'alert alert-success';
@@ -184,6 +189,6 @@ class NotificationsController extends AppController
             $msg,
             ['params' => ['class' => $flash_class]]
         );
-        $this->redirect('/notifications/');
+        return $this->redirect('/notifications/');
     }
 }

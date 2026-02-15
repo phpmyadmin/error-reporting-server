@@ -24,6 +24,7 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
+use Cake\Http\Response;
 use InvalidArgumentException;
 
 use function __;
@@ -63,12 +64,11 @@ class GithubController extends AppController
      * @param int $reportId The report number
      *
      * @throws NotFoundException
-     * @return void Nothing
      */
-    public function create_issue($reportId): void
+    public function create_issue($reportId): ?Response
     {
         if (empty($reportId)) {
-            throw new NotFoundException(__('Invalid report Id.'));
+            throw new NotFoundException('Invalid report Id.');
         }
 
         $reportId = (int) $reportId;
@@ -77,7 +77,7 @@ class GithubController extends AppController
         $report = $reportsTable->findById($reportId)->all()->first();
 
         if (! $report) {
-            throw new NotFoundException(__('The report does not exist.'));
+            throw new NotFoundException('The report does not exist.');
         }
 
         $reportArray = $report->toArray();
@@ -85,7 +85,7 @@ class GithubController extends AppController
             $this->set('error_name', $reportArray['error_name']);
             $this->set('error_message', $reportArray['error_message']);
 
-            return;
+            return null;
         }
 
         $this->disableAutoRender();
@@ -113,7 +113,7 @@ class GithubController extends AppController
             $report->status = $this->getReportStatusFromIssueState($issueDetails['state']);
             $reportsTable->save($report);
 
-            $this->redirect([
+            return $this->redirect([
                 '_name' => 'reports:view',
                 'id' => $reportId,
             ]);
@@ -123,6 +123,7 @@ class GithubController extends AppController
                 $this->getErrors($issueDetails, $status),
                 ['params' => ['class' => $flash_class]]
             );
+            return null;
         }
     }
 
@@ -136,7 +137,7 @@ class GithubController extends AppController
     public function link_issue($reportId): void
     {
         if (empty($reportId)) {
-            throw new NotFoundException(__('Invalid report Id.'));
+            throw new NotFoundException('Invalid report Id.');
         }
 
         $reportId = (int) $reportId;
@@ -145,12 +146,12 @@ class GithubController extends AppController
         $report = $reportsTable->findById($reportId)->all()->first();
 
         if (! $report) {
-            throw new NotFoundException(__('The report does not exist.'));
+            throw new NotFoundException('The report does not exist.');
         }
 
         $ticket_id = intval($this->request->getQuery('ticket_id'));
         if (! $ticket_id) {
-            throw new NotFoundException(__('Invalid Ticket ID!!'));
+            throw new NotFoundException('Invalid Ticket ID!!');
         }
 
         $reportArray = $report->toArray();
@@ -195,7 +196,7 @@ class GithubController extends AppController
             );
         }
 
-        $this->redirect([
+        return $this->redirect([
             '_name' => 'reports:view',
             'id' => $reportId,
         ]);
@@ -206,12 +207,11 @@ class GithubController extends AppController
      *
      * @param int $reportId The report Id
      * @throws NotFoundException
-     * @return void Nothing
      */
-    public function unlink_issue($reportId): void
+    public function unlink_issue($reportId): Response
     {
         if (empty($reportId)) {
-            throw new NotFoundException(__('Invalid report Id.'));
+            throw new NotFoundException('Invalid report Id.');
         }
 
         $reportId = (int) $reportId;
@@ -220,14 +220,14 @@ class GithubController extends AppController
         $report = $reportsTable->findById($reportId)->all()->first();
 
         if (! $report) {
-            throw new NotFoundException(__('The report does not exist.'));
+            throw new NotFoundException('The report does not exist.');
         }
 
         $reportArray = $report->toArray();
         $ticket_id = $reportArray['sourceforge_bug_id'];
 
         if (! $ticket_id) {
-            throw new NotFoundException(__('Invalid Ticket ID!!'));
+            throw new NotFoundException('Invalid Ticket ID!!');
         }
 
         // "formatted" text of the comment.
@@ -260,7 +260,7 @@ class GithubController extends AppController
             );
         }
 
-        $this->redirect([
+        return $this->redirect([
             '_name' => 'reports:view',
             'id' => $reportId,
         ]);
@@ -487,9 +487,8 @@ class GithubController extends AppController
      *
      * Can not (& should not) be directly accessed via web.
      *
-     * @return void Nothing
      */
-    public function sync_issue_status(): void
+    public function sync_issue_status(): ?Response
     {
         if (! Configure::read('CronDispatcher')) {
             $flash_class = 'alert alert-error';
@@ -498,9 +497,7 @@ class GithubController extends AppController
                 ['params' => ['class' => $flash_class]]
             );
 
-            $this->redirect('/');
-
-            return;
+            return $this->redirect('/');
         }
 
         $this->disableAutoRender();
@@ -556,5 +553,7 @@ class GithubController extends AppController
                 ['scope' => 'cron_jobs']
             );
         }
+
+        return null;
     }
 }

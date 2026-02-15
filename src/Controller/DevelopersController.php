@@ -103,7 +103,7 @@ class DevelopersController extends AppController
         return $this->redirect($last_page);
     }
 
-    public function logout(): void
+    public function logout(): Response
     {
         $this->request->getSession()->destroy();
 
@@ -112,7 +112,7 @@ class DevelopersController extends AppController
             'You have been logged out successfully',
             ['params' => ['class' => $flash_class]]
         );
-        $this->redirect('/');
+        return $this->redirect('/');
     }
 
     protected function authenticateDeveloper(array $userInfo, string $accessToken): void

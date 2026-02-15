@@ -4,7 +4,7 @@ use Cake\Routing\Router;
 
 ?>
 <div class="notifications index">
-    <h2><?= __('Notifications'); ?></h2>
+    <h2>Notifications</h2>
     <form name="notif_mass_action" method="post" action="<?=
         Router::url([
             'controller' => 'notifications',

@@ -30,8 +30,6 @@ use function time;
 
 /**
  * Clean old Notifications shell.
- *
- * @property NotificationsTable $Notifications
  */
 class CleanOldNotifsShell extends Command
 {
@@ -43,6 +41,8 @@ class CleanOldNotifsShell extends Command
      * @var string
      */
     protected $name = self::NAME;
+
+    protected NotificationsTable $Notifications;
 
     public static function defaultName(): string
     {
@@ -59,7 +59,7 @@ class CleanOldNotifsShell extends Command
     public function initialize(): void
     {
         parent::initialize();
-        $this->loadModel('Notifications');
+        $this->Notifications = $this->fetchTable('Notifications');
     }
 
     public function execute(Arguments $args, ConsoleIo $io)
