@@ -1,10 +1,13 @@
 <?php
 /**
- * Routes configuration
+ * Routes configuration.
  *
  * In this file, you set up routes to your controllers and their actions.
  * Routes are very important mechanism that allows you to freely connect
  * different URLs to chosen controllers and their actions (functions).
+ *
+ * It's loaded within the context of `Application::routes()` method which
+ * receives a `RouteBuilder` instance `$routes` as method argument.
  *
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
@@ -19,37 +22,36 @@
  */
 
 use Cake\Routing\Route\InflectedRoute;
-use Cake\Routing\Route\Route;
-use Cake\Routing\Router;
+use Cake\Routing\RouteBuilder;
 
-/**
- * The default class to use for all routes
- *
- * The following route classes are supplied with CakePHP and are appropriate
- * to set as the default:
- *
- * - Route
- * - InflectedRoute
- * - DashedRoute
- *
- * If no call is made to `Router::defaultRouteClass()`, the class used is
- * `Route` (`Cake\Routing\Route\Route`)
- *
- * Note that `Route` does not do any inflections on URLs which will result in
- * inconsistently cased URLs when used with `:plugin`, `:controller` and
- * `:action` markers.
- *
- * Cache: Routes are cached to improve performance, check the RoutingMiddleware
- * constructor in your `src/Application.php` file to change this behavior.
+/*
+ * This file is loaded in the context of the `Application` class.
+ * So you can use `$this` to reference the application class instance
+ * if required.
  */
-Router::defaultRouteClass(Route::class);
-
-
-Router::scope('/', static function ($routes): void {
-    /**
+return function (RouteBuilder $routes): void {
+    /*
+     * The default class to use for all routes
+     *
+     * The following route classes are supplied with CakePHP and are appropriate
+     * to set as the default:
+     *
+     * - Route
+     * - InflectedRoute
+     * - DashedRoute
+     *
+     * If no call is made to `Router::defaultRouteClass()`, the class used is
+     * `Route` (`Cake\Routing\Route\Route`)
+     *
+     * Note that `Route` does not do any inflections on URLs which will result in
+     * inconsistently cased URLs when used with `{plugin}`, `{controller}` and
+     * `{action}` markers.
+     */
+    $routes->setRouteClass(InflectedRoute::class);
+    /*
      * Here, we are connecting '/' (base path) to a controller called 'Pages',
      * its action called 'display', and we pass a param to select the view file
-     * to use (in this case, src/Template/Pages/home.php)...
+     * to use (in this case, templates/Pages/home.php)...
      */
     $routes->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
 
@@ -104,36 +106,35 @@ Router::scope('/', static function ($routes): void {
             ->setPatterns([
                 'id' => '[0-9]+',
             ]);
-    /**
+
+    /*
      * Connect catchall routes for all controllers.
      *
-     * Using the argument `DashedRoute`, the `fallbacks` method is a shortcut for
+     * The `fallbacks` method is a shortcut for
      *
      * ```
-     * $routes->connect('/:controller', ['action' => 'index'], ['routeClass' => 'DashedRoute']);
-     * $routes->connect('/:controller/:action/*', [], ['routeClass' => 'DashedRoute']);
+     * $builder->connect('/{controller}', ['action' => 'index']);
+     * $builder->connect('/{controller}/{action}/*', []);
      * ```
      *
-     * Any route class can be used with this method, such as:
-     * - DashedRoute
-     * - InflectedRoute
-     * - Route
-     * - Or your own route class
-     *
-     * You can remove these routes once you've connected the
-     * routes you want in your application.
+     * It is NOT recommended to use fallback routes after your initial prototyping phase!
+     * See https://book.cakephp.org/5/en/development/routing.html#fallbacks-method for more information
      */
-    $routes->fallbacks(InflectedRoute::class);
-});
+    $routes->fallbacks();
 
-/**
+/*
  * If you need a different set of middleware or none at all,
  * open new scope and define routes there.
  *
  * ```
- * Router::scope('/api', function (RouteBuilder $routes) {
- *     // No $routes->applyMiddleware() here.
+ * $routes->scope('/api', function (RouteBuilder $builder): void {
+ *     // No $builder->applyMiddleware() here.
+ *
+ *     // Parse specified extensions from URLs
+ *     // $builder->setExtensions(['json', 'xml']);
+ *
  *     // Connect API actions here.
  * });
  * ```
  */
+ };
