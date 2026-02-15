@@ -87,7 +87,7 @@ server {
         listen [::]:443 ssl;
 
         root /home/reports/error-reporting-server/webroot/;
-        index index.html index.htm index.php;
+        index index.php;
 
         server_name reports.phpmyadmin.net;
 
@@ -105,6 +105,21 @@ server {
                 include fastcgi_params;
         }
 }
+```
+- Configuration for Caddy:
+```Caddyfile
+https://reports.phpmyadmin.net {
+    # Set this path to your site's directory.
+    root * /home/reports/error-reporting-server/webroot/
+    php_fastcgi unix//var/run/php8.4-fpm-reports.sock
+
+    # Enable the static file server.
+    encode gzip
+    file_server
+
+    try_files {path} {path}/ /index.php?{query}
+}
+
 ```
 
 ## OAuth configuration setup
