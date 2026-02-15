@@ -38,9 +38,8 @@ class CleanOldNotifsShell extends Command
     /**
      * The name of this command.
      *
-     * @var string
      */
-    protected $name = self::NAME;
+    protected string $name = self::NAME;
 
     protected NotificationsTable $Notifications;
 
