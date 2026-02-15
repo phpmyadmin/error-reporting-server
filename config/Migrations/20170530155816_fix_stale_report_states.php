@@ -1,9 +1,9 @@
 <?php
 
 use Cake\Log\Log;
-use Migrations\AbstractMigration;
+use Migrations\BaseMigration;
 
-class FixStaleReportStates extends AbstractMigration
+class FixStaleReportStates extends BaseMigration
 {
     /**
      * This migration changes the old report statuses to more

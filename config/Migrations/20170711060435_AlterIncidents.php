@@ -1,8 +1,8 @@
 <?php
 
-use Migrations\AbstractMigration;
+use Migrations\BaseMigration;
 
-class AlterIncidents extends AbstractMigration
+class AlterIncidents extends BaseMigration
 {
     /**
      * Change Method.

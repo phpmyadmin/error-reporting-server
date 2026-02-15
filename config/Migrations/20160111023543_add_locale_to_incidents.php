@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use Migrations\BaseMigration;
 
-class AddLocaleToIncidents extends AbstractMigration
+class AddLocaleToIncidents extends BaseMigration
 {
     /**
      * Change Method.

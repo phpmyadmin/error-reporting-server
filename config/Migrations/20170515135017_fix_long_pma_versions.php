@@ -3,9 +3,9 @@
 use App\Model\Table\IncidentsTable;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
-use Phinx\Migration\AbstractMigration;
+use Migrations\BaseMigration;
 
-class FixLongPmaVersions extends AbstractMigration
+class FixLongPmaVersions extends BaseMigration
 {
     /**
      * This migration strips the phpMyAdmin version of Debian,

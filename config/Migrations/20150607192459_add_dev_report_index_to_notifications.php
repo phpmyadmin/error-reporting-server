@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use Migrations\BaseMigration;
 
-class AddDevReportIndexToNotifications extends AbstractMigration
+class AddDevReportIndexToNotifications extends BaseMigration
 {
     /**
      * Change Method.

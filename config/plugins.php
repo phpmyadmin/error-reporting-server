@@ -5,4 +5,7 @@ return [
         'onlyDebug' => true,
         'optional' => true,
     ],
+    'Migrations' => [
+        'onlyCli' => true,
+    ],
 ];

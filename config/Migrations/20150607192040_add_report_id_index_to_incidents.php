@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use Migrations\BaseMigration;
 
-class AddReportIdIndexToIncidents extends AbstractMigration
+class AddReportIdIndexToIncidents extends BaseMigration
 {
     /**
      * Change Method.
