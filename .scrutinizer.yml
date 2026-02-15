@@ -14,18 +14,19 @@ checks:
     php: true
 tools:
   external_code_coverage:
-    runs: 4 # php 7.x versions
+    runs: 1 # php 8.x versions
     timeout: 900 # 15 min
 
 build:
-    nodes:
-        analysis:
-            environment:
-                php: 7.2
-            dependencies:
-                before:
-                    - composer install
-            tests:
-                override:
-                    - php-scrutinizer-run
-                    - phpcs-run
+  image: default-jammy # noble was not available on 12/09/2025
+  nodes:
+    analysis:
+      environment:
+        php: 8.4
+      dependencies:
+        before:
+          - composer install
+      tests:
+        override:
+          - php-scrutinizer-run
+          - phpcs-run
