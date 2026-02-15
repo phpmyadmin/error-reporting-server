@@ -29,11 +29,11 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php-version: ["7.4", "8.0", "8.1", "8.2", "8.3"]
+                php-version: ["8.4"]
                 db-server: ["mysql:5.7"]
                 os: [ubuntu-latest]
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
               with:
                   # Fetch some commits for Scrutinizer coverage upload
                   fetch-depth: 15
@@ -45,7 +45,7 @@ jobs:
                   coverage: xdebug
                   ini-values: xdebug.mode="develop,coverage"
             - name: Cache module
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: ~/.composer/cache/
                   key: composer-cache
@@ -83,9 +83,15 @@ jobs:
                 TEST_MYSQL_PORT: ${{ job.services.database-server.ports['3306'] }}
             - name: Send coverage
               uses: codecov/codecov-action@v3
+              # Do not run this step on forked versions of the main repository (example: contributor forks)
+              if: github.repository == 'phpmyadmin/error-reporting-server'
               with:
+                fail_ci_if_error: true
+                token: ${{ secrets.CODECOV_TOKEN }}
                 flags: unit-${{ matrix.php-version }}-${{ matrix.os }}
                 name: phpunit-${{ matrix.php-version }}-${{ matrix.os }}
+                report_type: coverage
+
             - name: Send coverage to Scrutinizer
               uses: sudo-bot/action-scrutinizer@latest
               # Do not run this step on forked versions of the main repository (example: contributor forks)

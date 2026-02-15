@@ -14,15 +14,15 @@ jobs:
     lint-php:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-            - name: Use PHP 7.4
+            - uses: actions/checkout@v6
+            - name: Use PHP 8.4
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: 7.4
+                  php-version: 8.4
             - name: Validate composer.json and composer.lock
               run: composer validate
             - name: Cache module
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: ~/.composer/cache/
                   key: composer-cache
@@ -34,13 +34,13 @@ jobs:
     analyse-php:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-            - name: Use PHP 7.4
+            - uses: actions/checkout@v6
+            - name: Use PHP 8.4
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: 7.4
+                  php-version: 8.4
             - name: Cache module
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: ~/.composer/cache/
                   key: composer-cache
