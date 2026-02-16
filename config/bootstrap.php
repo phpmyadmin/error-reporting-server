@@ -97,6 +97,22 @@ if (file_exists(CONFIG . 'app_local.php')) {
 }
 
 /*
+ * Load a local configuration file to provide more configurations.
+ * Notice: For security reasons forwarding.php **should not** be included in your git repo.
+ */
+if (file_exists(CONFIG . 'forwarding.php')) {
+    Configure::load('forwarding', 'default');
+}
+
+/*
+ * Load a local configuration file to provide more configurations.
+ * Notice: For security reasons oauth.php **should not** be included in your git repo.
+ */
+if (file_exists(CONFIG . 'oauth.php')) {
+    Configure::load('oauth', 'default');
+}
+
+/*
  * When debug = true the metadata cache should only last for a short time.
  */
 if (Configure::read('debug')) {

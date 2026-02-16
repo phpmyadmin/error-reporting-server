@@ -1,24 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Configures github application details for authentication. You can get them
  * from the application configuration page on github.
  */
 
-namespace App\Config;
+return [
+    'GithubConfig' => [
+        'client_id' => '<application-client-id>',
+        'client_secret' => '<application-client-secret>',
+    ],
 
-use Cake\Core\Configure;
+    /**
+     * Configures the github repo to check commit access for
+     */
+    'GithubRepoPath' => 'phpmyadmin/phpmyadmin',
 
-Configure::write('GithubConfig', [
-    'client_id' => '<application-client-id>',
-    'client_secret' => '<application-client-secret>',
-]);
+    /**
+     * Access token for syncing Github issue states
+     */
+    'GithubAccessToken' => '<access-token>',
 
-/**
- * Configures the github repo to check commit access for
- */
-Configure::write('GithubRepoPath', 'phpmyadmin/phpmyadmin');
-
-/**
- * Access token for syncing Github issue states
- */
-Configure::write('GithubAccessToken', '<access-token>');
+];
