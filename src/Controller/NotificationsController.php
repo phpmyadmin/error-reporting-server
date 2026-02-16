@@ -18,8 +18,8 @@
 
 namespace App\Controller;
 
-use App\Model\Table\NotificationsTable;
 use App\Model\Table\DevelopersTable;
+use App\Model\Table\NotificationsTable;
 use App\Model\Table\ReportsTable;
 use Cake\Event\EventInterface;
 use Cake\Http\Response;
@@ -189,6 +189,7 @@ class NotificationsController extends AppController
             $msg,
             ['params' => ['class' => $flash_class]]
         );
+
         return $this->redirect('/notifications/');
     }
 }

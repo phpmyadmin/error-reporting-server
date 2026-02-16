@@ -15,7 +15,7 @@
 /*
  * Use the DS to separate the directories in other defines
  */
-if (!defined('DS')) {
+if (! defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
 

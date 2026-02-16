@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -45,6 +46,7 @@ use Cake\Mailer\TransportFactory;
 use Cake\Routing\Router;
 use Cake\Utility\Security;
 use Detection\MobileDetect;
+
 use function Cake\Core\env;
 
 /*
@@ -84,7 +86,7 @@ require CAKE . 'functions.php';
 try {
     Configure::config('default', new PhpConfig());
     Configure::load('app', 'default', false);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     exit($e->getMessage() . "\n");
 }
 
@@ -155,6 +157,7 @@ if (PHP_SAPI === 'cli') {
     if (Configure::check('Log.debug')) {
         Configure::write('Log.debug.file', 'cli-debug');
     }
+
     if (Configure::check('Log.error')) {
         Configure::write('Log.error.file', 'cli-error');
     }
@@ -173,7 +176,7 @@ if (PHP_SAPI === 'cli') {
  * Example: APP_FULL_BASE_URL=https://example.com
  */
 $fullBaseUrl = Configure::read('App.fullBaseUrl');
-if (!$fullBaseUrl) {
+if (! $fullBaseUrl) {
     $httpHost = env('HTTP_HOST');
 
     /*
@@ -186,13 +189,17 @@ if (!$fullBaseUrl) {
         if (env('HTTPS') || env('HTTP_X_FORWARDED_PROTO') === 'https') {
             $s = 's';
         }
+
         $fullBaseUrl = 'http' . $s . '://' . $httpHost;
     }
+
     unset($httpHost, $s);
 }
+
 if ($fullBaseUrl) {
     Router::fullBaseUrl($fullBaseUrl);
 }
+
 unset($fullBaseUrl);
 
 /*
@@ -211,12 +218,12 @@ Security::setSalt(Configure::consume('Security.salt'));
  * If you don't use these checks you can safely remove this code
  * and the mobiledetect package from composer.json.
  */
-ServerRequest::addDetector('mobile', function ($request) {
+ServerRequest::addDetector('mobile', static function ($request) {
     $detector = new MobileDetect();
 
     return $detector->isMobile();
 });
-ServerRequest::addDetector('tablet', function ($request) {
+ServerRequest::addDetector('tablet', static function ($request) {
     $detector = new MobileDetect();
 
     return $detector->isTablet();

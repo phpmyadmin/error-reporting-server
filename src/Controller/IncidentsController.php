@@ -28,7 +28,6 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
 
-use function __;
 use function array_merge;
 use function count;
 use function in_array;
@@ -40,7 +39,6 @@ use const JSON_UNESCAPED_SLASHES;
 
 /**
  * Incidents controller handling incident creation and rendering.
- *
  */
 class IncidentsController extends AppController
 {

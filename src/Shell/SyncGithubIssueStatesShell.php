@@ -41,7 +41,6 @@ class SyncGithubIssueStatesShell extends Command
 
     /**
      * The name of this command.
-     *
      */
     protected string $name = self::NAME;
 

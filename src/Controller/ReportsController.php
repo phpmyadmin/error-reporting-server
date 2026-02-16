@@ -18,17 +18,16 @@
 
 namespace App\Controller;
 
-use App\Model\Table\NotificationsTable;
 use App\Model\Table\DevelopersTable;
-use App\Model\Table\ReportsTable;
 use App\Model\Table\IncidentsTable;
+use App\Model\Table\NotificationsTable;
+use App\Model\Table\ReportsTable;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 
-use function __;
 use function array_key_exists;
 use function array_push;
 use function array_unshift;
@@ -37,7 +36,6 @@ use function json_encode;
 
 /**
  * Reports controller handling reports modification and rendering.
- *
  */
 class ReportsController extends AppController
 {
@@ -273,6 +271,7 @@ class ReportsController extends AppController
                 . $relatedTo,
             ['params' => ['class' => $flash_class]]
         );
+
         return $this->redirect('/reports/view/' . $reportId);
     }
 
@@ -297,6 +296,7 @@ class ReportsController extends AppController
             'This report has been marked as different.',
             ['params' => ['class' => $flash_class]]
         );
+
         return $this->redirect('/reports/view/' . $reportId);
     }
 
@@ -330,6 +330,7 @@ class ReportsController extends AppController
             'The state has been successfully changed.',
             ['params' => ['class' => $flash_class]]
         );
+
         return $this->redirect('/reports/view/' . $reportId);
     }
 
@@ -338,7 +339,6 @@ class ReportsController extends AppController
      * Currently only to change their statuses.
      * Can be Extended for other mass operations as well.
      * Expects an array of Report Ids as a POST parameter.
-     *
      */
     public function mass_action(): Response
     {
@@ -385,6 +385,7 @@ class ReportsController extends AppController
             $msg,
             ['params' => ['class' => $flash_class]]
         );
+
         return $this->redirect('/reports/');
     }
 

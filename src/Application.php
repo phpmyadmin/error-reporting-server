@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -14,6 +15,7 @@ declare(strict_types=1);
  * @since     3.3.0
  * @license   https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace App;
 
 use App\Middleware\HostHeaderMiddleware;
@@ -36,14 +38,12 @@ use Cake\Routing\Middleware\RoutingMiddleware;
  * This defines the bootstrapping logic and middleware layers you
  * want to use in your application.
  *
- * @extends \Cake\Http\BaseApplication<\App\Application>
+ * @extends BaseApplication<Application>
  */
 class Application extends BaseApplication
 {
     /**
      * Load all the application configuration and bootstrap logic.
-     *
-     * @return void
      */
     public function bootstrap(): void
     {
@@ -57,8 +57,8 @@ class Application extends BaseApplication
     /**
      * Setup the middleware queue your application will use.
      *
-     * @param \Cake\Http\MiddlewareQueue $middlewareQueue The middleware queue to setup.
-     * @return \Cake\Http\MiddlewareQueue The updated middleware queue.
+     * @param MiddlewareQueue $middlewareQueue The middleware queue to setup.
+     * @return MiddlewareQueue The updated middleware queue.
      */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
@@ -90,9 +90,7 @@ class Application extends BaseApplication
 
             // Cross Site Request Forgery (CSRF) Protection Middleware
             // https://book.cakephp.org/5/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
-            ->add(new CsrfProtectionMiddleware([
-                'httponly' => true,
-            ]));
+            ->add(new CsrfProtectionMiddleware(['httponly' => true]));
 
         return $middlewareQueue;
     }
@@ -100,8 +98,7 @@ class Application extends BaseApplication
     /**
      * Register application container services.
      *
-     * @param \Cake\Core\ContainerInterface $container The Container to update.
-     * @return void
+     * @param ContainerInterface $container The Container to update.
      * @link https://book.cakephp.org/5/en/development/dependency-injection.html#dependency-injection
      */
     public function services(ContainerInterface $container): void
@@ -113,8 +110,6 @@ class Application extends BaseApplication
     /**
      * Register custom event listeners here
      *
-     * @param \Cake\Event\EventManagerInterface $eventManager
-     * @return \Cake\Event\EventManagerInterface
      * @link https://book.cakephp.org/5/en/core-libraries/events.html#registering-listeners
      */
     public function events(EventManagerInterface $eventManager): EventManagerInterface

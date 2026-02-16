@@ -21,13 +21,12 @@ namespace App\Controller;
 use App\Controller\Component\GithubApiComponent;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
+use Cake\Http\Response;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
-use Cake\Http\Response;
 use InvalidArgumentException;
 
-use function __;
 use function array_key_exists;
 use function explode;
 use function in_array;
@@ -117,14 +116,15 @@ class GithubController extends AppController
                 '_name' => 'reports:view',
                 'id' => $reportId,
             ]);
-        } else {
-            $flash_class = 'alert alert-error';
-            $this->Flash->set(
-                $this->getErrors($issueDetails, $status),
-                ['params' => ['class' => $flash_class]]
-            );
-            return null;
         }
+
+        $flash_class = 'alert alert-error';
+        $this->Flash->set(
+            $this->getErrors($issueDetails, $status),
+            ['params' => ['class' => $flash_class]]
+        );
+
+        return null;
     }
 
     /**
@@ -486,7 +486,6 @@ class GithubController extends AppController
      * To be used as a cron job (using webroot/cron_dispatcher.php).
      *
      * Can not (& should not) be directly accessed via web.
-     *
      */
     public function sync_issue_status(): ?Response
     {

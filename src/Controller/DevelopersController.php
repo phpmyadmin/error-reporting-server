@@ -112,6 +112,7 @@ class DevelopersController extends AppController
             'You have been logged out successfully',
             ['params' => ['class' => $flash_class]]
         );
+
         return $this->redirect('/');
     }
 

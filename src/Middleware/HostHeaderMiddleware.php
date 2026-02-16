@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Middleware;
@@ -10,6 +11,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+
+use function parse_url;
+use function strtolower;
+
+use const PHP_URL_HOST;
 
 /**
  * Middleware to validate Host header and prevent Host Header Injection attacks.
@@ -25,9 +31,9 @@ class HostHeaderMiddleware implements MiddlewareInterface
     /**
      * Process the request and validate the Host header.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request.
-     * @param \Psr\Http\Server\RequestHandlerInterface $handler The request handler.
-     * @return \Psr\Http\Message\ResponseInterface A response.
+     * @param ServerRequestInterface  $request The request.
+     * @param RequestHandlerInterface $handler The request handler.
+     * @return ResponseInterface A response.
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -36,7 +42,7 @@ class HostHeaderMiddleware implements MiddlewareInterface
         }
 
         $fullBaseUrl = Configure::read('App.fullBaseUrl');
-        if (!$fullBaseUrl) {
+        if (! $fullBaseUrl) {
             throw new InternalErrorException(
                 'SECURITY: App.fullBaseUrl is not configured. ' .
                 'This is required in production to prevent Host Header Injection attacks. ' .
