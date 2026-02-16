@@ -24,7 +24,6 @@ use Cake\Log\Log;
 use Cake\Routing\Router;
 
 use function array_merge;
-use function curl_close;
 use function curl_error;
 use function curl_init;
 use function curl_setopt;
@@ -159,7 +158,6 @@ class GithubApiComponent extends Component
         $response = curl_exec($curlHandle);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
         if ($response === false) {
             Log::error('Curl error: "' . curl_error($curlHandle) . '" for: ' . $url);
-            curl_close($curlHandle);
 
             return ['', 0];
         }
@@ -176,8 +174,6 @@ class GithubApiComponent extends Component
                 $status,
             ];
         }
-
-        curl_close($curlHandle);
 
         return $decodedResponse;
     }
