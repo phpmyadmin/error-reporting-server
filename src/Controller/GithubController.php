@@ -434,20 +434,17 @@ class GithubController extends AppController
         $incidents_query = TableRegistry::getTableLocator()->get('Incidents')->findByReportId($reportId)->all();
         $incident_count = $incidents_query->count();
 
-        $params_count = [
-            'fields' => ['inci_count' => 'inci_count'],
-            'conditions' => [
-                'related_to = ' . $reportId,
-            ],
-        ];
-        $subquery_params_count = [
-            'fields' => ['report_id' => 'report_id'],
-        ];
         $subquery_count = TableRegistry::getTableLocator()->get('Incidents')->find(
             'all',
-            $subquery_params_count
+            fields: ['report_id'],
         );
-        $inci_count_related = TableRegistry::getTableLocator()->get('Reports')->find('all', $params_count)->innerJoin(
+        $inci_count_related = TableRegistry::getTableLocator()->get('Reports')->find(
+            'all',
+            fields: ['inci_count'],
+            conditions: [
+                'related_to = ' . $reportId,
+            ],
+        )->innerJoin(
             ['incidents' => $subquery_count],
             ['incidents.report_id = Reports.related_to']
         )->count();
