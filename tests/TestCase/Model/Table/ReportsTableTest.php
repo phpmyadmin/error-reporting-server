@@ -43,16 +43,17 @@ class ReportsTableTest extends TestCase
         //$this->assertEquals(count($incidents), 2);
     }
 
-    //TODO: will do after related to fix
-    //public function testGetRelatedReports() {
-    //    $this->Reports->id = 2;
-    //    $reports = $this->Reports->getRelatedReports();
-    //    $this->assertEquals(count($reports), 0);
-    //
-    //    $this->Report->read(null, 4);
-    //    $reports = $this->Report->getRelatedReports();
-    //    $this->assertEquals(count($reports), 1);
-    //}
+    public function testGetRelatedReports(): void
+    {
+        $this->Reports->id = 2;
+        $reports = $this->Reports->getRelatedReports()->all();
+        $this->assertEquals(count($reports), 0);
+
+        $this->markTestIncomplete('Does not work anymore');
+        $this->Reports->read(null, 4);
+        $reports = $this->Reports->getRelatedReports()->all();
+        $this->assertEquals(count($reports), 1);
+    }
 
     /**
      * Test for getIncidentsWithDescription

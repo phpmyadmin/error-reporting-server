@@ -2,14 +2,14 @@
 
 namespace App\Test\TestCase\View\Helper;
 
-use App\Model\Table\ReportsTable;
 use App\View\Helper\ReportsHelper;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ReportsHelperTest extends TestCase
 {
-    protected ReportsTable $Reports;
+    protected ReportsHelper $Reports;
 
     public function setUp(): void
     {
@@ -23,7 +23,7 @@ class ReportsHelperTest extends TestCase
      *
      * @return array array data for testLinkToReport
      */
-    public function providerForTestLinkToReport(): array
+    public static function providerForTestLinkToReport(): array
     {
         return [
             [
@@ -60,10 +60,10 @@ class ReportsHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider providerForTestLinkToReport
      * @param array  $report   The report
      * @param string $expected The expected
      */
+    #[DataProvider('providerForTestLinkToReport')]
     public function testLinkToReport(array $report, string $expected): void
     {
         $link = $this->Reports->linkToReport($report);
@@ -79,7 +79,7 @@ class ReportsHelperTest extends TestCase
      *
      * @return array array data to testCreateReportsLinks
      */
-    public function providerForTestCreateReportsLinks(): array
+    public static function providerForTestCreateReportsLinks(): array
     {
         return [
             [
@@ -116,10 +116,10 @@ class ReportsHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider providerForTestCreateReportsLinks
      * @param array  $reports  The reports
      * @param string $expected The expected reports
      */
+    #[DataProvider('providerForTestCreateReportsLinks')]
     public function testCreateReportsLinks(array $reports, string $expected): void
     {
         $links_str = $this->Reports->createReportsLinks($reports);

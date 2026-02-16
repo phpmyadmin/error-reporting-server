@@ -5,6 +5,7 @@ namespace App\Test\TestCase\Model\Table;
 use App\Model\Table\IncidentsTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionMethod;
 
 use function count;
@@ -492,16 +493,16 @@ class IncidentsTableTest extends TestCase
     }
 
     /**
-     * @dataProvider versionsStripping
      * @param string $version  The version
      * @param string $expected The expected version
      */
+    #[DataProvider('versionsStripping')]
     public function testStripversion(string $version, string $expected): void
     {
         $this->assertEquals($expected, IncidentsTable::getStrippedPmaVersion($version));
     }
 
-    public function versionsStripping(): array
+    public static function versionsStripping(): array
     {
         return [
             [

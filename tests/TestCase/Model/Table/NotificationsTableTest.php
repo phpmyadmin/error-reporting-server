@@ -2,7 +2,7 @@
 
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\NotificationTable;
+use App\Model\Table\NotificationsTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
@@ -13,7 +13,7 @@ use function count;
  */
 class NotificationsTableTest extends TestCase
 {
-    protected NotificationTable $Notification;
+    protected NotificationsTable $Notifications;
 
     /**
      * Fixtures.
