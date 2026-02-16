@@ -29,6 +29,8 @@ use Cake\ORM\TableRegistry;
  */
 class ReportsTable extends Table
 {
+    public int $id;
+
     /**
      * @var array
      *
@@ -274,9 +276,13 @@ class ReportsTable extends Table
 
         if ($count) {
             $queryDetails['fields'] = ['' . $fieldName . ''];
-            $queryDetails['limit'] = null;
             $queryDetails['group'] = 'Incidents.' . $fieldName;
-            $totalCount = TableRegistry::getTableLocator()->get('Incidents')->find('all', $queryDetails)->count();
+            $totalCount = TableRegistry::getTableLocator()->get('Incidents')->find(
+                'all',
+                conditions: $queryDetails['conditions'],
+                fields: $queryDetails['fields'],
+                group: $queryDetails['group'],
+            )->count();
 
             return [
                 $groupedCount->all(),
