@@ -162,13 +162,12 @@ class GithubApiComponent extends Component
             return ['', 0];
         }
 
+        $status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
+        // phpcs ignored patterns for mock testing reasons
+        Log::debug('Response-code: ' . $status . ' for: ' . $url);
+
         $decodedResponse = json_decode($response, true);
         if ($returnCode) {
-            $status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
-            // phpcs ignored patterns for mock testing reasons
-            curl_close($curlHandle);
-            Log::debug('Response-code: ' . $status . ' for: ' . $url);
-
             return [
                 $decodedResponse,
                 $status,
