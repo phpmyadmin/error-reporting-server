@@ -132,9 +132,8 @@ class GithubController extends AppController
      *
      * @param int $reportId The report Id
      * @throws NotFoundException
-     * @return void Nothing
      */
-    public function link_issue($reportId): void
+    public function link_issue($reportId): Response
     {
         if (empty($reportId)) {
             throw new NotFoundException('Invalid report Id.');
