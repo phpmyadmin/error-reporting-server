@@ -18,6 +18,7 @@
 
 namespace App\Test\TestCase\Controller;
 
+use App\Model\Table\DevelopersTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -36,12 +37,12 @@ class DevelopersControllerTest extends TestCase
     use PHPMock;
     use IntegrationTestTrait;
 
+    protected DevelopersTable $Developers;
+
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.Developers',
         'app.Notifications',
     ];

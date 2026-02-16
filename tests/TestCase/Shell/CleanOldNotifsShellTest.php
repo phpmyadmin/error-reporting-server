@@ -19,7 +19,7 @@
 namespace App\Test\TestCase\Shell;
 
 use Cake\Command\Command;
-use Cake\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
 /**
@@ -31,10 +31,8 @@ class CleanOldNotifsShellTest extends TestCase
 
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.Notifications',
         'app.Developers',
     ];

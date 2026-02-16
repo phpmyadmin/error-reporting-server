@@ -28,19 +28,12 @@ use Cake\TestSuite\TestCase;
  */
 class DevelopersTableTest extends TestCase
 {
-    /**
-     * Test subject
-     *
-     * @var DevelopersTable
-     */
-    public $Developers;
+    protected DevelopersTable $Developers;
 
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = ['app.Developers'];
+    public array $fixtures = ['app.Developers'];
 
     /**
      * setUp method

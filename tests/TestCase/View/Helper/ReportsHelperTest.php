@@ -2,12 +2,15 @@
 
 namespace App\Test\TestCase\View\Helper;
 
+use App\Model\Table\ReportsTable;
 use App\View\Helper\ReportsHelper;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 
 class ReportsHelperTest extends TestCase
 {
+    protected ReportsTable $Reports;
+
     public function setUp(): void
     {
         parent::setUp();

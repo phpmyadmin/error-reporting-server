@@ -16,12 +16,12 @@ use const DS;
 
 class IncidentsTableTest extends TestCase
 {
+    protected IncidentsTable $Incidents;
+
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.Notifications',
         'app.Developers',
         'app.Reports',

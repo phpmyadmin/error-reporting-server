@@ -20,7 +20,7 @@ namespace App\Test\TestCase\Shell;
 
 use Cake\Cache\Cache;
 use Cake\Command\Command;
-use Cake\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
 /**

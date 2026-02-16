@@ -18,6 +18,7 @@
 
 namespace App\Test\TestCase\Controller;
 
+use App\Model\Table\ReportsTable;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
@@ -38,12 +39,12 @@ class GithubControllerTest extends TestCase
     use PHPMock;
     use IntegrationTestTrait;
 
+    protected ReportsTable $Reports;
+
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.Reports',
         'app.Developers',
         'app.Incidents',

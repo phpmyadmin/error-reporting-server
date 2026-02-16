@@ -3,7 +3,7 @@
 namespace App\Test\TestCase\Shell;
 
 use Cake\Command\Command;
-use Cake\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
 
@@ -23,10 +23,8 @@ class SyncGithubIssueStatesShellTest extends TestCase
 
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = ['app.Reports', 'app.Developers', 'app.Notifications'];
+    public array $fixtures = ['app.Reports', 'app.Developers', 'app.Notifications'];
 
     public function setUp(): void
     {

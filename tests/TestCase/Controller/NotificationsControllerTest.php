@@ -2,6 +2,7 @@
 
 namespace App\Test\TestCase\Controller;
 
+use App\Model\Table\NotificationsTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -15,12 +16,12 @@ class NotificationsControllerTest extends TestCase
 {
     use IntegrationTestTrait;
 
+    protected NotificationsTable $Notifications;
+
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.Notifications',
         'app.Developers',
         'app.Reports',

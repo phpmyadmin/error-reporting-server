@@ -18,10 +18,8 @@ class NotificationsFixture extends TestFixture
 
     /**
      * Records.
-     *
-     * @var array
      */
-    public $records = [
+    public array $records = [
         [
             'id' => 1,
             'developer_id' => 1,

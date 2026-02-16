@@ -6,8 +6,7 @@ use Cake\TestSuite\Fixture\TestFixture;
 
 class ReportsFixture extends TestFixture
 {
-    /** @var string */
-    public $connection = 'test';
+    public string $connection = 'test';
 
     /**
      * Imports.
@@ -16,8 +15,7 @@ class ReportsFixture extends TestFixture
      */
     public $import = ['table' => 'reports'];
 
-    /** @var array */
-    public $records = [
+    public array $records = [
         [
             'id' => 1,
             'error_message' => 'Lorem ipsum dolor sit amet',

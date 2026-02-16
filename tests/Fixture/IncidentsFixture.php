@@ -18,10 +18,8 @@ class IncidentsFixture extends TestFixture
 
     /**
      * Records.
-     *
-     * @var array
      */
-    public $records = [
+    public array $records = [
         [
             'id' => 1,
             'error_name' => 'Lorem ipsum dolor sit amet',

@@ -2,6 +2,7 @@
 
 namespace App\Test\TestCase\Model\Table;
 
+use App\Model\Table\ReportsTable;
 use Cake\ORM\Query;
 use Cake\ORM\ResultSet;
 use Cake\ORM\TableRegistry;
@@ -11,12 +12,12 @@ use function count;
 
 class ReportsTableTest extends TestCase
 {
+    protected ReportsTable $Reports;
+
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.Notifications',
         'app.Developers',
         'app.Reports',

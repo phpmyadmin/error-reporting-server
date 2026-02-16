@@ -3,6 +3,7 @@
 namespace App\Test\TestCase\Controller;
 
 use App\Model\Table\IncidentsTable;
+use App\Model\Table\ReportsTable;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
@@ -18,12 +19,13 @@ class IncidentsControllerTest extends TestCase
 {
     use IntegrationTestTrait;
 
+    protected IncidentsTable $Incidents;
+    protected ReportsTable $Reports;
+
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.Notifications',
         'app.Developers',
         'app.Reports',

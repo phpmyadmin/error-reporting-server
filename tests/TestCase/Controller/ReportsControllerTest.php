@@ -2,6 +2,7 @@
 
 namespace App\Test\TestCase\Controller;
 
+use App\Model\Table\ReportsTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -13,12 +14,12 @@ class ReportsControllerTest extends TestCase
 {
     use IntegrationTestTrait;
 
+    protected ReportsTable $Reports;
+
     /**
      * Fixtures.
-     *
-     * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.Notifications',
         'app.Developers',
         'app.Reports',

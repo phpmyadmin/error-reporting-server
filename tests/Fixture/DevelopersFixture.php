@@ -18,10 +18,8 @@ class DevelopersFixture extends TestFixture
 
     /**
      * Records.
-     *
-     * @var array
      */
-    public $records = [
+    public array $records = [
         [
             'id' => 1,
             'github_id' => 1,
