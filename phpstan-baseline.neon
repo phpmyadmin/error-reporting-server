@@ -1,18 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Instantiated class App\\Middleware\\HostHeaderMiddleware not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Application.php
-
-		-
-			message: '#^Parameter \#1 \$middleware of method Cake\\Http\\MiddlewareQueue\:\:add\(\) expects array\|Closure\|Psr\\Http\\Server\\MiddlewareInterface\|string, App\\Middleware\\HostHeaderMiddleware given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Application.php
-
-		-
 			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, string\|false given\.$#'
 			identifier: argument.type
 			count: 2
@@ -241,12 +229,6 @@ parameters:
 			path: src/Controller/GithubController.php
 
 		-
-			message: '#^Used function __ not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: src/Controller/GithubController.php
-
-		-
 			message: '#^Access to an undefined property App\\Controller\\IncidentsController\:\:\$Mailer\.$#'
 			identifier: property.notFound
 			count: 1
@@ -280,12 +262,6 @@ parameters:
 			message: '#^Parameter \#1 \$string of method Cake\\Http\\Response\:\:withStringBody\(\) expects string\|null, string\|false given\.$#'
 			identifier: argument.type
 			count: 2
-			path: src/Controller/IncidentsController.php
-
-		-
-			message: '#^Used function __ not found\.$#'
-			identifier: function.notFound
-			count: 1
 			path: src/Controller/IncidentsController.php
 
 		-
@@ -369,12 +345,6 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$string of method Cake\\Http\\Response\:\:withStringBody\(\) expects string\|null, string\|false given\.$#'
 			identifier: argument.type
-			count: 1
-			path: src/Controller/ReportsController.php
-
-		-
-			message: '#^Used function __ not found\.$#'
-			identifier: function.notFound
 			count: 1
 			path: src/Controller/ReportsController.php
 
