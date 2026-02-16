@@ -57,7 +57,7 @@ class NotificationsControllerTest extends TestCase
             ]
         );
 
-        $notifications = $this->Notifications->find('all', ['fields' => ['Notifications.id']]);
+        $notifications = $this->Notifications->find('all', fields: ['Notifications.id']);
         $this->assertInstanceOf('Cake\ORM\Query', $notifications);
         $actual = $notifications->enableHydration(false)->toArray();
         $expected = [
@@ -71,7 +71,7 @@ class NotificationsControllerTest extends TestCase
             ['mark_all' => 1]
         );
 
-        $notifications = $this->Notifications->find('all', ['fields' => ['Notifications.id']]);
+        $notifications = $this->Notifications->find('all', fields: ['Notifications.id']);
         $this->assertInstanceOf('Cake\ORM\Query', $notifications);
         $actual = $notifications->enableHydration(false)->toArray();
         $expected = [];

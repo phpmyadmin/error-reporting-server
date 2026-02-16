@@ -108,7 +108,15 @@ class NotificationsController extends AppController
         $pagedParams['limit'] = intval($this->request->getQuery('iDisplayLength'));
         $pagedParams['offset'] = intval($this->request->getQuery('iDisplayStart'));
 
-        $rows = $this->Notifications->find('all', $pagedParams);
+        $rows = $this->Notifications->find(
+            'all',
+            contain: $pagedParams['contain'],
+            fields: $pagedParams['fields'],
+            conditions: $pagedParams['conditions'],
+            order: $pagedParams['order'],
+            limit: $pagedParams['limit'],
+            offset: $pagedParams['offset'],
+        );
         $totalFiltered = $this->Notifications->find(
             'all',
             conditions: [

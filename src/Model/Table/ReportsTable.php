@@ -221,7 +221,6 @@ class ReportsTable extends Table
             'conditions' => [
                 'NOT' => ['Incidents.' . $fieldName . ' is null'],
             ],
-            'limit' => $limit,
         ];
 
         if ($related) {
@@ -232,7 +231,11 @@ class ReportsTable extends Table
             $queryDetails['conditions'][] = ['Incidents.created >=' => $timeLimit];
         }
 
-        $groupedCount = TableRegistry::getTableLocator()->get('Incidents')->find('all', $queryDetails);
+        $groupedCount = TableRegistry::getTableLocator()->get('Incidents')->find(
+            'all',
+            conditions: $queryDetails['conditions'],
+            limit: $limit,
+        );
 
         /* Ommit version number in case of browser and server_software fields.
          * In case of browser field, version number is seperated by space,

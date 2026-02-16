@@ -186,7 +186,14 @@ class ReportsController extends AppController
         $pagedParams['offset'] = (int) $this->request->getQuery('iDisplayStart');
 
         $rows = $this->findAllDataTable(
-            $this->Reports->find('all', $pagedParams)->innerJoin(
+            $this->Reports->find(
+                'all',
+                fields: $pagedParams['fields'],
+                conditions: $pagedParams['conditions'],
+                order: $pagedParams['order'],
+                limit: $pagedParams['limit'],
+                offset: $pagedParams['offset'],
+            )->innerJoin(
                 ['incidents' => $subquery],
                 ['incidents.report_id = Reports.id']
             )

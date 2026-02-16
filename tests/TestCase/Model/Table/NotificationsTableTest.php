@@ -41,7 +41,7 @@ class NotificationsTableTest extends TestCase
         $devs = $developer->find('all');
         $devs = $devs->enableHydration(false)->toArray();
         $this->Notifications->addNotifications($report_id);
-        $notifs = $this->Notifications->find('all', ['conditions' => ['report_id' => $report_id]]);
+        $notifs = $this->Notifications->find('all', conditions: ['report_id' => $report_id]);
         $notifs = $notifs->enableHydration(false)->toArray();
         $this->assertEquals(count($notifs), count($devs));
     }

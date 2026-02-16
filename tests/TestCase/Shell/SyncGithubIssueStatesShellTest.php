@@ -62,12 +62,10 @@ class SyncGithubIssueStatesShellTest extends TestCase
         // Fetch all linked reports
         $reports = $Reports->find(
             'all',
-            [
-                'conditions' => [
-                    'sourceforge_bug_id IS NOT NULL',
-                    'NOT' => ['status' => 'resolved'],
-                ],
-            ]
+            conditions: [
+                'sourceforge_bug_id IS NOT NULL',
+                'NOT' => ['status' => 'resolved'],
+            ],
         );
         $this->assertEquals(3, $reports->count());
 
@@ -78,24 +76,20 @@ class SyncGithubIssueStatesShellTest extends TestCase
         // Fetch all linked reports
         $reports = $Reports->find(
             'all',
-            [
-                'conditions' => [
-                    'sourceforge_bug_id IS NOT NULL',
-                    'NOT' => ['status' => 'resolved'],
-                ],
-            ]
+            conditions: [
+                'sourceforge_bug_id IS NOT NULL',
+                'NOT' => ['status' => 'resolved'],
+            ],
         );
         $this->assertEquals(2, $reports->count());
 
         // Fetch all closed reports
         $reports = $Reports->find(
             'all',
-            [
-                'conditions' => [
-                    'sourceforge_bug_id IS NOT NULL',
-                    'status' => 'resolved',
-                ],
-            ]
+            conditions: [
+                'sourceforge_bug_id IS NOT NULL',
+                'status' => 'resolved',
+            ],
         );
         $this->assertEquals(1, $reports->count());
         $report5 = $Reports->get(4);

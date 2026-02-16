@@ -56,7 +56,10 @@ class IncidentsControllerTest extends TestCase
     public function testJson(): void
     {
         $this->get('/incidents/json/1');
+        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
         $incident = json_decode($this->_response->getBody(), true);
+        $this->assertNotNull($incident, 'The incident should be an array !');
+
         $expected = [
             'id' => 1,
             'error_name' => 'Lorem ipsum dolor sit amet',
@@ -102,8 +105,10 @@ class IncidentsControllerTest extends TestCase
 
         $report = $this->Reports->find(
             'all',
-            ['order' => 'Reports.created desc']
-        )->all()->first();
+            order: ['Reports.created desc']
+        )->first();
+        $this->assertNotNull($report, 'The report should be created !');
+
         $subject = 'A new report has been submitted '
             . 'on the Error Reporting Server: '
             . $report['id'];
@@ -123,7 +128,7 @@ class IncidentsControllerTest extends TestCase
 
         $report = $this->Reports->find(
             'all',
-            ['order' => 'Reports.created desc']
+            order: ['Reports.created desc']
         )->all()->first();
         $this->Reports->id = $report['id'];
         $incidents = $this->Reports->getIncidents();
@@ -158,7 +163,7 @@ class IncidentsControllerTest extends TestCase
 
         $report = $this->Reports->find(
             'all',
-            ['order' => 'Reports.created desc']
+            order: ['Reports.created desc']
         )->all()->first();
         $subject = 'A new report has been submitted '
             . 'on the Error Reporting Server: '
