@@ -189,7 +189,7 @@ class IncidentsController extends AppController
             [$entriesWithCount, $totalEntries] =
                     $this->Reports->getRelatedByField($field, 25, true);
             $relatedEntries[$field] = $entriesWithCount->toArray();
-            $viewVars["${field}_distinct_count"] = $totalEntries;
+            $viewVars[$field . '_distinct_count'] = $totalEntries;
         }
 
         $viewVars['related_entries'] = $relatedEntries;

@@ -400,7 +400,7 @@ class ReportsController extends AppController
             [$entriesWithCount, $totalEntries] =
                     $this->Reports->getRelatedByField($field, 25, true);
             $relatedEntries[$field] = $entriesWithCount->toArray();
-            $this->set("${field}_distinct_count", $totalEntries);
+            $this->set($field . '_distinct_count', $totalEntries);
         }
 
         $this->set('related_entries', $relatedEntries);
