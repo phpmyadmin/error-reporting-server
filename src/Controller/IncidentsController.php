@@ -168,7 +168,7 @@ class IncidentsController extends AppController
             'incidents' => $this->Reports->getIncidents()->toArray(),
             'incidents_with_description' => $this->Reports->getIncidentsWithDescription(),
             'incidents_with_stacktrace' => $this->Reports->getIncidentsWithDifferentStacktrace(),
-            'related_reports' => $this->Reports->getRelatedReports(),
+            'related_reports' => $this->Reports->getRelatedReports()->all(),
             'status' => $this->Reports->status,
         ];
         $viewVars = array_merge($viewVars, $this->getSimilarFields($reportId));

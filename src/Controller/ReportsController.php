@@ -126,7 +126,7 @@ class ReportsController extends AppController
             'incidents_with_stacktrace',
             $this->Reports->getIncidentsWithDifferentStacktrace()
         );
-        $this->set('related_reports', $this->Reports->getRelatedReports());
+        $this->set('related_reports', $this->Reports->getRelatedReports()->all());
         $this->set('status', $this->Reports->status);
         $this->setSimilarFields($reportId);
 
