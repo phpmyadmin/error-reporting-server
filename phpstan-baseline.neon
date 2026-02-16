@@ -211,12 +211,6 @@ parameters:
 			path: src/Controller/GithubController.php
 
 		-
-			message: '#^Method App\\Controller\\GithubController\:\:link_issue\(\) with return type void returns Cake\\Http\\Response\|null but should not return anything\.$#'
-			identifier: return.void
-			count: 1
-			path: src/Controller/GithubController.php
-
-		-
 			message: '#^Strict comparison using \!\=\= between ''Github issue has…''\|''Something went…'' and '''' will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
@@ -238,12 +232,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Model\\Table\\IncidentsTable\:\:\$recursive\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/Controller/IncidentsController.php
-
-		-
-			message: '#^Access to an undefined property App\\Model\\Table\\ReportsTable\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
 			path: src/Controller/IncidentsController.php
 
 		-
@@ -271,12 +259,6 @@ parameters:
 			path: src/Controller/NotificationsController.php
 
 		-
-			message: '#^Call to App\\Controller\\NotificationsController\:\:loadComponent could not find the class for "RequestHandler"$#'
-			identifier: cake.loadComponent.existClass
-			count: 1
-			path: src/Controller/NotificationsController.php
-
-		-
 			message: '#^Parameter \#1 \$string of method Cake\\Http\\Response\:\:withStringBody\(\) expects string\|null, string\|false given\.$#'
 			identifier: argument.type
 			count: 1
@@ -295,12 +277,6 @@ parameters:
 			path: src/Controller/ReportsController.php
 
 		-
-			message: '#^Access to an undefined property App\\Model\\Table\\ReportsTable\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Controller/ReportsController.php
-
-		-
 			message: '#^Access to an undefined property App\\Model\\Table\\ReportsTable\:\:\$recursive\.$#'
 			identifier: property.notFound
 			count: 1
@@ -310,12 +286,6 @@ parameters:
 			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$status\.$#'
 			identifier: property.notFound
 			count: 2
-			path: src/Controller/ReportsController.php
-
-		-
-			message: '#^Call to App\\Controller\\ReportsController\:\:loadComponent could not find the class for "RequestHandler"$#'
-			identifier: cake.loadComponent.existClass
-			count: 1
 			path: src/Controller/ReportsController.php
 
 		-
@@ -617,12 +587,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Model/Table/NotificationsTable.php
-
-		-
-			message: '#^Access to an undefined property App\\Model\\Table\\ReportsTable\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 5
-			path: src/Model/Table/ReportsTable.php
 
 		-
 			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$id\.$#'
