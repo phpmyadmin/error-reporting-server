@@ -2,6 +2,9 @@
 
 namespace App\Test\TestCase\Shell;
 
+use App\Test\Fixture\DevelopersFixture;
+use App\Test\Fixture\NotificationsFixture;
+use App\Test\Fixture\ReportsFixture;
 use Cake\Command\Command;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -21,10 +24,14 @@ class SyncGithubIssueStatesShellTest extends TestCase
     use ConsoleIntegrationTestTrait;
     use PHPMock;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = ['app.Reports', 'app.Developers', 'app.Notifications'];
+    public function getFixtures(): array
+    {
+        return [
+            NotificationsFixture::class,
+            DevelopersFixture::class,
+            ReportsFixture::class,
+        ];
+    }
 
     public function setUp(): void
     {

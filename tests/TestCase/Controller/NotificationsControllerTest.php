@@ -3,6 +3,10 @@
 namespace App\Test\TestCase\Controller;
 
 use App\Model\Table\NotificationsTable;
+use App\Test\Fixture\DevelopersFixture;
+use App\Test\Fixture\IncidentsFixture;
+use App\Test\Fixture\NotificationsFixture;
+use App\Test\Fixture\ReportsFixture;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -18,18 +22,19 @@ class NotificationsControllerTest extends TestCase
 
     protected NotificationsTable $Notifications;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = [
-        'app.Notifications',
-        'app.Developers',
-        'app.Reports',
-        'app.Incidents',
-    ];
+    public function getFixtures(): array
+    {
+        return [
+            NotificationsFixture::class,
+            DevelopersFixture::class,
+            ReportsFixture::class,
+            IncidentsFixture::class,
+        ];
+    }
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->Notifications = TableRegistry::getTableLocator()->get('Notifications');
         $this->session(['Developer.id' => 1, 'read_only' => true]);
     }

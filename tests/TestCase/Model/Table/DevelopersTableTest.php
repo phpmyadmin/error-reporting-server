@@ -19,6 +19,7 @@
 namespace App\Test\TestCase\Model\Table;
 
 use App\Model\Table\DevelopersTable;
+use App\Test\Fixture\DevelopersFixture;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
@@ -30,10 +31,12 @@ class DevelopersTableTest extends TestCase
 {
     protected DevelopersTable $Developers;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = ['app.Developers'];
+    public function getFixtures(): array
+    {
+        return [
+            DevelopersFixture::class,
+        ];
+    }
 
     /**
      * setUp method

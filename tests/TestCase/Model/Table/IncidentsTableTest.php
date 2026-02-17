@@ -3,6 +3,10 @@
 namespace App\Test\TestCase\Model\Table;
 
 use App\Model\Table\IncidentsTable;
+use App\Test\Fixture\DevelopersFixture;
+use App\Test\Fixture\IncidentsFixture;
+use App\Test\Fixture\NotificationsFixture;
+use App\Test\Fixture\ReportsFixture;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -19,15 +23,15 @@ class IncidentsTableTest extends TestCase
 {
     protected IncidentsTable $Incidents;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = [
-        'app.Notifications',
-        'app.Developers',
-        'app.Reports',
-        'app.Incidents',
-    ];
+    public function getFixtures(): array
+    {
+        return [
+            NotificationsFixture::class,
+            DevelopersFixture::class,
+            ReportsFixture::class,
+            IncidentsFixture::class,
+        ];
+    }
 
     public function setUp(): void
     {

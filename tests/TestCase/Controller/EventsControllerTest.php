@@ -3,6 +3,7 @@
 namespace App\Test\TestCase\Controller;
 
 use App\Model\Table\ReportsTable;
+use App\Test\Fixture\ReportsFixture;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -15,13 +16,16 @@ class EventsControllerTest extends TestCase
 
     protected ReportsTable $Reports;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = ['app.Reports'];
+    public function getFixtures(): array
+    {
+        return [
+            ReportsFixture::class,
+        ];
+    }
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 

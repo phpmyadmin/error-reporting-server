@@ -3,6 +3,10 @@
 namespace App\Test\TestCase\Model\Table;
 
 use App\Model\Table\NotificationsTable;
+use App\Test\Fixture\DevelopersFixture;
+use App\Test\Fixture\IncidentsFixture;
+use App\Test\Fixture\NotificationsFixture;
+use App\Test\Fixture\ReportsFixture;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
@@ -15,15 +19,15 @@ class NotificationsTableTest extends TestCase
 {
     protected NotificationsTable $Notifications;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = [
-        'app.Notifications',
-        'app.Developers',
-        'app.Reports',
-        'app.Incidents',
-    ];
+    public function getFixtures(): array
+    {
+        return [
+            NotificationsFixture::class,
+            DevelopersFixture::class,
+            ReportsFixture::class,
+            IncidentsFixture::class,
+        ];
+    }
 
     /**
      * setUp method.

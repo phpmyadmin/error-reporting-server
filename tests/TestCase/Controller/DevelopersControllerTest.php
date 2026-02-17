@@ -19,6 +19,8 @@
 namespace App\Test\TestCase\Controller;
 
 use App\Model\Table\DevelopersTable;
+use App\Test\Fixture\DevelopersFixture;
+use App\Test\Fixture\NotificationsFixture;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -39,16 +41,17 @@ class DevelopersControllerTest extends TestCase
 
     protected DevelopersTable $Developers;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = [
-        'app.Developers',
-        'app.Notifications',
-    ];
+    public function getFixtures(): array
+    {
+        return [
+            NotificationsFixture::class,
+            DevelopersFixture::class,
+        ];
+    }
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->Developers = TableRegistry::getTableLocator()->get('Developers');
     }
 

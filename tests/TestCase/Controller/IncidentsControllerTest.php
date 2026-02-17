@@ -4,6 +4,10 @@ namespace App\Test\TestCase\Controller;
 
 use App\Model\Table\IncidentsTable;
 use App\Model\Table\ReportsTable;
+use App\Test\Fixture\DevelopersFixture;
+use App\Test\Fixture\IncidentsFixture;
+use App\Test\Fixture\NotificationsFixture;
+use App\Test\Fixture\ReportsFixture;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\EmailTrait;
@@ -24,18 +28,19 @@ class IncidentsControllerTest extends TestCase
     protected IncidentsTable $Incidents;
     protected ReportsTable $Reports;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = [
-        'app.Notifications',
-        'app.Developers',
-        'app.Reports',
-        'app.Incidents',
-    ];
+    public function getFixtures(): array
+    {
+        return [
+            NotificationsFixture::class,
+            DevelopersFixture::class,
+            ReportsFixture::class,
+            IncidentsFixture::class,
+        ];
+    }
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->Incidents = TableRegistry::getTableLocator()->get('Incidents');
         //$Session = new SessionComponent(new ComponentRegistry());
         $this->session(['Developer.id' => 1]);

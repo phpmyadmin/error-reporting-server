@@ -13,6 +13,7 @@ class ReportTest extends TestCase
 {
     public function setUp(): void
     {
+        parent::setUp();
         Security::setSalt(
             'Ue%n8*v*QPejgq*v2^k5JSEMXx9Cer*jConpbjp&&vGK89jGRVBnyWaPBhY5s$87'
         );

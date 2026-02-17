@@ -19,6 +19,10 @@
 namespace App\Test\TestCase\Controller;
 
 use App\Model\Table\ReportsTable;
+use App\Test\Fixture\DevelopersFixture;
+use App\Test\Fixture\IncidentsFixture;
+use App\Test\Fixture\NotificationsFixture;
+use App\Test\Fixture\ReportsFixture;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
@@ -41,18 +45,19 @@ class GithubControllerTest extends TestCase
 
     protected ReportsTable $Reports;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = [
-        'app.Reports',
-        'app.Developers',
-        'app.Incidents',
-        'app.Notifications',
-    ];
+    public function getFixtures(): array
+    {
+        return [
+            NotificationsFixture::class,
+            DevelopersFixture::class,
+            ReportsFixture::class,
+            IncidentsFixture::class,
+        ];
+    }
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->session(['Developer.id' => 1, 'access_token' => 'abc']);
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }

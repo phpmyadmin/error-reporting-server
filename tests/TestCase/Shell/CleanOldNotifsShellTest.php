@@ -18,6 +18,8 @@
 
 namespace App\Test\TestCase\Shell;
 
+use App\Test\Fixture\DevelopersFixture;
+use App\Test\Fixture\NotificationsFixture;
 use Cake\Command\Command;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -29,13 +31,13 @@ class CleanOldNotifsShellTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    /**
-     * Fixtures.
-     */
-    public array $fixtures = [
-        'app.Notifications',
-        'app.Developers',
-    ];
+    public function getFixtures(): array
+    {
+        return [
+            NotificationsFixture::class,
+            DevelopersFixture::class,
+        ];
+    }
 
     public function setUp(): void
     {
