@@ -107,7 +107,7 @@ class GithubController extends AppController
             $this->request->getSession()->read('access_token')
         );
 
-        if ($this->handleGithubResponse($status, 1, $reportId, $issueDetails['number'])) {
+        if ($this->handleGithubResponse($status, 1, $reportId, $issueDetails['number'] ?? null)) {
             // Update report status
             $report->status = $this->getReportStatusFromIssueState($issueDetails['state']);
             $reportsTable->save($report);
@@ -325,18 +325,18 @@ class GithubController extends AppController
     /**
      * Github Response Handler.
      *
-     * @param int $response  the status returned by Github API
-     * @param int $type      type of response. 1 for create_issue, 2 for link_issue, 3 for unlink_issue,
-     *                       1 for create_issue,
-     *                       2 for link_issue,
-     *                       3 for unlink_issue,
-     *                       4 for get_issue
-     * @param int $report_id report id
-     * @param int $ticket_id ticket id, required for link ticket only
+     * @param int      $response  the status returned by Github API
+     * @param int      $type      type of response. 1 for create_issue, 2 for link_issue, 3 for unlink_issue,
+     *                            1 for create_issue,
+     *                            2 for link_issue,
+     *                            3 for unlink_issue,
+     *                            4 for get_issue
+     * @param int      $report_id report id
+     * @param int|null $ticket_id ticket id, required for link ticket only
      *
      * @return bool value. True on success. False on any type of failure.
      */
-    protected function handleGithubResponse(int $response, int $type, int $report_id, int $ticket_id = 1): bool
+    protected function handleGithubResponse(int $response, int $type, int $report_id, int|null $ticket_id = null): bool
     {
         if (! in_array($type, [1, 2, 3, 4])) {
             throw new InvalidArgumentException('Invalid Argument ' . $type . '.');

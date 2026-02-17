@@ -24,6 +24,7 @@ use App\Test\Fixture\IncidentsFixture;
 use App\Test\Fixture\NotificationsFixture;
 use App\Test\Fixture\ReportsFixture;
 use Cake\Core\Configure;
+use Cake\Http\TestSuite\HttpClientTrait;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -42,6 +43,7 @@ class GithubControllerTest extends TestCase
 {
     use PHPMock;
     use IntegrationTestTrait;
+    use HttpClientTrait;
 
     protected ReportsTable $Reports;
 
@@ -60,6 +62,7 @@ class GithubControllerTest extends TestCase
         parent::setUp();
         $this->session(['Developer.id' => 1, 'access_token' => 'abc']);
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
+        $this->enableCsrfToken();
     }
 
     /**
@@ -67,31 +70,24 @@ class GithubControllerTest extends TestCase
      */
     public function testCreateIssue(): void
     {
-        // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
-        // so that we don't actually hit the Github Api
-        $curlExecMock = $this->getFunctionMock('\App\Controller\Component', 'curl_exec');
-        $curlGetInfoMock = $this->getFunctionMock('\App\Controller\Component', 'curl_getinfo');
+        $repoPath = 'phpmyadmin/phpmyadmin';
 
         // Case 1. Test with an invalid reportId
         $this->get('github/create_issue/123');
+        $this->assertResponseError();
         $this->assertResponseContains('The report does not exist.');
 
         // Case 2. Test form with valid reportId
         $this->get('github/create_issue/5');
+        $this->assertResponseSuccess();
         $this->assertResponseContains('Lorem ipsum dolor sit amet'); // Description
 
         $issueResponse = file_get_contents(TESTS . 'Fixture' . DS . 'issue_response.json');
 
-        // Github unsuccessful response followed by successful response
-        $curlExecMock->expects($this->exactly(2))->willReturnOnConsecutiveCalls(
-            $issueResponse,
-            $issueResponse
+        $this->mockClientPost(
+            'https://api.github.com/repos/' . $repoPath . '/issues',
+            $this->newClientResponse(403, [], json_encode(['message' => 'Unauthorised'])),
         );
-        $curlGetInfoMock->expects($this->exactly(2))->willReturnOnConsecutiveCalls(
-            403,
-            201
-        );
-
         // Case 3. Test submission of form with unsuccessful github response
         $this->post(
             'github/create_issue/5',
@@ -102,6 +98,8 @@ class GithubControllerTest extends TestCase
                 'labels' => 'test-pma',
             ]
         );
+        $this->assertResponseSuccess();
+        $this->cleanupMockResponses();
 
         $this->enableRetainFlashMessages();
         $report = $this->Reports->get(5);
@@ -113,6 +111,10 @@ class GithubControllerTest extends TestCase
             'Flash.flash.0.message'
         );
 
+        $this->mockClientPost(
+            'https://api.github.com/repos/' . $repoPath . '/issues',
+            $this->newClientResponse(201, [], $issueResponse),
+        );
         // Case 4. Test submission of form with successful Github response
         $this->post(
             'github/create_issue/5',
@@ -134,10 +136,7 @@ class GithubControllerTest extends TestCase
      */
     public function testLinkIssue(): void
     {
-        // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
-        // so that we don't actually hit the Github Api
-        $curlExecMock = $this->getFunctionMock('\App\Controller\Component', 'curl_exec');
-        $curlGetInfoMock = $this->getFunctionMock('\App\Controller\Component', 'curl_getinfo');
+        $repoPath = 'phpmyadmin/phpmyadmin';
 
         // Case 1.1 Test with an invalid reportId
         $this->get('github/link_issue/123?ticket_id=1');
@@ -152,20 +151,13 @@ class GithubControllerTest extends TestCase
         $decodedResponse['state'] = 'closed';
         $issueResponseWithClosed = json_encode($decodedResponse);
 
-        // Github response unsuccessful followed by successful (open) and successful (closed)
-        $curlExecMock->expects($this->exactly(5))->willReturnOnConsecutiveCalls(
-            $issueResponse,
-            $issueResponse,
-            $issueResponse,
-            $issueResponseWithClosed,
-            $issueResponseWithClosed
+        $this->mockClientPost(
+            'https://api.github.com/repos/' . $repoPath . '/issues/9999999/comments',
+            $this->newClientResponse(404, [], json_encode(['message' => 'Not found'])),
         );
-        $curlGetInfoMock->expects($this->exactly(5))->willReturnOnConsecutiveCalls(
-            404,
-            201,
-            200,
-            201,
-            200
+        $this->mockClientGet(
+            'https://api.github.com/repos/' . $repoPath . '/issues/9999999',
+            $this->newClientResponse(404, [], json_encode(['message' => 'Not found'])),
         );
 
         // Case 2. Test submission of form with unsuccessful github response
@@ -182,7 +174,16 @@ class GithubControllerTest extends TestCase
             . 'Please check and try again!',
             'Flash.flash.0.message'
         );
+        $this->cleanupMockResponses();
 
+        $this->mockClientPost(
+            'https://api.github.com/repos/' . $repoPath . '/issues/1387/comments',
+            $this->newClientResponse(201, [], json_encode([])),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/repos/' . $repoPath . '/issues/1387',
+            $this->newClientResponse(200, [], $issueResponse),
+        );
         // Case 3. Test submission of form with successful Github response (with issue open)
         $this->get(
             'github/link_issue/5?ticket_id=1387'
@@ -191,7 +192,16 @@ class GithubControllerTest extends TestCase
         $report = $this->Reports->get(5);
         $this->assertEquals(1387, $report->sourceforge_bug_id);
         $this->assertEquals('forwarded', $report->status);
+        $this->cleanupMockResponses();
 
+        $this->mockClientPost(
+            'https://api.github.com/repos/' . $repoPath . '/issues/1387/comments',
+            $this->newClientResponse(201, [], json_encode([])),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/repos/' . $repoPath . '/issues/1387',
+            $this->newClientResponse(200, [], $issueResponseWithClosed),
+        );
         // Case 4. Test submission of form with successful Github response (with issue closed)
         $this->get(
             'github/link_issue/5?ticket_id=1387'
@@ -200,6 +210,7 @@ class GithubControllerTest extends TestCase
         $report = $this->Reports->get(5);
         $this->assertEquals(1387, $report->sourceforge_bug_id);
         $this->assertEquals('resolved', $report->status);
+        $this->cleanupMockResponses();
     }
 
     /**
@@ -207,10 +218,7 @@ class GithubControllerTest extends TestCase
      */
     public function testUnlinkIssue(): void
     {
-        // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
-        // so that we don't actually hit the Github Api
-        $curlExecMock = $this->getFunctionMock('\App\Controller\Component', 'curl_exec');
-        $curlGetInfoMock = $this->getFunctionMock('\App\Controller\Component', 'curl_getinfo');
+        $repoPath = 'phpmyadmin/phpmyadmin';
 
         // Case 1.1 Test with an invalid reportId
         $this->get('github/unlink_issue/123');
@@ -222,22 +230,16 @@ class GithubControllerTest extends TestCase
 
         $commentResponse = file_get_contents(TESTS . 'Fixture' . DS . 'comment_response.json');
 
-        // Github response unsuccessful followed by successful
-        $curlExecMock->expects($this->exactly(2))->willReturnOnConsecutiveCalls(
-            json_encode(['message' => 'Unauthorised access']),
-            $commentResponse
-        );
-        $curlGetInfoMock->expects($this->exactly(2))->willReturnOnConsecutiveCalls(
-            401,
-            201
-        );
-
         // Link the report before trying to unlink
         $report = $this->Reports->get(5);
         $report->sourceforge_bug_id = 1387;
         $report->status = 'forwarded';
         $this->Reports->save($report);
 
+        $this->mockClientPost(
+            'https://api.github.com/repos/' . $repoPath . '/issues/1387/comments',
+            $this->newClientResponse(401, [], json_encode(['message' => 'Unauthorised access'])),
+        );
         // Case 2. Test submission of form with unsuccessful and unexpected github response
         $this->get(
             'github/unlink_issue/5'
@@ -251,7 +253,12 @@ class GithubControllerTest extends TestCase
             'Unhandled response code received: 401',
             'Flash.flash.0.message'
         );
+        $this->cleanupMockResponses();
 
+        $this->mockClientPost(
+            'https://api.github.com/repos/' . $repoPath . '/issues/1387/comments',
+            $this->newClientResponse(201, [], $commentResponse),
+        );
         // Case 3. Test submission of form with successful Github response
         $this->get(
             'github/unlink_issue/5'
@@ -260,6 +267,7 @@ class GithubControllerTest extends TestCase
         $report = $this->Reports->get(5);
         $this->assertEquals(null, $report->sourceforge_bug_id);
         $this->assertEquals('new', $report->status);
+        $this->cleanupMockResponses();
     }
 
     /**
@@ -267,10 +275,7 @@ class GithubControllerTest extends TestCase
      */
     public function testSyncIssueStatus(): void
     {
-        // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
-        // so that we don't actually hit the Github Api
-        $curlExecMock = $this->getFunctionMock('\App\Controller\Component', 'curl_exec');
-        $curlGetInfoMock = $this->getFunctionMock('\App\Controller\Component', 'curl_getinfo');
+        $repoPath = 'phpmyadmin/phpmyadmin';
 
         // Test via web interface
         Configure::write('CronDispatcher', false);
@@ -283,16 +288,19 @@ class GithubControllerTest extends TestCase
         $decodedResponse['state'] = 'closed';
         $issueResponseWithClosed = json_encode($decodedResponse);
 
-        // Github response unsuccessful followed by two successful responses
-        $curlExecMock->expects($this->exactly(3))->willReturnOnConsecutiveCalls(
-            json_encode(['message' => 'Unauthorised access']),
-            $issueResponse,
-            $issueResponseWithClosed
+        $this->mockClientGet(
+            'https://api.github.com/repos/' . $repoPath . '/issues/1',
+            $this->newClientResponse(401, [], json_encode(['message' => 'Unauthorised access'])),
         );
-        $curlGetInfoMock->expects($this->exactly(3))->willReturnOnConsecutiveCalls(
-            401,
-            200,
-            200
+
+        $this->mockClientGet(
+            'https://api.github.com/repos/' . $repoPath . '/issues/2',
+            $this->newClientResponse(200, [], $issueResponse),
+        );
+
+        $this->mockClientGet(
+            'https://api.github.com/repos/' . $repoPath . '/issues/4',
+            $this->newClientResponse(200, [], $issueResponseWithClosed),
         );
 
         // Test via cli (i.e. the CronDispatcher setting should be defined)
@@ -302,13 +310,16 @@ class GithubControllerTest extends TestCase
         // 401
         $report = $this->Reports->get(1);
         $this->assertEquals('forwarded', $report->status);
+        $this->assertEquals(1, $report->sourceforge_bug_id);
 
         // 200 (open state)
         $report = $this->Reports->get(2);
         $this->assertEquals('forwarded', $report->status);
+        $this->assertEquals(2, $report->sourceforge_bug_id);
 
         // 200 (closed state)
         $report = $this->Reports->get(4);
         $this->assertEquals('resolved', $report->status);
+        $this->assertEquals(4, $report->sourceforge_bug_id);
     }
 }

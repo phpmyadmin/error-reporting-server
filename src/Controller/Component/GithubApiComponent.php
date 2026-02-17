@@ -20,29 +20,17 @@ namespace App\Controller\Component;
 
 use Cake\Controller\Component;
 use Cake\Core\Configure;
+use Cake\Http\Client;
+use Cake\Http\Client\Request as ClientRequest;
+use Cake\Http\Client\Response as ClientResponse;
 use Cake\Log\Log;
 use Cake\Routing\Router;
 
 use function array_merge;
-use function curl_error;
-use function curl_exec;
-use function curl_getinfo;
-use function curl_init;
-use function curl_setopt;
+use function assert;
 use function http_build_query;
-use function json_decode;
 use function json_encode;
 use function strtoupper;
-
-use const CURL_HTTP_VERSION_1_1;
-use const CURLINFO_HTTP_CODE;
-use const CURLOPT_CUSTOMREQUEST;
-use const CURLOPT_FOLLOWLOCATION;
-use const CURLOPT_HTTP_VERSION;
-use const CURLOPT_HTTPHEADER;
-use const CURLOPT_POSTFIELDS;
-use const CURLOPT_RETURNTRANSFER;
-use const CURLOPT_USERAGENT;
 
 /**
  * Github api component handling comunication with github.
@@ -53,6 +41,8 @@ class GithubApiComponent extends Component
      * perform an api request given a path, the data to send, the method and whether
      * or not to return a status.
      *
+     * @see GithubApiComponent::sendRequest()
+     *
      * @param string       $path         the api path to preform the request to
      * @param array|string $data         the data to send in the request. This works with both GET
      *                            and Post requests
@@ -60,21 +50,20 @@ class GithubApiComponent extends Component
      * @param bool         $returnStatus whether to return the status code with the
      *                                   request
      * @param string       $access_token the github access token
+     * @phpstan-param ClientRequest::METHOD_* $method
      *
      * @return array the returned response decoded and optionally the status code,
      *               see GithubApiComponent::sendRequest()
-     *
-     * @see GithubApiComponent::sendRequest()
      */
     public function apiRequest(
-        string $path = '',
-        $data = [],
-        string $method = 'GET',
+        string $path,
+        array|string $data,
+        string $method,
         bool $returnStatus = false,
         string $access_token = ''
     ): array {
         $path = 'https://api.github.com/' . $path;
-        if (strtoupper($method) === 'GET') {
+        if (strtoupper($method) === ClientRequest::METHOD_GET) {
             $path .= '?' . http_build_query($data);
             $data = [];
         }
@@ -96,7 +85,7 @@ class GithubApiComponent extends Component
             Configure::read('GithubConfig', []),
             ['code' => $code]
         );
-        $decodedResponse = $this->sendRequest($url, http_build_query($data), 'POST');
+        $decodedResponse = $this->sendRequest($url, http_build_query($data), ClientRequest::METHOD_POST);
 
         return $decodedResponse['access_token'] ?? null;
     }
@@ -111,63 +100,60 @@ class GithubApiComponent extends Component
      */
     public function getUserInfo(string $accessToken): array
     {
-        return $this->apiRequest('user', [], 'GET', true, $accessToken);
+        return $this->apiRequest('user', [], ClientRequest::METHOD_GET, true, $accessToken);
     }
 
     /**
      * perform an http request using curl given a url, the post data to send, the
      * request method and whether or not to return a status.
      *
-     * @param string       $url          the url to preform the request to
-     * @param array|string $data         the post data to send in the request. This only works with POST requests. GET requests need the data appended in the url.
-     *                            with POST requests. GET requests need the data appended
-     *                            in the url.
-     * @param string       $method       the method type of the request
-     * @param bool         $returnCode   whether to return the status code with the
-     *                                   request
-     * @param string       $access_token the github access token
+     * @param string       $url         the url to preform the request to
+     * @param array|string $data        the post data to send in the request. This only works with POST requests. GET requests need the data appended in the url.
+     *                           with POST requests. GET requests need the data appended
+     *                           in the url.
+     * @param string       $method      the method type of the request
+     * @param bool         $returnCode  whether to return the status code with the
+     *                                  request
+     * @param string       $accessToken the github access token
+     * @phpstan-param ClientRequest::METHOD_* $method
      *
      * @return array the returned response decoded and optionally the status code,
      *               eg: array($decodedResponse, $statusCode) or just $decodedResponse
      */
     public function sendRequest(
         string $url,
-        $data,
+        array|string $data,
         string $method,
         bool $returnCode = false,
-        string $access_token = ''
+        string $accessToken = ''
     ): array {
         Log::debug('Request-url: ' . $url);
-        $curlHandle = curl_init($url);
-        if ($curlHandle === false) {
-            Log::error('Curl init error for: ' . $url);
 
-            return ['', 0];
+        $headers = [
+            'Accept' => 'application/json',
+            'User-Agent' => 'phpMyAdmin - Error Reporting Server',
+        ];
+        if ($accessToken !== '') {
+            $headers['Authorization'] = 'token ' . $accessToken;
         }
 
-        curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, $method);
-        $header = ['Accept: application/json'];
-        if ($access_token !== '') {
-            $header[] = 'Authorization: token ' . $access_token;
-        }
+        $request = new ClientRequest(
+            url: $url,
+            method: $method,
+            headers: $headers,
+            data: $data,
+        );
+        $http = new Client([
+            'redirect' => 5,// Max redirects to follow
+        ]);
+        $response = $http->sendRequest($request);
 
-        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($curlHandle, CURLOPT_USERAGENT, 'phpMyAdmin - Error Reporting Server');
-        curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($curlHandle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-        curl_setopt($curlHandle, CURLOPT_FOLLOWLOCATION, 1);// Issues moved to another repo have redirects
-        curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
-        $response = curl_exec($curlHandle);
-        if ($response === false) {
-            Log::error('Curl error: "' . curl_error($curlHandle) . '" for: ' . $url);
+        $status = $response->getStatusCode();
+        assert($response instanceof ClientResponse);
 
-            return ['', 0];
-        }
-
-        $status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
         Log::debug('Response-code: ' . $status . ' for: ' . $url);
 
-        $decodedResponse = json_decode($response, true);
+        $decodedResponse = $response->getJson();
         if ($returnCode) {
             return [
                 $decodedResponse,
@@ -218,7 +204,7 @@ class GithubApiComponent extends Component
         [, $status] = $this->apiRequest(
             'repos/' . $repoPath . '/collaborators/' . $username,
             [],
-            'GET',
+            ClientRequest::METHOD_GET,
             true,
             $access_token
         );
@@ -242,7 +228,7 @@ class GithubApiComponent extends Component
         return $this->apiRequest(
             'repos/' . $repoPath . '/issues',
             json_encode($data),
-            'POST',
+            ClientRequest::METHOD_POST,
             true,
             $access_token
         );
@@ -262,7 +248,7 @@ class GithubApiComponent extends Component
         return $this->apiRequest(
             'repos/' . $repoPath . '/issues/' . $issueNumber . '/comments',
             json_encode($data),
-            'POST',
+            ClientRequest::METHOD_POST,
             true,
             $access_token
         );
@@ -282,7 +268,7 @@ class GithubApiComponent extends Component
         return $this->apiRequest(
             'repos/' . $repoPath . '/issues/' . $issueNumber,
             $data,
-            'GET',
+            ClientRequest::METHOD_GET,
             true,
             $access_token
         );
