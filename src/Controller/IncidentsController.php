@@ -64,11 +64,28 @@ class IncidentsController extends AppController
 
     public function create(): ?Response
     {
+        $this->disableAutoRender();
+        $this->response = $this->response
+                ->withHeader('Content-Type', 'application/json')
+                ->withHeader('X-Content-Type-Options', 'nosniff');
+
         // Only allow POST requests
         $this->request->allowMethod(['post']);
 
         $requestBody = (string) $this->request->getBody();
         $bugReport = json_decode($requestBody, true);
+
+        if ($bugReport === null || $bugReport === false || $requestBody === '') {
+            $response = ['success' => false];
+
+            $this->response = $this->response
+                ->withStringBody(
+                    json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                );
+
+            return $this->response;
+        }
+
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
 
         $sentryConfig = Configure::read('Forwarding.Sentry');
@@ -81,20 +98,12 @@ class IncidentsController extends AppController
             count($result['incidents']) > 0
             && ! in_array(false, $result['incidents'])
         ) {
-            $response = [
-                'success' => true,
-            ];
+            $response = ['success' => true];
         } else {
-            $response = [
-                'success' => false,
-            ];
+            $response = ['success' => false];
         }
 
-        $this->disableAutoRender();
-
         $this->response = $this->response
-            ->withHeader('Content-Type', 'application/json')
-            ->withHeader('X-Content-Type-Options', 'nosniff')
             ->withStringBody(
                 json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
             );
