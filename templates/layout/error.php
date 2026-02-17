@@ -48,7 +48,7 @@
                 <?php echo $this->fetch('content'); ?>
                 <strong>Code:</strong> <?php echo $code; ?><br>
                 <strong>Url:</strong> <?php echo $url; ?><br>
-                <?php if ($current_developer !== null) { ?>
+                <?php if (isset($current_developer) && $current_developer !== null) { ?>
                     <br><pre><?php echo $error; ?></pre>
                 <?php }
 
