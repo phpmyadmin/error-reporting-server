@@ -1,8 +1,6 @@
 <?php
 
 /**
- * Sync Github issue states Shell.
- *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  *
@@ -16,7 +14,7 @@
  * @see      https://www.phpmyadmin.net/
  */
 
-namespace App\Shell;
+namespace App\Command;
 
 use App\Application;
 use Cake\Command\Command;
@@ -32,21 +30,16 @@ use function date;
 
 use const PHP_SAPI;
 
-/**
- * Sync Github issue states Shell.
- */
-class SyncGithubIssueStatesShell extends Command
+class SyncGithubIssueStatesCommand extends Command
 {
-    protected const NAME = 'sync_github_issue_states';
-
-    /**
-     * The name of this command.
-     */
-    protected string $name = self::NAME;
-
     public static function defaultName(): string
     {
-        return self::NAME;
+        return 'sync_github_issue_states';
+    }
+
+    public static function getDescription(): string
+    {
+        return 'Sync Github issue states';
     }
 
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
@@ -96,7 +89,7 @@ class SyncGithubIssueStatesShell extends Command
                 ['scope' => 'cron_jobs']
             );
 
-            return 0;
+            return self::CODE_ERROR;
         }
 
         Log::error(
@@ -108,6 +101,6 @@ class SyncGithubIssueStatesShell extends Command
             ['scope' => 'cron_jobs']
         );
 
-        return 1;
+        return self::CODE_SUCCESS;
     }
 }

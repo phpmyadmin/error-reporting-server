@@ -30,12 +30,6 @@ class StatsShellTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->useCommandRunner();
-    }
-
     /**
      * Test execute method
      */

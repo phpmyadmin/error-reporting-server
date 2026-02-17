@@ -1,8 +1,6 @@
 <?php
 
 /**
- * Stats Shell.
- *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  *
@@ -16,7 +14,7 @@
  * @see      https://www.phpmyadmin.net/
  */
 
-namespace App\Shell;
+namespace App\Command;
 
 use App\Model\Table\IncidentsTable;
 use App\Model\Table\ReportsTable;
@@ -29,23 +27,21 @@ use Cake\Console\ConsoleOptionParser;
 use function json_encode;
 
 /**
- * Stats shell.
+ * Stats command.
  */
-class StatsShell extends Command
+class StatsCommand extends Command
 {
     protected IncidentsTable $Incidents;
     protected ReportsTable $Reports;
 
-    protected const NAME = 'stats';
-
-    /**
-     * The name of this command.
-     */
-    protected string $name = self::NAME;
-
     public static function defaultName(): string
     {
-        return self::NAME;
+        return 'stats';
+    }
+
+    public static function getDescription(): string
+    {
+        return 'Build statistics';
     }
 
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser

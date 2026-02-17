@@ -1,8 +1,6 @@
 <?php
 
 /**
- * Clean Old Notifications Shell.
- *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
  *
@@ -16,7 +14,7 @@
  * @see      https://www.phpmyadmin.net/
  */
 
-namespace App\Shell;
+namespace App\Command;
 
 use App\Model\Table\NotificationsTable;
 use Cake\Command\Command;
@@ -28,23 +26,18 @@ use Cake\Log\Log;
 use function date;
 use function time;
 
-/**
- * Clean old Notifications shell.
- */
-class CleanOldNotifsShell extends Command
+class CleanOldNotifsCommand extends Command
 {
-    protected const NAME = 'clean_old_notifs';
-
-    /**
-     * The name of this command.
-     */
-    protected string $name = self::NAME;
-
     protected NotificationsTable $Notifications;
 
     public static function defaultName(): string
     {
-        return self::NAME;
+        return 'clean_old_notifs';
+    }
+
+    public static function getDescription(): string
+    {
+        return 'Clean old Notifications';
     }
 
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser

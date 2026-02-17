@@ -15,7 +15,7 @@
  * @since     3.0.0
  */
 
-namespace App\Shell;
+namespace App\Command;
 
 use Cake\Command\Command;
 use Cake\Console\Arguments;
@@ -28,21 +28,16 @@ use function class_exists;
 use function restore_error_handler;
 use function restore_exception_handler;
 
-/**
- * Simple console wrapper around Psy\Shell.
- */
-class ConsoleShell extends Command
+class ConsoleCommand extends Command
 {
-    protected const NAME = 'console';
-
-    /**
-     * The name of this command.
-     */
-    protected string $name = self::NAME;
-
     public static function defaultName(): string
     {
-        return self::NAME;
+        return 'console';
+    }
+
+    public static function getDescription(): string
+    {
+        return 'Simple console wrapper around Psy\Shell';
     }
 
     protected function buildOptionParser(ConsoleOptionParser $parser): ConsoleOptionParser
@@ -70,7 +65,7 @@ class ConsoleShell extends Command
             $io->err('<info>$ php composer.phar require --dev psy/psysh</info>');
             $io->err('');
 
-            return 1;
+            return self::CODE_SUCCESS;
         }
 
         $io->out('You can exit with <info>`CTRL-C`</info> or <info>`exit`</info>');
