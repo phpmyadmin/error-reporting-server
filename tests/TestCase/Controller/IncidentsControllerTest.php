@@ -6,6 +6,7 @@ use App\Model\Table\IncidentsTable;
 use App\Model\Table\ReportsTable;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
+use Cake\TestSuite\EmailTrait;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
@@ -18,6 +19,7 @@ use const DS;
 class IncidentsControllerTest extends TestCase
 {
     use IntegrationTestTrait;
+    use EmailTrait;
 
     protected IncidentsTable $Incidents;
     protected ReportsTable $Reports;
@@ -38,6 +40,7 @@ class IncidentsControllerTest extends TestCase
         //$Session = new SessionComponent(new ComponentRegistry());
         $this->session(['Developer.id' => 1]);
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
+        $this->setupTransports();
     }
 
     public function testView(): void
@@ -103,6 +106,13 @@ class IncidentsControllerTest extends TestCase
         $this->configRequest(['input' => $bugReport]);
         $this->post('/incidents/create');
 
+        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
+        $incident = json_decode($this->_response->getBody(), true);
+        $this->assertNotNull($incident, 'The incident should be an array !');
+
+        $expected = ['success' => true];
+        $this->assertEquals($expected, $incident);
+
         $report = $this->Reports->find(
             'all',
             order: ['Reports.created desc']
@@ -125,6 +135,10 @@ class IncidentsControllerTest extends TestCase
         //Configure::write('test_transport_email', null);
 
         $this->post('/incidents/create');
+        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
+        $result = json_decode($this->_response->getBody(), true);
+        $this->assertNotNull($result);
+        $this->assertSame(true, $result['success']);
 
         $report = $this->Reports->find(
             'all',
@@ -146,13 +160,20 @@ class IncidentsControllerTest extends TestCase
             IncidentsTable::getStrippedPmaVersion($bugReportDecoded['pma_version']),
             $report['pma_version']
         );
+    }
 
+    public function testCreateInvalidEmptyReport(): void
+    {
         $this->configRequest(['input' => '']);
         $this->post('/incidents/create');
+        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
         $result = json_decode($this->_response->getBody(), true);
         $this->assertNotNull($result);
-        $this->assertEquals(false, $result['success']);
+        $this->assertSame(false, $result['success']);
+    }
 
+    public function testCreateInvalidReport(): void
+    {
         // Test invalid Notification email configuration
         Configure::write('NotificationEmailsTo', '');
 
@@ -160,6 +181,10 @@ class IncidentsControllerTest extends TestCase
         $bugReportDecoded = json_decode($bugReport, true);
         $this->configRequest(['input' => $bugReport]);
         $this->post('/incidents/create');
+        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
+        $result = json_decode($this->_response->getBody(), true);
+        $this->assertNotNull($result);
+        $this->assertSame(true, $result['success']);
 
         $report = $this->Reports->find(
             'all',
@@ -170,9 +195,6 @@ class IncidentsControllerTest extends TestCase
             . $report['id'];
         $this->assertEquals('4.5.4.1', $report['pma_version']);
 
-        $emailContent = Configure::read('test_transport_email');
-
-        // Since no email sent
-        $this->assertEquals(null, $emailContent);
+        $this->assertNoMailSent();
     }
 }
