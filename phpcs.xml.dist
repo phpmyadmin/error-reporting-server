@@ -22,57 +22,64 @@
         <exclude name="SlevomatCodingStandard.Commenting.ForbiddenAnnotations.AnnotationForbidden"/>
         <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectAnnotationsGroup"/>
         <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectOrderOfAnnotationsGroup"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversableParameterTypeHintSpecification"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversablePropertyTypeHintSpecification"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingTraversableReturnTypeHintSpecification"/>
-        <exclude name="Generic.Files.LineLength.TooLong"/>
+        <exclude name="Generic.Files.InlineHTML.Found"/>
+        <exclude name="Generic.PHP.CharacterBeforePHPOpeningTag.Found"/>
         <exclude name="Squiz.Arrays.ArrayDeclaration.KeySpecified"/>
         <exclude name="Squiz.Arrays.ArrayDeclaration.NoKeySpecified"/>
-        <exclude name="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps"/>
-        <exclude name="Squiz.NamingConventions.ValidVariableName.NotCamelCaps"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint"/>
-        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint"/>
     </rule>
 
-    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
-        <exclude-pattern>*/src/Controller/*</exclude-pattern>
+    <rule ref="SlevomatCodingStandard.Functions.RequireSingleLineCall"/>
+    <rule ref="SlevomatCodingStandard.Whitespaces.DuplicateSpaces">
+        <properties>
+            <property name="ignoreSpacesInComment" value="true"/>
+        </properties>
     </rule>
 
-    <rule ref="Generic.Files.InlineHTML.Found">
-        <exclude-pattern>*/templates/*</exclude-pattern>
-    </rule>
-
-    <rule ref="Generic.PHP.CharacterBeforePHPOpeningTag.Found">
-        <exclude-pattern>*/templates/*</exclude-pattern>
-    </rule>
-
-    <rule ref="Generic.PHP.DisallowShortOpenTag.EchoFound">
-        <exclude-pattern>*/templates/*</exclude-pattern>
-    </rule>
-
-    <rule ref="Squiz.NamingConventions.ValidVariableName.StringNotCamelCaps">
-        <exclude-pattern>*/templates/*</exclude-pattern>
-    </rule>
-
-    <rule ref="Squiz.Arrays.ArrayDeclaration.MultiLineNotAllowed">
-        <exclude-pattern>*/config/*</exclude-pattern>
-    </rule>
-
-     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
-        <exclude-pattern>*/config/Migrations/*</exclude-pattern>
-    </rule>
-    <rule ref="PEAR.Commenting.FunctionComment.MissingReturn">
-        <exclude-pattern>*/config/Migrations/*</exclude-pattern>
-        <exclude-pattern>*/tests/*</exclude-pattern>
-    </rule>
     <rule ref="Squiz.Classes.ClassFileName.NoMatch">
         <exclude-pattern>*/config/Migrations/*</exclude-pattern>
     </rule>
+
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>*/config/Migrations/*</exclude-pattern>
+    </rule>
+
     <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
         <exclude-pattern>*/config/Migrations/*</exclude-pattern>
+    </rule>
+
+    <!-- Rules that should be followed, but are not required -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <severity>4</severity>
+    </rule>
+    <rule ref="Squiz.NamingConventions.ValidVariableName.NotCamelCaps">
+        <severity>4</severity>
+    </rule>
+    <rule ref="Squiz.Arrays.ArrayDeclaration.MultiLineNotAllowed">
+        <severity>4</severity>
+    </rule>
+    <rule ref="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps">
+        <severity>4</severity>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Functions.RequireSingleLineCall.RequiredSingleLineCall">
+        <severity>4</severity>
+    </rule>
+    <rule ref="Generic.Files.LineLength.TooLong">
+        <severity>4</severity>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification">
+        <severity>4</severity>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
+        <severity>4</severity>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification">
+        <severity>4</severity>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
+        <severity>4</severity>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint">
+        <severity>4</severity>
     </rule>
 
 </ruleset>

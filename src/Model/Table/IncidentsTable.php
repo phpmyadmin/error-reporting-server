@@ -191,7 +191,7 @@ class IncidentsTable extends Table
             ];
         }
 
-        $incident_ids = [];    // array to hold ids of all the inserted incidents
+        $incident_ids = []; // array to hold ids of all the inserted incidents
         $new_report_ids = []; // array to hold ids of all newly created reports
 
         // Avoid storing too many errors from single report
@@ -387,7 +387,7 @@ class IncidentsTable extends Table
                         'script_name' => $error['file'],
                         'stacktrace' => json_encode($error['stackTrace'] ?? []),
                         'stackhash' => $error['stackhash'],
-                        'exception_type' => 1,         // 'php'
+                        'exception_type' => 1, // 'php'
                     ]
                 );
                 array_push($schematizedReports, $tmpReport);
@@ -406,7 +406,7 @@ class IncidentsTable extends Table
                     'script_name' => $bugReport['script_name'] ?? '',
                     'stacktrace' => json_encode($exception['stack'] ?? []),
                     'stackhash' => self::getStackHash($exception['stack'] ?? []),
-                    'exception_type' => 0,     //'js'
+                    'exception_type' => 0, //'js'
                 ]
             );
 
