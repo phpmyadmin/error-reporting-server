@@ -25,6 +25,8 @@ use Cake\Routing\Router;
 
 use function array_merge;
 use function curl_error;
+use function curl_exec;
+use function curl_getinfo;
 use function curl_init;
 use function curl_setopt;
 use function http_build_query;
@@ -155,15 +157,14 @@ class GithubApiComponent extends Component
         curl_setopt($curlHandle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
         curl_setopt($curlHandle, CURLOPT_FOLLOWLOCATION, 1);// Issues moved to another repo have redirects
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
-        $response = curl_exec($curlHandle);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
+        $response = curl_exec($curlHandle);
         if ($response === false) {
             Log::error('Curl error: "' . curl_error($curlHandle) . '" for: ' . $url);
 
             return ['', 0];
         }
 
-        $status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);// phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFallbackGlobalName
-        // phpcs ignored patterns for mock testing reasons
+        $status = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
         Log::debug('Response-code: ' . $status . ' for: ' . $url);
 
         $decodedResponse = json_decode($response, true);

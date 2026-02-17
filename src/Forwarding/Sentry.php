@@ -10,6 +10,7 @@ use Exception;
 
 use function curl_errno;
 use function curl_exec;
+use function curl_getinfo;
 use function curl_init;
 use function curl_setopt;
 use function curl_strerror;
@@ -22,6 +23,7 @@ use function json_decode;
 use function json_encode;
 use function time;
 
+use const CURLINFO_HTTP_CODE;
 use const CURLOPT_CAINFO;
 use const CURLOPT_CAPATH;
 use const CURLOPT_HTTPHEADER;
@@ -154,6 +156,9 @@ class Sentry
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
         $output = curl_exec($ch);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        Log::debug('Response-code: ' . $status);
+
         if (! is_string($output)) {
             $error = 'Creating the report feedback failed: ' . json_encode($output);
             Log::error($error);
