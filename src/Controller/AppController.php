@@ -141,24 +141,31 @@ class AppController extends Controller
     {
         $controllerName = $this->request->getParam('controller');
         $this->set('current_controller', $controllerName);
-        $notif_count = 0;
 
         $devId = $this->request->getSession()->read('Developer.id');
-        if ($devId) {
+        if ($devId !== null) {
             $response = $this->checkReadonlyAccess();
             if ($response !== null) {
                 // This is a security check
                 // The response can be printed if you remove this line
                 return $response;
             }
+        }
 
+        $current_developer = null;
+        if ($devId !== null) {
+            // Check if the user still exists in the database
             $current_developer = TableRegistry::getTableLocator()->get('Developers')->
                     findById($devId)->all()->first();
+        }
 
+        $notif_count = 0;
+        if ($current_developer !== null) {
             $notif_count = TableRegistry::getTableLocator()->get('Notifications')->find(
                 'all',
-                conditions: ['developer_id' => (int) isset($current_developer) ? $current_developer['id'] : null]
+                conditions: ['developer_id' => $current_developer['id']]
             )->count();
+
             $this->set('current_developer', $current_developer);
             $this->set('developer_signed_in', true);
 
