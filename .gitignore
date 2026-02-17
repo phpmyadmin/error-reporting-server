@@ -4,6 +4,7 @@ tmp/*
 [Cc]onfig/oauth.php
 [Cc]onfig/forwarding.php
 [Cc]onfig/app.php
+[Cc]onfig/app_local.php
 app/tmp/*
 app/[Cc]onfig/core.php
 app/[Cc]onfig/database.php
