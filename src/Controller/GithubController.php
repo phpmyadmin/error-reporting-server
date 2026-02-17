@@ -436,11 +436,11 @@ class GithubController extends AppController
 
         $subquery_count = TableRegistry::getTableLocator()->get('Incidents')->find(
             'all',
-            fields: ['report_id'],
+            fields: ['report_id' => 'report_id'],
         );
         $inci_count_related = TableRegistry::getTableLocator()->get('Reports')->find(
             'all',
-            fields: ['inci_count'],
+            fields: ['inci_count' => 'inci_count'],
             conditions: [
                 'related_to = ' . $reportId,
             ],
