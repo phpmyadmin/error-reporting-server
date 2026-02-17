@@ -83,13 +83,10 @@ class IncidentsController extends AppController
         ) {
             $response = [
                 'success' => true,
-                'message' => 'Thank you for your submission',
-                'incident_id' => $result['incidents'],        // Return a list of incident ids.
             ];
         } else {
             $response = [
                 'success' => false,
-                'message' => 'There was a problem with your submission.',
             ];
         }
 
