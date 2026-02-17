@@ -8,6 +8,8 @@
     <arg name="extensions" value="php"/>
 
     <file>.</file>
+    <!-- Make sniff report relative -->
+    <arg name="basepath" value="."/>
 
     <exclude-pattern>*/src/Console/Installer.php</exclude-pattern>
     <exclude-pattern>*/tmp/*</exclude-pattern>
