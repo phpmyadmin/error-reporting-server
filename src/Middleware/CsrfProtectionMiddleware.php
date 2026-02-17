@@ -15,7 +15,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 class CsrfProtectionMiddleware extends CakeCsrfProtectionMiddleware
 {
     /**
-     * Process the request and validate the Host header.
+     * Process the request
      *
      * @param ServerRequestInterface  $request The request.
      * @param RequestHandlerInterface $handler The request handler.

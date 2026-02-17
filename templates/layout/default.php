@@ -49,7 +49,7 @@ use Cake\Utility\Inflector;
         <div class="navbar">
             <div class="navbar-inner">
                 <a class="brand" href="<?= $baseURL; ?>">phpMyAdmin</a>
-                <?php if ($developer_signed_in) : ?>
+                <?php if ($current_developer !== null) : ?>
                     <ul class="nav">
                         <?php
                             $controllers = ['reports'];
@@ -77,7 +77,7 @@ use Cake\Utility\Inflector;
                     </ul>
                 <?php endif; ?>
                 <ul class="nav pull-right">
-                    <?php if ($developer_signed_in) : ?>
+                    <?php if ($current_developer !== null) : ?>
                         <li>
                             <p class="navbar-text">
                                 Hello, <?= $current_developer['full_name']; ?>

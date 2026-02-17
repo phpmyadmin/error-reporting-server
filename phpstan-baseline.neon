@@ -7,18 +7,6 @@ parameters:
 			path: src/Console/Installer.php
 
 		-
-			message: '#^Property App\\Controller\\AppController\:\:\$readonly_whitelist type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Controller/AppController.php
-
-		-
-			message: '#^Property App\\Controller\\AppController\:\:\$whitelist type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Controller/AppController.php
-
-		-
 			message: '#^Method App\\Controller\\Component\\GithubApiComponent\:\:apiRequest\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

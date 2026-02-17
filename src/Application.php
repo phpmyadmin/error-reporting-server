@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Middleware\AuthenticationMiddleware;
 use App\Middleware\CsrfProtectionMiddleware;
 use App\Middleware\HostHeaderMiddleware;
 use Cake\Core\Configure;
@@ -90,7 +91,10 @@ class Application extends BaseApplication
 
             // Cross Site Request Forgery (CSRF) Protection Middleware
             // https://book.cakephp.org/5/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
-            ->add(new CsrfProtectionMiddleware(['httponly' => true]));
+            ->add(new CsrfProtectionMiddleware(['httponly' => true]))
+
+            // Check for access controls
+            ->add(new AuthenticationMiddleware());
 
         return $middlewareQueue;
     }

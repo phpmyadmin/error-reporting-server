@@ -48,7 +48,7 @@
                 <?php echo $this->fetch('content'); ?>
                 <strong>Code:</strong> <?php echo $code; ?><br>
                 <strong>Url:</strong> <?php echo $url; ?><br>
-                <?php if (isset($developer_signed_in) && $developer_signed_in) { ?>
+                <?php if ($current_developer !== null) { ?>
                     <br><pre><?php echo $error; ?></pre>
                 <?php }
 
