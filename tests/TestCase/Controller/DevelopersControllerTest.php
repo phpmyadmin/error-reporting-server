@@ -21,6 +21,7 @@ namespace App\Test\TestCase\Controller;
 use App\Model\Table\DevelopersTable;
 use App\Test\Fixture\DevelopersFixture;
 use App\Test\Fixture\NotificationsFixture;
+use Cake\Http\TestSuite\HttpClientTrait;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -38,6 +39,7 @@ class DevelopersControllerTest extends TestCase
 {
     use PHPMock;
     use IntegrationTestTrait;
+    use HttpClientTrait;
 
     protected DevelopersTable $Developers;
 
@@ -73,45 +75,40 @@ class DevelopersControllerTest extends TestCase
      */
     public function testCallback(): void
     {
-        // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
-        // so that we don't actually hit the Github Api
-        $curlExecMock = $this->getFunctionMock('\App\Controller\Component', 'curl_exec');
-        $curlGetInfoMock = $this->getFunctionMock('\App\Controller\Component', 'curl_getinfo');
-
         $accessTokenResponse = json_encode(['access_token' => 'abc']);
         $emptyAccessTokenResponse = json_encode(['access_token' => null]);
 
         $nonSuccessUserResponse = json_encode(['message' => 'Unauthorized access']);
         $userResponse = file_get_contents(TESTS . 'Fixture' . DS . 'user_response.json');
 
-        // Github unsuccessful response followed by successful response
-        $curlExecMock->expects($this->exactly(10))->willReturnOnConsecutiveCalls(
-            $emptyAccessTokenResponse,
-            $emptyAccessTokenResponse,
-            $accessTokenResponse,
-            $nonSuccessUserResponse,
-            $accessTokenResponse,
-            $userResponse,
-            null,
-            $accessTokenResponse,
-            $userResponse,
-            null
+        // Data for 1.1
+        $this->cleanupMockResponses();
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(401, [], $emptyAccessTokenResponse),
         );
-        $curlGetInfoMock->expects($this->exactly(5))->willReturnOnConsecutiveCalls(
-            401,
-            200,
-            404,
-            200,
-            204
-        );
-
         // Case 1.1 Test no access_token in Github response (with last_page not set in session)
         // So, empty the session
         $this->session([]);
 
+        $this->cleanupMockResponses();
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(200, [], $emptyAccessTokenResponse),
+        );
         $this->get('developers/callback/?code=123123123');
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
+        // Data for 1.2
+        $this->cleanupMockResponses();
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(200, [], $accessTokenResponse),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/user',
+            $this->newClientResponse(404, [], $nonSuccessUserResponse),
+        );
         // Case 1.2 Test no access_token in Github response (with last_page set in session)
         $this->session(
             [
@@ -125,6 +122,16 @@ class DevelopersControllerTest extends TestCase
         $this->get('developers/callback/?code=123123123');
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
+        // Data for 2.
+        $this->cleanupMockResponses();
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(200, [], $accessTokenResponse),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/user',
+            $this->newClientResponse(404, [], $nonSuccessUserResponse),
+        );
         // Case 2. Non successful response code from Github
         $this->session(
             [
@@ -137,6 +144,21 @@ class DevelopersControllerTest extends TestCase
         $this->get('developers/callback/?code=123123123');
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
+        // Data for 3.
+        $this->cleanupMockResponses();
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(200, [], $accessTokenResponse),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/user',
+            $this->newClientResponse(200, [], $userResponse),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/repos/phpmyadmin/phpmyadmin/collaborators/pma-bot',
+            $this->newClientResponse(200, [], json_encode([])),
+        );
+
         // Case 3. Successful response code (new user), check whether session variables are init
         $this->get('developers/callback/?code=123123123');
         $this->assertSession(3, 'Developer.id');
@@ -147,6 +169,20 @@ class DevelopersControllerTest extends TestCase
         $this->assertEquals('abc', $developer->access_token);
         $this->assertEquals('pma-bot@phpmyadmin.net', $developer->email);
 
+        // Data for 4.
+        $this->cleanupMockResponses();
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(200, [], $accessTokenResponse),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/user',
+            $this->newClientResponse(200, [], $userResponse),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/repos/phpmyadmin/phpmyadmin/collaborators/pma-bot',
+            $this->newClientResponse(204, [], json_encode([])),
+        );
         // Case 4. Successful response code (returning user)
         // check whether session variables are init
         $this->session(['last_page' => null]);
