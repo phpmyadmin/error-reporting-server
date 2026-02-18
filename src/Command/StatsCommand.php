@@ -72,6 +72,7 @@ class StatsCommand extends Command
             $query = [
                 'group' => 'grouped_by',
                 'order' => 'Incidents.created',
+                'conditions' => [],
             ];
             if (isset($filter['limit'])) {
                 $query['conditions'] = [
@@ -79,7 +80,12 @@ class StatsCommand extends Command
                 ];
             }
 
-            $downloadStats = $this->Incidents->find('all', $query);
+            $downloadStats = $this->Incidents->find(
+                'all',
+                group: $query['group'],
+                order: $query['order'],
+                conditions: $query['conditions'],
+            );
             $downloadStats->select([
                 'grouped_by' => $filter['group'],
                 'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",

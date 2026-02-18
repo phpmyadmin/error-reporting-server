@@ -152,7 +152,13 @@ class NotificationsController extends AppController
 
         $response = [
             'iTotalDisplayRecords' => $totalFiltered,
-            'iTotalRecords' => $this->Notifications->find('all', $params)->count(),
+            'iTotalRecords' => $this->Notifications->find(
+                'all',
+                contain: $params['contain'],
+                fields: $params['fields'],
+                conditions: $params['conditions'],
+                order: $params['order'],
+            )->count(),
             'sEcho' => intval($this->request->getQuery('sEcho')),
             'aaData' => $dispRows,
         ];
