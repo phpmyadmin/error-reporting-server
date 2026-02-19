@@ -89,7 +89,7 @@ class SyncGithubIssueStatesCommand extends Command
                 ['scope' => 'cron_jobs']
             );
 
-            return self::CODE_ERROR;
+            return self::CODE_SUCCESS;
         }
 
         Log::error(
@@ -101,6 +101,6 @@ class SyncGithubIssueStatesCommand extends Command
             ['scope' => 'cron_jobs']
         );
 
-        return self::CODE_SUCCESS;
+        return self::CODE_ERROR;
     }
 }

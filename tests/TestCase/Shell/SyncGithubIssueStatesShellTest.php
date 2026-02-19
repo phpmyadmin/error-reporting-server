@@ -7,6 +7,7 @@ use App\Test\Fixture\NotificationsFixture;
 use App\Test\Fixture\ReportsFixture;
 use Cake\Command\Command;
 use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\Http\TestSuite\HttpClientTrait;
 use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
 
@@ -23,6 +24,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
     use PHPMock;
+    use HttpClientTrait;
 
     public function getFixtures(): array
     {
@@ -38,26 +40,24 @@ class SyncGithubIssueStatesShellTest extends TestCase
      */
     public function testExecute(): void
     {
+        $repoPath = 'phpmyadmin/phpmyadmin';
         $Reports = $this->getTableLocator()->get('Reports');
-        // Mock functions `curl_exec` and `curl_getinfo` in GithubApiComponent
-        // so that we don't actually hit the Github Api
-        $curlExecMock = $this->getFunctionMock('\App\Controller\Component', 'curl_exec');
-        $curlGetInfoMock = $this->getFunctionMock('\App\Controller\Component', 'curl_getinfo');
-
         $issueResponse = file_get_contents(TESTS . 'Fixture' . DS . 'issue_response.json');
         $decodedResponse = json_decode($issueResponse, true);
         $decodedResponse['state'] = 'closed';
         $issueResponseWithClosed = json_encode($decodedResponse);
 
-        $curlExecMock->expects($this->exactly(3))->willReturnOnConsecutiveCalls(
-            $issueResponse,
-            $issueResponse,
-            $issueResponseWithClosed
+        $this->mockClientGet(
+            'https://api.github.com/repos/' . $repoPath . '/issues/1',
+            $this->newClientResponse(200, [], $issueResponse),
         );
-        $curlGetInfoMock->expects($this->exactly(3))->willReturnOnConsecutiveCalls(
-            200,
-            200,
-            200
+        $this->mockClientGet(
+            'https://api.github.com/repos/' . $repoPath . '/issues/2',
+            $this->newClientResponse(200, [], $issueResponse),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/repos/' . $repoPath . '/issues/4',
+            $this->newClientResponse(200, [], $issueResponseWithClosed),
         );
 
         // Fetch all linked reports
