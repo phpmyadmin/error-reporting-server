@@ -43,7 +43,7 @@ class IncidentsControllerTest extends TestCase
         parent::setUp();
         $this->Incidents = TableRegistry::getTableLocator()->get('Incidents');
         //$Session = new SessionComponent(new ComponentRegistry());
-        $this->session(['Developer.id' => 1]);
+        $this->session(['Developer.id' => 1, 'read_only' => false]);
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $this->setupTransports();
     }
@@ -51,6 +51,7 @@ class IncidentsControllerTest extends TestCase
     public function testView(): void
     {
         $this->get('/incidents/view/1');
+        $this->assertResponseCode(200);
 
         $this->assertNotEmpty($this->viewVariable('incident'));
         $this->assertIsArray(
@@ -64,7 +65,7 @@ class IncidentsControllerTest extends TestCase
     public function testJson(): void
     {
         $this->get('/incidents/json/1');
-        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
+        $this->assertResponseCode(200);
         $incident = json_decode($this->_response->getBody(), true);
         $this->assertNotNull($incident, 'The incident should be an array !');
 
@@ -111,7 +112,7 @@ class IncidentsControllerTest extends TestCase
         $this->configRequest(['input' => $bugReport]);
         $this->post('/incidents/create');
 
-        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
+        $this->assertResponseCode(200);
         $incident = json_decode($this->_response->getBody(), true);
         $this->assertNotNull($incident, 'The incident should be an array !');
 
@@ -140,7 +141,7 @@ class IncidentsControllerTest extends TestCase
         //Configure::write('test_transport_email', null);
 
         $this->post('/incidents/create');
-        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
+        $this->assertResponseCode(200);
         $result = json_decode($this->_response->getBody(), true);
         $this->assertNotNull($result);
         $this->assertSame(true, $result['success']);
@@ -171,7 +172,7 @@ class IncidentsControllerTest extends TestCase
     {
         $this->configRequest(['input' => '']);
         $this->post('/incidents/create');
-        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
+        $this->assertResponseCode(200);
         $result = json_decode($this->_response->getBody(), true);
         $this->assertNotNull($result);
         $this->assertSame(false, $result['success']);
@@ -186,7 +187,7 @@ class IncidentsControllerTest extends TestCase
         $bugReportDecoded = json_decode($bugReport, true);
         $this->configRequest(['input' => $bugReport]);
         $this->post('/incidents/create');
-        $this->assertSame(200, $this->_response->getStatusCode(), 'The reponse code should be 200 !');
+        $this->assertResponseCode(200);
         $result = json_decode($this->_response->getBody(), true);
         $this->assertNotNull($result);
         $this->assertSame(true, $result['success']);
