@@ -7,6 +7,7 @@ use App\Test\Fixture\DevelopersFixture;
 use App\Test\Fixture\IncidentsFixture;
 use App\Test\Fixture\NotificationsFixture;
 use App\Test\Fixture\ReportsFixture;
+use Cake\ORM\Query;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -37,6 +38,7 @@ class NotificationsControllerTest extends TestCase
         parent::setUp();
         $this->Notifications = TableRegistry::getTableLocator()->get('Notifications');
         $this->session(['Developer.id' => 1, 'read_only' => true]);
+        $this->enableCsrfToken();
     }
 
     public function testIndex(): void
@@ -61,12 +63,13 @@ class NotificationsControllerTest extends TestCase
                 ],
             ]
         );
+        $this->assertResponseCode(302);
 
         $notifications = $this->Notifications->find('all', fields: ['Notifications.id']);
-        $this->assertInstanceOf('Cake\ORM\Query', $notifications);
+        $this->assertInstanceOf(Query::class, $notifications);
         $actual = $notifications->enableHydration(false)->toArray();
         $expected = [
-            ['id' => '2'],
+            ['id' => 2],
         ];
         $this->assertEquals($actual, $expected);
 
@@ -75,9 +78,10 @@ class NotificationsControllerTest extends TestCase
             '/notifications/mass_action',
             ['mark_all' => 1]
         );
+        $this->assertResponseCode(302);
 
         $notifications = $this->Notifications->find('all', fields: ['Notifications.id']);
-        $this->assertInstanceOf('Cake\ORM\Query', $notifications);
+        $this->assertInstanceOf(Query::class, $notifications);
         $actual = $notifications->enableHydration(false)->toArray();
         $expected = [];
         $this->assertEquals($actual, $expected);
