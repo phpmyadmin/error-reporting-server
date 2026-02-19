@@ -123,7 +123,6 @@ class IncidentsController extends AppController
             throw new NotFoundException('Invalid Incident');
         }
 
-        $this->Incidents->recursive = -1;
         $incident = $this->Incidents->findById($id)->all()->first();
         if (! $incident) {
             throw new NotFoundException('The incident does not exist.');

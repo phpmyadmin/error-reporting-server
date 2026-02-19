@@ -86,7 +86,6 @@ class StatsController extends AppController
             ];
         }
 
-        $this->Incidents->recursive = -1;
         $downloadStats = Cache::read('downloadStats_' . $filter_string);
         if ($downloadStats === null) {
             $downloadStats = $this->Incidents->find(

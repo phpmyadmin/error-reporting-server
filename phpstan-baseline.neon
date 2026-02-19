@@ -187,12 +187,6 @@ parameters:
 			path: src/Controller/IncidentsController.php
 
 		-
-			message: '#^Access to an undefined property App\\Model\\Table\\IncidentsTable\:\:\$recursive\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Controller/IncidentsController.php
-
-		-
 			message: '#^Cannot use array destructuring on array\|object\.$#'
 			identifier: offsetAccess.nonArray
 			count: 1
@@ -235,12 +229,6 @@ parameters:
 			path: src/Controller/ReportsController.php
 
 		-
-			message: '#^Access to an undefined property App\\Model\\Table\\ReportsTable\:\:\$recursive\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Controller/ReportsController.php
-
-		-
 			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$status\.$#'
 			identifier: property.notFound
 			count: 2
@@ -275,12 +263,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Controller/ReportsController.php
-
-		-
-			message: '#^Access to an undefined property App\\Model\\Table\\IncidentsTable\:\:\$recursive\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Controller/StatsController.php
 
 		-
 			message: '#^Parameter \#3 \$value of function curl_setopt expects array\|string, string\|false given\.$#'

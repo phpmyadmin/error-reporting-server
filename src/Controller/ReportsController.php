@@ -69,7 +69,6 @@ class ReportsController extends AppController
 
     public function index(): void
     {
-        $this->Reports->recursive = -1;
         $this->set(
             'distinct_statuses',
             $this->findArrayList(
