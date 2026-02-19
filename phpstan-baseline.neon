@@ -115,12 +115,6 @@ parameters:
 			path: src/Controller/DevelopersController.php
 
 		-
-			message: '#^Access to an undefined property App\\Controller\\EventsController\:\:\$Reports\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Controller/EventsController.php
-
-		-
 			message: '#^Parameter \#1 \$payload of method App\\Controller\\EventsController\:\:getHash\(\) expects string, string\|false given\.$#'
 			identifier: argument.type
 			count: 1

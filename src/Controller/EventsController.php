@@ -18,8 +18,8 @@
 
 namespace App\Controller;
 
+use App\Model\Table\ReportsTable;
 use Cake\Core\Configure;
-use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\Log\Log;
@@ -37,18 +37,12 @@ use function strpos;
  */
 class EventsController extends AppController
 {
+    protected ReportsTable $Reports;
+
     public function initialize(): void
     {
         parent::initialize();
-        //FIXME: it got deprecated and does not work anymore
-        //$this->loadComponent('Csrf');
-
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
-    }
-
-    public function beforeFilter(EventInterface $event)
-    {
-        //$this->getEventManager()->off($this->Csrf);
     }
 
     public function index(): ?Response
