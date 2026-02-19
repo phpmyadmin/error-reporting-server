@@ -44,6 +44,7 @@ class NotificationsControllerTest extends TestCase
     public function testIndex(): void
     {
         $this->get('notifications');
+        $this->assertResponseCode(307);
 
         // 'read_only' users are not allowed to view notifications page
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
