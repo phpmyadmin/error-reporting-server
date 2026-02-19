@@ -24,7 +24,7 @@ class CsrfProtectionMiddleware extends CakeCsrfProtectionMiddleware
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $requestRoute = $request->getUri()->getPath();
-        if ($requestRoute === '/incidents/create') {
+        if ($requestRoute === '/events' || $requestRoute === '/incidents/create') {
             return $handler->handle($request);
         }
 
