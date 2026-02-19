@@ -155,7 +155,11 @@ class ReportsController extends AppController
             ],
             'group' => 'report_id',
         ];
-        $subquery = TableRegistry::getTableLocator()->get('incidents')->find('all', $subquery_params);
+        $subquery = TableRegistry::getTableLocator()->get('incidents')->find(
+            'all',
+            fields: $subquery_params['fields'],
+            group: $subquery_params['group'],
+        );
 
         // override automatic aliasing, for proper usage in joins
         $aColumns = [
@@ -199,7 +203,12 @@ class ReportsController extends AppController
             )
         );
         //$rows = Sanitize::clean($rows);
-        $totalFiltered = $this->Reports->find('all', $params)->count();
+        $totalFiltered = $this->Reports->find(
+            'all',
+            fields: $params['fields'],
+            conditions: $params['conditions'],
+            order: $params['order'],
+        )->count();
 
         // change exception_type from boolean values to strings
         // add incident count for related reports
@@ -216,7 +225,7 @@ class ReportsController extends AppController
             ];
             $subquery_count = TableRegistry::getTableLocator()->get('incidents')->find(
                 'all',
-                $subquery_params_count
+                fields: $subquery_params_count['fields'],
             );
 
             $params_count = [
@@ -226,7 +235,11 @@ class ReportsController extends AppController
                 ],
             ];
 
-            $inci_count_related = $this->Reports->find('all', $params_count)->innerJoin(
+            $inci_count_related = $this->Reports->find(
+                'all',
+                fields: $params_count['fields'],
+                conditions: $params_count['conditions'],
+            )->innerJoin(
                 ['incidents' => $subquery_count],
                 ['incidents.report_id = Reports.related_to']
             )->count();
