@@ -77,6 +77,7 @@ class StatsController extends AppController
         $query = [
             'group' => 'grouped_by',
             'order' => 'Incidents.created',
+            'conditions' => [],
         ];
 
         if (isset($filter['limit'])) {
@@ -88,7 +89,12 @@ class StatsController extends AppController
         $this->Incidents->recursive = -1;
         $downloadStats = Cache::read('downloadStats_' . $filter_string);
         if ($downloadStats === null) {
-            $downloadStats = $this->Incidents->find('all', $query);
+            $downloadStats = $this->Incidents->find(
+                'all',
+                group: $query['group'],
+                order: $query['order'],
+                conditions: $query['conditions'],
+            );
             $downloadStats->select([
                 'grouped_by' => $filter['group'],
                 'date' => "DATE_FORMAT(Incidents.created, '%a %b %d %Y %T')",
