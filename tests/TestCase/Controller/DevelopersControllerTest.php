@@ -66,6 +66,7 @@ class DevelopersControllerTest extends TestCase
         $this->session([]);
 
         $this->get('developers/login');
+        $this->assertResponseCode(302);
         $this->assertRedirectContains('https://github.com/login/oauth/authorize');
         $this->assertRedirectContains('developers%2Fcallback');
     }
@@ -97,6 +98,7 @@ class DevelopersControllerTest extends TestCase
             $this->newClientResponse(200, [], $emptyAccessTokenResponse),
         );
         $this->get('developers/callback/?code=123123123');
+        $this->assertResponseCode(302);
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
         // Data for 1.2
@@ -120,6 +122,7 @@ class DevelopersControllerTest extends TestCase
         );
 
         $this->get('developers/callback/?code=123123123');
+        $this->assertResponseCode(302);
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
         // Data for 2.
@@ -142,6 +145,7 @@ class DevelopersControllerTest extends TestCase
             ]
         );
         $this->get('developers/callback/?code=123123123');
+        $this->assertResponseCode(302);
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
         // Data for 3.
@@ -161,6 +165,7 @@ class DevelopersControllerTest extends TestCase
 
         // Case 3. Successful response code (new user), check whether session variables are init
         $this->get('developers/callback/?code=123123123');
+        $this->assertResponseCode(302);
         $this->assertSession(3, 'Developer.id');
         $this->assertSession(true, 'read_only');
         $this->assertSession('abc', 'access_token');
@@ -188,6 +193,7 @@ class DevelopersControllerTest extends TestCase
         $this->session(['last_page' => null]);
 
         $this->get('developers/callback/?code=123123123');
+        $this->assertResponseCode(302);
         $this->assertSession(3, 'Developer.id');
         $this->assertSession(false, 'read_only');
         $this->assertSession('abc', 'access_token');
@@ -201,9 +207,10 @@ class DevelopersControllerTest extends TestCase
      */
     public function testLogout(): void
     {
-        $this->session(['Developer.id' => 1]);
+        $this->session(['Developer.id' => 1, 'read_only' => false]);
 
         $this->get('developers/logout');
+        $this->assertResponseCode(302);
         $this->assertSession(null, 'Developer.id');
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
     }
