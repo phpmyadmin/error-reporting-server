@@ -7,6 +7,7 @@ use App\Test\Fixture\DevelopersFixture;
 use App\Test\Fixture\IncidentsFixture;
 use App\Test\Fixture\NotificationsFixture;
 use App\Test\Fixture\ReportsFixture;
+use Cake\Http\TestSuite\HttpClientTrait;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
@@ -17,6 +18,7 @@ use function json_decode;
 class ReportsControllerTest extends TestCase
 {
     use IntegrationTestTrait;
+    use HttpClientTrait;
 
     protected ReportsTable $Reports;
 
@@ -35,11 +37,13 @@ class ReportsControllerTest extends TestCase
         parent::setUp();
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $this->session(['Developer.id' => 1]);
+        $this->enableCsrfToken();
     }
 
     public function testIndex(): void
     {
         $this->get('/reports');
+        $this->assertResponseCode(200);
         $this->assertEquals(['3.8', '4.0'], $this->viewVariable('distinct_versions'));
         $this->assertEquals(['forwarded', 'new'], $this->viewVariable('distinct_statuses'));
         $this->assertEquals(
@@ -54,6 +58,7 @@ class ReportsControllerTest extends TestCase
     public function testView(): void
     {
         $this->get('/reports/view/1');
+        $this->assertResponseCode(200);
         $report = $this->viewVariable('report');
         $this->assertNotEmpty($report);
         $this->assertEquals(1, $report[0]['id']);
@@ -76,16 +81,17 @@ class ReportsControllerTest extends TestCase
         $this->assertEquals(1, count($this->viewVariable('incidents')));
 
         $this->assertNotEmpty($this->viewVariable('incidents_with_description'));
-        $this->assertEquals(1, count($this->viewVariable('incidents_with_description')->toList()));
+        $this->assertEquals(1, count($this->viewVariable('incidents_with_description')->toArray()));
 
         $this->assertNotEmpty($this->viewVariable('incidents_with_stacktrace'));
-        $this->assertEquals(1, count($this->viewVariable('incidents_with_stacktrace')->toList()));
+        $this->assertEquals(1, count($this->viewVariable('incidents_with_stacktrace')->toArray()));
 
-        $this->assertNotEmpty($this->viewVariable('related_reports'));
-        //FIXME: 0 or 1 ?
-        //$this->assertEquals(1, count($this->viewVariable('related_reports')->toList()));
+        // Change the two assertions when "TODO: fix related to" is done
+        $this->assertEquals(0, count($this->viewVariable('related_reports')->toArray()));
+        $this->assertEmpty($this->viewVariable('related_reports'));
 
         $this->get('/reports/view/3');
+        $this->assertResponseCode(404);
         $this->assertResponseContains('The report does not exist.');
         $this->assertResponseContains('/reports/view/3');
     }
@@ -93,6 +99,7 @@ class ReportsControllerTest extends TestCase
     public function testDataTables(): void
     {
         $this->get('/reports/data_tables?sEcho=1&iDisplayLength=25');
+        $this->assertResponseCode(200);
         $expected = [
             'iTotalRecords' => 4,
             'iTotalDisplayRecords' => 4,
@@ -147,6 +154,7 @@ class ReportsControllerTest extends TestCase
         $this->assertEquals($expected, json_decode($this->_response->getBody(), true));
 
         $this->get('/reports/data_tables?sEcho=1&sSearch=error2&bSearchable_2=true&iSortCol_0=0&sSortDir_0=desc&bSortable_0=true&iSortingCols=2&iDisplayLength=25');
+        $this->assertResponseCode(200);
         $expected = [
             'iTotalRecords' => 4,
             'iTotalDisplayRecords' => 2,
@@ -180,6 +188,7 @@ class ReportsControllerTest extends TestCase
         $this->assertEquals($expected, $result);
 
         $this->get('/reports/data_tables?sEcho=1&sSearch_1=1&iDisplayLength=25');
+        $this->assertResponseCode(200);
         $expected = [
             'iTotalRecords' => 4,
             'iTotalDisplayRecords' => 1,
@@ -202,6 +211,7 @@ class ReportsControllerTest extends TestCase
         $this->assertEquals($expected, $result);
 
         $this->get('/reports/data_tables?sEcho=1&sSearch_1=0&iDisplayLength=25');
+        $this->assertResponseCode(200);
         $expected = [
             'iTotalRecords' => 4,
             'iTotalDisplayRecords' => 0,
@@ -222,16 +232,13 @@ class ReportsControllerTest extends TestCase
             '/reports/mark_related_to/2',
             ['related_to' => 4]
         );
+        $this->assertResponseCode(302);
 
         $this->Reports->id = 2;
         $incidents = $this->Reports->getIncidents();
         $this->assertEquals(3, $incidents->count());
     }
 
-    /**
-     * @depends testMarkRelatedTo
-     * @return void nothing
-     */
     public function testUnmarkRelatedTo(): void
     {
         $this->testMarkRelatedTo();
@@ -240,6 +247,7 @@ class ReportsControllerTest extends TestCase
         $this->assertEquals(3, $incidents->count());
 
         $this->post('/reports/unmark_related_to/2');
+        $this->assertResponseCode(302);
 
         $this->Reports->id = 2;
         $incidents = $this->Reports->getIncidents();
@@ -268,6 +276,7 @@ class ReportsControllerTest extends TestCase
                 'state' => 'incorrect_state',
             ]
         );
+        $this->assertResponseCode(302);
 
         // Should not change
         $report1 = $this->Reports->get(1);
@@ -284,6 +293,7 @@ class ReportsControllerTest extends TestCase
                 'state' => 'resolved',
             ]
         );
+        $this->assertResponseCode(302);
 
         // Should not change
         $report1 = $this->Reports->get(1);
@@ -300,6 +310,7 @@ class ReportsControllerTest extends TestCase
                 'state' => 'resolved',
             ]
         );
+        $this->assertResponseCode(404);
 
         /* Test case 4 */
         $this->post(
@@ -312,6 +323,7 @@ class ReportsControllerTest extends TestCase
                 'state' => 'resolved',
             ]
         );
+        $this->assertResponseCode(302);
 
         // Should change
         $report1 = $this->Reports->get(1);
@@ -336,12 +348,14 @@ class ReportsControllerTest extends TestCase
             '/reports/change_state/6',
             ['state' => 'resolved']
         );
+        $this->assertResponseCode(404);
 
         /* Test case 2: Incorrect State */
         $this->post(
             '/reports/change_state/1',
             ['state' => 'incorrect_state']
         );
+        $this->assertResponseCode(404);
         $report = $this->Reports->get(1);
         $this->assertEquals('forwarded', $report->status);
 
@@ -350,6 +364,7 @@ class ReportsControllerTest extends TestCase
             '/reports/change_state/1',
             ['state' => 'resolved']
         );
+        $this->assertResponseCode(302);
         $report = $this->Reports->get(1);
         $this->assertEquals('resolved', $report->status);
     }
