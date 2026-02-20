@@ -37,12 +37,21 @@ class NotificationsControllerTest extends TestCase
     {
         parent::setUp();
         $this->Notifications = TableRegistry::getTableLocator()->get('Notifications');
-        $this->session(['Developer.id' => 1, 'read_only' => true]);
         $this->enableCsrfToken();
     }
 
     public function testIndex(): void
     {
+        $this->session(['Developer.id' => 1, 'read_only' => false]);
+
+        $this->get('notifications');
+        $this->assertResponseCode(200);
+    }
+
+    public function testIndexReadOnly(): void
+    {
+        $this->session(['Developer.id' => 1, 'read_only' => true]);
+
         $this->get('notifications');
         $this->assertResponseCode(307);
 

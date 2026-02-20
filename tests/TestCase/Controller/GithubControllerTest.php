@@ -60,7 +60,7 @@ class GithubControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->session(['Developer.id' => 1, 'access_token' => 'abc']);
+        $this->session(['Developer.id' => 1, 'access_token' => 'abc', 'read_only' => false]);
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $this->enableCsrfToken();
     }
