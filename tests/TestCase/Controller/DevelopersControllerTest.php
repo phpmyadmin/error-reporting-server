@@ -66,6 +66,7 @@ class DevelopersControllerTest extends TestCase
         $this->session([]);
 
         $this->get('developers/login');
+        $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertRedirectContains('https://github.com/login/oauth/authorize');
         $this->assertRedirectContains('developers%2Fcallback');
@@ -122,6 +123,7 @@ class DevelopersControllerTest extends TestCase
         );
 
         $this->get('developers/callback/?code=123123123');
+        $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
@@ -145,6 +147,7 @@ class DevelopersControllerTest extends TestCase
             ]
         );
         $this->get('developers/callback/?code=123123123');
+        $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
@@ -165,6 +168,7 @@ class DevelopersControllerTest extends TestCase
 
         // Case 3. Successful response code (new user), check whether session variables are init
         $this->get('developers/callback/?code=123123123');
+        $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertSession(3, 'Developer.id');
         $this->assertSession(true, 'read_only');
@@ -193,6 +197,7 @@ class DevelopersControllerTest extends TestCase
         $this->session(['last_page' => null]);
 
         $this->get('developers/callback/?code=123123123');
+        $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertSession(3, 'Developer.id');
         $this->assertSession(false, 'read_only');
@@ -210,6 +215,7 @@ class DevelopersControllerTest extends TestCase
         $this->session(['Developer.id' => 1, 'read_only' => false]);
 
         $this->get('developers/logout');
+        $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertSession(null, 'Developer.id');
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
