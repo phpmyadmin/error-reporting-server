@@ -34,7 +34,6 @@ class AuthenticationMiddleware implements MiddlewareInterface
             'data_tables',
         ],
         'Incidents' => ['view'],
-        'Notifications' => '*',
     ];
 
     /**
