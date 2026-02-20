@@ -46,10 +46,11 @@ class DevelopersController extends AppController
         ]);
     }
 
-    public function login(): void
+    public function login(): Response
     {
         $url = $this->GithubApi->getRedirectUrl('user:email,public_repo');
-        $this->redirect($url);
+
+        return $this->redirect($url);
     }
 
     public function callback(): ?Response
