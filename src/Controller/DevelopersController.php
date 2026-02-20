@@ -48,6 +48,7 @@ class DevelopersController extends AppController
 
     public function login(): Response
     {
+        $this->request->getSession()->destroy();
         $url = $this->GithubApi->getRedirectUrl('user:email,public_repo');
 
         return $this->redirect($url);
