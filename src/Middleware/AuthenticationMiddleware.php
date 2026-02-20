@@ -51,7 +51,18 @@ class AuthenticationMiddleware implements MiddlewareInterface
         assert($request instanceof ServerRequest);
 
         $devId = $request->getSession()->read('Developer.id');
+
+        $currentDeveloper = null;
         if ($devId !== null) {
+            // Check if the user still exists in the database
+            $currentDeveloper = TableRegistry::getTableLocator()->get('Developers')->
+                    findById($devId)->all()->first();
+
+            $request = $request->withAttribute('current_developer', $currentDeveloper);
+            unset($devId);// Stop using this variable
+        }
+
+        if ($currentDeveloper !== null) {
             $isRequired = $this->isWriteAccessRequired($request);
             if ($isRequired === true) {
                 $request->getSession()->destroy();
@@ -69,18 +80,7 @@ class AuthenticationMiddleware implements MiddlewareInterface
                 // This is a security check
                 return $redirectResponse;
             }
-        }
-
-        $currentDeveloper = null;
-        if ($devId !== null) {
-            // Check if the user still exists in the database
-            $currentDeveloper = TableRegistry::getTableLocator()->get('Developers')->
-                    findById($devId)->all()->first();
-        }
-
-        $request = $request->withAttribute('current_developer', $currentDeveloper);
-
-        if ($currentDeveloper === null) {
+        } else {
             $isPublicAccess = $this->isPublicAccess($request);
             if ($isPublicAccess === false) {
                 $flash_class = 'alert';
