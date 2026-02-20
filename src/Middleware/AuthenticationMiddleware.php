@@ -134,16 +134,19 @@ class AuthenticationMiddleware implements MiddlewareInterface
 
         // Check for the controller name
         if (! isset(self::READ_ONLY_ACCESS_CONTROL_LIST[$controllerName])) {
-            // Not public
-            return false;
+            return false;// The controller is not in the list
         }
 
         // Require for all actions ?
         if (self::READ_ONLY_ACCESS_CONTROL_LIST[$controllerName] === '*') {
-            return true;
+            return true;// Needs write access
         }
 
         // Check for the specific action name
-        return in_array($action, self::READ_ONLY_ACCESS_CONTROL_LIST[$controllerName]);
+        if (in_array($action, self::READ_ONLY_ACCESS_CONTROL_LIST[$controllerName])) {// phpcs:ignore SlevomatCodingStandard.ControlStructures.UselessIfConditionWithReturn.UselessIfCondition
+            return true;// Needs write access
+        }
+
+        return false;// phpcs:ignore SlevomatCodingStandard.ControlStructures.UselessIfConditionWithReturn.UselessIfCondition
     }
 }
