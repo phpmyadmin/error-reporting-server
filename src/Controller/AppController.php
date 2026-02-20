@@ -110,6 +110,7 @@ class AppController extends Controller
         // The user is logged in
         if ($currentDeveloper !== null) {
             $this->set('read_only', $this->request->getSession()->read('read_only'));
+            $this->set('current_developer', $currentDeveloper);
             $notificationCount = TableRegistry::getTableLocator()->get('Notifications')->find(
                 'all',
                 conditions: ['developer_id' => $currentDeveloper['id']]
