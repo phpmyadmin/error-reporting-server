@@ -79,7 +79,7 @@ class GithubControllerTest extends TestCase
 
         // Case 2. Test form with valid reportId
         $this->get('github/create_issue/5');
-        $this->assertResponseSuccess();
+        $this->assertResponseCode(200);
         $this->assertResponseContains('Lorem ipsum dolor sit amet'); // Description
 
         $issueResponse = file_get_contents(TESTS . 'Fixture' . DS . 'issue_response.json');
@@ -98,7 +98,7 @@ class GithubControllerTest extends TestCase
                 'labels' => 'test-pma',
             ]
         );
-        $this->assertResponseSuccess();
+        $this->assertResponseCode(200);
         $this->cleanupMockResponses();
 
         $this->enableRetainFlashMessages();
@@ -125,6 +125,7 @@ class GithubControllerTest extends TestCase
                 'labels' => 'test-pma',
             ]
         );
+        $this->assertResponseCode(302);
 
         $report = $this->Reports->get(5);
         $this->assertEquals(1347, $report->sourceforge_bug_id);
@@ -140,10 +141,12 @@ class GithubControllerTest extends TestCase
 
         // Case 1.1 Test with an invalid reportId
         $this->get('github/link_issue/123?ticket_id=1');
+        $this->assertResponseCode(404);
         $this->assertResponseContains('The report does not exist.');
 
         // Case 1.2 Test with an invalid ticketId
         $this->get('github/link_issue/5?ticket_id=');
+        $this->assertResponseCode(404);
         $this->assertResponseContains('Invalid Ticket ID');
 
         $issueResponse = file_get_contents(TESTS . 'Fixture' . DS . 'issue_response.json');
@@ -164,6 +167,7 @@ class GithubControllerTest extends TestCase
         $this->get(
             'github/link_issue/5?ticket_id=9999999'
         );
+        $this->assertResponseCode(302);
 
         $this->enableRetainFlashMessages();
         $report = $this->Reports->get(5);
@@ -188,6 +192,7 @@ class GithubControllerTest extends TestCase
         $this->get(
             'github/link_issue/5?ticket_id=1387'
         );
+        $this->assertResponseCode(302);
 
         $report = $this->Reports->get(5);
         $this->assertEquals(1387, $report->sourceforge_bug_id);
@@ -206,6 +211,7 @@ class GithubControllerTest extends TestCase
         $this->get(
             'github/link_issue/5?ticket_id=1387'
         );
+        $this->assertResponseCode(302);
 
         $report = $this->Reports->get(5);
         $this->assertEquals(1387, $report->sourceforge_bug_id);
@@ -222,10 +228,12 @@ class GithubControllerTest extends TestCase
 
         // Case 1.1 Test with an invalid reportId
         $this->get('github/unlink_issue/123');
+        $this->assertResponseCode(404);
         $this->assertResponseContains('The report does not exist.');
 
         // Case 1.2 Test unlinked with an already unlinked issue
         $this->get('github/unlink_issue/5');
+        $this->assertResponseCode(404);
         $this->assertResponseContains('Invalid Ticket ID');
 
         $commentResponse = file_get_contents(TESTS . 'Fixture' . DS . 'comment_response.json');
@@ -244,6 +252,7 @@ class GithubControllerTest extends TestCase
         $this->get(
             'github/unlink_issue/5'
         );
+        $this->assertResponseCode(302);
 
         $this->enableRetainFlashMessages();
         $report = $this->Reports->get(5);
@@ -263,6 +272,7 @@ class GithubControllerTest extends TestCase
         $this->get(
             'github/unlink_issue/5'
         );
+        $this->assertResponseCode(302);
 
         $report = $this->Reports->get(5);
         $this->assertEquals(null, $report->sourceforge_bug_id);
@@ -281,6 +291,7 @@ class GithubControllerTest extends TestCase
         Configure::write('CronDispatcher', false);
         $this->enableRetainFlashMessages();
         $this->get('github/sync_issue_status');
+        $this->assertResponseCode(302);
         $this->assertRedirect('/');
 
         $issueResponse = file_get_contents(TESTS . 'Fixture' . DS . 'issue_response.json');
@@ -306,6 +317,7 @@ class GithubControllerTest extends TestCase
         // Test via cli (i.e. the CronDispatcher setting should be defined)
         Configure::write('CronDispatcher', true);
         $this->get('github/sync_issue_status');
+        $this->assertResponseCode(200);
 
         // 401
         $report = $this->Reports->get(1);
