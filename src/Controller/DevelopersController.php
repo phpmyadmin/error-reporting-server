@@ -49,7 +49,7 @@ class DevelopersController extends AppController
     public function login(): Response
     {
         $this->request->getSession()->destroy();
-        $url = $this->GithubApi->getRedirectUrl('user:email,public_repo');
+        $url = $this->GithubApi->getRedirectUrl('user:email,public_repo,read:org,repo');
 
         return $this->redirect($url);
     }
@@ -83,7 +83,7 @@ class DevelopersController extends AppController
         $userInfo['has_commit_access'] = $this->GithubApi->canCommitTo(
             $userInfo['login'],
             Configure::read('GithubRepoPath'),
-            Configure::read('GithubAccessToken')
+            $accessToken
         );
 
         $this->authenticateDeveloper($userInfo, $accessToken);
