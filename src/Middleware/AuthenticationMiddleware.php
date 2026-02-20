@@ -45,6 +45,13 @@ class AuthenticationMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $controllerName = $request->getParam('controller');
+        $action = $request->getParam('action');
+
+        if ($controllerName === 'Requests' && $action === 'view') {// cakephp/debug_kit
+            return $handler->handle($request);
+        }
+
         $redirectResponse = new Response()->withStatus(307)->withHeader('Location', '/');
 
         assert($request instanceof ServerRequest);
@@ -62,15 +69,15 @@ class AuthenticationMiddleware implements MiddlewareInterface
         }
 
         if ($currentDeveloper !== null) {
-            $isRequired = $this->isWriteAccessRequired($request);
-            if ($isRequired === true) {
+            $hasAccess = $this->hasAccessToAction($request);
+            if ($hasAccess === false) {
                 $request->getSession()->destroy();
                 $request->getSession()->write('last_page', '');
 
                 $flash_class = 'alert';
                 $request->getFlash()->set(
                     'You need to have commit access on phpmyadmin/phpmyadmin '
-                    . 'repository on Github.com to do this',
+                    . 'repository on Github.com to do this action (' . $controllerName . ':' . $action . ')',
                     [
                         'params' => ['class' => $flash_class],
                     ]
@@ -84,7 +91,7 @@ class AuthenticationMiddleware implements MiddlewareInterface
             if ($isPublicAccess === false) {
                 $flash_class = 'alert';
                 $request->getFlash()->set(
-                    'You need to be signed in to do this',
+                    'You need to be signed in to do this action (' . $controllerName . ':' . $action . ')',
                     ['params' => ['class' => $flash_class]]
                 );
 
@@ -120,7 +127,7 @@ class AuthenticationMiddleware implements MiddlewareInterface
         return in_array($action, self::NO_ACCESS_CONTROL_LIST[$controllerName]);
     }
 
-    protected function isWriteAccessRequired(ServerRequest $request): bool
+    protected function hasAccessToAction(ServerRequest $request): bool
     {
         $controllerName = $request->getParam('controller');
         $action = $request->getParam('action');
@@ -128,8 +135,10 @@ class AuthenticationMiddleware implements MiddlewareInterface
 
         // If developer has commit access on phpmyadmin/phpmyadmin
         if ($read_only === false) {
-            return false;
+            return true;
         }
+
+        // Now we check if the user can access this action in read only mode
 
         // Check for the controller name
         if (! isset(self::READ_ONLY_ACCESS_CONTROL_LIST[$controllerName])) {
@@ -138,12 +147,12 @@ class AuthenticationMiddleware implements MiddlewareInterface
 
         // Require for all actions ?
         if (self::READ_ONLY_ACCESS_CONTROL_LIST[$controllerName] === '*') {
-            return true;// Needs write access
+            return true;// Can access all actions in read only mode
         }
 
         // Check for the specific action name
         if (in_array($action, self::READ_ONLY_ACCESS_CONTROL_LIST[$controllerName])) {// phpcs:ignore SlevomatCodingStandard.ControlStructures.UselessIfConditionWithReturn.UselessIfCondition
-            return true;// Needs write access
+            return true;// Can access this action in read only mode
         }
 
         return false;// phpcs:ignore SlevomatCodingStandard.ControlStructures.UselessIfConditionWithReturn.UselessIfCondition
