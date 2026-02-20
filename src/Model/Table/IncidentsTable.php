@@ -208,11 +208,14 @@ class IncidentsTable extends Table
         $incidentsTable = TableRegistry::getTableLocator()->get('Incidents');
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         foreach ($schematizedIncidents as $index => $si) {
+            if (isset($si['error_message'])) {
+                $si['error_message'] = mb_strimwidth($si['error_message'], 0, 200, '...');
+            }
+
             // find closest report. If not found, create a new report.
             $closestReport = $this->getClosestReport($bugReport, $index);
             if ($closestReport) {
                 $si['report_id'] = $closestReport['id'];
-                $si['error_message'] = mb_strimwidth($si['error_message'], 0, 200, '...');
                 $si = $incidentsTable->newEntity($si);
                 $si->created = date('Y-m-d H:i:s', time());
                 $si->modified = date('Y-m-d H:i:s', time());
@@ -236,7 +239,6 @@ class IncidentsTable extends Table
                 $reportsTable->save($report);
 
                 $si['report_id'] = $report->id;
-                $si['error_message'] = mb_strimwidth($si['error_message'], 0, 200, '...');
                 $new_report_ids[] = $report->id;
                 $si = $incidentsTable->newEntity($si);
                 $si->created = date('Y-m-d H:i:s', time());
