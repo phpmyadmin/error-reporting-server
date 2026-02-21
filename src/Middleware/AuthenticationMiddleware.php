@@ -45,6 +45,8 @@ class AuthenticationMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        assert($request instanceof ServerRequest);
+
         $controllerName = $request->getParam('controller');
         $action = $request->getParam('action');
 
@@ -53,8 +55,6 @@ class AuthenticationMiddleware implements MiddlewareInterface
         }
 
         $redirectResponse = new Response()->withStatus(307)->withHeader('Location', '/');
-
-        assert($request instanceof ServerRequest);
 
         $devId = $request->getSession()->read('Developer.id');
 

@@ -153,11 +153,11 @@ class GithubApiComponent extends Component
 
         Log::debug('Response-code: ' . $status . ' for: ' . $url);
 
+        $decodedResponse = $response->getJson();
         if ($status === 401) {
-            Log::error('[GitHub] error '. $status . ' on ' . $url . ' and data ' . json_encode($decodedResponse) . ' maybe the token is expired ?');
+            Log::error('[GitHub] error ' . $status . ' on ' . $url . ' and data ' . json_encode($decodedResponse) . ' maybe the token is expired ?');
         }
 
-        $decodedResponse = $response->getJson();
         if ($returnCode) {
             return [
                 $decodedResponse,
