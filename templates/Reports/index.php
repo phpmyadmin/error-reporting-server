@@ -13,6 +13,7 @@ $reportsUrl = Router::url(
 <form class="form-inline" id="state-form"
         action=" <?= Router::url('/reports/mass_action/'); ?> "
         method="post">
+    <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
     <table id="reports_table" data-ajax-url="<?= $reportsUrl ?>">
         <thead>
             <tr>

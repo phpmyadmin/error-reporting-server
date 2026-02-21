@@ -120,5 +120,6 @@ class AppController extends Controller
         }
 
         $this->set('notif_count', $notificationCount);
+        $this->set('csrf_token', $this->request->getAttribute('csrfToken'));
     }
 }

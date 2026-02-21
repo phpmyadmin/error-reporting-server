@@ -17,6 +17,7 @@ use Cake\Routing\Router;
     <form class="form-inline" id="state-form" style="display: none"
             action="/<?= BASE_DIR ?>reports/change_state/<?= $report[0]['id']; ?>"
             method="post">
+        <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
         <span>Change state to:</span>
         <?=
             $this->Form->select(
@@ -35,6 +36,7 @@ use Cake\Routing\Router;
 <?php if ($related_reports->isEmpty() && ! $read_only) : ?>
     <form class="form-inline" action="/<?= BASE_DIR ?>reports/mark_related_to/<?=
         $report[0]['id']; ?>" method="post">
+        <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
         <span>Mark the same as:</span>
         <input type="number" min="1" name="related_to" />
         <input type="submit" value="Submit" class="btn btn-primary" />
@@ -45,6 +47,7 @@ use Cake\Routing\Router;
         (<?= $this->Reports->createReportsLinks($related_reports); ?>).
         <form class="form-inline" action="/<?= BASE_DIR ?>reports/unmark_related_to/<?= $report[0]['id']; ?>" method="post">
                 <input type="submit" value="Remove from this group" class="btn btn-primary" />
+                <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
         </form>
     </p>
 <?php endif; ?>
@@ -83,6 +86,7 @@ use Cake\Routing\Router;
                         . '" method="GET" class="form-horizontal" style="margin-bottom:5px;"'
                         . ' onclick="return window.confirm(\'Are you sure you want to unlink this report?\');" >';
                 ?>
+                <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
 
                 <?=
                     $this->Form->input('Unlink from issue', [
@@ -117,6 +121,7 @@ use Cake\Routing\Router;
                                     ]) . '" method="GET" '
                                     . 'class="form-horizontal" style="margin-bottom:5px;">';
                             ?>
+                            <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
 
                             <?=
                                 $this->Form->input(
