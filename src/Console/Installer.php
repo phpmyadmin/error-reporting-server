@@ -83,7 +83,7 @@ class Installer
     {
         $appLocalConfig = $dir . '/config/app_local.php';
         $appLocalConfigTemplate = $dir . '/config/app_local.example.php';
-        if (!file_exists($appLocalConfigTemplate) && !file_exists($appLocalConfig)) {
+        if (file_exists($appLocalConfigTemplate) && !file_exists($appLocalConfig)) {
             copy($appLocalConfigTemplate, $appLocalConfig);
             $io->write('Created `config/app_local.php` file');
         }
