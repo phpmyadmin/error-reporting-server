@@ -1,6 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Parameter \#2 \$factory of static method Cake\\Datasource\\FactoryLocator\:\:add\(\) expects Cake\\Datasource\\Locator\\LocatorInterface\<Cake\\Datasource\\RepositoryInterface\>, Cake\\ORM\\Locator\\TableLocator given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Application.php
+
+		-
 			message: '#^Method App\\Controller\\Component\\GithubApiComponent\:\:apiRequest\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -109,6 +115,12 @@ parameters:
 			path: src/Controller/DevelopersController.php
 
 		-
+			message: '#^Parameter \#3 \$developer of method App\\Model\\Table\\DevelopersTable\:\:saveFromGithub\(\) expects Cake\\Datasource\\EntityInterface, array\|Cake\\Datasource\\EntityInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/DevelopersController.php
+
+		-
 			message: '#^Parameter \#1 \$payload of method App\\Controller\\EventsController\:\:getHash\(\) expects string, string\|false given\.$#'
 			identifier: argument.type
 			count: 1
@@ -139,9 +151,15 @@ parameters:
 			path: src/Controller/GithubController.php
 
 		-
+			message: '#^Cannot access property \$status on array\|Cake\\Datasource\\EntityInterface\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: src/Controller/GithubController.php
+
+		-
 			message: '#^Cannot call method toArray\(\) on array\|Cake\\Datasource\\EntityInterface\.$#'
 			identifier: method.nonObject
-			count: 1
+			count: 4
 			path: src/Controller/GithubController.php
 
 		-
@@ -163,6 +181,12 @@ parameters:
 			path: src/Controller/GithubController.php
 
 		-
+			message: '#^Parameter \#1 \$entity of method Cake\\ORM\\Table\<array\>\:\:save\(\) expects Cake\\Datasource\\EntityInterface, array\|Cake\\Datasource\\EntityInterface given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Controller/GithubController.php
+
+		-
 			message: '#^Strict comparison using \!\=\= between ''Github issue has…''\|''Something went…'' and '''' will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
@@ -177,6 +201,12 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Controller\\IncidentsController\:\:\$Mailer\.$#'
 			identifier: property.notFound
+			count: 1
+			path: src/Controller/IncidentsController.php
+
+		-
+			message: '#^Cannot call method toArray\(\) on array\|Cake\\Datasource\\EntityInterface\.$#'
+			identifier: method.nonObject
 			count: 1
 			path: src/Controller/IncidentsController.php
 
@@ -387,6 +417,12 @@ parameters:
 		-
 			message: '#^Method App\\Model\\Table\\IncidentsTable\:\:getClosestReport\(\) has parameter \$bugReport with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Table/IncidentsTable.php
+
+		-
+			message: '#^Method App\\Model\\Table\\IncidentsTable\:\:getClosestReport\(\) should return Cake\\ORM\\Entity\|null but returns array\|Cake\\Datasource\\EntityInterface\|null\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Model/Table/IncidentsTable.php
 
@@ -637,10 +673,10 @@ parameters:
 			path: src/Report.php
 
 		-
-			message: '#^Class App\\View\\AppView extends generic class Cake\\View\\View but does not specify its types\: TSubject$#'
+			message: '#^Class App\\View\\Helper\\AppHelper extends generic class Cake\\View\\Helper but does not specify its types\: TView$#'
 			identifier: missingType.generics
 			count: 1
-			path: src/View/AppView.php
+			path: src/View/Helper/AppHelper.php
 
 		-
 			message: '#^Access to an undefined property App\\View\\Helper\\ReportsHelper\:\:\$Incidents\.$#'
