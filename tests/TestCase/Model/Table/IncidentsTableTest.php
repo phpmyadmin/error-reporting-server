@@ -387,6 +387,15 @@ class IncidentsTableTest extends TestCase
         $this->assertEquals($returnedReport, $result);
     }
 
+    public function testCreateIncidentFromBugReportUANull(): void
+    {
+        $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_ua_null_js.json');
+        $bugReport = json_decode($bugReport, true);
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+        $this->assertEquals(1, count($result['incidents']));
+    }
+
     public function testCreateIncidentFromBugReport(): void
     {
         $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');

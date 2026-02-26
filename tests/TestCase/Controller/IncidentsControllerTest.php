@@ -178,6 +178,32 @@ class IncidentsControllerTest extends TestCase
         $this->assertSame(false, $result['success']);
     }
 
+    public function testCreateIncidentFromBugReportUANull(): void
+    {
+        // Test invalid Notification email configuration
+        Configure::write('NotificationEmailsTo', '');
+
+        $bugReport = file_get_contents(TESTS . 'Fixture' . DS . 'report_ua_null_js.json');
+        $bugReportDecoded = json_decode($bugReport, true);
+        $this->configRequest(['input' => $bugReport]);
+        $this->post('/incidents/create');
+        $this->assertResponseCode(200);
+        $result = json_decode($this->_response->getBody(), true);
+        $this->assertNotNull($result);
+        $this->assertSame(true, $result['success']);
+
+        $report = $this->Reports->find(
+            'all',
+            order: ['Reports.created desc']
+        )->all()->first();
+        $subject = 'A new report has been submitted '
+            . 'on the Error Reporting Server: '
+            . $report['id'];
+        $this->assertEquals('5.2.4-dev', $report['pma_version']);
+
+        $this->assertNoMailSent();
+    }
+
     public function testCreateInvalidReport(): void
     {
         // Test invalid Notification email configuration

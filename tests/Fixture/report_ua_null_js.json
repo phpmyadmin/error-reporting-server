@@ -1,0 +1,13 @@
+{
+    "pma_version": "5.2.4-dev",
+    "browser_name": "OTHER",
+    "browser_version": 0,
+    "user_os": "Other",
+    "server_software": "nginx/1.29.5",
+    "user_agent_string": null,
+    "locale": "en",
+    "configuration_storage": "enabled",
+    "php_version": "8.5.3",
+    "script_name": "index.php",
+    "exception_type": "js"
+}
