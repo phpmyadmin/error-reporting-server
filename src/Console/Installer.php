@@ -182,6 +182,11 @@ class Installer
      */
     public static function setSecuritySalt(string $dir, IOInterface $io): void
     {
+        $appLocalConfig = $dir . '/config/app_local.php';
+        if (! file_exists($appLocalConfig)) {
+            return;
+        }
+
         $newKey = hash('sha256', Security::randomBytes(64));
         static::setSecuritySaltInFile($dir, $io, $newKey, 'app_local.php');
     }
