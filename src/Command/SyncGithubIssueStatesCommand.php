@@ -62,7 +62,7 @@ class SyncGithubIssueStatesCommand extends Command
 
         Configure::write('CronDispatcher', true);
         if (PHP_SAPI !== 'cli') {
-            return static::CODE_ERROR;
+            return self::CODE_ERROR;
         }
 
         $session = Session::create();
