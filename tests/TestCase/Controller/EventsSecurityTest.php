@@ -18,11 +18,13 @@ namespace App\Test\TestCase\Controller;
 
 use App\Model\Table\ReportsTable;
 use App\Test\Fixture\ReportsFixture;
+use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+use function hash_hmac;
 use function json_encode;
 use function str_repeat;
 
@@ -124,20 +126,49 @@ class EventsSecurityTest extends TestCase
         $this->assertSame('new', $this->Reports->get(4)->get('status'));
     }
 
+    /**
+     * Sign a payload the way GitHub does.
+     */
+    protected function sign(string $payload): string
+    {
+        return 'sha1=' . hash_hmac(
+            'sha1',
+            $payload,
+            (string) Configure::read('GithubWebhookSecret'),
+        );
+    }
+
     public function testAValidSignatureIsAccepted(): void
     {
         $report = $this->Reports->get(4);
         $report->set('status', 'forwarded');
         $this->Reports->save($report);
 
+        $payload = $this->closingPayload();
         $this->configRequest([
             'headers' => $this->headersWithoutSignature() + [
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
+                'X-Hub-Signature' => $this->sign($payload),
+            ],
+        ]);
+        $this->post('/events', $payload);
+
+        $this->assertResponseCode(201);
+        $this->assertSame('resolved', $this->Reports->get(4)->get('status'));
+    }
+
+    /**
+     * The signature covers the body: the signature of another payload must not
+     * be accepted for this one.
+     */
+    public function testASignatureOfAnotherPayloadIsRejected(): void
+    {
+        $this->configRequest([
+            'headers' => $this->headersWithoutSignature() + [
+                'X-Hub-Signature' => $this->sign('{"action":"opened"}'),
             ],
         ]);
         $this->post('/events', $this->closingPayload());
 
-        $this->assertResponseCode(201);
-        $this->assertSame('resolved', $this->Reports->get(4)->get('status'));
+        $this->assertResponseCode(401);
     }
 }

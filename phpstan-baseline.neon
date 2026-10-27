@@ -103,12 +103,6 @@ parameters:
 			path: src/Controller/DevelopersController.php
 
 		-
-			message: '#^Parameter \#1 \$payload of method App\\Controller\\EventsController\:\:getHash\(\) expects string, string\|false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/EventsController.php
-
-		-
 			message: '#^Strict comparison using \!\=\= between string and null will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 3

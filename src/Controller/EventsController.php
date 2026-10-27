@@ -27,7 +27,6 @@ use Cake\ORM\TableRegistry;
 
 use function count;
 use function explode;
-use function file_get_contents;
 use function hash_equals;
 use function hash_hmac;
 use function hash_hmac_algos;
@@ -54,8 +53,12 @@ class EventsController extends AppController
         // Only allow POST requests
         $this->request->allowMethod(['post']);
 
+        // The raw body is the only thing the signature can be checked against,
+        // read it once from the request.
+        $payload = (string) $this->request->getBody();
+
         // Validate request
-        $statusCode = $this->validateRequest($this->request);
+        $statusCode = $this->validateRequest($this->request, $payload);
         if ($statusCode !== 201) {
             Log::error(
                 'Could not validate the request. Sending a '
@@ -75,7 +78,7 @@ class EventsController extends AppController
             return $this->response->withStatus($statusCode);
         }
 
-        $issuesData = json_decode((string) $this->request->getBody(), true);
+        $issuesData = json_decode($payload, true);
         $eventAction = $issuesData['action'];
         $issueNumber = $issuesData['issue'] ? $issuesData['issue']['number'] : '';
 
@@ -113,10 +116,11 @@ class EventsController extends AppController
      * Validate HTTP Request received
      *
      * @param ServerRequest $request Request object
+     * @param string        $payload Raw body of the request
      *
      * @return int status code based on if this is a valid request
      */
-    protected function validateRequest(ServerRequest $request): int
+    protected function validateRequest(ServerRequest $request, string $payload): int
     {
         // Default $statusCode
         $statusCode = 201;
@@ -181,7 +185,7 @@ class EventsController extends AppController
             return 401;
         }
 
-        $expectedHash = $this->getHash(file_get_contents('php://input'), $algo);
+        $expectedHash = $this->getHash($payload, $algo);
 
         if (! hash_equals($expectedHash, $receivedHash)) {
             // Check if hash matches

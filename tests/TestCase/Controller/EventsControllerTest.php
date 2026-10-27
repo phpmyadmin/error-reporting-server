@@ -4,10 +4,12 @@ namespace App\Test\TestCase\Controller;
 
 use App\Model\Table\ReportsTable;
 use App\Test\Fixture\ReportsFixture;
+use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
+use function hash_hmac;
 use function json_encode;
 
 class EventsControllerTest extends TestCase
@@ -28,6 +30,40 @@ class EventsControllerTest extends TestCase
         parent::setUp();
 
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
+    }
+
+    /**
+     * Build the headers of a delivery, signed the way GitHub signs it.
+     *
+     * @param string                $payload Body of the delivery
+     * @param array<string, string> $replace Headers replacing the default ones
+     *
+     * @return array<string, string>
+     */
+    protected function deliveryHeaders(string $payload, array $replace = []): array
+    {
+        return $replace + [
+            'User-Agent' => 'GitHub-Hookshot-abcdef',
+            'X-GitHub-Event' => 'issues',
+            'X-Hub-Signature' => 'sha1=' . hash_hmac(
+                'sha1',
+                $payload,
+                (string) Configure::read('GithubWebhookSecret'),
+            ),
+        ];
+    }
+
+    /**
+     * Send a delivery of an issue event.
+     *
+     * @param array<string, mixed>  $event   Content of the "issue" event
+     * @param array<string, string> $replace Headers replacing the default ones
+     */
+    protected function deliverIssueEvent(array $event, array $replace = []): void
+    {
+        $payload = json_encode($event);
+        $this->configRequest(['headers' => $this->deliveryHeaders($payload, $replace)]);
+        $this->post('/events', $payload);
     }
 
     public function testIndex(): void
@@ -53,148 +89,64 @@ class EventsControllerTest extends TestCase
 
         /* Test case 3 */
         // Invalid Hash in headers
-        $this->configRequest([
-            'headers' => [
-                'User-Agent' => 'GitHub-Hookshot-abcdef',
-                'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=89db05030cf4c1fbcfb4d590deda30fa40a247ed',
-            ],
-        ]);
-        $this->post(
-            '/events',
-            json_encode(
-                [
-                    'action' => 'closed',
-                    'issue' => ['number' => 4],
-                ],
-            ),
+        $this->deliverIssueEvent(
+            ['action' => 'closed', 'issue' => ['number' => 4]],
+            ['X-Hub-Signature' => 'sha1=89db05030cf4c1fbcfb4d590deda30fa40a247ed'],
         );
         $this->assertResponseCode(401);
 
         /* Test case 4 */
         // Invalid issues action
-        $this->configRequest([
-            'headers' => [
-                'User-Agent' => 'GitHub-Hookshot-abcdef',
-                'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
-            ],
-        ]);
-        $this->post(
-            '/events',
-            json_encode(
-                [
-                    'action' => 'anything-invalid',
-                    'issue' => ['number' => 4],
-                ],
-            ),
+        $this->deliverIssueEvent(
+            ['action' => 'anything-invalid', 'issue' => ['number' => 4]],
         );
         $this->assertResponseCode(204);
 
         /* Test case 5 */
         // Event for an unlinked issue
-        $this->configRequest([
-            'headers' => [
-                'User-Agent' => 'GitHub-Hookshot-abcdef',
-                'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
-            ],
-        ]);
-        $this->post(
-            '/events',
-            json_encode(
-                [
-                    'action' => 'closed',
-                    'issue' => ['number' => 1234],
-                ],
-            ),
+        $this->deliverIssueEvent(
+            ['action' => 'closed', 'issue' => ['number' => 1234]],
         );
         $this->assertResponseCode(204);
 
         // Prepare for testcase
         $report = $this->Reports->get(4);
-        $report->status = 'resolved';
+        $report->set('status', 'resolved');
         $this->Reports->save($report);
 
         /* Test case 6 */
         // Event 'opened' for a linked issue
-        $this->configRequest([
-            'headers' => [
-                'User-Agent' => 'GitHub-Hookshot-abcdef',
-                'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
-            ],
-        ]);
-        $this->post(
-            '/events',
-            json_encode(
-                [
-                    'action' => 'opened',
-                    'issue' => ['number' => 4],
-                ],
-            ),
+        $this->deliverIssueEvent(
+            ['action' => 'opened', 'issue' => ['number' => 4]],
         );
         $this->assertResponseCode(201);
-        $report = $this->Reports->get(4);
-        $this->assertEquals($report->status, 'forwarded');
+        $this->assertSame('forwarded', $this->Reports->get(4)->get('status'));
 
         /* Test case 7 */
         // Event 'closed' for a linked issue
-        $this->configRequest([
-            'headers' => [
-                'User-Agent' => 'GitHub-Hookshot-abcdef',
-                'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
-            ],
-        ]);
-        $this->post(
-            '/events',
-            json_encode(
-                [
-                    'action' => 'closed',
-                    'issue' => ['number' => 4],
-                ],
-            ),
+        $this->deliverIssueEvent(
+            ['action' => 'closed', 'issue' => ['number' => 4]],
         );
         $this->assertResponseCode(201);
-        $report = $this->Reports->get(4);
-        $this->assertEquals($report->status, 'resolved');
+        $this->assertSame('resolved', $this->Reports->get(4)->get('status'));
 
         // Prepare for testcase
         $report = $this->Reports->get(4);
-        $report->status = 'resolved';
+        $report->set('status', 'resolved');
         $this->Reports->save($report);
 
         /* Test case 8 */
         // Event 'reopened' for a linked issue
-        $this->configRequest([
-            'headers' => [
-                'User-Agent' => 'GitHub-Hookshot-abcdef',
-                'X-GitHub-Event' => 'issues',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
-            ],
-        ]);
-        $this->post(
-            '/events',
-            json_encode(
-                [
-                    'action' => 'reopened',
-                    'issue' => ['number' => 4],
-                ],
-            ),
+        $this->deliverIssueEvent(
+            ['action' => 'reopened', 'issue' => ['number' => 4]],
         );
         $this->assertResponseCode(201);
-        $report = $this->Reports->get(4);
-        $this->assertEquals($report->status, 'forwarded');
+        $this->assertSame('forwarded', $this->Reports->get(4)->get('status'));
 
         /* Test case 9 */
         // Event 'ping'
         $this->configRequest([
-            'headers' => [
-                'User-Agent' => 'GitHub-Hookshot-abcdef',
-                'X-GitHub-Event' => 'ping',
-                'X-Hub-Signature' => 'sha1=ddcf5dadbbb716e43da25344989dde547c6c3a03',
-            ],
+            'headers' => $this->deliveryHeaders('', ['X-GitHub-Event' => 'ping']),
         ]);
         $this->post('/events');
         $this->assertResponseCode(200);
