@@ -25,6 +25,7 @@ use Cake\Http\ServerRequest;
 use function array_keys;
 use function count;
 use function intval;
+use function strtoupper;
 
 /**
  * Github api component handling comunication with github.
@@ -77,7 +78,9 @@ class OrderSearchComponent extends Component
 
             $keys = array_keys($aColumns);
 
-            $sortDir = $request->getQuery('sSortDir_0');
+            // The direction is appended to the ORDER BY clause as is, so only the
+            // two values DataTables can send are allowed.
+            $sortDir = strtoupper((string) $request->getQuery('sSortDir_0')) === 'DESC' ? 'DESC' : 'ASC';
             if ($sort_column_index > 0 && $request->getQuery('bSortable_' . $sort_column_index) === 'true') {
                 $order[] = [$aColumns[$keys[$sort_column_index - 1]] . ' ' . $sortDir];
             }
