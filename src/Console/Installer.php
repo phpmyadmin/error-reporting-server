@@ -16,6 +16,10 @@ declare(strict_types=1);
  */
 namespace App\Console;
 
+// The Codeception installer is not a dependency of this application, it is
+// only used when it happens to be installed: the class_exists() guard below
+// is what makes its absence harmless.
+/** @scrutinizer ignore-type */
 use Cake\Codeception\Console\Installer as CodeceptionInstaller;
 use Cake\Utility\Security;
 use Composer\IO\IOInterface;

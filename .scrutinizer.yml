@@ -25,7 +25,9 @@ build:
         php: 8.4
       dependencies:
         before:
-          - composer install
+          # --dev so the tests can extend Cake\TestSuite\TestCase, which
+          # inherits from PHPUnit
+          - composer install --no-interaction --prefer-dist --optimize-autoloader --dev
       tests:
         override:
           - php-scrutinizer-run
