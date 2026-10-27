@@ -50,12 +50,11 @@ class ReportsTableTest extends TestCase
     public function testGetRelatedReports(): void
     {
         $reports = $this->Reports->getRelatedReports(2)->all();
-        $this->assertEquals(count($reports), 0);
+        $this->assertCount(0, $reports);
 
-        $this->markTestIncomplete('Does not work anymore');
-        $this->Reports->read(null, 4);
-        $reports = $this->Reports->getRelatedReports()->all();
-        $this->assertEquals(count($reports), 1);
+        $this->Reports->updateAll(['related_to' => 4], ['id' => 5]);
+        $reports = $this->Reports->getRelatedReports(4)->all();
+        $this->assertCount(1, $reports);
     }
 
     /**
