@@ -22,7 +22,7 @@ jobs:
             ports:
               - "3306:3306"
             options: >-
-              --health-cmd="mysqladmin ping"
+              --health-cmd="healthcheck.sh --connect --innodb_initialized"
               --health-interval=10s
               --health-timeout=5s
               --health-retries=3
@@ -30,7 +30,7 @@ jobs:
             fail-fast: false
             matrix:
                 php-version: ["8.4"]
-                db-server: ["mysql:5.7"]
+                db-server: ["mariadb:11.8"]
                 os: [ubuntu-latest]
         steps:
             - uses: actions/checkout@v7
@@ -41,7 +41,7 @@ jobs:
               uses: shivammathur/setup-php@v2
               with:
                   php-version: ${{ matrix.php-version }}
-                  extensions: mbstring,mysql
+                  extensions: intl,mbstring,mysql
                   coverage: xdebug
                   ini-values: xdebug.mode="develop,coverage"
             - name: Cache Composer packages
