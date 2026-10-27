@@ -225,8 +225,7 @@ class ReportsControllerTest extends TestCase
 
     public function testMarkRelatedTo(): void
     {
-        $this->Reports->id = 2;
-        $incidents = $this->Reports->getIncidents();
+        $incidents = $this->Reports->getIncidents(2);
         $this->assertEquals(1, $incidents->count());
 
         $this->post(
@@ -235,23 +234,20 @@ class ReportsControllerTest extends TestCase
         );
         $this->assertResponseCode(302);
 
-        $this->Reports->id = 2;
-        $incidents = $this->Reports->getIncidents();
+        $incidents = $this->Reports->getIncidents(2);
         $this->assertEquals(3, $incidents->count());
     }
 
     public function testUnmarkRelatedTo(): void
     {
         $this->testMarkRelatedTo();
-        $this->Reports->id = 2;
-        $incidents = $this->Reports->getIncidents();
+        $incidents = $this->Reports->getIncidents(2);
         $this->assertEquals(3, $incidents->count());
 
         $this->post('/reports/unmark_related_to/2');
         $this->assertResponseCode(302);
 
-        $this->Reports->id = 2;
-        $incidents = $this->Reports->getIncidents();
+        $incidents = $this->Reports->getIncidents(2);
         $this->assertEquals(1, $incidents->count());
     }
 

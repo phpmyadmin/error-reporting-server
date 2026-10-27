@@ -77,43 +77,49 @@ class ReportsTable extends Table
     }
 
     /**
-     * Retrieves the incident records that are related to the current report.
+     * Retrieves the incident records that are related to a report.
+     *
+     * @param int $reportId Id of the report
      *
      * @return Query the list of incidents ordered by creation date desc
      */
-    public function getIncidents(): Query
+    public function getIncidents(int $reportId): Query
     {
         return TableRegistry::getTableLocator()->get('Incidents')->find(
             'all',
             limit: 50,
-            conditions: $this->relatedIncidentsConditions(),
+            conditions: $this->relatedIncidentsConditions($reportId),
             order: 'Incidents.created desc',
         );
     }
 
     /**
-     * Retrieves the report records that are related to the current report.
+     * Retrieves the report records that are related to a report.
+     *
+     * @param int $reportId Id of the report
      *
      * @return Query the list of related reports
      */
-    public function getRelatedReports(): Query
+    public function getRelatedReports(int $reportId): Query
     {
-        return $this->find('all', conditions: $this->relatedReportsConditions());
+        return $this->find('all', conditions: $this->relatedReportsConditions($reportId));
     }
 
     /**
      * Retrieves the incident records that are related to the current report that
      * also have a description.
      *
+     * @param int $reportId Id of the report
+     *
      * @return Query the list of incidents ordered by description length desc
      */
-    public function getIncidentsWithDescription(): Query
+    public function getIncidentsWithDescription(int $reportId): Query
     {
         return TableRegistry::getTableLocator()->get('Incidents')->find(
             'all',
             conditions: [
                 'NOT' => ['Incidents.steps is null'],
-                $this->relatedIncidentsConditions(),
+                $this->relatedIncidentsConditions($reportId),
             ],
             order: 'Incidents.steps desc',
         );
@@ -123,9 +129,11 @@ class ReportsTable extends Table
      * Retrieves the incident records that are related to the current report that
      * that have a different stacktrace.
      *
+     * @param int $reportId Id of the report
+     *
      * @return Query the list of incidents
      */
-    public function getIncidentsWithDifferentStacktrace(): Query
+    public function getIncidentsWithDifferentStacktrace(int $reportId): Query
     {
         return TableRegistry::getTableLocator()->get('Incidents')->find(
             'all',
@@ -135,7 +143,7 @@ class ReportsTable extends Table
                 'Incidents.full_report',
                 'Incidents.exception_type',
             ],
-            conditions: $this->relatedIncidentsConditions(),
+            conditions: $this->relatedIncidentsConditions($reportId),
             group: 'Incidents.stackhash',
         )->distinct(['Incidents.stackhash']);
     }
@@ -197,7 +205,7 @@ class ReportsTable extends Table
      * @param string $fieldName the name of the field to group by
      * @param int    $limit     the max number of groups to return
      * @param bool   $count     whether to return the number of distinct groups
-     * @param bool   $related   whether to limit the search to only related incidents
+     * @param int    $reportId  only include incidents related to this report
      * @param string $timeLimit the date at which to start the search
      *
      * @return array|object the groups with the count of each group and possibly the number
@@ -207,7 +215,7 @@ class ReportsTable extends Table
         string $fieldName,
         int $limit = 10,
         bool $count = false,
-        bool $related = true,
+        int|null $reportId = null,
         string|null $timeLimit = null,
     ) {
         $fieldAlias = 'Incidents__' . $fieldName;
@@ -217,8 +225,8 @@ class ReportsTable extends Table
             ],
         ];
 
-        if ($related) {
-            $queryDetails['conditions'][] = $this->relatedIncidentsConditions();
+        if ($reportId !== null) {
+            $queryDetails['conditions'][] = $this->relatedIncidentsConditions($reportId);
         }
 
         if ($timeLimit) {
@@ -302,41 +310,45 @@ class ReportsTable extends Table
     }
 
     /**
-     * returns an array of conditions that would return all related incidents to the
-     * current report.
+     * returns an array of conditions that would return all related incidents to a
+     * report.
+     *
+     * @param int $reportId Id of the report
      *
      * @return array the related incidents conditions
      */
-    protected function relatedIncidentsConditions(): array
+    protected function relatedIncidentsConditions(int $reportId): array
     {
         $conditions = [
-            ['Incidents.report_id = ' . $this->id],
+            ['Incidents.report_id = ' . $reportId],
         ];
-        $report = $this->get($this->id);
-        if ($report->related_to) { //TODO: fix when fix related reports
-            $conditions[] = ['Incidents.report_id = ' . $report->related_to];
+        $report = $this->get($reportId);
+        if ($report->get('related_to')) { //TODO: fix when fix related reports
+            $conditions[] = ['Incidents.report_id = ' . $report->get('related_to')];
         }
 
         return ['OR' => $conditions];
     }
 
     /**
-     * returns an array of conditions that would return all related reports to the
-     * current report.
+     * returns an array of conditions that would return all related reports to a
+     * report.
+     *
+     * @param int $reportId Id of the report
      *
      * @return array the related reports conditions
      */
-    protected function relatedReportsConditions(): array
+    protected function relatedReportsConditions(int $reportId): array
     {
-        $conditions = [['related_to' => $this->id]];
-        $report = $this->get($this->id);
-        if ($report->related_to) { //TODO: fix related to
-            $conditions[] = ['related_to' => $report->related_to];
-            $conditions[] = ['id' => $report->related_to];
+        $conditions = [['related_to' => $reportId]];
+        $report = $this->get($reportId);
+        if ($report->get('related_to')) { //TODO: fix related to
+            $conditions[] = ['related_to' => $report->get('related_to')];
+            $conditions[] = ['id' => $report->get('related_to')];
         }
 
         $conditions = [['OR' => $conditions]];
-        $conditions[] = ['Reports.id !=' => $this->id];
+        $conditions[] = ['Reports.id !=' => $reportId];
 
         return $conditions;
     }

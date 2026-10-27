@@ -163,15 +163,14 @@ class IncidentsController extends AppController
     {
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $report = $this->Reports->findById($reportId)->all()->first()->toArray();
-        $this->Reports->id = $reportId;
 
         $viewVars = [
             'report' => $report,
             'project_name' => Configure::read('GithubRepoPath'),
-            'incidents' => $this->Reports->getIncidents()->toArray(),
-            'incidents_with_description' => $this->Reports->getIncidentsWithDescription(),
-            'incidents_with_stacktrace' => $this->Reports->getIncidentsWithDifferentStacktrace(),
-            'related_reports' => $this->Reports->getRelatedReports()->all(),
+            'incidents' => $this->Reports->getIncidents($reportId)->toArray(),
+            'incidents_with_description' => $this->Reports->getIncidentsWithDescription($reportId),
+            'incidents_with_stacktrace' => $this->Reports->getIncidentsWithDifferentStacktrace($reportId),
+            'related_reports' => $this->Reports->getRelatedReports($reportId)->all(),
             'status' => $this->Reports->status,
         ];
         $viewVars = array_merge($viewVars, $this->getSimilarFields($reportId));
@@ -181,8 +180,6 @@ class IncidentsController extends AppController
 
     protected function getSimilarFields(int $id): array
     {
-        $this->Reports->id = $id;
-
         $viewVars = [
             'columns' => TableRegistry::getTableLocator()->get('Incidents')->summarizableFields,
         ];
@@ -190,7 +187,7 @@ class IncidentsController extends AppController
 
         foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
             [$entriesWithCount, $totalEntries] =
-                    $this->Reports->getRelatedByField($field, 25, true);
+                    $this->Reports->getRelatedByField($field, 25, true, $id);
             $relatedEntries[$field] = $entriesWithCount->toArray();
             $viewVars[$field . '_distinct_count'] = $totalEntries;
         }

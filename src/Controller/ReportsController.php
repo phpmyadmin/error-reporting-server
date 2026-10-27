@@ -116,17 +116,16 @@ class ReportsController extends AppController
 
         $this->set('report', $report);
         $this->set('project_name', Configure::read('GithubRepoPath'));
-        $this->Reports->id = $reportId;
-        $this->set('incidents', $this->Reports->getIncidents()->toArray());
+        $this->set('incidents', $this->Reports->getIncidents($reportId)->toArray());
         $this->set(
             'incidents_with_description',
-            $this->Reports->getIncidentsWithDescription(),
+            $this->Reports->getIncidentsWithDescription($reportId),
         );
         $this->set(
             'incidents_with_stacktrace',
-            $this->Reports->getIncidentsWithDifferentStacktrace(),
+            $this->Reports->getIncidentsWithDifferentStacktrace($reportId),
         );
-        $this->set('related_reports', $this->Reports->getRelatedReports()->all());
+        $this->set('related_reports', $this->Reports->getRelatedReports($reportId)->all());
         $this->set('status', $this->Reports->status);
         $this->setSimilarFields($reportId);
 
@@ -406,14 +405,12 @@ class ReportsController extends AppController
 
     protected function setSimilarFields(int $id): void
     {
-        $this->Reports->id = $id;
-
         $this->set('columns', TableRegistry::getTableLocator()->get('Incidents')->summarizableFields);
         $relatedEntries = [];
 
         foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
             [$entriesWithCount, $totalEntries] =
-                    $this->Reports->getRelatedByField($field, 25, true);
+                    $this->Reports->getRelatedByField($field, 25, true, $id);
             $relatedEntries[$field] = $entriesWithCount->toArray();
             $this->set($field . '_distinct_count', $totalEntries);
         }

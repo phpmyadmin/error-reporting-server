@@ -519,7 +519,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$related_to\.$#'
 			identifier: property.notFound
-			count: 6
+			count: 4
 			path: src/Model/Table/ReportsTable.php
 
 		-

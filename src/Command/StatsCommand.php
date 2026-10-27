@@ -65,7 +65,7 @@ class StatsCommand extends Command
             foreach ($this->Incidents->summarizableFields as $field) {
                 $io->out('processing ' . $filter_string . ':' . $field);
                 $entriesWithCount = $this->Reports->
-                        getRelatedByField($field, 25, false, false, $filter['limit']);
+                        getRelatedByField($field, 25, false, null, $filter['limit']);
                 $entriesWithCount = json_encode($entriesWithCount);
                 Cache::write($field . '_' . $filter_string, $entriesWithCount);
             }

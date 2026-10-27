@@ -37,8 +37,7 @@ class ReportsTableTest extends TestCase
 
     public function testGetIncidents(): void
     {
-        $this->Reports->id = 4;
-        $incidents = $this->Reports->getIncidents();
+        $incidents = $this->Reports->getIncidents(4);
         $this->assertInstanceOf('Cake\ORM\Query', $incidents);
         $result = $incidents->enableHydration(false)->toArray();
         $this->assertEquals(count($result), 2);
@@ -50,8 +49,7 @@ class ReportsTableTest extends TestCase
 
     public function testGetRelatedReports(): void
     {
-        $this->Reports->id = 2;
-        $reports = $this->Reports->getRelatedReports()->all();
+        $reports = $this->Reports->getRelatedReports(2)->all();
         $this->assertEquals(count($reports), 0);
 
         $this->markTestIncomplete('Does not work anymore');
@@ -65,8 +63,7 @@ class ReportsTableTest extends TestCase
      */
     public function testGetIncidentsWithDescription(): void
     {
-        $this->Reports->id = 4;
-        $incidents = $this->Reports->getIncidentsWithDescription();
+        $incidents = $this->Reports->getIncidentsWithDescription(4);
         $this->assertInstanceOf('Cake\ORM\Query', $incidents);
         $result = $incidents->enableHydration(false)->toArray();
         $this->assertEquals(count($result), 1);
@@ -74,8 +71,7 @@ class ReportsTableTest extends TestCase
 
     public function testGetIncidentsWithDifferentStacktrace(): void
     {
-        $this->Reports->id = 4;
-        $incidents = $this->Reports->getIncidentsWithDifferentStacktrace();
+        $incidents = $this->Reports->getIncidentsWithDifferentStacktrace(4);
         $this->assertInstanceOf('Cake\ORM\Query', $incidents);
         $result = $incidents->enableHydration(false)->toArray();
         $this->assertEquals(count($result), 1);
@@ -110,8 +106,7 @@ class ReportsTableTest extends TestCase
      */
     public function testGetRelatedByField(): void
     {
-        $this->Reports->id = 1;
-        $result = $this->Reports->getRelatedByField('php_version');
+        $result = $this->Reports->getRelatedByField('php_version', 10, false, 1);
         $this->assertInstanceOf(Query::class, $result);
         $result = $result->enableHydration(false)->toArray();
         $expected = [
@@ -121,8 +116,7 @@ class ReportsTableTest extends TestCase
             ],
         ];
         $this->assertEquals($expected, $result);
-        $this->Reports->id = 4;
-        $result = $this->Reports->getRelatedByField('php_version', 1);
+        $result = $this->Reports->getRelatedByField('php_version', 1, false, 4);
         $this->assertInstanceOf(Query::class, $result);
         $result = $result->enableHydration(false)->toArray();
         $expected = [
@@ -132,12 +126,11 @@ class ReportsTableTest extends TestCase
             ],
         ];
         $this->assertEquals($expected, $result);
-        $this->Reports->id = 1;
         $result = $this->Reports->getRelatedByField(
             'php_version',
             10,
             false,
-            true,
+            1,
             '2013-08-29 18:10:01',
         );
         $this->assertInstanceOf(Query::class, $result);
@@ -150,7 +143,7 @@ class ReportsTableTest extends TestCase
         ];
         $this->assertEquals($expected, $result);
 
-        $result = $this->Reports->getRelatedByField('php_version', 10, false, false);
+        $result = $this->Reports->getRelatedByField('php_version', 10, false, null);
         $this->assertInstanceOf(Query::class, $result);
         $result = $result->enableHydration(false)->toArray();
         $expected = [
@@ -164,7 +157,7 @@ class ReportsTableTest extends TestCase
             ],
         ];
         $this->assertEquals($expected, $result);
-        $result = $this->Reports->getRelatedByField('php_version', 10, true);
+        $result = $this->Reports->getRelatedByField('php_version', 10, true, 1);
         $this->assertInstanceOf(ResultSet::class, $result[0]);
         $result[0] = $result[0]->toArray();
         $result[0][0] = $result[0][0]->toArray();

@@ -62,7 +62,7 @@ class StatsController extends AppController
             $entriesWithCount = Cache::read($field . '_' . $filter_string);
             if ($entriesWithCount === null) {
                 $entriesWithCount = TableRegistry::getTableLocator()->get('Reports')->
-                        getRelatedByField($field, 25, false, false, $filter['limit']);
+                        getRelatedByField($field, 25, false, null, $filter['limit']);
                 $entriesWithCount = json_encode($entriesWithCount);
                 Cache::write($field . '_' . $filter_string, $entriesWithCount);
             }

@@ -151,8 +151,7 @@ class IncidentsControllerTest extends TestCase
             'all',
             order: ['Reports.created desc'],
         )->all()->first();
-        $this->Reports->id = $report['id'];
-        $incidents = $this->Reports->getIncidents();
+        $incidents = $this->Reports->getIncidents($report['id']);
         $incidents = $incidents->enableHydration(false)->toArray();
         $this->assertEquals(2, count($incidents));
         $this->assertEquals(
