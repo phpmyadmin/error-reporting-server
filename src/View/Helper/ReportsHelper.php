@@ -125,7 +125,7 @@ class ReportsHelper extends AppHelper
         return 'var ' . $arrayName . ' = '
             . json_encode(
                 $finalData,
-                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
             ) . ';';
     }
 
@@ -140,7 +140,7 @@ class ReportsHelper extends AppHelper
         return 'var ' . $arrayName . ' = '
         . json_encode(
             $data,
-            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
         ) . ';';
     }
 }

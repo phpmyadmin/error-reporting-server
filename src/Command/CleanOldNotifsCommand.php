@@ -64,21 +64,21 @@ class CleanOldNotifsCommand extends Command
             Log::write(
                 'info',
                 'No notifications found for deleting!',
-                'cron_jobs'
+                'cron_jobs',
             );
         } elseif ($this->Notifications->deleteAll($conditions)) {
             // Try deleting the matched records
             Log::write(
                 'info',
                 'Old notifications deleted successfully!',
-                'cron_jobs'
+                'cron_jobs',
             );
         } else {
             // If NOT successful, print out an error message
             Log::write(
                 'error',
                 'Deleting old notifications failed!',
-                'cron_jobs'
+                'cron_jobs',
             );
         }
     }

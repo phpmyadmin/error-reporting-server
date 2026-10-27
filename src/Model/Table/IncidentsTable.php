@@ -46,21 +46,17 @@ use function time;
 class IncidentsTable extends Table
 {
     /**
-     * @var array
-     *
      * @see http://book.cakephp.org/2.0/en/models/behaviors.html#using-behaviors
      * @see Model::$actsAs
      */
-    public $actsAs = ['Summarizable'];
+    public array $actsAs = ['Summarizable'];
 
     /**
-     * @var array
-     *
      * @see http://book.cakephp.org/2.0/en/models/model-attributes.html#validate
      * @see http://book.cakephp.org/2.0/en/models/data-validation.html
      * @see Model::$validate
      */
-    public $validate = [
+    public array $validate = [
         'pma_version' => [
             'rule' => 'notEmpty',
             'required' => true,
@@ -117,10 +113,8 @@ class IncidentsTable extends Table
     /**
      * The fields which are summarized in the report page with charts and are also
      * used in the overall stats and charts for the website.
-     *
-     * @var array
      */
-    public $summarizableFields = [
+    public array $summarizableFields = [
         'browser',
         'pma_version',
         'php_version',
@@ -132,7 +126,7 @@ class IncidentsTable extends Table
     ];
 
     /** @var array[] */
-    public $filterTimes = [];
+    public array $filterTimes = [];
 
     public function __construct(array $data)
     {
@@ -182,7 +176,7 @@ class IncidentsTable extends Table
      *          2. array of newly created report ids. If no new report was created,
      *               an empty array is returned
      */
-    public function createIncidentFromBugReport(?array $bugReport): array
+    public function createIncidentFromBugReport(array|null $bugReport): array
     {
         if ($bugReport === null) {
             return [
@@ -256,7 +250,7 @@ class IncidentsTable extends Table
                             'error',
                             'ERRORED: Notification::addNotifications() failed on Report#'
                                 . $tmpIncident['report_id'],
-                            'alert'
+                            'alert',
                         );
                     }
                 }
@@ -283,7 +277,7 @@ class IncidentsTable extends Table
      *
      * @return Entity|null the first similar report or null
      */
-    protected function getClosestReport(array $bugReport, int $index = 0): ?Entity
+    protected function getClosestReport(array $bugReport, int $index = 0): Entity|null
     {
         if (isset($bugReport['exception_type']) && $bugReport['exception_type'] === 'php') {
             $location = $bugReport['errors'][$index]['file'];
@@ -296,7 +290,7 @@ class IncidentsTable extends Table
         return TableRegistry::getTableLocator()->get('Reports')->findByLocationAndLinenumberAndPmaVersion(
             $location,
             $linenumber,
-            self::getStrippedPmaVersion($bugReport['pma_version'])
+            self::getStrippedPmaVersion($bugReport['pma_version']),
         )->all()->first();
     }
 
@@ -339,7 +333,7 @@ class IncidentsTable extends Table
                 'linenumber' => $linenumber ?? 0,
                 'pma_version' => self::getStrippedPmaVersion($bugReport['pma_version']),
                 'exception_type' => $exception_type,
-            ]
+            ],
         );
 
         return $reportDetails;
@@ -381,7 +375,7 @@ class IncidentsTable extends Table
                         'stacktrace' => json_encode($error['stackTrace'] ?? []),
                         'stackhash' => $error['stackhash'],
                         'exception_type' => 1, // 'php'
-                    ]
+                    ],
                 );
                 array_push($schematizedReports, $tmpReport);
             }
@@ -400,7 +394,7 @@ class IncidentsTable extends Table
                     'stacktrace' => json_encode($exception['stack'] ?? []),
                     'stackhash' => self::getStackHash($exception['stack'] ?? []),
                     'exception_type' => 0, //'js'
-                ]
+                ],
             );
 
             if (isset($bugReport['steps'])) {
@@ -499,7 +493,7 @@ class IncidentsTable extends Table
         $result = preg_match(
             '/^(\d+\.){' . ($versionLength - 1) . '}\d+/',
             $versionString,
-            $matches
+            $matches,
         );
         if ($result) {
             return $matches[0];
@@ -549,7 +543,7 @@ class IncidentsTable extends Table
                 '/(apache\/\d+\.\d+)|(nginx\/\d+\.\d+)|(iis\/\d+\.\d+)'
                 . '|(lighttpd\/\d+\.\d+)/i',
                 $signature,
-                $matches
+                $matches,
             )
         ) {
             return $matches[0];
@@ -612,7 +606,7 @@ class IncidentsTable extends Table
             'Too long data submitted in the incident. The length of stacktrace: '
             . $stacktraceLength . ', the length of bug report: '
             . $fullReportLength . '. The full incident reported was as follows: '
-            . json_encode($si)
+            . json_encode($si),
         );
 
         // add a 'false' to the return array

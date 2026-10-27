@@ -28,7 +28,7 @@ class CsrfProtectionMiddleware extends CakeCsrfProtectionMiddleware
 
         return parent::process(
             request: $request,
-            handler: $handler
+            handler: $handler,
         );
     }
 }

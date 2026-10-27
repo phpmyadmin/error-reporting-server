@@ -52,7 +52,7 @@ class ReportsControllerTest extends TestCase
                 'error1',
                 'error2',
             ],
-            $this->viewVariable('distinct_error_names')
+            $this->viewVariable('distinct_error_names'),
         );
     }
 
@@ -71,7 +71,7 @@ class ReportsControllerTest extends TestCase
         $this->assertNotEmpty($this->viewVariable('related_entries'));
         $this->assertEquals(
             count($this->viewVariable('columns')),
-            count($this->viewVariable('related_entries'))
+            count($this->viewVariable('related_entries')),
         );
 
         foreach ($this->viewVariable('columns') as $column) {
@@ -231,7 +231,7 @@ class ReportsControllerTest extends TestCase
 
         $this->post(
             '/reports/mark_related_to/2',
-            ['related_to' => 4]
+            ['related_to' => 4],
         );
         $this->assertResponseCode(302);
 
@@ -275,7 +275,7 @@ class ReportsControllerTest extends TestCase
                     '5',
                 ],
                 'state' => 'incorrect_state',
-            ]
+            ],
         );
         $this->assertResponseCode(302);
 
@@ -292,7 +292,7 @@ class ReportsControllerTest extends TestCase
             [
                 'reports' => [],
                 'state' => 'resolved',
-            ]
+            ],
         );
         $this->assertResponseCode(302);
 
@@ -309,7 +309,7 @@ class ReportsControllerTest extends TestCase
             [
                 'reports' => [10],
                 'state' => 'resolved',
-            ]
+            ],
         );
         $this->assertResponseCode(404);
 
@@ -322,7 +322,7 @@ class ReportsControllerTest extends TestCase
                     5,
                 ],
                 'state' => 'resolved',
-            ]
+            ],
         );
         $this->assertResponseCode(302);
 
@@ -347,14 +347,14 @@ class ReportsControllerTest extends TestCase
         /* Test case 1: Incorrect Report ID */
         $this->post(
             '/reports/change_state/6',
-            ['state' => 'resolved']
+            ['state' => 'resolved'],
         );
         $this->assertResponseCode(404);
 
         /* Test case 2: Incorrect State */
         $this->post(
             '/reports/change_state/1',
-            ['state' => 'incorrect_state']
+            ['state' => 'incorrect_state'],
         );
         $this->assertResponseCode(404);
         $report = $this->Reports->get(1);
@@ -363,7 +363,7 @@ class ReportsControllerTest extends TestCase
         /* Test case 3 */
         $this->post(
             '/reports/change_state/1',
-            ['state' => 'resolved']
+            ['state' => 'resolved'],
         );
         $this->assertResponseCode(302);
         $report = $this->Reports->get(1);

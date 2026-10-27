@@ -25,7 +25,7 @@
     <?= $this->Reports->getChartArray(
         'chartArray',
         $columns,
-        $related_entries
+        $related_entries,
     ) . "\n";
 ?>
     <?= $this->Reports->getLineChartData('linechart_data', $download_stats); ?>

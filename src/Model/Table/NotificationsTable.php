@@ -36,10 +36,8 @@ class NotificationsTable extends Table
 {
     /**
      * Validation rules.
-     *
-     * @var array
      */
-    public $validate = [
+    public array $validate = [
         'developer_id' => [
             'numeric' => [
                 'rule' => ['numeric'],

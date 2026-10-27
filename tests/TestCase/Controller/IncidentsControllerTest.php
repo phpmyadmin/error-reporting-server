@@ -56,10 +56,10 @@ class IncidentsControllerTest extends TestCase
 
         $this->assertNotEmpty($this->viewVariable('incident'));
         $this->assertIsArray(
-            $this->viewVariable('incident')['stacktrace']
+            $this->viewVariable('incident')['stacktrace'],
         );
         $this->assertIsArray(
-            $this->viewVariable('incident')['full_report']
+            $this->viewVariable('incident')['full_report'],
         );
     }
 
@@ -122,7 +122,7 @@ class IncidentsControllerTest extends TestCase
 
         $report = $this->Reports->find(
             'all',
-            order: ['Reports.created desc']
+            order: ['Reports.created desc'],
         )->first();
         $this->assertNotNull($report, 'The report should be created !');
 
@@ -149,7 +149,7 @@ class IncidentsControllerTest extends TestCase
 
         $report = $this->Reports->find(
             'all',
-            order: ['Reports.created desc']
+            order: ['Reports.created desc'],
         )->all()->first();
         $this->Reports->id = $report['id'];
         $incidents = $this->Reports->getIncidents();
@@ -157,15 +157,15 @@ class IncidentsControllerTest extends TestCase
         $this->assertEquals(2, count($incidents));
         $this->assertEquals(
             $bugReportDecoded['exception']['message'],
-            $report['error_message']
+            $report['error_message'],
         );
         $this->assertEquals(
             $bugReportDecoded['exception']['name'],
-            $report['error_name']
+            $report['error_name'],
         );
         $this->assertEquals(
             IncidentsTable::getStrippedPmaVersion($bugReportDecoded['pma_version']),
-            $report['pma_version']
+            $report['pma_version'],
         );
     }
 
@@ -195,7 +195,7 @@ class IncidentsControllerTest extends TestCase
 
         $report = $this->Reports->find(
             'all',
-            order: ['Reports.created desc']
+            order: ['Reports.created desc'],
         )->all()->first();
         $subject = 'A new report has been submitted '
             . 'on the Error Reporting Server: '
@@ -221,7 +221,7 @@ class IncidentsControllerTest extends TestCase
 
         $report = $this->Reports->find(
             'all',
-            order: ['Reports.created desc']
+            order: ['Reports.created desc'],
         )->all()->first();
         $subject = 'A new report has been submitted '
             . 'on the Error Reporting Server: '

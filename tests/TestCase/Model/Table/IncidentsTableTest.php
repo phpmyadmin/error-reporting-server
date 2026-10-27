@@ -81,25 +81,25 @@ class IncidentsTableTest extends TestCase
 
         $result = $method->invoke(
             $this->Incidents,
-            'some random/data Apache/2.1.7;other.random/data'
+            'some random/data Apache/2.1.7;other.random/data',
         );
         $this->assertEquals('Apache/2.1', $result);
 
         $result = $method->invoke(
             $this->Incidents,
-            'some random/data Nginx/1.0.7;other.random/data'
+            'some random/data Nginx/1.0.7;other.random/data',
         );
         $this->assertEquals('Nginx/1.0', $result);
 
         $result = $method->invoke(
             $this->Incidents,
-            'some random/data Lighttpd/4.6.7;other.random/data'
+            'some random/data Lighttpd/4.6.7;other.random/data',
         );
         $this->assertEquals('Lighttpd/4.6', $result);
 
         $result = $method->invoke(
             $this->Incidents,
-            'some random/data DoesNotExist/3.5;other.random/data'
+            'some random/data DoesNotExist/3.5;other.random/data',
         );
         $this->assertEquals('UNKNOWN', $result);
     }
@@ -112,35 +112,35 @@ class IncidentsTableTest extends TestCase
         $result = $method->invoke(
             $this->Incidents,
             '15.3.12.17',
-            1
+            1,
         );
         $this->assertEquals('15', $result);
 
         $result = $method->invoke(
             $this->Incidents,
             '15.3.12.17',
-            2
+            2,
         );
         $this->assertEquals('15.3', $result);
 
         $result = $method->invoke(
             $this->Incidents,
             '15.3.12.17',
-            3
+            3,
         );
         $this->assertEquals('15.3.12', $result);
 
         $result = $method->invoke(
             $this->Incidents,
             '15.3.12.17',
-            'wrong argument'
+            'wrong argument',
         );
         $this->assertEquals('15', $result);
 
         $result = $method->invoke(
             $this->Incidents,
             '15.3.12.17',
-            -1
+            -1,
         );
         $this->assertEquals('15', $result);
     }
@@ -185,40 +185,40 @@ class IncidentsTableTest extends TestCase
 
         $result = $method->invoke(
             $this->Incidents,
-            $stacktrace_script
+            $stacktrace_script,
         );
         $this->assertEquals(['script1', 300], $result);
 
         $result = $method->invoke(
             $this->Incidents,
-            $stacktrace
+            $stacktrace,
         );
         $this->assertEquals(['file1', 300], $result);
 
         $stacktrace[0]['filename'] = 'tracekit/tracekit.js';
         $result = $method->invoke(
             $this->Incidents,
-            $stacktrace
+            $stacktrace,
         );
         $this->assertEquals(['file2', 200], $result);
 
         $stacktrace[0]['filename'] = 'error_report.js';
         $result = $method->invoke(
             $this->Incidents,
-            $stacktrace
+            $stacktrace,
         );
         $this->assertEquals(['file2', 200], $result);
 
         $stacktrace[1] = null;
         $result = $method->invoke(
             $this->Incidents,
-            $stacktrace
+            $stacktrace,
         );
         $this->assertEquals(['error_report.js', 300], $result);
 
         $result = $method->invoke(
             $this->Incidents,
-            $stacktrace_uri
+            $stacktrace_uri,
         );
         $this->assertEquals(['file2', 200], $result);
     }
@@ -234,7 +234,7 @@ class IncidentsTableTest extends TestCase
 
         $result = $method->invoke(
             $this->Incidents,
-            $bugReport
+            $bugReport,
         );
 
         $expected = [
@@ -265,7 +265,7 @@ class IncidentsTableTest extends TestCase
 
         $result = $method->invoke(
             $this->Incidents,
-            $bugReport
+            $bugReport,
         );
 
         $expected = [
@@ -333,7 +333,7 @@ class IncidentsTableTest extends TestCase
 
         $result = $method->invoke(
             $this->Incidents,
-            $bugReport
+            $bugReport,
         );
 
         $expected = [
@@ -355,7 +355,7 @@ class IncidentsTableTest extends TestCase
         $result = $method->invoke(
             $this->Incidents,
             $bugReport,
-            1
+            1,
         );
 
         $expected = [
@@ -382,7 +382,7 @@ class IncidentsTableTest extends TestCase
 
         $result = $method->invoke(
             $this->Incidents,
-            $bugReport
+            $bugReport,
         );
 
         $this->assertEquals($returnedReport, $result);

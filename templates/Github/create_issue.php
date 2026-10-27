@@ -8,7 +8,7 @@
             'between' => '<div class="controls">',
             'after' => '</div>',
             'class' => 'form-horizontal',
-        ]
+        ],
     );
 ?>
     <fieldset>
@@ -19,7 +19,7 @@
                 [
                     'placeholder' => 'Summary',
                     'value' => $error_name,
-                ]
+                ],
             );
         ?>
         <?=
@@ -29,7 +29,7 @@
                     'placeholder' => 'Description',
                     'rows' => 10,
                     'value' => $error_message,
-                ]
+                ],
             );
         ?>
         <?= $this->Form->input('labels', ['placeholder' => 'Labels']); ?>

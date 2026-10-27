@@ -123,7 +123,7 @@ class NotificationsController extends AppController
             'all',
             conditions: [
                 'developer_id' => $current_developer['id'],
-            ]
+            ],
         )->count();
 
         // Make the display rows array
@@ -138,7 +138,7 @@ class NotificationsController extends AppController
                     [
                         '_name' => 'reports:view',
                         'id' => $row->get('report_id'),
-                    ]
+                    ],
                 )
                 . '">'
                 . $row->get('report_id')
@@ -184,7 +184,7 @@ class NotificationsController extends AppController
         if ($this->request->getData('mark_all')) {
             // Delete all notifications for this Developer
             $this->Notifications->deleteAll(
-                ['developer_id' => $this->request->getSession()->read('Developer.id')]
+                ['developer_id' => $this->request->getSession()->read('Developer.id')],
             );
 
             $msg = 'All your notifications have been marked \'Read\'';
@@ -202,7 +202,7 @@ class NotificationsController extends AppController
 
         $this->Flash->set(
             $msg,
-            ['params' => ['class' => $flash_class]]
+            ['params' => ['class' => $flash_class]],
         );
 
         return $this->redirect('/notifications/');

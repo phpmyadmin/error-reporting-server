@@ -32,23 +32,19 @@ class ReportsTable extends Table
     public int $id;
 
     /**
-     * @var array
-     *
      * @see http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html#hasmany
      * @see Cake::Model::$hasMany
      */
-    public $hasMany = [
+    public array $hasMany = [
         'Incidents' => ['dependant' => true],
     ];
 
     /**
-     * @var array
-     *
      * @see http://book.cakephp.org/2.0/en/models/model-attributes.html#validate
      * @see http://book.cakephp.org/2.0/en/models/data-validation.html
      * @see Model::$validate
      */
-    public $validate = [
+    public array $validate = [
         'error_message' => [
             'rule' => 'notEmpty',
             'required' => true,
@@ -58,21 +54,17 @@ class ReportsTable extends Table
     /**
      * List of valid finder method options, supplied as the first parameter to find().
      *
-     * @var array
-     *
      * @see Model::$findMethods
      */
-    public $findMethods = [
+    public array $findMethods = [
         'allDataTable' => true,
         'arrayList' => true,
     ];
 
     /**
      * List of valid finder method options, supplied as the first parameter to find().
-     *
-     * @var array
      */
-    public $status = [
+    public array $status = [
         'new' => 'New',
         'invalid' => 'Invalid',
         'resolved' => 'Resolved',
@@ -95,7 +87,7 @@ class ReportsTable extends Table
             'all',
             limit: 50,
             conditions: $this->relatedIncidentsConditions(),
-            order: 'Incidents.created desc'
+            order: 'Incidents.created desc',
         );
     }
 
@@ -123,7 +115,7 @@ class ReportsTable extends Table
                 'NOT' => ['Incidents.steps is null'],
                 $this->relatedIncidentsConditions(),
             ],
-            order: 'Incidents.steps desc'
+            order: 'Incidents.steps desc',
         );
     }
 
@@ -144,7 +136,7 @@ class ReportsTable extends Table
                 'Incidents.exception_type',
             ],
             conditions: $this->relatedIncidentsConditions(),
-            group: 'Incidents.stackhash'
+            group: 'Incidents.stackhash',
         )->distinct(['Incidents.stackhash']);
     }
 
@@ -163,14 +155,14 @@ class ReportsTable extends Table
         if ($rel_report instanceof EntityInterface) {
             $this->updateAll(
                 ['related_to' => $rel_report->get('id')],
-                ['related_to' => $report->get('id')]
+                ['related_to' => $report->get('id')],
             );
         }
 
         // remove all redundant self-groupings
         $this->updateAll(
             ['related_to' => null],
-            ['reports.related_to = reports.id']
+            ['reports.related_to = reports.id'],
         );
     }
 
@@ -216,7 +208,7 @@ class ReportsTable extends Table
         int $limit = 10,
         bool $count = false,
         bool $related = true,
-        ?string $timeLimit = null
+        string|null $timeLimit = null,
     ) {
         $fieldAlias = 'Incidents__' . $fieldName;
         $queryDetails = [

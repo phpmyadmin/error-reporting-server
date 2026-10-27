@@ -80,7 +80,7 @@ class AuthenticationMiddleware implements MiddlewareInterface
                     . 'repository on Github.com to do this action (' . $controllerName . ':' . $action . ')',
                     [
                         'params' => ['class' => $flash_class],
-                    ]
+                    ],
                 );
 
                 // This is a security check
@@ -92,7 +92,7 @@ class AuthenticationMiddleware implements MiddlewareInterface
                 $flash_class = 'alert';
                 $request->getFlash()->set(
                     'You need to be signed in to do this action (' . $controllerName . ':' . $action . ')',
-                    ['params' => ['class' => $flash_class]]
+                    ['params' => ['class' => $flash_class]],
                 );
 
                 // save the return url

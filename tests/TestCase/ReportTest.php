@@ -16,14 +16,14 @@ class ReportTest extends TestCase
         parent::setUp();
 
         Security::setSalt(
-            'Ue%n8*v*QPejgq*v2^k5JSEMXx9Cer*jConpbjp&&vGK89jGRVBnyWaPBhY5s$87'
+            'Ue%n8*v*QPejgq*v2^k5JSEMXx9Cer*jConpbjp&&vGK89jGRVBnyWaPBhY5s$87',
         );
     }
 
     public function testReportFromObject(): void
     {
         $contents = file_get_contents(
-            __DIR__ . '/../Fixture/report_js.json'
+            __DIR__ . '/../Fixture/report_js.json',
         );
         $obj = json_decode($contents);
         $report1 = Report::fromObject($obj);
@@ -35,7 +35,7 @@ class ReportTest extends TestCase
     public function testUserId(): void
     {
         $contents = file_get_contents(
-            __DIR__ . '/../Fixture/report_issue_16853_js.json'
+            __DIR__ . '/../Fixture/report_issue_16853_js.json',
         );
         $report = Report::fromString($contents);
 
@@ -56,12 +56,12 @@ class ReportTest extends TestCase
                 'ip_address' => '0.0.0.0',
                 'id' => '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
             ],
-            $report->getUser()
+            $report->getUser(),
         );
 
         $this->assertSame(
             '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
-            $report->getUserId()
+            $report->getUserId(),
         );
 
         $oldForwardedValue = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
@@ -73,7 +73,7 @@ class ReportTest extends TestCase
                 'ip_address' => '0.0.0.0',
                 'id' => '747901a7736cb599fefec3b52bb939a511fb7662a66ba30e6049b128f2114cec',
             ],
-            $report->getUser()
+            $report->getUser(),
         );
         $_SERVER['HTTP_X_FORWARDED_FOR'] = $oldForwardedValue;
         $this->assertEquals(
@@ -81,10 +81,10 @@ class ReportTest extends TestCase
                 'ip_address' => '0.0.0.0',
                 'id' => '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
             ],
-            $report->getUser()
+            $report->getUser(),
         );
         Security::setSalt(
-            'N8KB3iKch@xT4nP$WcPoF!9fwxtT7pNY5Hm4*Ld6G^Ux3tQ57iJzPYumu@jXVzue'
+            'N8KB3iKch@xT4nP$WcPoF!9fwxtT7pNY5Hm4*Ld6G^Ux3tQ57iJzPYumu@jXVzue',
         );
 
         $this->assertEquals(
@@ -92,14 +92,14 @@ class ReportTest extends TestCase
                 'ip_address' => '0.0.0.0',
                 'id' => '883a06cb74b037abf70b14ddd6f5518b04c10031648b9af72bc24ddb97fbfd52',
             ],
-            $report->getUser()
+            $report->getUser(),
         );
     }
 
     public function testReportRoutingSystem(): void
     {
         $contents = file_get_contents(
-            __DIR__ . '/../Fixture/report_issue_16853_js.json'
+            __DIR__ . '/../Fixture/report_issue_16853_js.json',
         );
         $report = Report::fromString($contents);
 
@@ -135,7 +135,7 @@ class ReportTest extends TestCase
                 'ip_address' => '0.0.0.0',
                 'id' => '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
             ],
-            $user
+            $user,
         );
         $this->assertFalse($report->isMultiReports());
         $this->assertFalse($report->hasUserFeedback());
@@ -186,7 +186,7 @@ class ReportTest extends TestCase
     public function testReportFromString(): void
     {
         $contents = file_get_contents(
-            __DIR__ . '/../Fixture/report_js.json'
+            __DIR__ . '/../Fixture/report_js.json',
         );
         $report = Report::fromString($contents);
 
@@ -222,7 +222,7 @@ class ReportTest extends TestCase
                 'ip_address' => '0.0.0.0',
                 'id' => '90244836bc888d4b4bb8449010dba862ebc5a8905a79da8269b4e76d08831226',
             ],
-            $user
+            $user,
         );
         $this->assertFalse($report->isMultiReports());
         $this->assertTrue($report->hasUserFeedback());

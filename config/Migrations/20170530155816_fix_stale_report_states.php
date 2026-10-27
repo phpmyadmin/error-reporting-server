@@ -25,7 +25,7 @@ class FixStaleReportStates extends BaseMigration
         Log::debug(
             $rowsAffected . ' reports are linked to a'
                 . ' Github issue.'
-                . ' These have been marked to have a \'forwarded\' status.'
+                . ' These have been marked to have a \'forwarded\' status.',
         );
     }
 
@@ -46,7 +46,7 @@ class FixStaleReportStates extends BaseMigration
 
             Log::debug(
                 $rowsAffected . ' reports with \'' . $oldStatus . '\''
-                    . ' were mapped to \'' . $newStatus . '\'.'
+                    . ' were mapped to \'' . $newStatus . '\'.',
             );
         }
     }
@@ -72,7 +72,7 @@ class FixStaleReportStates extends BaseMigration
 
         Log::debug(
             $rowsAffected . ' duplicate reports were mapped to '
-                . ' same status as their ' . $origCount . ' original reports'
+                . ' same status as their ' . $origCount . ' original reports',
         );
     }
 }

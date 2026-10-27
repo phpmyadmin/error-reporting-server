@@ -97,7 +97,7 @@ class GithubControllerTest extends TestCase
                 'milestone' => '3.8',
                 'description' => 'Lorem ipsum dolor sit amet',
                 'labels' => 'test-pma',
-            ]
+            ],
         );
         $this->assertResponseCode(200);
         $this->cleanupMockResponses();
@@ -109,7 +109,7 @@ class GithubControllerTest extends TestCase
         $this->assertSession(
             'Unauthorised access to Github. github credentials may be out of date.'
             . ' Please check and try again later.',
-            'Flash.flash.0.message'
+            'Flash.flash.0.message',
         );
 
         $this->mockClientPost(
@@ -124,7 +124,7 @@ class GithubControllerTest extends TestCase
                 'milestone' => '3.8',
                 'description' => 'Lorem ipsum dolor sit amet',
                 'labels' => 'test-pma',
-            ]
+            ],
         );
         $this->assertResponseCode(302);
 
@@ -166,7 +166,7 @@ class GithubControllerTest extends TestCase
 
         // Case 2. Test submission of form with unsuccessful github response
         $this->get(
-            'github/link_issue/5?ticket_id=9999999'
+            'github/link_issue/5?ticket_id=9999999',
         );
         $this->assertResponseCode(302);
 
@@ -177,7 +177,7 @@ class GithubControllerTest extends TestCase
         $this->assertSession(
             'Bug Issue not found on Github. Are you sure the issue number is correct? '
             . 'Please check and try again!',
-            'Flash.flash.0.message'
+            'Flash.flash.0.message',
         );
         $this->cleanupMockResponses();
 
@@ -191,7 +191,7 @@ class GithubControllerTest extends TestCase
         );
         // Case 3. Test submission of form with successful Github response (with issue open)
         $this->get(
-            'github/link_issue/5?ticket_id=1387'
+            'github/link_issue/5?ticket_id=1387',
         );
         $this->assertResponseCode(302);
 
@@ -210,7 +210,7 @@ class GithubControllerTest extends TestCase
         );
         // Case 4. Test submission of form with successful Github response (with issue closed)
         $this->get(
-            'github/link_issue/5?ticket_id=1387'
+            'github/link_issue/5?ticket_id=1387',
         );
         $this->assertResponseCode(302);
 
@@ -251,7 +251,7 @@ class GithubControllerTest extends TestCase
         );
         // Case 2. Test submission of form with unsuccessful and unexpected github response
         $this->get(
-            'github/unlink_issue/5'
+            'github/unlink_issue/5',
         );
         $this->assertResponseCode(302);
 
@@ -261,7 +261,7 @@ class GithubControllerTest extends TestCase
         $this->assertEquals('forwarded', $report->status);
         $this->assertSession(
             'Unhandled response code received: 401',
-            'Flash.flash.0.message'
+            'Flash.flash.0.message',
         );
         $this->cleanupMockResponses();
 
@@ -271,7 +271,7 @@ class GithubControllerTest extends TestCase
         );
         // Case 3. Test submission of form with successful Github response
         $this->get(
-            'github/unlink_issue/5'
+            'github/unlink_issue/5',
         );
         $this->assertResponseCode(302);
 

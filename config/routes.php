@@ -65,7 +65,7 @@ return static function (RouteBuilder $routes): void {
     $routes->connect(
         '/reports/view/{id}',
         ['controller' => 'Reports', 'action' => 'view'],
-        ['_name' => 'reports:view']
+        ['_name' => 'reports:view'],
     )
             ->setPass(['id', 'reportId'])
             ->setPatterns([
@@ -74,13 +74,13 @@ return static function (RouteBuilder $routes): void {
 
     $routes->connect(
         '/github/sync_issue_status',
-        ['controller' => 'Github', 'action' => 'sync_issue_status']
+        ['controller' => 'Github', 'action' => 'sync_issue_status'],
     );
 
     $routes->connect(
         '/github/create_issue/{id}',
         ['controller' => 'Github', 'action' => 'create_issue'],
-        ['_name' => 'github:create_issue']
+        ['_name' => 'github:create_issue'],
     )
             ->setPass(['id', 'reportId'])
             ->setPatterns([
@@ -90,7 +90,7 @@ return static function (RouteBuilder $routes): void {
     $routes->connect(
         '/github/unlink_issue/{id}',
         ['controller' => 'Github', 'action' => 'unlink_issue'],
-        ['_name' => 'github:unlink_issue']
+        ['_name' => 'github:unlink_issue'],
     )
             ->setPass(['id', 'reportId'])
             ->setPatterns([
@@ -100,7 +100,7 @@ return static function (RouteBuilder $routes): void {
     $routes->connect(
         '/github/link_issue/{id}',
         ['controller' => 'Github', 'action' => 'link_issue'],
-        ['_name' => 'github:link_issue']
+        ['_name' => 'github:link_issue'],
     )
             ->setPass(['id', 'reportId'])
             ->setPatterns([

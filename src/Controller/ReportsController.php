@@ -74,34 +74,34 @@ class ReportsController extends AppController
             'distinct_statuses',
             $this->findArrayList(
                 $this->Reports->find()->select(['status'])->distinct(['status']),
-                'status'
-            )
+                'status',
+            ),
         );
         $this->set(
             'distinct_locations',
             $this->findArrayList(
                 $this->Reports->find()->select(['location'])
                     ->distinct(['location']),
-                'location'
-            )
+                'location',
+            ),
         );
         $this->set(
             'distinct_versions',
-            $this->findArrayList($this->Reports->find()->select(['pma_version'])->distinct(['pma_version']), 'pma_version')
+            $this->findArrayList($this->Reports->find()->select(['pma_version'])->distinct(['pma_version']), 'pma_version'),
         );
         $this->set(
             'distinct_error_names',
             $this->findArrayList($this->Reports->find(
                 'all',
                 fields: ['error_name'],
-                conditions: ['error_name !=' => '']
-            )->distinct(['error_name']), 'error_name')
+                conditions: ['error_name !=' => ''],
+            )->distinct(['error_name']), 'error_name'),
         );
         $this->set('statuses', $this->Reports->status);
         $this->autoRender = true;
     }
 
-    public function view(?string $reportId): void
+    public function view(string|null $reportId): void
     {
         if (empty($reportId)) {
             throw new NotFoundException('Invalid report Id.');
@@ -120,11 +120,11 @@ class ReportsController extends AppController
         $this->set('incidents', $this->Reports->getIncidents()->toArray());
         $this->set(
             'incidents_with_description',
-            $this->Reports->getIncidentsWithDescription()
+            $this->Reports->getIncidentsWithDescription(),
         );
         $this->set(
             'incidents_with_stacktrace',
-            $this->Reports->getIncidentsWithDifferentStacktrace()
+            $this->Reports->getIncidentsWithDifferentStacktrace(),
         );
         $this->set('related_reports', $this->Reports->getRelatedReports()->all());
         $this->set('status', $this->Reports->status);
@@ -142,11 +142,11 @@ class ReportsController extends AppController
             [
                 'developer_id' => $current_developer['Developer']['id'],
                 'report_id' => $reportId,
-            ]
+            ],
         );
     }
 
-    public function data_tables(): ?Response
+    public function data_tables(): Response|null
     {
         $subquery_params = [
             'fields' => [
@@ -199,8 +199,8 @@ class ReportsController extends AppController
                 offset: $pagedParams['offset'],
             )->innerJoin(
                 ['incidents' => $subquery],
-                ['incidents.report_id = Reports.id']
-            )
+                ['incidents.report_id = Reports.id'],
+            ),
         );
         //$rows = Sanitize::clean($rows);
         $totalFiltered = $this->Reports->find(
@@ -241,7 +241,7 @@ class ReportsController extends AppController
                 conditions: $params_count['conditions'],
             )->innerJoin(
                 ['incidents' => $subquery_count],
-                ['incidents.report_id = Reports.related_to']
+                ['incidents.report_id = Reports.related_to'],
             )->count();
 
             $row[7] += $inci_count_related;
@@ -263,7 +263,7 @@ class ReportsController extends AppController
             ->withStringBody(json_encode($response));
     }
 
-    public function mark_related_to(?string $reportId): Response
+    public function mark_related_to(string|null $reportId): Response
     {
         // Only allow POST requests
         $this->request->allowMethod(['post']);
@@ -284,13 +284,13 @@ class ReportsController extends AppController
         $this->Flash->set(
             'This report has been marked the same as #'
                 . $relatedTo,
-            ['params' => ['class' => $flash_class]]
+            ['params' => ['class' => $flash_class]],
         );
 
         return $this->redirect('/reports/view/' . $reportId);
     }
 
-    public function unmark_related_to(?string $reportId): Response
+    public function unmark_related_to(string|null $reportId): Response
     {
         // Only allow POST requests
         $this->request->allowMethod(['post']);
@@ -309,13 +309,13 @@ class ReportsController extends AppController
         $flash_class = 'alert alert-success';
         $this->Flash->set(
             'This report has been marked as different.',
-            ['params' => ['class' => $flash_class]]
+            ['params' => ['class' => $flash_class]],
         );
 
         return $this->redirect('/reports/view/' . $reportId);
     }
 
-    public function change_state(?string $reportId): Response
+    public function change_state(string|null $reportId): Response
     {
         if (! $reportId) {
             throw new NotFoundException('Invalid Report');
@@ -343,7 +343,7 @@ class ReportsController extends AppController
         $flash_class = 'alert alert-success';
         $this->Flash->set(
             'The state has been successfully changed.',
-            ['params' => ['class' => $flash_class]]
+            ['params' => ['class' => $flash_class]],
         );
 
         return $this->redirect('/reports/view/' . $reportId);
@@ -368,7 +368,7 @@ class ReportsController extends AppController
             Log::write(
                 'error',
                 'ERRORED: Invalid param "state" in ReportsController::mass_action()',
-                'alert'
+                'alert',
             );
             $msg = 'ERROR: Invalid State!!';
         } elseif (count($this->request->getData('reports')) === 0) {
@@ -384,7 +384,7 @@ class ReportsController extends AppController
                     Log::write(
                         'error',
                         'ERRORED: Invalid report_id in ReportsController::mass_action()',
-                        'alert'
+                        'alert',
                     );
                     $msg = 'ERROR:Invalid Report ID:' . $report_id;
                     $flash_class = 'alert alert-error';
@@ -398,7 +398,7 @@ class ReportsController extends AppController
 
         $this->Flash->set(
             $msg,
-            ['params' => ['class' => $flash_class]]
+            ['params' => ['class' => $flash_class]],
         );
 
         return $this->redirect('/reports/');

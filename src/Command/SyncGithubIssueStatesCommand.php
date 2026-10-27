@@ -57,7 +57,7 @@ class SyncGithubIssueStatesCommand extends Command
                 . 'github/sync_issue_status'
                 . '" at '
                 . date('d-m-Y G:i:s (e)'),
-            ['scope' => 'cron_jobs']
+            ['scope' => 'cron_jobs'],
         );
 
         Configure::write('CronDispatcher', true);
@@ -84,7 +84,7 @@ class SyncGithubIssueStatesCommand extends Command
                     . 'github/sync_issue_status'
                     . '" at '
                     . date('d-m-Y G:i:s (e)'),
-                ['scope' => 'cron_jobs']
+                ['scope' => 'cron_jobs'],
             );
 
             return self::CODE_SUCCESS;
@@ -96,7 +96,7 @@ class SyncGithubIssueStatesCommand extends Command
                 . '" at '
                 . date('d-m-Y G:i:s (e)')
                 . ' response code: ' . $response->getStatusCode(),
-            ['scope' => 'cron_jobs']
+            ['scope' => 'cron_jobs'],
         );
 
         return self::CODE_ERROR;

@@ -50,7 +50,7 @@ class Initial extends BaseMigration
             ])
             ->addIndex(
                 ['github_id'],
-                ['unique' => true]
+                ['unique' => true],
             )
             ->create();
         $table = $this->table('incidents');
@@ -141,7 +141,7 @@ class Initial extends BaseMigration
                 'null' => true,
             ])
             ->addIndex(
-                ['created']
+                ['created'],
             )
             ->create();
         $table = $this->table('notifications');

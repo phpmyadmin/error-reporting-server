@@ -35,7 +35,7 @@ class DevelopersTable extends Table
      *
      * @return int|null The developer Id
      */
-    public function saveFromGithub(array $githubInfo, string $accessToken, EntityInterface $developer): ?int
+    public function saveFromGithub(array $githubInfo, string $accessToken, EntityInterface $developer): int|null
     {
         $developer->full_name = $githubInfo['name'];
         $developer->gravatar_id = $githubInfo['gravatar_id'];

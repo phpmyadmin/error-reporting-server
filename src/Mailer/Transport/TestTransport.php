@@ -31,7 +31,7 @@ class TestTransport extends AbstractTransport
                 'to',
                 'cc',
                 'subject',
-            ]
+            ],
         );
 
         $message = trim($message->getBodyString());

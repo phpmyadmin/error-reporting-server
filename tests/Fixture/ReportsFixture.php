@@ -10,10 +10,8 @@ class ReportsFixture extends TestFixture
 
     /**
      * Imports.
-     *
-     * @var array
      */
-    public $import = ['table' => 'reports'];
+    public array $import = ['table' => 'reports'];
 
     public array $records = [
         [

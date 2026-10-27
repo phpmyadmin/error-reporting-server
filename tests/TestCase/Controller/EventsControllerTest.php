@@ -66,8 +66,8 @@ class EventsControllerTest extends TestCase
                 [
                     'action' => 'closed',
                     'issue' => ['number' => 4],
-                ]
-            )
+                ],
+            ),
         );
         $this->assertResponseCode(401);
 
@@ -86,8 +86,8 @@ class EventsControllerTest extends TestCase
                 [
                     'action' => 'anything-invalid',
                     'issue' => ['number' => 4],
-                ]
-            )
+                ],
+            ),
         );
         $this->assertResponseCode(204);
 
@@ -106,8 +106,8 @@ class EventsControllerTest extends TestCase
                 [
                     'action' => 'closed',
                     'issue' => ['number' => 1234],
-                ]
-            )
+                ],
+            ),
         );
         $this->assertResponseCode(204);
 
@@ -131,8 +131,8 @@ class EventsControllerTest extends TestCase
                 [
                     'action' => 'opened',
                     'issue' => ['number' => 4],
-                ]
-            )
+                ],
+            ),
         );
         $this->assertResponseCode(201);
         $report = $this->Reports->get(4);
@@ -153,8 +153,8 @@ class EventsControllerTest extends TestCase
                 [
                     'action' => 'closed',
                     'issue' => ['number' => 4],
-                ]
-            )
+                ],
+            ),
         );
         $this->assertResponseCode(201);
         $report = $this->Reports->get(4);
@@ -180,8 +180,8 @@ class EventsControllerTest extends TestCase
                 [
                     'action' => 'reopened',
                     'issue' => ['number' => 4],
-                ]
-            )
+                ],
+            ),
         );
         $this->assertResponseCode(201);
         $report = $this->Reports->get(4);

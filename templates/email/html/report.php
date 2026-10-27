@@ -45,7 +45,7 @@ use Cake\Routing\Router;
                 $this->Reports->entriesFromIncidents(
                     $related_entries['pma_version'],
                     $pma_version_distinct_count,
-                    'pma_version'
+                    'pma_version',
                 );
                 ?>
         </td>
@@ -57,7 +57,7 @@ use Cake\Routing\Router;
                 $this->Reports->entriesFromIncidents(
                     $related_entries['php_version'],
                     $php_version_distinct_count,
-                    'php_version'
+                    'php_version',
                 );
                 ?>
         </td>
@@ -69,7 +69,7 @@ use Cake\Routing\Router;
                 $this->Reports->entriesFromIncidents(
                     $related_entries['browser'],
                     $browser_distinct_count,
-                    'browser'
+                    'browser',
                 );
                 ?>
         </td>
@@ -91,7 +91,7 @@ use Cake\Routing\Router;
                     $this->Reports->entriesFromIncidents(
                         $related_entries['script_name'],
                         $script_name_distinct_count,
-                        'script_name'
+                        'script_name',
                     );
                 ?>
             </td>
@@ -104,7 +104,7 @@ use Cake\Routing\Router;
                 $this->Reports->entriesFromIncidents(
                     $related_entries['configuration_storage'],
                     $configuration_storage_distinct_count,
-                    'configuration_storage'
+                    'configuration_storage',
                 );
                 ?>
         </td>
@@ -116,7 +116,7 @@ use Cake\Routing\Router;
                 $this->Reports->entriesFromIncidents(
                     $related_entries['server_software'],
                     $server_software_distinct_count,
-                    'server_software'
+                    'server_software',
                 );
                 ?>
         </td>
@@ -128,7 +128,7 @@ use Cake\Routing\Router;
                 $this->Reports->entriesFromIncidents(
                     $related_entries['user_os'],
                     $user_os_distinct_count,
-                    'user_os'
+                    'user_os',
                 );
                 ?>
         </td>
@@ -140,7 +140,7 @@ use Cake\Routing\Router;
                 $this->Reports->entriesFromIncidents(
                     $related_entries['locale'],
                     $locale_distinct_count,
-                    'locale'
+                    'locale',
                 );
                 ?>
         </td>

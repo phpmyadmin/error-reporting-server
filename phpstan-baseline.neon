@@ -625,18 +625,6 @@ parameters:
 			path: src/Report.php
 
 		-
-			message: '#^Property App\\Report\:\:\$internal____date \(string\) on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.property
-			count: 1
-			path: src/Report.php
-
-		-
-			message: '#^Property App\\Report\:\:\$internal____userMessage \(string\) on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.property
-			count: 1
-			path: src/Report.php
-
-		-
 			message: '#^Class App\\View\\Helper\\AppHelper extends generic class Cake\\View\\Helper but does not specify its types\: TView$#'
 			identifier: missingType.generics
 			count: 1

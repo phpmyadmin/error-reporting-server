@@ -114,7 +114,7 @@
         <?=
             json_encode(
                 $incident['full_report']['microhistory'],
-                JSON_PRETTY_PRINT
+                JSON_PRETTY_PRINT,
             );
         ?>
     <?php endif; ?>

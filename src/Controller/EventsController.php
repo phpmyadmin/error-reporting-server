@@ -46,7 +46,7 @@ class EventsController extends AppController
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
-    public function index(): ?Response
+    public function index(): Response|null
     {
         // Only allow POST requests
         $this->request->allowMethod(['post']);
@@ -56,7 +56,7 @@ class EventsController extends AppController
         if ($statusCode !== 201) {
             Log::error(
                 'Could not validate the request. Sending a '
-                    . $statusCode . ' response.'
+                    . $statusCode . ' response.',
             );
 
             // Send a response
@@ -83,19 +83,19 @@ class EventsController extends AppController
                 Log::debug(
                     $reportsUpdated . ' linked reports to issue number '
                         . $issueNumber . ' were updated according to received action '
-                        . $eventAction
+                        . $eventAction,
                 );
             } else {
                 Log::info(
                     'No linked report found for issue number \'' . $issueNumber
-                    . '\'. Ignoring the event.'
+                    . '\'. Ignoring the event.',
                 );
                 $statusCode = 204;
             }
         } else {
             Log::info(
                 'received a webhook event for action \'' . $eventAction
-                . '\' on issue number ' . $issueNumber . '. Ignoring the event.'
+                . '\' on issue number ' . $issueNumber . '. Ignoring the event.',
             );
             $statusCode = 204;
         }
@@ -140,7 +140,7 @@ class EventsController extends AppController
 
             Log::error(
                 'Invalid User agent: ' . $userAgent
-                . '. Ignoring the event.'
+                . '. Ignoring the event.',
             );
 
             return 403;
@@ -151,7 +151,7 @@ class EventsController extends AppController
             // Otherwise, Send a '400: Bad Request'
 
             Log::info(
-                'Ping event type received.'
+                'Ping event type received.',
             );
 
             return 200;
@@ -163,7 +163,7 @@ class EventsController extends AppController
 
             Log::error(
                 'Unexpected event type: ' . $eventType
-                . '. Ignoring the event.'
+                . '. Ignoring the event.',
             );
 
             return 400;
@@ -176,7 +176,7 @@ class EventsController extends AppController
             Log::error(
                 'received hash ' . $receivedHash . ' does not match '
                 . ' expected hash ' . $expectedHash
-                . '. Ignoring the event.'
+                . '. Ignoring the event.',
             );
 
             return 401;

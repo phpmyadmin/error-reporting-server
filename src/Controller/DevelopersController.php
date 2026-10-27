@@ -55,7 +55,7 @@ class DevelopersController extends AppController
         return $this->redirect($url);
     }
 
-    public function callback(): ?Response
+    public function callback(): Response|null
     {
         $code = $this->request->getQuery('code');
         $accessToken = $this->GithubApi->getAccessToken($code);
@@ -64,7 +64,7 @@ class DevelopersController extends AppController
             $this->Flash->set(
                 'We were not able to authenticate you.'
                     . ' Please try again later',
-                ['params' => ['class' => $flash_class]]
+                ['params' => ['class' => $flash_class]],
             );
 
             return $this->redirect('/');
@@ -75,7 +75,7 @@ class DevelopersController extends AppController
             $flash_class = 'alert alert-error';
             $this->Flash->set(
                 $userInfo['message'],
-                ['params' => ['class' => $flash_class]]
+                ['params' => ['class' => $flash_class]],
             );
 
             return $this->redirect('/');
@@ -84,7 +84,7 @@ class DevelopersController extends AppController
         $userInfo['has_commit_access'] = $this->GithubApi->canCommitTo(
             $userInfo['login'],
             Configure::read('GithubRepoPath'),
-            $accessToken
+            $accessToken,
         );
 
         $this->authenticateDeveloper($userInfo, $accessToken);
@@ -92,7 +92,7 @@ class DevelopersController extends AppController
         $flash_class = 'alert alert-success';
         $this->Flash->set(
             'You have been logged in successfully',
-            ['params' => ['class' => $flash_class]]
+            ['params' => ['class' => $flash_class]],
         );
 
         $last_page = $this->request->getSession()->read('last_page');
@@ -113,7 +113,7 @@ class DevelopersController extends AppController
         $flash_class = 'alert alert-success';
         $this->Flash->set(
             'You have been logged out successfully',
-            ['params' => ['class' => $flash_class]]
+            ['params' => ['class' => $flash_class]],
         );
 
         return $this->redirect('/');

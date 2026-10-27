@@ -68,7 +68,7 @@ class DevelopersTableTest extends TestCase
             try {
                 $i++;
                 $savedDeveloper = $this->Developers->get($i);
-            } catch (RecordNotFoundException $e) {
+            } catch (RecordNotFoundException) {
                 break;
             }
         }

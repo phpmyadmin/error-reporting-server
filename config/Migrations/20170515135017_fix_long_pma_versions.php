@@ -38,7 +38,7 @@ class FixLongPmaVersions extends BaseMigration
         while ($row = $result->fetch()) {
             $strippedVersionString
                 = IncidentsTable::getStrippedPmaVersion(
-                    $row['pma_version']
+                    $row['pma_version'],
                 );
 
             if ($strippedVersionString === $row['pma_version']) {

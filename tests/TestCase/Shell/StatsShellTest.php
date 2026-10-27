@@ -47,14 +47,14 @@ class StatsShellTest extends TestCase
                 // Make sure all the fields are covered
                 $this->assertNotEquals(
                     false,
-                    Cache::read($field . '_' . $filter_string)
+                    Cache::read($field . '_' . $filter_string),
                 );
             }
 
             // Make sure download stats value stored
             $this->assertNotEquals(
                 false,
-                Cache::read('downloadStats_' . $filter_string)
+                Cache::read('downloadStats_' . $filter_string),
             );
         }
     }

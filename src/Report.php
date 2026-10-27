@@ -32,14 +32,11 @@ use const PHP_URL_QUERY;
  */
 class Report extends stdClass
 {
-    /** @var string */
-    private $internal____date = null;
+    private ?string $internal____date = null;
 
-    /** @var string */
-    private $internal____eventId = null;
+    private ?string $internal____eventId = null;
 
-    /** @var string */
-    private $internal____userMessage = null;
+    private ?string $internal____userMessage = null;
 
     public function hasUserFeedback(): bool
     {
@@ -200,7 +197,7 @@ class Report extends stdClass
         $userIp = Security::hash(
             $userIp . crc32($userIp),
             'sha256',
-            true // Enable app security salt
+            true, // Enable app security salt
         );// Make finding back the Ip near to impossible
 
         $user = new stdClass();
@@ -212,7 +209,7 @@ class Report extends stdClass
         return Security::hash(
             $userIp . $serverSoftware . $userAgentString . $locale . $configurationStorage . $phpVersion,
             'sha256',
-            true // Enable app security salt
+            true, // Enable app security salt
         );
     }
 
@@ -225,7 +222,7 @@ class Report extends stdClass
         return $user;
     }
 
-    private function findRoute(?string $uri): ?string
+    private function findRoute(string|null $uri): string|null
     {
         if ($uri === null) {
             return null;
@@ -242,7 +239,7 @@ class Report extends stdClass
         return $output['route'] ?? null;
     }
 
-    public function getRoute(): ?string
+    public function getRoute(): string|null
     {
         if (isset($this->exception)) {
             return $this->findRoute($this->exception->uri ?? null);
@@ -407,7 +404,7 @@ class Report extends stdClass
                 $this->getExceptionJs(),
                 [
                     'event_id' => $this->getEventId(),
-                ]
+                ],
             ),
         ];
     }

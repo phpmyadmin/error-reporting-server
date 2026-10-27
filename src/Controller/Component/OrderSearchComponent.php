@@ -67,12 +67,8 @@ class OrderSearchComponent extends Component
         return $searchConditions;
     }
 
-    /**
-     * @param string[] $aColumns The columns
-     *
-     * @return array|null
-     */
-    public function getOrder(array $aColumns, ServerRequest $request): ?array
+    /** @param string[] $aColumns The columns */
+    public function getOrder(array $aColumns, ServerRequest $request): array|null
     {
         if ($request->getQuery('iSortCol_0') !== null) {
             $order = [];

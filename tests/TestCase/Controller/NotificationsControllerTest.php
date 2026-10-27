@@ -72,7 +72,7 @@ class NotificationsControllerTest extends TestCase
                     '1',
                     '3',
                 ],
-            ]
+            ],
         );
         $this->assertResponseCode(302);
 
@@ -87,7 +87,7 @@ class NotificationsControllerTest extends TestCase
         /* Test case 2 */
         $this->post(
             '/notifications/mass_action',
-            ['mark_all' => 1]
+            ['mark_all' => 1],
         );
         $this->assertResponseCode(302);
 

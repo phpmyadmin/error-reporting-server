@@ -14,7 +14,7 @@ class AddReportIdIndexToIncidents extends BaseMigration
     {
         $table = $this->table('incidents');
         $table->addIndex(
-            ['report_id']
+            ['report_id'],
         );
         $table->update();
     }

@@ -144,7 +144,7 @@ class Sentry
             'name' => 'phpMyAdmin User',
         ];
         $ch = curl_init(
-            $sentryConfig['base_url'] . '/api/embed/error-page/?eventId=' . $eventId . '&dsn=' . $sentryConfig['dsn_url']
+            $sentryConfig['base_url'] . '/api/embed/error-page/?eventId=' . $eventId . '&dsn=' . $sentryConfig['dsn_url'],
         );
         if ($ch === false) {
             throw new Exception('Could not init cURL');

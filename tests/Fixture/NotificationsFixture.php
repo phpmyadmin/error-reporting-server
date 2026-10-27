@@ -11,10 +11,8 @@ class NotificationsFixture extends TestFixture
 {
     /**
      * Imports.
-     *
-     * @var array
      */
-    public $import = ['table' => 'notifications'];
+    public array $import = ['table' => 'notifications'];
 
     /**
      * Records.

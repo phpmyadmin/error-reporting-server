@@ -6,7 +6,7 @@ $reportsUrl = Router::url(
     [
         'controller' => 'reports',
         'action' => 'data_tables',
-    ]
+    ],
 );
 ?>
 <h1>Reports</h1>
@@ -119,7 +119,7 @@ $reportsUrl = Router::url(
                 $this->Form->select(
                     'state',
                     $statuses,
-                    ['empty' => false]
+                    ['empty' => false],
                 );
             ?>
             <input type="submit" value="Change" class="btn btn-primary" />

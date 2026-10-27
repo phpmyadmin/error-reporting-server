@@ -71,7 +71,7 @@ class ReportsHelperTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $link
+            $link,
         );
     }
 
@@ -127,7 +127,7 @@ class ReportsHelperTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $links_str
+            $links_str,
         );
     }
 }

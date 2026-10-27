@@ -11,10 +11,8 @@ class IncidentsFixture extends TestFixture
 {
     /**
      * Imports.
-     *
-     * @var array
      */
-    public $import = ['table' => 'incidents'];
+    public array $import = ['table' => 'incidents'];
 
     /**
      * Records.

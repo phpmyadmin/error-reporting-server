@@ -29,7 +29,7 @@ use Cake\Routing\Router;
                 [
                     'controller' => 'notifications',
                     'action' => 'data_tables',
-                ]
+                ],
             );?>"
         >
             <thead>

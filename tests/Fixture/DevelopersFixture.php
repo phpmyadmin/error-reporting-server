@@ -11,10 +11,8 @@ class DevelopersFixture extends TestFixture
 {
     /**
      * Imports.
-     *
-     * @var array
      */
-    public $import = ['table' => 'developers'];
+    public array $import = ['table' => 'developers'];
 
     /**
      * Records.

@@ -120,7 +120,7 @@ class DevelopersControllerTest extends TestCase
                     'controller' => 'notifications',
                     'action' => 'index',
                 ],
-            ]
+            ],
         );
 
         $this->get('developers/callback/?code=123123123');
@@ -145,7 +145,7 @@ class DevelopersControllerTest extends TestCase
                     'controller' => 'reports',
                     'action' => 'index',
                 ],
-            ]
+            ],
         );
         $this->get('developers/callback/?code=123123123');
         $this->assertResponseEmpty();

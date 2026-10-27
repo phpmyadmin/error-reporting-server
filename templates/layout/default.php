@@ -40,7 +40,7 @@ use Cake\Utility\Inflector;
         <?=
             $this->Html->scriptBlock(
                 'var notifications_count = ' . $notif_count . ';',
-                ['inline' => true]
+                ['inline' => true],
             );
             ?>
     </head>

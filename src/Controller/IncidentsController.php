@@ -63,7 +63,7 @@ class IncidentsController extends AppController
         $this->Reports = $this->fetchTable('Reports');
     }
 
-    public function create(): ?Response
+    public function create(): Response|null
     {
         $this->disableAutoRender();
         $this->response = $this->response
@@ -81,7 +81,7 @@ class IncidentsController extends AppController
 
             $this->response = $this->response
                 ->withStringBody(
-                    json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                    json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
                 );
 
             return $this->response;
@@ -103,7 +103,7 @@ class IncidentsController extends AppController
 
         $this->response = $this->response
             ->withStringBody(
-                json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
             );
 
         // For all the newly added reports,
@@ -115,7 +115,7 @@ class IncidentsController extends AppController
         return $this->response;
     }
 
-    public function json(?string $id): ?Response
+    public function json(string|null $id): Response|null
     {
         if (empty($id)) {
             throw new NotFoundException('Invalid Incident');
@@ -138,7 +138,7 @@ class IncidentsController extends AppController
             ->withStringBody(json_encode($incident, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
-    public function view(?string $incidentId): void
+    public function view(string|null $incidentId): void
     {
         if (empty($incidentId)) {
             throw new NotFoundException('Invalid Incident');

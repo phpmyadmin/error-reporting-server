@@ -66,7 +66,7 @@ class GithubController extends AppController
      *
      * @throws NotFoundException
      */
-    public function create_issue($reportId): ?Response
+    public function create_issue($reportId): Response|null
     {
         if (empty($reportId)) {
             throw new NotFoundException('Invalid report Id.');
@@ -106,7 +106,7 @@ class GithubController extends AppController
         [$issueDetails, $status] = $this->GithubApi->createIssue(
             Configure::read('GithubRepoPath'),
             $data,
-            $this->request->getSession()->read('access_token')
+            $this->request->getSession()->read('access_token'),
         );
 
         if ($this->handleGithubResponse($status, 1, $reportId, $issueDetails['number'] ?? null)) {
@@ -123,7 +123,7 @@ class GithubController extends AppController
         $flash_class = 'alert alert-error';
         $this->Flash->set(
             $this->getErrors($issueDetails, $status),
-            ['params' => ['class' => $flash_class]]
+            ['params' => ['class' => $flash_class]],
         );
 
         return null;
@@ -163,13 +163,13 @@ class GithubController extends AppController
 
         $commentText = $this->getReportDescriptionText(
             $reportId,
-            $reportArray
+            $reportArray,
         );
         [$commentDetails, $status] = $this->GithubApi->createComment(
             Configure::read('GithubRepoPath'),
             ['body' => $commentText],
             $ticket_id,
-            $this->request->getSession()->read('access_token')
+            $this->request->getSession()->read('access_token'),
         );
         if ($this->handleGithubResponse($status, 2, $reportId, $ticket_id)) {
             // Update report status
@@ -179,13 +179,13 @@ class GithubController extends AppController
                 Configure::read('GithubRepoPath'),
                 [],
                 $ticket_id,
-                $this->request->getSession()->read('access_token')
+                $this->request->getSession()->read('access_token'),
             );
             if ($this->handleGithubResponse($status, 4, $reportId, $ticket_id)) {
                 // If linked Github issue state is available, use it to update Report's status
                 $report->set(
                     'status',
-                    $this->getReportStatusFromIssueState($issueDetails['state'])
+                    $this->getReportStatusFromIssueState($issueDetails['state']),
                 );
             }
 
@@ -194,7 +194,7 @@ class GithubController extends AppController
             $flash_class = 'alert alert-error';
             $this->Flash->set(
                 $this->getErrors($commentDetails, $status),
-                ['params' => ['class' => $flash_class]]
+                ['params' => ['class' => $flash_class]],
             );
         }
 
@@ -247,7 +247,7 @@ class GithubController extends AppController
             Configure::read('GithubRepoPath'),
             ['body' => $commentText],
             $ticket_id,
-            $this->request->getSession()->read('access_token')
+            $this->request->getSession()->read('access_token'),
         );
 
         if ($this->handleGithubResponse($status, 3, $reportId)) {
@@ -258,7 +258,7 @@ class GithubController extends AppController
             $flash_class = 'alert alert-error';
             $this->Flash->set(
                 $this->getErrors($commentDetails, $status),
-                ['params' => ['class' => $flash_class]]
+                ['params' => ['class' => $flash_class]],
             );
         }
 
@@ -381,7 +381,7 @@ class GithubController extends AppController
                 $flash_class = 'alert alert-success';
                 $this->Flash->set(
                     $msg,
-                    ['params' => ['class' => $flash_class]]
+                    ['params' => ['class' => $flash_class]],
                 );
             }
 
@@ -394,7 +394,7 @@ class GithubController extends AppController
                 'Unauthorised access to Github. github'
                     . ' credentials may be out of date. Please check and try again'
                     . ' later.',
-                ['params' => ['class' => $flash_class]]
+                ['params' => ['class' => $flash_class]],
             );
 
             return false;
@@ -405,7 +405,7 @@ class GithubController extends AppController
             $this->Flash->set(
                 'Bug Issue not found on Github.'
                     . ' Are you sure the issue number is correct? Please check and try again!',
-                ['params' => ['class' => $flash_class]]
+                ['params' => ['class' => $flash_class]],
             );
 
             return false;
@@ -415,7 +415,7 @@ class GithubController extends AppController
         $flash_class = 'alert alert-error';
         $this->Flash->set(
             'Unhandled response code received: ' . $response,
-            ['params' => ['class' => $flash_class]]
+            ['params' => ['class' => $flash_class]],
         );
 
         return false;
@@ -446,7 +446,7 @@ class GithubController extends AppController
             ],
         )->innerJoin(
             ['incidents' => $subquery_count],
-            ['incidents.report_id = Reports.related_to']
+            ['incidents.report_id = Reports.related_to'],
         )->count();
 
         return $incident_count + $inci_count_related;
@@ -483,13 +483,13 @@ class GithubController extends AppController
      *
      * Can not (& should not) be directly accessed via web.
      */
-    public function sync_issue_status(): ?Response
+    public function sync_issue_status(): Response|null
     {
         if (! Configure::read('CronDispatcher')) {
             $flash_class = 'alert alert-error';
             $this->Flash->set(
                 'Unauthorised action! This action is not available on Web interface',
-                ['params' => ['class' => $flash_class]]
+                ['params' => ['class' => $flash_class]],
             );
 
             return $this->redirect('/');
@@ -504,7 +504,7 @@ class GithubController extends AppController
             conditions: [
                 'sourceforge_bug_id IS NOT NULL',
                 'NOT' => ['status' => 'resolved'],
-            ]
+            ],
         );
 
         foreach ($reports as $report) {
@@ -515,7 +515,7 @@ class GithubController extends AppController
                 Configure::read('GithubRepoPath'),
                 [],
                 $report['sourceforge_bug_id'],
-                Configure::read('GithubAccessToken')
+                Configure::read('GithubAccessToken'),
             );
 
             if (! $this->handleGithubResponse($status, 4, $report['id'], $report['sourceforge_bug_id'])) {
@@ -525,7 +525,7 @@ class GithubController extends AppController
                         . ' associated with Report#'
                         . $report['id']
                         . '. Status returned: ' . $status,
-                    ['scope' => 'cron_jobs']
+                    ['scope' => 'cron_jobs'],
                 );
                 continue;
             }
@@ -545,7 +545,7 @@ class GithubController extends AppController
                 'SUCCESS: Updated status of Report #'
                 . $report['id'] . ' from state of its linked Github issue #'
                 . $report['sourceforge_bug_id'] . ' to ' . $rep->get('status'),
-                ['scope' => 'cron_jobs']
+                ['scope' => 'cron_jobs'],
             );
         }
 

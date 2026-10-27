@@ -138,7 +138,7 @@ class ReportsTableTest extends TestCase
             10,
             false,
             true,
-            '2013-08-29 18:10:01'
+            '2013-08-29 18:10:01',
         );
         $this->assertInstanceOf(Query::class, $result);
         $result = $result->enableHydration(false)->toArray();

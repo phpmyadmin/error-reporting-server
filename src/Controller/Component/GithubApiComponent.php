@@ -60,7 +60,7 @@ class GithubApiComponent extends Component
         array|string $data,
         string $method,
         bool $returnStatus = false,
-        string $access_token = ''
+        string $access_token = '',
     ): array {
         $path = 'https://api.github.com/' . $path;
         if (strtoupper($method) === ClientRequest::METHOD_GET) {
@@ -78,12 +78,12 @@ class GithubApiComponent extends Component
      *
      * @return string|null the access token
      */
-    public function getAccessToken(?string $code): ?string
+    public function getAccessToken(string|null $code): string|null
     {
         $url = 'https://github.com/login/oauth/access_token';
         $data = array_merge(
             Configure::read('GithubConfig', []),
-            ['code' => $code]
+            ['code' => $code],
         );
         $decodedResponse = $this->sendRequest($url, http_build_query($data), ClientRequest::METHOD_POST);
 
@@ -125,7 +125,7 @@ class GithubApiComponent extends Component
         array|string $data,
         string $method,
         bool $returnCode = false,
-        string $accessToken = ''
+        string $accessToken = '',
     ): array {
         Log::debug('Request-url: ' . $url);
 
@@ -176,7 +176,7 @@ class GithubApiComponent extends Component
      *
      * @return string the generated url to redirect the user to
      */
-    public function getRedirectUrl(?string $scope = null): string
+    public function getRedirectUrl(string|null $scope = null): string
     {
         $url = 'https://github.com/login/oauth/authorize';
         $data = [
@@ -186,7 +186,7 @@ class GithubApiComponent extends Component
                     'controller' => 'developers',
                     'action' => 'callback',
                 ],
-                true
+                true,
             ),
             'scope' => $scope,
         ];
@@ -210,7 +210,7 @@ class GithubApiComponent extends Component
             [],
             ClientRequest::METHOD_GET,
             true,
-            $access_token
+            $access_token,
         );
         if ($status !== 204 && $status !== 404) {
             Log::error('Collaborators call ended in a status code: ' . $status);
@@ -233,7 +233,7 @@ class GithubApiComponent extends Component
             json_encode($data),
             ClientRequest::METHOD_POST,
             true,
-            $access_token
+            $access_token,
         );
     }
 
@@ -252,7 +252,7 @@ class GithubApiComponent extends Component
             json_encode($data),
             ClientRequest::METHOD_POST,
             true,
-            $access_token
+            $access_token,
         );
     }
 
@@ -271,7 +271,7 @@ class GithubApiComponent extends Component
             $data,
             ClientRequest::METHOD_GET,
             true,
-            $access_token
+            $access_token,
         );
     }
 }

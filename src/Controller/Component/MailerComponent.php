@@ -59,8 +59,8 @@ class MailerComponent extends Component
             ->setSubject(
                 sprintf(
                     'A new report has been submitted on the Error Reporting Server: %s',
-                    $viewVars['report']['id']
-                )
+                    $viewVars['report']['id'],
+                ),
             )
             ->setEmailFormat('html')
             ->setTo($emailTo)
