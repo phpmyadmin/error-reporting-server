@@ -6,22 +6,22 @@ phpMyAdmin's Error Reporting Server
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/phpmyadmin/error-reporting-server/?branch=master)
 
 phpMyAdmin server side component for the error reporting system. It uses
-CakePHP with some extra plugins like migrations, debugkit and OAuth
-component.
+CakePHP, the migrations plugin and, for the development environment, the
+debug kit plugin. The GitHub login is implemented in
+`src/Controller/DevelopersController.php`, there is no OAuth plugin.
 
 # How to deploy
 
 In order to deploy the app in this repo you need to follow these steps:
 
 - Clone this repo or extract the zip file
-- Add a virtual hosts entry pointing at the directory where you extracted the
-  files in the previous step. Make sure that the installation is in the
-  document root.
+- Add a virtual hosts entry pointing at the `webroot` directory of the files
+  you extracted in the previous step, and not at the directory itself: the
+  application code has to stay out of the document root.
 - Run `composer install` to download and configure dependencies and library files
-- Configure the web server (see [below](#oauth-configuration-setup))
+- Configure the web server (see [below](#web-server-setup))
 - Create the database for the server
-- install the mbstring and intl extensions, on Debian use:
-  `sudo apt-get install php-mbstring php-intl`
+- Install the PHP extensions listed in [Requirements](#requirements)
 - cd application_root_dir (directory under which subdirectory `src` resides)
 - mkdir tmp;
 - mkdir logs;
@@ -31,10 +31,15 @@ In order to deploy the app in this repo you need to follow these steps:
 	- `setfacl -R -d -m u:${HTTPDUSER}:rwx tmp`
 	- `setfacl -R -m u:${HTTPDUSER}:rwx logs`
 	- `setfacl -R -d -m u:${HTTPDUSER}:rwx logs`
-- Copy the default configuration file `config/app.default.php` to
-  `config/app.php` and fill out the required info.
+- The `composer install` of the previous step creates `config/app.php` from
+  `config/app.default.php` and generates its security salt. If you installed
+  the dependencies another way, copy the default configuration file
+  `config/app.default.php` to `config/app.php` yourself.
   Make sure to change the salts, debug level and
   the database credentials in the `app.php` file.
+- Add the `AcceptedReportsVersions` key to an existing `config/app.php`, it is
+  documented in `config/app.default.php`. The reports of the versions that are
+  not listed are dropped, and without the key every report is dropped.
 - Copy the `oauth_example.php` to `oauth.php` and follow the instructions below
   to set the appropriate variables in the file.
 - Copy the `forwarding_example.php` to `forwarding.php` and fill the values.
@@ -48,7 +53,11 @@ In order to deploy the app in this repo you need to follow these steps:
 ## Requirements
 
 - php >= 8.4
-- MySQL
+- The `curl`, `intl`, `json`, `mbstring` and `pdo_mysql` extensions, the same
+  list is declared in `composer.json`. On Debian:
+  `sudo apt-get install php-curl php-intl php-mbstring php-mysql`
+- MySQL or MariaDB. The continuous integration runs the MariaDB version
+  packaged in Debian 13 trixie (11.8).
 
 
 ## Web server setup
@@ -99,7 +108,7 @@ server {
 
         location ~ \.php$ {
                 fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        #       # With php7-fpm:
+        #       # With php8.4-fpm:
                 fastcgi_pass unix:/var/run/php8.4-fpm-reports.sock;
                 fastcgi_index index.php;
                 include fastcgi_params;
@@ -153,7 +162,7 @@ access of the developers. Add the webhook to that repository:
   - Select `Issues` events from available events
   - Set the secret token value
 
-- Set the appropriate value of secret token in the `GithubWebhookSecret` key of config/app.php (same as what you set while setting up the webhook)
+- Set the appropriate value of secret token in the `GithubWebhookSecret` key of ``config/app.php`` (same as what you set while setting up the webhook)
 
 The secret and the repository are in two different files: `GithubWebhookSecret`
 lives in ``config/app.php``, `GithubRepoPath` in ``config/oauth.php``.
@@ -198,16 +207,15 @@ The webhook is the real time path. If the hook was down, or if an issue was
 closed before it was set up, run the synchronization action described below to
 read the state of every issue again.
 
-
 ## Sync Github Issue state
 
 - Get a Github Personal Access token as explained [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
 - You need to set the `repo` scope for this token.
-- Set value of obtained `GithubAccessToken` in config/oauth.php
-- After setting value of GithubAccessToken in config/oauth.php as explained above, you can run the synchronization action as
+- Set value of obtained `GithubAccessToken` in ``config/oauth.php``
+- After setting value of `GithubAccessToken` in ``config/oauth.php`` as explained above, you can run the synchronization action as
 
 ```sh
-./bin/cake sync_github_issue_states
+bin/cake sync_github_issue_states
 ```
 
 - This can be scheduled as a cron job too.
@@ -245,7 +253,8 @@ run everyday as cron job.
 
 ### Cron Job Logging
 
-A separate log file named `cron_jobs` is maintained for all the cron jobs. The
-logging is done via the `Log` class. All the failures and other activity relating
-to cron jobs should be reported there only. That makes debugging easier in case
-of a failure.
+A separate log file, `logs/cron_jobs.log`, is maintained for all the cron jobs:
+the code logs with the `cron_jobs` scope and the scope is configured in the
+`Log` section of ``config/app.php``. The logging is done via the `Log` class.
+All the failures and other activity relating to cron jobs should be reported
+there only. That makes debugging easier in case of a failure.
