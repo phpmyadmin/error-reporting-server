@@ -18,6 +18,7 @@
 
 namespace App\Model\Table;
 
+use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\Model\Model;
 use Cake\ORM\Entity;
@@ -33,12 +34,20 @@ use function hash_final;
 use function hash_init;
 use function hash_update;
 use function in_array;
+use function is_array;
+use function is_string;
 use function json_encode;
 use function mb_strimwidth;
 use function mb_strlen;
 use function preg_match;
+use function preg_replace;
+use function str_ends_with;
+use function str_starts_with;
 use function strtotime;
+use function substr;
 use function time;
+use function trim;
+use function version_compare;
 
 /**
  * An incident a representing a single incident of a submited bug.
@@ -179,6 +188,21 @@ class IncidentsTable extends Table
     public function createIncidentFromBugReport(array|null $bugReport): array
     {
         if ($bugReport === null) {
+            return [
+                'incidents' => [false],
+                'reports' => [],
+            ];
+        }
+
+        // Old versions are not maintained anymore, their reports are noise.
+        $pmaVersion = $bugReport['pma_version'] ?? '';
+        if (! self::isSupportedPmaVersion(is_string($pmaVersion) ? $pmaVersion : '')) {
+            Log::info(
+                'Ignoring a report of the unsupported phpMyAdmin version "'
+                . (is_string($pmaVersion) ? $pmaVersion : '') . '".',
+                'cron_jobs',
+            );
+
             return [
                 'incidents' => [false],
                 'reports' => [],
@@ -500,6 +524,64 @@ class IncidentsTable extends Table
         }
 
         return $versionString;
+    }
+
+    /**
+     * Tells whether a report of this phpMyAdmin version is still accepted.
+     *
+     * The accepted versions come from the AcceptedReportsVersions key of the
+     * configuration, an entry is either a branch like "4.9.*" or a minimum
+     * version like ">=5.2". There is no fallback list: a missing or empty key
+     * accepts nothing, the application stores what it is told to store.
+     *
+     * @param string $versionString phpMyAdmin version
+     *
+     * @return bool true if the version is accepted
+     */
+    public static function isSupportedPmaVersion(string $versionString): bool
+    {
+        // Keep the numeric part only, "5.2.4-dev" and "6.0.0-alpha1" are
+        // development builds of a released branch.
+        $version = preg_replace('/[^0-9.].*$/', '', self::getStrippedPmaVersion($versionString));
+        if ($version === null || preg_match('/^\d+(\.\d+)*$/', $version) !== 1) {
+            return false;
+        }
+
+        $accepted = Configure::read('AcceptedReportsVersions');
+        if (! is_array($accepted)) {
+            return false;
+        }
+
+        foreach ($accepted as $rule) {
+            if (! is_string($rule)) {
+                continue;
+            }
+
+            if (str_starts_with($rule, '>=')) {
+                if (version_compare($version, trim(substr($rule, 2)), '>=')) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (str_ends_with($rule, '.*')) {
+                // A branch needs at least a patch number, "4.9" alone is not
+                // a released version.
+                $branch = substr($rule, 0, -2);
+                if ($branch !== '' && str_starts_with($version, $branch . '.')) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if ($version === $rule) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -393,4 +393,8 @@ return [
     'NotificationEmailsFrom' => 'reports-notify@phpmyadmin.net',
     'NotificationEmailsTransport' => 'test',
     'GithubWebhookSecret' => 'test-pma-ers-1',
+    'AcceptedReportsVersions' => [
+        '4.9.*',
+        '>=5.2',
+    ],
 ];

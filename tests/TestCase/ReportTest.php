@@ -205,8 +205,8 @@ class ReportTest extends TestCase
             'configuration_storage' => true,
             'php_version' => '5.2.2',
             'exception_type' => null,
-            'version_major' => '4',
-            'version_series' => '4.5',
+            'version_major' => '5',
+            'version_series' => '5.2',
         ], $tags);
         $this->assertEquals((object) [
             'os' => (object) ['name' => 'Windows'],
@@ -230,8 +230,8 @@ class ReportTest extends TestCase
         $this->assertEquals([
             [
                 'sentry.interfaces.Message' => $message,
-                'release' => '4.5.4.1',
-                'dist' => '4.5.4.1deb2ubuntu2',
+                'release' => '5.2.4',
+                'dist' => '5.2.4',
                 'platform' => 'javascript',
                 'environment' => 'production',
                 'timestamp' => $report->getTimestampUTC(),
@@ -274,8 +274,8 @@ class ReportTest extends TestCase
         ], $reports);
         $this->assertEquals([
             'sentry.interfaces.Message' => $message,
-            'release' => '4.5.4.1',
-            'dist' => '4.5.4.1deb2ubuntu2',
+            'release' => '5.2.4',
+            'dist' => '5.2.4',
             'platform' => 'javascript',
             'timestamp' => $report->getTimestampUTC(),
             'tags' => $tags,

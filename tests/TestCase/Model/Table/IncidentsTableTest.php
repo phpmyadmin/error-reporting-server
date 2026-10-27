@@ -7,6 +7,7 @@ use App\Test\Fixture\DevelopersFixture;
 use App\Test\Fixture\IncidentsFixture;
 use App\Test\Fixture\NotificationsFixture;
 use App\Test\Fixture\ReportsFixture;
+use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -239,7 +240,7 @@ class IncidentsTableTest extends TestCase
 
         $expected = [
             [
-                'pma_version' => '4.5.4.1',
+                'pma_version' => '5.2.4',
                 'php_version' => '5.2',
                 'steps' => '<script>test steps',
                 'error_message' => 'a is not defined',
@@ -270,7 +271,7 @@ class IncidentsTableTest extends TestCase
 
         $expected = [
             [
-                'pma_version' => '4.5.4.1',
+                'pma_version' => '5.2.4',
                 'php_version' => '5.5',
                 'error_message' => 'Undefined variable: haha',
                 'error_name' => 'Notice',
@@ -286,7 +287,7 @@ class IncidentsTableTest extends TestCase
                 'exception_type' => 1,
             ],
             [
-                'pma_version' => '4.5.4.1',
+                'pma_version' => '5.2.4',
                 'php_version' => '5.5',
                 'error_message' => 'Undefined variable: hihi',
                 'error_name' => 'Notice',
@@ -302,7 +303,7 @@ class IncidentsTableTest extends TestCase
                 'exception_type' => 1,
             ],
             [
-                'pma_version' => '4.5.4.1',
+                'pma_version' => '5.2.4',
                 'php_version' => '5.5',
                 'error_message' => 'Undefined variable: hehe',
                 'error_name' => 'Notice',
@@ -342,7 +343,7 @@ class IncidentsTableTest extends TestCase
             'status' => 'new',
             'location' => 'error.js',
             'linenumber' => (int) 312,
-            'pma_version' => '4.5.4.1',
+            'pma_version' => '5.2.4',
             'exception_type' => 0,
         ];
 
@@ -364,7 +365,7 @@ class IncidentsTableTest extends TestCase
             'status' => 'new',
             'location' => './libraries/Util.class.php',
             'linenumber' => (int) 557,
-            'pma_version' => '4.5.4.1',
+            'pma_version' => '5.2.4',
             'exception_type' => 1,
         ];
         $this->assertEquals($expected, $result);
@@ -600,5 +601,104 @@ class IncidentsTableTest extends TestCase
                 '5.1.0',
             ],
         ];
+    }
+
+    /** @return array<string, array{string, bool}> */
+    public static function pmaVersionProvider(): array
+    {
+        return [
+            'old 4.8' => ['4.8.6', false],
+            'old 4.8 with suffix' => ['4.8.6deb1', false],
+            'old 4.2' => ['4.2.3', false],
+            '5.0' => ['5.0.4', false],
+            '5.1' => ['5.1.1-dev', false],
+            '5.1 with suffix' => ['5.1.0-3.el7.remi', false],
+            '4.9' => ['4.9.10', true],
+            '4.9 with suffix' => ['4.9.0.1deb1', true],
+            '5.2' => ['5.2.0', true],
+            '5.2 dev' => ['5.2.4-dev', true],
+            '5.2 rc' => ['5.2.0-rc2', true],
+            '4.9 branch needs a patch' => ['4.9', false],
+            '5.3' => ['5.3.2', true],
+            '6.0 alpha' => ['6.0.0-alpha1', true],
+            '6.1' => ['6.1.0', true],
+            'empty' => ['', false],
+            'garbage' => ['Lorem ipsum', false],
+            'git build' => ['5.2.0-dev+20240101.abcdef', true],
+            'no version' => ['Git', false],
+        ];
+    }
+
+    #[DataProvider('pmaVersionProvider')]
+    public function testIsSupportedPmaVersion(string $version, bool $expected): void
+    {
+        $this->assertSame($expected, IncidentsTable::isSupportedPmaVersion($version));
+    }
+
+    /**
+     * A rule can also be one exact version.
+     */
+    public function testAnExactVersionRule(): void
+    {
+        Configure::write('AcceptedReportsVersions', ['5.2.4']);
+
+        $this->assertTrue(IncidentsTable::isSupportedPmaVersion('5.2.4'));
+        $this->assertFalse(IncidentsTable::isSupportedPmaVersion('5.2.5'));
+        // A development build is read as the branch it belongs to.
+        $this->assertTrue(IncidentsTable::isSupportedPmaVersion('5.2.4-dev'));
+    }
+
+    /**
+     * The accepted versions are read from the configuration.
+     */
+    public function testTheAcceptedVersionsComeFromTheConfiguration(): void
+    {
+        Configure::write('AcceptedReportsVersions', ['>=6.0']);
+
+        $this->assertFalse(IncidentsTable::isSupportedPmaVersion('5.2.4'));
+        $this->assertFalse(IncidentsTable::isSupportedPmaVersion('4.9.10'));
+        $this->assertTrue(IncidentsTable::isSupportedPmaVersion('6.0.0'));
+        $this->assertTrue(IncidentsTable::isSupportedPmaVersion('6.1.2'));
+    }
+
+    /**
+     * Without the configuration key nothing is accepted, there is no default.
+     */
+    public function testNothingIsAcceptedWithoutConfiguration(): void
+    {
+        Configure::delete('AcceptedReportsVersions');
+
+        $this->assertFalse(IncidentsTable::isSupportedPmaVersion('4.9.10'));
+        $this->assertFalse(IncidentsTable::isSupportedPmaVersion('5.2.4'));
+        $this->assertFalse(IncidentsTable::isSupportedPmaVersion('6.1.2'));
+    }
+
+    /**
+     * An empty list accepts nothing either.
+     */
+    public function testNothingIsAcceptedWithAnEmptyList(): void
+    {
+        Configure::write('AcceptedReportsVersions', []);
+
+        $this->assertFalse(IncidentsTable::isSupportedPmaVersion('5.2.4'));
+    }
+
+    /**
+     * A report of a version that is not maintained anymore is not stored.
+     */
+    public function testCreateIncidentFromAnUnsupportedVersion(): void
+    {
+        $bugReport = json_decode(
+            file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json'),
+            true,
+        );
+        $bugReport['pma_version'] = '4.8.6';
+
+        $incidentsBefore = $this->Incidents->find()->count();
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertSame([false], $result['incidents']);
+        $this->assertSame([], $result['reports']);
+        $this->assertSame($incidentsBefore, $this->Incidents->find()->count());
     }
 }

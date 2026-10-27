@@ -129,7 +129,7 @@ class IncidentsControllerTest extends TestCase
         $subject = 'A new report has been submitted '
             . 'on the Error Reporting Server: '
             . $report['id'];
-        $this->assertEquals('4.5.4.1', $report['pma_version']);
+        $this->assertEquals('5.2.4', $report['pma_version']);
 
         //FIXME: test email sending
         // Test notification email
@@ -225,7 +225,7 @@ class IncidentsControllerTest extends TestCase
         $subject = 'A new report has been submitted '
             . 'on the Error Reporting Server: '
             . $report['id'];
-        $this->assertEquals('4.5.4.1', $report['pma_version']);
+        $this->assertEquals('5.2.4', $report['pma_version']);
 
         $this->assertNoMailSent();
     }
