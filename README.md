@@ -20,8 +20,8 @@ In order to deploy the app in this repo you need to follow these steps:
 - Run `composer install` to download and configure dependencies and library files
 - Configure the web server (see [below](#oauth-configuration-setup))
 - Create the database for the server
-- install mbstring (required for cake 3.0)
-- install intl extension; on Debian use: `sudo apt-get install php-intl` //(required for cake 3.0)
+- install the mbstring and intl extensions, on Debian use:
+  `sudo apt-get install php-mbstring php-intl`
 - cd application_root_dir (directory under which subdirectory `src` resides)
 - mkdir tmp;
 - mkdir logs;
@@ -143,7 +143,7 @@ Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth
   - Select `Issues` events from available events
   - Set the secret token value
 
-- Set the appropriate value of secret token in app.php (same as what you set while setting up the webhook)
+- Set the appropriate value of secret token in the `GithubWebhookSecret` key of config/app.php (same as what you set while setting up the webhook)
 
 
 ## Sync Github Issue state
@@ -161,11 +161,17 @@ Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth
 
 # How to run the test suite
 
-If you are on a development machine you can use the webrunner at `/test.php`
-However if you need a command line runner. You can use:
+You can run the test suite with:
 
 ```sh
 composer run test --timeout=0
+```
+
+The coding standard and the static analysis can be run with:
+
+```sh
+composer run phpcs
+composer run phpstan
 ```
 
 # Running the stackhash update shell
