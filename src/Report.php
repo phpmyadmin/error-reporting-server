@@ -16,7 +16,6 @@ use function date;
 use function explode;
 use function html_entity_decode;
 use function htmlspecialchars_decode;
-use function is_string;
 use function json_decode;
 use function openssl_random_pseudo_bytes;
 use function parse_str;
@@ -247,11 +246,9 @@ class Report extends stdClass
             return null;
         }
 
-        $query = parse_url($uri, PHP_URL_QUERY);// foo=bar&a=b
-        if (! is_string($query)) {
-            return null;
-        }
-
+        // parse_url() answers false on a malformed URL, and the query is
+        // empty when the URL has none: both give no route.
+        $query = (string) (parse_url($uri, PHP_URL_QUERY) ?? '');// foo=bar&a=b
         $output = [];
         parse_str($query, $output);
 
