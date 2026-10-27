@@ -87,7 +87,15 @@ try {
     Configure::config('default', new PhpConfig());
     Configure::load('app', 'default', false);
 } catch (Throwable $e) {
-    exit($e->getMessage() . "\n");
+    // The error and exception traps need app.php, so report the failure by hand.
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, $e->getMessage() . "\n");
+    } else {
+        error_log($e->getMessage());
+        http_response_code(500);
+    }
+
+    exit(1);
 }
 
 /*
