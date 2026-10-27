@@ -28,7 +28,10 @@ use Cake\ORM\TableRegistry;
 use function count;
 use function explode;
 use function file_get_contents;
+use function hash_equals;
 use function hash_hmac;
+use function hash_hmac_algos;
+use function in_array;
 use function json_decode;
 use function strpos;
 
@@ -124,15 +127,13 @@ class EventsController extends AppController
         $receivedHashHeader = $request->getHeaderLine('X-Hub-Signature');
         $algo = '';
         $receivedHash = '';
-        if ($receivedHashHeader !== null) {
+        if ($receivedHashHeader !== '') {
             $parts = explode('=', $receivedHashHeader);
-            if (count($parts) > 1) {
+            if (count($parts) === 2) {
                 $algo = $parts[0];
                 $receivedHash = $parts[1];
             }
         }
-
-        $expectedHash = $this->getHash(file_get_contents('php://input'), $algo);
 
         if ($userAgent !== null && strpos($userAgent, 'GitHub-Hookshot') !== 0) {
             // Check if the User-agent is Github
@@ -169,7 +170,20 @@ class EventsController extends AppController
             return 400;
         }
 
-        if ($receivedHash !== $expectedHash) {
+        if (! in_array($algo, hash_hmac_algos(), true)) {
+            // Without a supported algorithm the expected hash would be empty or
+            // built from a hash the request does not use.
+            Log::error(
+                'Unsupported signature algorithm: ' . $algo
+                . '. Ignoring the event.',
+            );
+
+            return 401;
+        }
+
+        $expectedHash = $this->getHash(file_get_contents('php://input'), $algo);
+
+        if (! hash_equals($expectedHash, $receivedHash)) {
             // Check if hash matches
             // Otherwise, Send a '401: Unauthorized'
 
@@ -195,11 +209,7 @@ class EventsController extends AppController
      */
     protected function getHash(string $payload, string $algo): string
     {
-        if ($algo === '') {
-            return '';
-        }
-
-        $key = Configure::read('GithubWebhookSecret');
+        $key = (string) Configure::read('GithubWebhookSecret');
 
         return hash_hmac($algo, $payload, $key);
     }
