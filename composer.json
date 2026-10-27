@@ -35,7 +35,7 @@
         "cakephp/bake": "^3.8",
         "cakephp/debug_kit": "^5.2.4",
         "php-mock/php-mock-phpunit": "^2.16",
-        "phpmyadmin/coding-standard": "^3",
+        "phpmyadmin/coding-standard": "^5.0",
         "phpstan/phpstan": "^2.3",
         "phpunit/phpunit": "^13.4",
         "psy/psysh": "@stable"
