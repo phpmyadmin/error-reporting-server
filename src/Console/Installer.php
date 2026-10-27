@@ -16,15 +16,11 @@ declare(strict_types=1);
  */
 namespace App\Console;
 
-if (!defined('STDIN')) {
-    define('STDIN', fopen('php://stdin', 'r'));
-}
-
 use Cake\Codeception\Console\Installer as CodeceptionInstaller;
 use Cake\Utility\Security;
 use Composer\IO\IOInterface;
 use Composer\Script\Event;
-use Exception;
+use InvalidArgumentException;
 
 /**
  * Provides installation hooks for when this application is installed through
@@ -52,7 +48,7 @@ class Installer
      * Does some routine installation tasks so people don't have to.
      *
      * @param \Composer\Script\Event $event The composer event object.
-     * @throws \Exception Exception raised by validator.
+     * @throws \InvalidArgumentException Exception raised by validator.
      * @return void
      */
     public static function postInstall(Event $event): void
@@ -61,7 +57,7 @@ class Installer
 
         $rootDir = dirname(__DIR__, 2);
 
-        static::createAppLocalConfig($rootDir, $io);
+        static::createAppConfig($rootDir, $io);
         static::createWritableDirectories($rootDir, $io);
 
         static::setFolderPermissions($rootDir, $io);
@@ -73,19 +69,19 @@ class Installer
     }
 
     /**
-     * Create config/app_local.php file if it does not exist.
+     * Create config/app.php file if it does not exist.
      *
      * @param string $dir The application's root directory.
      * @param \Composer\IO\IOInterface $io IO interface to write to console.
      * @return void
      */
-    public static function createAppLocalConfig(string $dir, IOInterface $io): void
+    public static function createAppConfig(string $dir, IOInterface $io): void
     {
-        $appLocalConfig = $dir . '/config/app_local.php';
-        $appLocalConfigTemplate = $dir . '/config/app_local.example.php';
-        if (file_exists($appLocalConfigTemplate) && !file_exists($appLocalConfig)) {
-            copy($appLocalConfigTemplate, $appLocalConfig);
-            $io->write('Created `config/app_local.php` file');
+        $appConfig = $dir . '/config/app.php';
+        $appConfigTemplate = $dir . '/config/app.default.php';
+        if (file_exists($appConfigTemplate) && !file_exists($appConfig)) {
+            copy($appConfigTemplate, $appConfig);
+            $io->write('Created `config/app.php` file');
         }
     }
 
@@ -124,7 +120,7 @@ class Installer
                 if (in_array($arg, ['Y', 'y', 'N', 'n'])) {
                     return $arg;
                 }
-                throw new Exception('This is not a valid answer. Please choose Y or n.');
+                throw new InvalidArgumentException('This is not a valid answer. Please choose Y or n.');
             };
             $setFolderPermissions = $io->askAndValidate(
                 '<info>Set Folder Permissions ? (Default to Y)</info> [<comment>Y,n</comment>]? ',
@@ -140,7 +136,15 @@ class Installer
 
         // Change the permissions on a path and output the results.
         $changePerms = function (string $path) use ($io): void {
-            $currentPerms = fileperms($path) & 0777;
+            $perms = fileperms($path);
+            if ($perms === false) {
+                // `false & 0777` would be 0 and chmod() would strip owner and group permissions.
+                $io->writeError('Failed to read permissions on ' . $path);
+
+                return;
+            }
+
+            $currentPerms = $perms & 0777;
             $worldWritable = $currentPerms | 0007;
             if ($worldWritable == $currentPerms) {
                 return;
@@ -150,7 +154,7 @@ class Installer
             if ($res) {
                 $io->write('Permissions set on ' . $path);
             } else {
-                $io->write('Failed to set permissions on ' . $path);
+                $io->writeError('Failed to set permissions on ' . $path);
             }
         };
 
@@ -182,13 +186,12 @@ class Installer
      */
     public static function setSecuritySalt(string $dir, IOInterface $io): void
     {
-        $appLocalConfig = $dir . '/config/app_local.php';
-        if (! file_exists($appLocalConfig)) {
+        if (! file_exists($dir . '/config/app.php')) {
             return;
         }
 
         $newKey = hash('sha256', Security::randomBytes(64));
-        static::setSecuritySaltInFile($dir, $io, $newKey, 'app_local.php');
+        static::setSecuritySaltInFile($dir, $io, $newKey, 'app.php');
     }
 
     /**
@@ -210,7 +213,7 @@ class Installer
             return;
         }
 
-        $content = str_replace('__SALT__', $newKey, $content, $count);
+        $content = str_replace("env('SECURITY_SALT')", "'" . $newKey . "'", $content, $count);
 
         if ($count == 0) {
             $io->write('No Security.salt placeholder to replace.');
