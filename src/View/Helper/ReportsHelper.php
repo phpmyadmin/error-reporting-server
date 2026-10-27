@@ -13,7 +13,7 @@ use const JSON_UNESCAPED_UNICODE;
 
 class ReportsHelper extends AppHelper
 {
-    /** @var string */
+    /** @var array<int|string, array<string, mixed>|string> */
     public array $helpers = ['Incidents'];
 
     /**

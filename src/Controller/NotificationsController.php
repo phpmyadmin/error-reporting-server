@@ -130,23 +130,23 @@ class NotificationsController extends AppController
         $tmp_row = [];
         foreach ($rows as $row) {
             $tmp_row[0] = '<input type="checkbox" name="notifs[]" value="'
-                . $row['id']
+                . $row->get('id')
                 . '"/>';
             $tmp_row[1] = '<a href="'
                 . Router::url(
                     [
                         '_name' => 'reports:view',
-                        'id' => $row['report_id'],
+                        'id' => $row->get('report_id'),
                     ]
                 )
                 . '">'
-                . $row['report_id']
+                . $row->get('report_id')
                 . '</a>';
-            $tmp_row[2] = $row['error_name'];
-            $tmp_row[3] = $row['error_message'];
-            $tmp_row[4] = $row['pma_version'];
-            $tmp_row[5] = $row['exception_type'] ? 'php' : 'js';
-            $tmp_row[6] = $row['created_time'];
+            $tmp_row[2] = $row->get('error_name');
+            $tmp_row[3] = $row->get('error_message');
+            $tmp_row[4] = $row->get('pma_version');
+            $tmp_row[5] = $row->get('exception_type') ? 'php' : 'js';
+            $tmp_row[6] = $row->get('created_time');
             array_push($dispRows, $tmp_row);
         }
 

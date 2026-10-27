@@ -93,7 +93,7 @@ class NotificationsTable extends Table
         $res = true;
         foreach ($devs as $dev) {
             $notification = $notoficationTable->newEmptyEntity();
-            $notification->developer_id = $dev['id'];
+            $notification->developer_id = $dev->get('id');
             $notification->report_id = $report_id;
             $notification->created = date('Y-m-d H:i:s', time());
             $notification->modified = date('Y-m-d H:i:s', time());

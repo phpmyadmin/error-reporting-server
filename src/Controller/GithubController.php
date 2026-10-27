@@ -20,6 +20,7 @@ namespace App\Controller;
 
 use App\Controller\Component\GithubApiComponent;
 use Cake\Core\Configure;
+use Cake\Datasource\EntityInterface;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\Log\Log;
@@ -75,7 +76,7 @@ class GithubController extends AppController
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
-        if (! $report) {
+        if (! $report instanceof EntityInterface) {
             throw new NotFoundException('The report does not exist.');
         }
 
@@ -109,7 +110,7 @@ class GithubController extends AppController
 
         if ($this->handleGithubResponse($status, 1, $reportId, $issueDetails['number'] ?? null)) {
             // Update report status
-            $report->status = $this->getReportStatusFromIssueState($issueDetails['state']);
+            $report->set('status', $this->getReportStatusFromIssueState($issueDetails['state']));
             $reportsTable->save($report);
 
             return $this->redirect([
@@ -144,7 +145,7 @@ class GithubController extends AppController
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
-        if (! $report) {
+        if (! $report instanceof EntityInterface) {
             throw new NotFoundException('The report does not exist.');
         }
 
@@ -181,8 +182,9 @@ class GithubController extends AppController
             );
             if ($this->handleGithubResponse($status, 4, $reportId, $ticket_id)) {
                 // If linked Github issue state is available, use it to update Report's status
-                $report->status = $this->getReportStatusFromIssueState(
-                    $issueDetails['state']
+                $report->set(
+                    'status',
+                    $this->getReportStatusFromIssueState($issueDetails['state'])
                 );
             }
 
@@ -218,7 +220,7 @@ class GithubController extends AppController
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         $report = $reportsTable->findById($reportId)->all()->first();
 
-        if (! $report) {
+        if (! $report instanceof EntityInterface) {
             throw new NotFoundException('The report does not exist.');
         }
 
@@ -249,7 +251,7 @@ class GithubController extends AppController
 
         if ($this->handleGithubResponse($status, 3, $reportId)) {
             // Update report status
-            $report->status = 'new';
+            $report->set('status', 'new');
             $reportsTable->save($report);
         } else {
             $flash_class = 'alert alert-error';
@@ -536,7 +538,7 @@ class GithubController extends AppController
             }
 
             $rep = $reportsTable->get($report['id']);
-            $rep->status = $this->getReportStatusFromIssueState($issueDetails['state']);
+            $rep->set('status', $this->getReportStatusFromIssueState($issueDetails['state']));
 
             // Save the report
             $reportsTable->save($rep);
@@ -544,7 +546,7 @@ class GithubController extends AppController
             Log::debug(
                 'SUCCESS: Updated status of Report #'
                 . $report['id'] . ' from state of its linked Github issue #'
-                . $report['sourceforge_bug_id'] . ' to ' . $rep->status,
+                . $report['sourceforge_bug_id'] . ' to ' . $rep->get('status'),
                 ['scope' => 'cron_jobs']
             );
         }

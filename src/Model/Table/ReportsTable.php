@@ -159,11 +159,11 @@ class ReportsTable extends Table
         $report->related_to = null;
         $this->save($report);
 
-        $rel_report = $this->findByRelatedTo($report->id)->first();
-        if ($rel_report) {
+        $rel_report = $this->findByRelatedTo($report->get('id'))->first();
+        if ($rel_report instanceof EntityInterface) {
             $this->updateAll(
-                ['related_to' => $rel_report->id],
-                ['related_to' => $report->id]
+                ['related_to' => $rel_report->get('id')],
+                ['related_to' => $report->get('id')]
             );
         }
 
