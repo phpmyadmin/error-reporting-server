@@ -33,7 +33,7 @@ jobs:
                 db-server: ["mysql:5.7"]
                 os: [ubuntu-latest]
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
               with:
                   # Fetch some commits for Scrutinizer coverage upload
                   fetch-depth: 15
@@ -44,13 +44,15 @@ jobs:
                   extensions: mbstring,mysql
                   coverage: xdebug
                   ini-values: xdebug.mode="develop,coverage"
-            - name: Cache module
-              uses: actions/cache@v5
+            - name: Cache Composer packages
+              uses: actions/cache@v6
               with:
-                  path: ~/.composer/cache/
-                  key: composer-cache
+                  path: ~/.cache/composer/
+                  key: composer-${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('composer.json') }}
+                  restore-keys: |
+                      composer-${{ runner.os }}-php-${{ matrix.php-version }}-
             - name: Install dependencies
-              run: composer install --no-interaction --ignore-platform-req=php+
+              run: composer install --no-interaction --prefer-dist
             - name: Copy config files
               run: |
                 cp config/app_ci.php config/app.php
@@ -82,7 +84,7 @@ jobs:
                 TEST_MYSQL_PASS: testbench
                 TEST_MYSQL_PORT: ${{ job.services.database-server.ports['3306'] }}
             - name: Send coverage
-              uses: codecov/codecov-action@v3
+              uses: codecov/codecov-action@v7
               # Do not run this step on forked versions of the main repository (example: contributor forks)
               if: github.repository == 'phpmyadmin/error-reporting-server'
               with:
