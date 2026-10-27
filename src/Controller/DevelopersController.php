@@ -39,6 +39,7 @@ class DevelopersController extends AppController
     public function initialize(): void
     {
         parent::initialize();
+
         $this->loadComponent('GithubApi');
         $this->viewBuilder()->setHelpers([
             'Html',

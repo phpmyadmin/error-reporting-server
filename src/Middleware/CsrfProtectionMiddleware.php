@@ -9,9 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-/**
- * @see https://stackoverflow.com/a/79890247/5155484
- */
+/** @see https://stackoverflow.com/a/79890247/5155484 */
 class CsrfProtectionMiddleware extends CakeCsrfProtectionMiddleware
 {
     /**

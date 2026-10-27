@@ -49,6 +49,7 @@ class NotificationsController extends AppController
     public function initialize(): void
     {
         parent::initialize();
+
         $this->loadComponent('OrderSearch');
         $this->viewBuilder()->setHelpers([
             'Html',

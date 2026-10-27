@@ -50,6 +50,7 @@ class CleanOldNotifsCommand extends Command
     public function initialize(): void
     {
         parent::initialize();
+
         $this->Notifications = $this->fetchTable('Notifications');
     }
 

@@ -42,6 +42,7 @@ class StatsController extends AppController
     public function initialize(): void
     {
         parent::initialize();
+
         $this->viewBuilder()->setHelpers(['Reports']);
         $this->Incidents = $this->fetchTable('Incidents');
     }
@@ -106,9 +107,7 @@ class StatsController extends AppController
         $this->set('download_stats', json_decode($downloadStats, true));
     }
 
-    /**
-     * @return mixed I am not sure about the type
-     */
+    /** @return mixed I am not sure about the type */
     protected function getTimeFilter()
     {
         if ($this->request->getQuery('filter')) {

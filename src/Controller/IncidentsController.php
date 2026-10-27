@@ -56,6 +56,7 @@ class IncidentsController extends AppController
     public function initialize(): void
     {
         parent::initialize();
+
         $this->loadComponent('Mailer');
         $this->Notifications = $this->fetchTable('Notifications');
         $this->Incidents = $this->fetchTable('Incidents');
@@ -94,10 +95,7 @@ class IncidentsController extends AppController
             Sentry::process($report);
         }
 
-        if (
-            count($result['incidents']) > 0
-            && ! in_array(false, $result['incidents'])
-        ) {
+        if (count($result['incidents']) > 0 && ! in_array(false, $result['incidents'])) {
             $response = ['success' => true];
         } else {
             $response = ['success' => false];

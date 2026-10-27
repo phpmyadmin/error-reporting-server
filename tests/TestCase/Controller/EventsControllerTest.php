@@ -26,6 +26,7 @@ class EventsControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 

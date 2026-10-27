@@ -285,10 +285,7 @@ class IncidentsTable extends Table
      */
     protected function getClosestReport(array $bugReport, int $index = 0): ?Entity
     {
-        if (
-            isset($bugReport['exception_type'])
-            && $bugReport['exception_type'] === 'php'
-        ) {
+        if (isset($bugReport['exception_type']) && $bugReport['exception_type'] === 'php') {
             $location = $bugReport['errors'][$index]['file'];
             $linenumber = $bugReport['errors'][$index]['lineNum'];
         } else {
@@ -314,10 +311,7 @@ class IncidentsTable extends Table
      */
     protected function getReportDetails(array $bugReport, int $index = 0): array
     {
-        if (
-            isset($bugReport['exception_type'])
-            && $bugReport['exception_type'] === 'php'
-        ) {
+        if (isset($bugReport['exception_type']) && $bugReport['exception_type'] === 'php') {
             $location = $bugReport['errors'][$index]['file'];
             $linenumber = $bugReport['errors'][$index]['lineNum'];
             $reportDetails = [
@@ -375,10 +369,7 @@ class IncidentsTable extends Table
             'full_report' => json_encode($bugReport),
         ];
 
-        if (
-            isset($bugReport['exception_type'])
-            && $bugReport['exception_type'] === 'php'
-        ) {
+        if (isset($bugReport['exception_type']) && $bugReport['exception_type'] === 'php') {
             // for each "errors"
             foreach ($bugReport['errors'] as $error) {
                 $tmpReport = array_merge(
@@ -610,10 +601,7 @@ class IncidentsTable extends Table
         $stacktraceLength = mb_strlen($si['stacktrace']);
         $fullReportLength = mb_strlen($si['full_report']);
 
-        if (
-            $stacktraceLength <= 65535
-            && $fullReportLength <= 65535
-        ) {
+        if ($stacktraceLength <= 65535 && $fullReportLength <= 65535) {
             return;
         }
 

@@ -88,6 +88,7 @@ class AppController extends Controller
     public function initialize(): void
     {
         parent::initialize();
+
         $this->loadComponent('Flash');
         $this->Notifications = $this->fetchTable('Notifications');
         $this->Developers = $this->fetchTable('Developers');

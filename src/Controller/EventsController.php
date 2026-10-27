@@ -42,6 +42,7 @@ class EventsController extends AppController
     public function initialize(): void
     {
         parent::initialize();
+
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
     }
 
@@ -75,11 +76,7 @@ class EventsController extends AppController
         $eventAction = $issuesData['action'];
         $issueNumber = $issuesData['issue'] ? $issuesData['issue']['number'] : '';
 
-        if (
-            $eventAction === 'closed'
-            || $eventAction === 'opened'
-            || $eventAction === 'reopened'
-        ) {
+        if ($eventAction === 'closed' || $eventAction === 'opened' || $eventAction === 'reopened') {
             $status = $this->getAppropriateStatus($eventAction);
             $reportsUpdated = $this->Reports->setLinkedReportStatus($issueNumber, $status);
             if ($reportsUpdated > 0) {

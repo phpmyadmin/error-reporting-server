@@ -41,6 +41,7 @@ class IncidentsControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->Incidents = TableRegistry::getTableLocator()->get('Incidents');
         //$Session = new SessionComponent(new ComponentRegistry());
         $this->session(['Developer.id' => 1, 'read_only' => false]);

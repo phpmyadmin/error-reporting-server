@@ -54,6 +54,7 @@ class StatsCommand extends Command
     public function initialize(): void
     {
         parent::initialize();
+
         $this->Incidents = $this->fetchTable('Incidents');
         $this->Reports = $this->fetchTable('Reports');
     }

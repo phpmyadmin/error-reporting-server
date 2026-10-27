@@ -116,12 +116,12 @@ class Report extends stdClass
         //$tags->browser_name = $this->{'browser_name'} ?? null;
         //$tags->browser_version = $this->{'browser_version'} ?? null;
         //$tags->user_os = $this->{'user_os'} ?? null;
-        $tags->server_software = $this->{'server_software'} ?? null;
-        $tags->user_agent_string = $this->{'user_agent_string'} ?? null;
-        $tags->locale = $this->{'locale'} ?? null;
-        $tags->configuration_storage = ($this->{'configuration_storage'} ?? '') === 'enabled'; // "enabled" or "disabled"
-        $tags->php_version = $this->{'php_version'} ?? null;
-        $tags->exception_type = $this->{'exception_type'} ?? null;// js or php
+        $tags->server_software = $this->server_software ?? null;
+        $tags->user_agent_string = $this->user_agent_string ?? null;
+        $tags->locale = $this->locale ?? null;
+        $tags->configuration_storage = ($this->configuration_storage ?? '') === 'enabled'; // "enabled" or "disabled"
+        $tags->php_version = $this->php_version ?? null;
+        $tags->exception_type = $this->exception_type ?? null;// js or php
 
         return $tags;
     }
@@ -130,11 +130,11 @@ class Report extends stdClass
     {
         $contexts = new stdClass();
         $contexts->os = new stdClass();
-        $contexts->os->name = $this->{'user_os'} ?? null;
+        $contexts->os->name = $this->user_os ?? null;
 
         $contexts->browser = new stdClass();
-        $contexts->browser->name = $this->{'browser_name'} ?? null;
-        $contexts->browser->version = $this->{'browser_version'} ?? null;
+        $contexts->browser->name = $this->browser_name ?? null;
+        $contexts->browser->version = $this->browser_version ?? null;
 
         return $contexts;
     }
@@ -144,25 +144,23 @@ class Report extends stdClass
         return htmlspecialchars_decode(html_entity_decode($text, ENT_QUOTES | ENT_HTML5));
     }
 
-    /**
-     * @return array<string,mixed>
-     */
+    /** @return array<string,mixed> */
     public function getExceptionJS(): array
     {
         $exception = new stdClass();
-        $exception->type = $this->decode($this->{'exception'}->name ?? '');
-        $exception->value = $this->decode($this->{'exception'}->message ?? '');
+        $exception->type = $this->decode($this->exception->name ?? '');
+        $exception->value = $this->decode($this->exception->message ?? '');
         $exception->stacktrace = new stdClass();
         $exception->stacktrace->frames = [];
-        $exStack = ($this->{'exception'} ?? (object) ['stack' => []])->{'stack'} ?? [];
+        $exStack = ($this->exception ?? (object) ['stack' => []])->stack ?? [];
         foreach ($exStack as $stack) {
             $exception->stacktrace->frames[] = [
                 'platform' => 'javascript',
-                'function' => $this->decode($stack->{'func'} ?? ''),
-                'lineno' => (int) ($stack->{'line'} ?? 0),
-                'colno' => (int) ($stack->{'column'} ?? 0),
-                'abs_path' => $stack->{'uri'} ?? '',
-                'filename' => $stack->{'scriptname'} ?? '',
+                'function' => $this->decode($stack->func ?? ''),
+                'lineno' => (int) ($stack->line ?? 0),
+                'colno' => (int) ($stack->column ?? 0),
+                'abs_path' => $stack->uri ?? '',
+                'filename' => $stack->scriptname ?? '',
             ];
         }
 
@@ -171,8 +169,8 @@ class Report extends stdClass
             'exception' => [
                 'values' => [$exception],
             ],
-            'message' => $this->decode($this->{'exception'}->message ?? ''),
-            'culprit' => $this->{'script_name'} ?? $this->{'uri'} ?? null,
+            'message' => $this->decode($this->exception->message ?? ''),
+            'culprit' => $this->script_name ?? $this->uri ?? null,
         ];
     }
 
@@ -184,7 +182,7 @@ class Report extends stdClass
     public function getUserMessage(): stdClass
     {
         $userMessage = new stdClass();
-        $userMessage->{'message'} = $this->decode($this->{'description'} ?? '');
+        $userMessage->message = $this->decode($this->description ?? '');
 
         return $userMessage;
     }
@@ -193,11 +191,11 @@ class Report extends stdClass
     {
         // Do not use the Ip as real data, protect the user !
         $userIp = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
-        $serverSoftware = $this->{'server_software'} ?? null;
-        $userAgentString = $this->{'user_agent_string'} ?? null;
-        $locale = $this->{'locale'} ?? null;
-        $configurationStorage = $this->{'configuration_storage'} ?? null;
-        $phpVersion = $this->{'php_version'} ?? null;
+        $serverSoftware = $this->server_software ?? null;
+        $userAgentString = $this->user_agent_string ?? null;
+        $locale = $this->locale ?? null;
+        $configurationStorage = $this->configuration_storage ?? null;
+        $phpVersion = $this->php_version ?? null;
 
         $userIp = Security::hash(
             $userIp . crc32($userIp),
@@ -246,8 +244,8 @@ class Report extends stdClass
 
     public function getRoute(): ?string
     {
-        if (isset($this->{'exception'})) {
-            return $this->findRoute($this->{'exception'}->{'uri'} ?? null);
+        if (isset($this->exception)) {
+            return $this->findRoute($this->exception->uri ?? null);
         }
 
         return null;
@@ -255,7 +253,7 @@ class Report extends stdClass
 
     public function isMultiReports(): bool
     {
-        return isset($this->{'exception_type'}) && $this->{'exception_type'} === 'php';
+        return isset($this->exception_type) && $this->exception_type === 'php';
     }
 
     public function typeToLevel(string $type): string
@@ -287,9 +285,7 @@ class Report extends stdClass
         }
     }
 
-    /**
-     * @return array<int,array<string,mixed>>
-     */
+    /** @return array<int,array<string,mixed>> */
     public function getMultiDataToSend(): array
     {
         $reports = [];
@@ -319,30 +315,30 @@ class Report extends stdClass
             "stackhash": "e6e0b1e1b9d90fee08a5ab8226e485fb"
         }
         */
-        foreach ($this->{'errors'} as $error) {
+        foreach ($this->errors as $error) {
             $exception = new stdClass();
-            $exception->type = $this->decode($error->{'type'} ?? '');
-            $exception->value = $this->decode($error->{'msg'} ?? '');
+            $exception->type = $this->decode($error->type ?? '');
+            $exception->value = $this->decode($error->msg ?? '');
             $exception->stacktrace = new stdClass();
             $exception->stacktrace->frames = [];
 
-            foreach ($error->{'stackTrace'} as $stack) {
+            foreach ($error->stackTrace as $stack) {
                 $trace = [
                     'platform' => 'php',
-                    'function' => $stack->{'function'} ?? '',
-                    'lineno' => (int) ($stack->{'line'} ?? 0),
-                    'filename' => $error->{'file'} ?? null,
+                    'function' => $stack->function ?? '',
+                    'lineno' => (int) ($stack->line ?? 0),
+                    'filename' => $error->file ?? null,
                 ];
-                if (isset($stack->{'class'})) {
-                    $trace['package'] = $stack->{'class'};
+                if (isset($stack->class)) {
+                    $trace['package'] = $stack->class;
                 }
 
-                if (isset($stack->{'type'})) {
-                    $trace['symbol_addr'] = $stack->{'type'};
+                if (isset($stack->type)) {
+                    $trace['symbol_addr'] = $stack->type;
                 }
 
-                if (isset($stack->{'args'})) {// function arguments
-                    $trace['vars'] = (object) $stack->{'args'};
+                if (isset($stack->args)) {// function arguments
+                    $trace['vars'] = (object) $stack->args;
                 }
 
                 $exception->stacktrace->frames[] = $trace;
@@ -350,12 +346,12 @@ class Report extends stdClass
 
             $reports[] = [
                 'platform' => 'php',
-                'level' => $this->typeToLevel($error->{'type'}),
+                'level' => $this->typeToLevel($error->type),
                 'exception' => [
                     'values' => [$exception],
                 ],
-                'message' => $this->decode($error->{'msg'} ?? ''),
-                'culprit' => $error->{'file'},
+                'message' => $this->decode($error->msg ?? ''),
+                'culprit' => $error->file,
             ];
         }
 
@@ -364,15 +360,13 @@ class Report extends stdClass
 
     public function getPmaVersion(): string
     {
-        return IncidentsTable::getStrippedPmaVersion($this->{'pma_version'} ?? '');
+        return IncidentsTable::getStrippedPmaVersion($this->pma_version ?? '');
     }
 
-    /**
-     * @return array<string,mixed>
-     */
+    /** @return array<string,mixed> */
     public function toJson(): array
     {
-        $exType = $this->{'exception_type'} ?? 'js';
+        $exType = $this->exception_type ?? 'js';
 
         // array_filter removes keys having null values
         $release = $this->getPmaVersion();
@@ -380,7 +374,7 @@ class Report extends stdClass
         return array_filter([
             'sentry.interfaces.Message' => $this->getUserMessage(),
             'release' => $release,
-            'dist' => $this->{'pma_version'} ?? '',
+            'dist' => $this->pma_version ?? '',
             'platform' => $exType === 'js' ? 'javascript' : 'php',
             'timestamp' => $this->getTimestampUTC(),
             'tags' => $this->getTags(),
@@ -393,9 +387,7 @@ class Report extends stdClass
         ]);
     }
 
-    /**
-     * @return array<int,array<string,mixed>>
-     */
+    /** @return array<int,array<string,mixed>> */
     public function getReports(): array
     {
         if ($this->isMultiReports()) {

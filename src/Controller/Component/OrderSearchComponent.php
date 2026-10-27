@@ -36,8 +36,6 @@ class OrderSearchComponent extends Component
      * and hence it should be ignored.
      *
      * @param string[] $aColumns The columns
-     *
-     * @return array
      */
     public function getSearchConditions(array $aColumns, ServerRequest $request): array
     {
@@ -84,10 +82,7 @@ class OrderSearchComponent extends Component
             $keys = array_keys($aColumns);
 
             $sortDir = $request->getQuery('sSortDir_0');
-            if (
-                $sort_column_index > 0
-                && $request->getQuery('bSortable_' . $sort_column_index) === 'true'
-            ) {
+            if ($sort_column_index > 0 && $request->getQuery('bSortable_' . $sort_column_index) === 'true') {
                 $order[] = [$aColumns[$keys[$sort_column_index - 1]] . ' ' . $sortDir];
             }
 

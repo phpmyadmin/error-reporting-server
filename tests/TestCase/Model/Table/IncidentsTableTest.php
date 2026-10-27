@@ -36,6 +36,7 @@ class IncidentsTableTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->Incidents = TableRegistry::getTableLocator()->get('Incidents');
     }
 

@@ -54,6 +54,7 @@ class DevelopersControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->Developers = TableRegistry::getTableLocator()->get('Developers');
     }
 

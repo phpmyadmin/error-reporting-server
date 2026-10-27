@@ -35,6 +35,7 @@ class ReportsControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $this->session(['Developer.id' => 1, 'read_only' => false]);
         $this->enableCsrfToken();

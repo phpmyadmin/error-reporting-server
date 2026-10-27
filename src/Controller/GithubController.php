@@ -51,6 +51,7 @@ class GithubController extends AppController
     public function initialize(): void
     {
         parent::initialize();
+
         $this->loadComponent('GithubApi');
         $this->viewBuilder()->setHelpers([
             'Html',
@@ -399,10 +400,7 @@ class GithubController extends AppController
             return false;
         }
 
-        if (
-            $response === 404
-            && $type === 2
-        ) {
+        if ($response === 404 && $type === 2) {
             $flash_class = 'alert alert-error';
             $this->Flash->set(
                 'Bug Issue not found on Github.'

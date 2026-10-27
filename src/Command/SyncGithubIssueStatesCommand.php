@@ -49,9 +49,7 @@ class SyncGithubIssueStatesCommand extends Command
             ->setDescription('Sync GitHub issues states');
     }
 
-    /**
-     * @return int
-     */
+    /** @return int */
     public function execute(Arguments $args, ConsoleIo $io)
     {
         Log::debug(

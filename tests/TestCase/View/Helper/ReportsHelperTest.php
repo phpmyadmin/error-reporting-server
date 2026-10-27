@@ -14,6 +14,7 @@ class ReportsHelperTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $View = new View();
         $this->Reports = new ReportsHelper($View);
     }

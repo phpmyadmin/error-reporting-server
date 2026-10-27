@@ -225,7 +225,6 @@ class GithubApiComponent extends Component
      * @param string $repoPath     The repo slug
      * @param array  $data         issue details
      * @param string $access_token the github access token
-     * @return array
      */
     public function createIssue(string $repoPath, array $data, string $access_token): array
     {
@@ -245,7 +244,6 @@ class GithubApiComponent extends Component
      * @param array  $data         The data
      * @param int    $issueNumber  The issue number
      * @param string $access_token The github access token
-     * @return array
      */
     public function createComment(string $repoPath, array $data, int $issueNumber, string $access_token): array
     {
@@ -265,7 +263,6 @@ class GithubApiComponent extends Component
      * @param array  $data         The data
      * @param int    $issueNumber  The issue number
      * @param string $access_token The github access token
-     * @return array
      */
     public function getIssue(string $repoPath, array $data, int $issueNumber, string $access_token): array
     {

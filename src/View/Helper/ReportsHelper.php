@@ -102,9 +102,7 @@ class ReportsHelper extends AppHelper
         return $html;
     }
 
-    /**
-     * @return string HTML code
-     */
+    /** @return string HTML code */
     public function getChartArray(string $arrayName, array $columns, array $relatedEntries): string
     {
         $finalData = [];
@@ -131,9 +129,7 @@ class ReportsHelper extends AppHelper
             ) . ';';
     }
 
-    /**
-     * @return string HTML
-     */
+    /** @return string HTML */
     public function getLineChartData(string $arrayName, array $entries): string
     {
         $data = [];

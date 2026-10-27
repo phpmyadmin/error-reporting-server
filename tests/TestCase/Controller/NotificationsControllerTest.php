@@ -36,6 +36,7 @@ class NotificationsControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->Notifications = TableRegistry::getTableLocator()->get('Notifications');
         $this->enableCsrfToken();
     }

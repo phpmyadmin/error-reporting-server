@@ -54,6 +54,7 @@ class ReportsController extends AppController
     public function initialize(): void
     {
         parent::initialize();
+
         $this->loadComponent('OrderSearch');
         $this->viewBuilder()->setHelpers([
             'Html',
@@ -268,11 +269,7 @@ class ReportsController extends AppController
         $this->request->allowMethod(['post']);
 
         $relatedTo = $this->request->getData('related_to');
-        if (
-            ! $reportId
-            || ! $relatedTo
-            || $reportId === $relatedTo
-        ) {
+        if (! $reportId || ! $relatedTo || $reportId === $relatedTo) {
             throw new NotFoundException('Invalid Report');
         }
 
@@ -439,10 +436,7 @@ class ReportsController extends AppController
         return $output;
     }
 
-    /**
-     * @param mixed $results
-     * @return array
-     */
+    /** @param mixed $results */
     protected function findAllDataTable($results): array
     {
         $output = [];
