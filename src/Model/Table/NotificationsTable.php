@@ -20,10 +20,8 @@ namespace App\Model\Table;
 
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
-use InvalidArgumentException;
 
 use function date;
-use function is_int;
 use function time;
 
 /**
@@ -82,19 +80,17 @@ class NotificationsTable extends Table
      */
     public static function addNotifications(int $report_id)
     {
-        if (! is_int($report_id)) {
-            throw new InvalidArgumentException('Invalid Argument "$report_id"! Integer Expected.');
-        }
-
         $devs = TableRegistry::getTableLocator()->get('Developers')->find('all');
         $notoficationTable = TableRegistry::getTableLocator()->get('Notifications');
         $res = true;
         foreach ($devs as $dev) {
             $notification = $notoficationTable->newEmptyEntity();
-            $notification->developer_id = $dev->get('id');
-            $notification->report_id = $report_id;
-            $notification->created = date('Y-m-d H:i:s', time());
-            $notification->modified = date('Y-m-d H:i:s', time());
+            $notification->patch([
+                'developer_id' => $dev->get('id'),
+                'report_id' => $report_id,
+                'created' => date('Y-m-d H:i:s', time()),
+                'modified' => date('Y-m-d H:i:s', time()),
+            ]);
             $res = $notoficationTable->save($notification);
         }
 

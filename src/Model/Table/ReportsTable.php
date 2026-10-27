@@ -123,7 +123,7 @@ class ReportsTable extends Table
      */
     public function removeFromRelatedGroup(EntityInterface $report): void
     {
-        $report->related_to = null;
+        $report->set('related_to', null);
         $this->save($report);
 
         $rel_report = $this->findByRelatedTo($report->get('id'))->first();
@@ -152,13 +152,14 @@ class ReportsTable extends Table
     {
         $dup_report = $this->get($related_to);
 
-        if ($dup_report && $dup_report->related_to) {
-            $report->related_to = $dup_report->related_to;
+        $dup_related_to = $dup_report->get('related_to');
+        if ($dup_related_to) {
+            $report->set('related_to', $dup_related_to);
         } else {
-            $report->related_to = $related_to;
+            $report->set('related_to', $related_to);
         }
 
-        $report->status = $dup_report->status;
+        $report->set('status', $dup_report->get('status'));
 
         $this->save($report);
     }
