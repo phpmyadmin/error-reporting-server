@@ -271,48 +271,6 @@ parameters:
 			path: src/Mailer/Transport/TestTransport.php
 
 		-
-			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$access_token\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Model/Table/DevelopersTable.php
-
-		-
-			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Model/Table/DevelopersTable.php
-
-		-
-			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$full_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Model/Table/DevelopersTable.php
-
-		-
-			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$github_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Model/Table/DevelopersTable.php
-
-		-
-			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$gravatar_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Model/Table/DevelopersTable.php
-
-		-
-			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$has_commit_access\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Model/Table/DevelopersTable.php
-
-		-
-			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Model/Table/DevelopersTable.php
-
-		-
 			message: '#^Method App\\Model\\Table\\DevelopersTable\:\:saveFromGithub\(\) has parameter \$githubInfo with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

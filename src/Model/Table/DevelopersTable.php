@@ -21,6 +21,8 @@ namespace App\Model\Table;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Table;
 
+use function is_int;
+
 /**
  * A developer who has access to the system.
  */
@@ -37,14 +39,18 @@ class DevelopersTable extends Table
      */
     public function saveFromGithub(array $githubInfo, string $accessToken, EntityInterface $developer): int|null
     {
-        $developer->full_name = $githubInfo['name'];
-        $developer->gravatar_id = $githubInfo['gravatar_id'];
-        $developer->email = $githubInfo['email'];
-        $developer->github_id = $githubInfo['id'];
-        $developer->access_token = $accessToken;
-        $developer->has_commit_access = $githubInfo['has_commit_access'] ? 1 : 0;
+        $developer->patch([
+            'full_name' => $githubInfo['name'],
+            'gravatar_id' => $githubInfo['gravatar_id'],
+            'email' => $githubInfo['email'],
+            'github_id' => $githubInfo['id'],
+            'access_token' => $accessToken,
+            'has_commit_access' => $githubInfo['has_commit_access'] ? 1 : 0,
+        ]);
         if ($this->save($developer)) {
-            return $developer->id;
+            $id = $developer->get('id');
+
+            return is_int($id) ? $id : null;
         }
 
         return null;
