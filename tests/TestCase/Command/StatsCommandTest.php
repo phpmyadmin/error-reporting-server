@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tests for Stats Shell.
+ * Tests for Stats Command.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -16,7 +16,7 @@
  * @see      https://www.phpmyadmin.net/
  */
 
-namespace App\Test\TestCase\Shell;
+namespace App\Test\TestCase\Command;
 
 use Cake\Cache\Cache;
 use Cake\Command\Command;
@@ -24,9 +24,9 @@ use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Shell\StatsShell Test Case
+ * App\Command\StatsCommand Test Case
  */
-class StatsShellTest extends TestCase
+class StatsCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
@@ -38,7 +38,7 @@ class StatsShellTest extends TestCase
         // Clear the existing cache
         Cache::clear();
 
-        // Run the shell command
+        // Run the command
         $this->exec('stats');
         $this->assertExitCode(Command::CODE_SUCCESS);
         $Incidents = $this->getTableLocator()->get('Incidents');

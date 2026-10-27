@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\TestCase\Shell;
+namespace App\Test\TestCase\Command;
 
 use App\Test\Fixture\DevelopersFixture;
 use App\Test\Fixture\NotificationsFixture;
@@ -18,9 +18,9 @@ use function json_encode;
 use const DS;
 
 /**
- * App\Shell\SyncGithubIssueStatesShell Test Case
+ * App\Command\SyncGithubIssueStatesCommand Test Case
  */
-class SyncGithubIssueStatesShellTest extends TestCase
+class SyncGithubIssueStatesCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
     use PHPMock;
@@ -70,7 +70,7 @@ class SyncGithubIssueStatesShellTest extends TestCase
         );
         $this->assertEquals(3, $reports->count());
 
-        // Run the shell command
+        // Run the command
         $this->exec('sync_github_issue_states');
         $this->assertExitCode(Command::CODE_SUCCESS);
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tests for Clean Old Notifications Shell.
+ * Tests for Clean Old Notifications Command.
  *
  * phpMyAdmin Error reporting server
  * Copyright (c) phpMyAdmin project (https://www.phpmyadmin.net/)
@@ -16,7 +16,7 @@
  * @see      https://www.phpmyadmin.net/
  */
 
-namespace App\Test\TestCase\Shell;
+namespace App\Test\TestCase\Command;
 
 use App\Test\Fixture\DevelopersFixture;
 use App\Test\Fixture\NotificationsFixture;
@@ -25,9 +25,9 @@ use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Shell\CleanOldNotifsShell Test Case
+ * App\Command\CleanOldNotifsCommand Test Case
  */
-class CleanOldNotifsShellTest extends TestCase
+class CleanOldNotifsCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
@@ -51,7 +51,7 @@ class CleanOldNotifsShellTest extends TestCase
             = $Notifications->find('all')->where($conditions)->count();
         $this->assertEquals(2, $currentNotificationCount);
 
-        // Run the shell command
+        // Run the command
         $this->exec('clean_old_notifs');
         $this->assertExitCode(Command::CODE_SUCCESS);
 
