@@ -174,31 +174,25 @@ composer run phpcs
 composer run phpstan
 ```
 
-# Running the stackhash update shell
-
-There is a new way of finding unique stacktraces that uses hashes that did not
-exist previously. I created a shell to calculate those hashes for old records so
-that they can work with the new code. To use the shell you can just type:
-
-```sh
-Console/cake custom addHashesToOldRecords
-```
-
 # Cron Jobs
 
-To Schedule & run cron jobs cakephp provides a console tool. We need to create shell for use in console. We can run the created shell as cron job.
+To schedule and run cron jobs, CakePHP provides a console tool. A command can be
+run as a cron job.
 
 ### Execute an Action as Cron Job
-For example, following is the command to execute the shell src/Shell/StatsShell.php which cache the error reporting statistics for later use.
+For example, following is the command to execute src/Command/StatsCommand.php
+which caches the error reporting statistics for later use.
 
 ```sh
 bin/cake stats
 ```
 
-stats cache will expire in one day so we need to schedule this command to run everyday as cron job.
-
-We need to create new shells to schedule and run different tasks.
+The statistics cache expires in one day so we need to schedule this command to
+run everyday as cron job.
 
 ### Cron Job Logging
 
-A separate log file named `cron_jobs` is maintained for all the cron jobs. All the logging is done via `CakeLog` interface. All the failures and other activity relating to cron jobs should be reported there only. That would make debugging easier in case of failure.
+A separate log file named `cron_jobs` is maintained for all the cron jobs. The
+logging is done via the `Log` class. All the failures and other activity relating
+to cron jobs should be reported there only. That makes debugging easier in case
+of a failure.
