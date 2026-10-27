@@ -80,7 +80,7 @@ use Cake\Utility\Inflector;
                     <?php if (isset($current_developer) && $current_developer !== null) : ?>
                         <li>
                             <p class="navbar-text">
-                                Hello, <?= $current_developer['full_name']; ?>
+                                Hello, <?= h($current_developer['full_name']); ?>
                             </p>
                         </li>
                         <li>
