@@ -55,7 +55,8 @@
         "post-install-cmd": "App\\Console\\Installer::postInstall",
         "check": [
             "@test",
-            "@phpcs"
+            "@phpcs",
+            "@phpstan"
         ],
         "phpcs": "@php ./vendor/bin/phpcs",
         "phpcbf": "@php ./vendor/bin/phpcbf",
