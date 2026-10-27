@@ -93,7 +93,7 @@ class EventsSecurityTest extends TestCase
         $this->assertSame('new', $this->Reports->get(4)->get('status'));
     }
 
-    /** @return array<string, array{string}> */
+    /** @return array<string, array<int, string>> */
     public static function invalidSignatureProvider(): array
     {
         return [
