@@ -174,7 +174,7 @@ class IncidentsHelper extends AppHelper
                 continue;
             }
 
-            $html .= $element . ': ' . $level[$element] . '; ';
+            $html .= $element . ': ' . htmlspecialchars($level[$element]) . '; ';
         }
 
         $html .= '</span>';

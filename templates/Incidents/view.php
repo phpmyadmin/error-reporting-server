@@ -1,4 +1,4 @@
-<h1>Incident #<?= $incident['id']; ?>
+<h1>Incident #<?= h($incident['id']); ?>
     <small>[Report <?= $this->Reports->linkToReportFromIncident($incident); ?>]</small>
 </h1>
 <table cellspacing="0" class="table table-bordered error-report">
@@ -11,31 +11,31 @@
     <tr>
         <td>Error Name</td>
         <td>
-            <?= $incident['error_name']; ?>
+            <?= h($incident['error_name']); ?>
         </td>
     </tr>
     <tr>
         <td>Error Message</td>
         <td>
-            <?= $incident['error_message']; ?>
+            <?= h($incident['error_message']); ?>
         </td>
     </tr>
     <tr>
         <td>Submission Date</td>
         <td>
-            <?= $incident['created']; ?>
+            <?= h($incident['created']); ?>
         </td>
     </tr>
     <tr>
         <td>PMA Version</td>
         <td>
-            <?= $incident['full_report']['pma_version']; ?>
+            <?= h($incident['full_report']['pma_version'] ?? ''); ?>
         </td>
     </tr>
     <tr>
         <td>PHP Version</td>
         <td>
-            <?= $incident['full_report']['php_version']; ?>
+            <?= h($incident['full_report']['php_version'] ?? ''); ?>
         </td>
     </tr>
     <tr>
@@ -50,31 +50,31 @@
     <tr>
         <td>Useragent</td>
         <td>
-            <?= $incident['full_report']['user_agent_string']; ?>
+            <?= h($incident['full_report']['user_agent_string'] ?? ''); ?>
         </td>
     </tr>
     <tr>
         <td>Server Software</td>
         <td>
-            <?= $incident['full_report']['server_software']; ?>
+            <?= h($incident['full_report']['server_software'] ?? ''); ?>
         </td>
     </tr>
     <tr>
         <td>User OS</td>
         <td>
-            <?= $incident['user_os']; ?>
+            <?= h($incident['user_os']); ?>
         </td>
     </tr>
     <tr>
         <td>Locale</td>
         <td>
-            <?= $incident['full_report']['locale']; ?>
+            <?= h($incident['full_report']['locale'] ?? ''); ?>
         </td>
     </tr>
     <tr>
         <td>Script name</td>
         <td>
-            <?= $incident['script_name']; ?>
+            <?= h($incident['script_name']); ?>
         </td>
     </tr>
     <tr>
@@ -83,14 +83,14 @@
             <?php if ($incident['exception_type']) : ?>
                 <?= 'NA'; ?>
             <?php else : ?>
-                <?= $incident['full_report']['exception']['uri']; ?>
+                <?= h($incident['full_report']['exception']['uri'] ?? ''); ?>
             <?php endif; ?>
         </td>
     </tr>
     <tr>
         <td>Configuration storage enabled</td>
         <td>
-            <?= $incident['full_report']['configuration_storage']; ?>
+            <?= h($incident['full_report']['configuration_storage'] ?? ''); ?>
         </td>
     </tr>
 </table>
@@ -98,7 +98,7 @@
 <?php if (! empty($incident['steps'])) : ?>
     <h4>Description submited by user:</h4>
     <pre>
-        <?= nl2br($incident['steps']); ?>
+        <?= nl2br(h($incident['steps'])); ?>
     </pre>
 <?php endif; ?>
 
@@ -112,9 +112,11 @@
         <?= 'NA'; ?>
     <?php else : ?>
         <?=
-            json_encode(
-                $incident['full_report']['microhistory'],
-                JSON_PRETTY_PRINT,
+            h(
+                json_encode(
+                    $incident['full_report']['microhistory'],
+                    JSON_PRETTY_PRINT,
+                ),
             );
         ?>
     <?php endif; ?>
