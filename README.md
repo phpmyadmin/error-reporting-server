@@ -132,7 +132,7 @@ register an application there.
 
 The callback for the github app should be ``<http://YOUR_PREFERRED_DOMAIN>/developers/callback`` where ``YOUR_PREFERRED_DOMAIN`` is the URL you wish to access the local instance on.
 
-Copy the example configuration in ``config/oauth.example.php`` to ``config/oauth.php`` and replace the dummy credentials with the obtained client ID and secret.
+Copy the example configuration in ``config/oauth_example.php`` to ``config/oauth.php`` and replace the dummy credentials with the obtained client ID and secret.
 
 [gh-oauth]: https://github.com/settings/developers
 
