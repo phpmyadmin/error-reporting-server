@@ -97,11 +97,13 @@ class Report extends stdClass
 
     public function getEventId(): string
     {
-        if ($this->internal____eventId === null) {
-            $this->internal____eventId = bin2hex((string) openssl_random_pseudo_bytes(16));
+        $eventId = $this->internal____eventId;
+        if ($eventId === null) {
+            $eventId = bin2hex((string) openssl_random_pseudo_bytes(16));
+            $this->internal____eventId = $eventId;
         }
 
-        return $this->internal____eventId;
+        return $eventId;
     }
 
     public function getTimestampUTC(): string
@@ -218,8 +220,6 @@ class Report extends stdClass
             'sha256',
             true, // Enable app security salt
         );// Make finding back the Ip near to impossible
-
-        $user = new stdClass();
 
         // A user can be anonymously identified using the hash of the hashed IP + server software
         // + the UA + the locale + is configuration storage enabled + php version
