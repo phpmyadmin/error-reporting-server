@@ -31,7 +31,7 @@ In order to deploy the app in this repo you need to follow these steps:
 	- `setfacl -R -d -m u:${HTTPDUSER}:rwx tmp`
 	- `setfacl -R -m u:${HTTPDUSER}:rwx logs`
 	- `setfacl -R -d -m u:${HTTPDUSER}:rwx logs`
-- Copy the example files `config/app_example.php` to
+- Copy the default configuration file `config/app.default.php` to
   `config/app.php` and fill out the required info.
   Make sure to change the salts, debug level and
   the database credentials in the `app.php` file.
