@@ -59,11 +59,11 @@ use Cake\Routing\Router;
     </tr>
     <tr>
         <td>Error Name</td>
-        <td><?= $report[0]['error_name']; ?></td>
+        <td><?= h($report[0]['error_name']); ?></td>
     </tr>
     <tr>
         <td>Error Message</td>
-        <td><?= $report[0]['error_message']; ?></td>
+        <td><?= h($report[0]['error_message']); ?></td>
     </tr>
     <tr>
         <td>GitHub Issue</td>
@@ -196,11 +196,11 @@ use Cake\Routing\Router;
     <?php if ($incidents[0]['exception_type']) : // php ?>
         <tr>
             <td>Location</td>
-            <td><?= $report[0]['location']; ?></td>
+            <td><?= h($report[0]['location']); ?></td>
         </tr>
         <tr>
             <td>Line Number</td>
-            <td><?= $report[0]['linenumber']; ?></td>
+            <td><?= h($report[0]['linenumber']); ?></td>
         </tr>
     <?php else : ?>
         <tr>
@@ -271,8 +271,8 @@ use Cake\Routing\Router;
     <tr>
         <td>Submission Date</td>
         <td>
-            <?= $report[0]['created']; ?> and it was last seen on
-            <?= $incidents[0]['created']; ?>
+            <?= h($report[0]['created']); ?> and it was last seen on
+            <?= h($incidents[0]['created']); ?>
         </td>
     </tr>
     <tr>

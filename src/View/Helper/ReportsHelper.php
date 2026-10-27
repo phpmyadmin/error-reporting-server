@@ -8,7 +8,10 @@ use function count;
 use function implode;
 use function json_encode;
 
-use const JSON_UNESCAPED_SLASHES;
+use const JSON_HEX_AMP;
+use const JSON_HEX_APOS;
+use const JSON_HEX_QUOT;
+use const JSON_HEX_TAG;
 use const JSON_UNESCAPED_UNICODE;
 
 class ReportsHelper extends AppHelper
@@ -125,7 +128,8 @@ class ReportsHelper extends AppHelper
         return 'var ' . $arrayName . ' = '
             . json_encode(
                 $finalData,
-                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+                JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP
+                | JSON_HEX_APOS | JSON_HEX_QUOT,
             ) . ';';
     }
 
@@ -140,7 +144,8 @@ class ReportsHelper extends AppHelper
         return 'var ' . $arrayName . ' = '
         . json_encode(
             $data,
-            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+            JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP
+            | JSON_HEX_APOS | JSON_HEX_QUOT,
         ) . ';';
     }
 }

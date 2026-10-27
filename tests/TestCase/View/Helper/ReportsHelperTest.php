@@ -130,4 +130,39 @@ class ReportsHelperTest extends TestCase
             $links_str,
         );
     }
+
+    /**
+     * The chart data is printed inside a <script> element, a label must not be
+     * able to close it.
+     */
+    public function testTheChartLabelsCannotCloseTheScriptElement(): void
+    {
+        $helper = $this->Reports;
+
+        $script = $helper->getChartArray(
+            'related_reports_data',
+            ['php_version'],
+            [
+                'php_version' => [
+                    ['php_version' => '</script><script>alert("xss")</script>', 'count' => 1],
+                ],
+            ],
+        );
+
+        $this->assertStringNotContainsString('</script>', $script);
+    }
+
+    public function testTheLineChartDataCannotCloseTheScriptElement(): void
+    {
+        $helper = $this->Reports;
+
+        $script = $helper->getLineChartData(
+            'reports_data',
+            [
+                ['date' => '</script><script>alert("xss")</script>', 'count' => 1],
+            ],
+        );
+
+        $this->assertStringNotContainsString('</script>', $script);
+    }
 }
