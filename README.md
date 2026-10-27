@@ -192,8 +192,29 @@ SourceForge name, it holds the GitHub issue number.
   answers `200` before any signature check, it only tells GitHub that the
   endpoint is reachable.
 - The signature of the payload is read from the `X-Hub-Signature` header, the
-  SHA-1 one. GitHub also sends it until it is removed, together with the
-  `X-Hub-Signature-256` header this service does not read yet.
+  SHA-1 one, and it covers the body of the delivery. GitHub also sends it until
+  it is removed, together with the `X-Hub-Signature-256` header this service
+  does not read yet.
+
+### Answers
+
+| Status | When | Body |
+| ------ | ---- | ---- |
+| `200` | `ping` event | none |
+| `201` | a report was updated | none |
+| `204` | the delivery changes nothing | none |
+| `400` | the event is not an `Issues` one, or the `Host` header does not match | `{"error": "..."}` |
+| `401` | the signature is missing, unknown or wrong | `{"error": "..."}` |
+| `403` | the request does not come from GitHub | `{"error": "..."}` |
+
+A response without content carries no `Content-Type` header: the field
+describes the content of the message (RFC 9110, section 8.3), and a `204` must
+not have any content at all (section 15.3.5). The refusals carry a small JSON
+body, so their `application/json` content type is accurate and the reason can be
+read in the "Recent Deliveries" of the hook.
+
+GitHub only reads the status code, an answer that is not a `2xx` marks the
+delivery as failed and it can be redelivered from the interface.
 
 The `App.fullBaseUrl` setting has to be filled, with the `APP_FULL_BASE_URL`
 environment variable or the key of ``config/app.php``: without it every request

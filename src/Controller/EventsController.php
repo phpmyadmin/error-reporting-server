@@ -32,6 +32,7 @@ use function hash_hmac;
 use function hash_hmac_algos;
 use function in_array;
 use function json_decode;
+use function json_encode;
 use function strpos;
 
 /**
@@ -65,17 +66,12 @@ class EventsController extends AppController
                     . $statusCode . ' response.',
             );
 
-            // Send a response
-            $this->disableAutoRender();
-
-            return $this->response->withStatus($statusCode);
+            return $this->respond($statusCode);
         }
 
         if ($statusCode === 200) {
            // Send a success response to ping event
-            $this->disableAutoRender();
-
-            return $this->response->withStatus($statusCode);
+            return $this->respond($statusCode);
         }
 
         $issuesData = json_decode($payload, true);
@@ -107,9 +103,41 @@ class EventsController extends AppController
         }
 
         // Send a response
+        return $this->respond($statusCode);
+    }
+
+    /**
+     * Build the response of the webhook.
+     *
+     * A response without content must not carry a Content-Type header: the
+     * field describes the content of the message (RFC 9110 section 8.3) and
+     * CakePHP already removes it from a 204. The refusals carry a small JSON
+     * body instead, so the Content-Type tells the truth and the reason can be
+     * read in the "Recent Deliveries" of GitHub.
+     *
+     * @param int $statusCode Status code to answer with
+     *
+     * @return Response The response to send
+     */
+    protected function respond(int $statusCode): Response
+    {
         $this->disableAutoRender();
 
-        return $this->response->withStatus($statusCode);
+        $response = $this->response->withStatus($statusCode);
+
+        $reason = match ($statusCode) {
+            400 => 'Unexpected event type.',
+            401 => 'The signature of the payload is missing or does not match.',
+            403 => 'The request does not come from GitHub.',
+            default => null,
+        };
+        if ($reason === null) {
+            return $response;
+        }
+
+        return $response
+            ->withType('application/json')
+            ->withStringBody((string) json_encode(['error' => $reason]));
     }
 
     /**

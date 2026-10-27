@@ -25,6 +25,7 @@ use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 use function hash_hmac;
+use function json_decode;
 use function json_encode;
 use function str_repeat;
 
@@ -170,5 +171,44 @@ class EventsSecurityTest extends TestCase
         $this->post('/events', $this->closingPayload());
 
         $this->assertResponseCode(401);
+    }
+
+    /**
+     * A 204 response has no content, so it must not declare a Content-Type
+     * (RFC 9110, sections 8.3 and 15.3.5).
+     */
+    public function testAnIgnoredEventHasNoContentType(): void
+    {
+        $payload = '{"action":"labeled","issue":{"number":4}}';
+        $this->configRequest([
+            'headers' => $this->headersWithoutSignature() + [
+                'X-Hub-Signature' => $this->sign($payload),
+            ],
+        ]);
+        $this->post('/events', $payload);
+
+        $this->assertResponseCode(204);
+        $this->assertFalse($this->_response->getHeaderLine('Content-Type') !== '');
+        $this->assertSame('', (string) $this->_response->getBody());
+    }
+
+    /**
+     * The refusals explain themselves in JSON.
+     */
+    public function testARefusalIsJson(): void
+    {
+        $this->configRequest([
+            'headers' => $this->headersWithoutSignature() + [
+                'X-Hub-Signature' => 'sha1=' . str_repeat('0', 40),
+            ],
+        ]);
+        $this->post('/events', $this->closingPayload());
+
+        $this->assertResponseCode(401);
+        $this->assertContentType('application/json');
+        $this->assertSame(
+            ['error' => 'The signature of the payload is missing or does not match.'],
+            json_decode((string) $this->_response->getBody(), true),
+        );
     }
 }
