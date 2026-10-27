@@ -32,11 +32,11 @@ use const PHP_URL_QUERY;
  */
 class Report extends stdClass
 {
-    private ?string $internal____date = null;
+    private string|null $internal____date = null;
 
-    private ?string $internal____eventId = null;
+    private string|null $internal____eventId = null;
 
-    private ?string $internal____userMessage = null;
+    private string|null $internal____userMessage = null;
 
     public function hasUserFeedback(): bool
     {

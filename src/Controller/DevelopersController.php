@@ -20,6 +20,7 @@ namespace App\Controller;
 
 use App\Controller\Component\GithubApiComponent;
 use Cake\Core\Configure;
+use Cake\Datasource\EntityInterface;
 use Cake\Http\Response;
 
 /**
@@ -121,16 +122,13 @@ class DevelopersController extends AppController
 
     protected function authenticateDeveloper(array $userInfo, string $accessToken): void
     {
-        $developers = $this->Developers->findByGithubId($userInfo['id']);
-        $developer = $developers->all()->first();
-        if (! $developer) {
+        $developer = $this->Developers->findByGithubId($userInfo['id'])->first();
+        if (! $developer instanceof EntityInterface) {
             $developer = $this->Developers->newEmptyEntity();
-        } else {
-            $this->Developers->id = $developer['id'];
         }
 
-        $this->Developers->id = $this->Developers->saveFromGithub($userInfo, $accessToken, $developer);
-        $this->request->getSession()->write('Developer.id', $this->Developers->id);
+        $developerId = $this->Developers->saveFromGithub($userInfo, $accessToken, $developer);
+        $this->request->getSession()->write('Developer.id', $developerId);
         $this->request->getSession()->write('access_token', $accessToken);
         $this->request->getSession()->write('read_only', ! $userInfo['has_commit_access']);
     }
