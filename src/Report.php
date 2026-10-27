@@ -29,6 +29,25 @@ use const PHP_URL_QUERY;
 
 /**
  * Represents an user report
+ *
+ * The properties below are the keys of the JSON payload sent by phpMyAdmin,
+ * fromObject() copies all of them on the instance.
+ *
+ * @property string|null            $browser_name
+ * @property string|null            $browser_version
+ * @property string|null            $configuration_storage
+ * @property string|null            $description
+ * @property array<int, mixed>|null $errors
+ * @property stdClass|null          $exception
+ * @property string|null            $exception_type
+ * @property string|null            $locale
+ * @property string|null            $php_version
+ * @property string|null            $pma_version
+ * @property string|null            $script_name
+ * @property string|null            $server_software
+ * @property string|null            $uri
+ * @property string|null            $user_agent_string
+ * @property string|null            $user_os
  */
 class Report extends stdClass
 {
