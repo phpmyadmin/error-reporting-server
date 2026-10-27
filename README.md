@@ -59,77 +59,19 @@ In order to deploy the app in this repo you need to follow these steps:
 - MySQL or MariaDB. The continuous integration runs the MariaDB version
   packaged in Debian 13 trixie (11.8).
 
-
 ## Web server setup
 
-- Configuration for Apache (this will run the server on port 80, if you
-  already have services on port 80 you may wish to use a different port
-  or configuration method):
-```apache
-<VirtualHost *:80>
-			ServerAdmin webmaster@localhost
-			ServerName reports.phpmyadmin.net
+The application is served from the `webroot` directory, and the web server has
+to send every request to `webroot/index.php`. Example configurations are kept
+in the `docs` directory:
 
-			<Directory /path/to/repo/dir/webroot/>
-				AddType application/x-httpd-php .html
-				Options Indexes MultiViews
-				Require all granted
-			</Directory>
+- [Apache](docs/apache.conf)
+- [Caddy](docs/Caddyfile)
+- [lighttpd](docs/lighttpd.conf)
+- [nginx](docs/nginx.conf)
 
-			ErrorLog "/var/log/httpd/dummy-host.example.com-error_log"
-			CustomLog "/var/log/httpd/dummy-host.example.com-access_log" common
-</VirtualHost>
-```
-- Configuration for lighttpd:
-```lighttpd
-$HTTP["host"] =~ "^reports.phpmyadmin.net$" {
-			server.document-root = "/srv/http/reports.phpmyadmin.net/webroot/"
-			url.rewrite-if-not-file =(
-				"^([^\?]*)(\?(.+))?$" => "/index.php?url=$1&$3"
-			)
-}
-```
-- Configuration for nginx:
-```nginx
-server {
-        listen [::]:80;
-        listen [::]:443 ssl;
-
-        root /home/reports/error-reporting-server/webroot/;
-        index index.php;
-
-        server_name reports.phpmyadmin.net;
-
-        location / {
-                # First attempt to serve request as file, then
-                # as directory, then fall back to displaying a 404.
-                try_files $uri $uri/ /index.php?$args;
-        }
-
-        location ~ \.php$ {
-                fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        #       # With php8.4-fpm:
-                fastcgi_pass unix:/var/run/php8.4-fpm-reports.sock;
-                fastcgi_index index.php;
-                include fastcgi_params;
-        }
-}
-```
-- Configuration for Caddy:
-```Caddyfile
-https://reports.phpmyadmin.net {
-    # Set this path to your site's directory.
-    root * /home/reports/error-reporting-server/webroot/
-    php_fastcgi unix//var/run/php8.4-fpm-reports.sock
-
-    # Enable the static file server.
-    encode gzip
-    file_server
-
-    try_files {path} {path}/ /index.php?{query}
-}
-
-```
+See [docs/server-setup.md](docs/server-setup.md) for the document root, the
+permissions, the PHP-FPM pool and the application URL.
 
 ## OAuth configuration setup
 
@@ -171,7 +113,7 @@ bin/cake sync_github_issue_states
 
 - This can be scheduled as a cron job too.
 
-# How to run the test suite
+## How to run the test suite
 
 You can run the test suite with:
 
@@ -186,7 +128,7 @@ composer run phpcs
 composer run phpstan
 ```
 
-# Cron Jobs
+## Cron Jobs
 
 To schedule and run cron jobs, CakePHP provides a console tool. A command can be
 run as a cron job.
