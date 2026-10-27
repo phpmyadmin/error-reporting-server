@@ -19,7 +19,6 @@
 namespace App\Model\Table;
 
 use Cake\Datasource\EntityInterface;
-use Cake\Model\Model;
 use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
@@ -29,40 +28,8 @@ use Cake\ORM\TableRegistry;
  */
 class ReportsTable extends Table
 {
-    public int $id;
-
     /**
-     * @see http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html#hasmany
-     * @see Cake::Model::$hasMany
-     */
-    public array $hasMany = [
-        'Incidents' => ['dependant' => true],
-    ];
-
-    /**
-     * @see http://book.cakephp.org/2.0/en/models/model-attributes.html#validate
-     * @see http://book.cakephp.org/2.0/en/models/data-validation.html
-     * @see Model::$validate
-     */
-    public array $validate = [
-        'error_message' => [
-            'rule' => 'notEmpty',
-            'required' => true,
-        ],
-    ];
-
-    /**
-     * List of valid finder method options, supplied as the first parameter to find().
-     *
-     * @see Model::$findMethods
-     */
-    public array $findMethods = [
-        'allDataTable' => true,
-        'arrayList' => true,
-    ];
-
-    /**
-     * List of valid finder method options, supplied as the first parameter to find().
+     * List of the available report statuses.
      */
     public array $status = [
         'new' => 'New',

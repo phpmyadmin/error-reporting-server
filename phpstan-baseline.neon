@@ -583,25 +583,7 @@ parameters:
 			path: src/Model/Table/ReportsTable.php
 
 		-
-			message: '#^Property App\\Model\\Table\\ReportsTable\:\:\$findMethods type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Model/Table/ReportsTable.php
-
-		-
-			message: '#^Property App\\Model\\Table\\ReportsTable\:\:\$hasMany type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Model/Table/ReportsTable.php
-
-		-
 			message: '#^Property App\\Model\\Table\\ReportsTable\:\:\$status type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Model/Table/ReportsTable.php
-
-		-
-			message: '#^Property App\\Model\\Table\\ReportsTable\:\:\$validate type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Model/Table/ReportsTable.php
