@@ -371,6 +371,15 @@ return [
             'url' => env('LOG_QUERIES_URL', null),
             'scopes' => ['cake.database.queries'],
         ],
+        // The activity of the commands run by cron, see the README
+        'cron_jobs' => [
+            'className' => FileLog::class,
+            'path' => LOGS,
+            'file' => 'cron_jobs',
+            'url' => env('LOG_CRON_JOBS_URL', null),
+            'scopes' => ['cron_jobs'],
+            'levels' => [],
+        ],
     ],
 
     /*

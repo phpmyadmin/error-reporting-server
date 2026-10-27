@@ -346,6 +346,14 @@ return [
             'url' => null,
             'scopes' => ['queriesLog'],
         ],
+        'cron_jobs' => [
+            'className' => FileLog::class,
+            'path' => LOGS,
+            'file' => 'cron_jobs',
+            'url' => null,
+            'scopes' => ['cron_jobs'],
+            'levels' => [],
+        ],
     ],
 
     /**
