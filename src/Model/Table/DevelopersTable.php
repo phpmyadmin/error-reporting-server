@@ -29,15 +29,17 @@ use function is_int;
 class DevelopersTable extends Table
 {
     /**
-     * creates a developer record given his github info and his access token.
+     * creates a developer record given his github info.
      *
-     * @param array           $githubInfo  the data gitub has on this developer
-     * @param string          $accessToken this developer's access token
-     * @param EntityInterface $developer   the developper
+     * The GitHub access token is not stored: it is only kept in the session
+     * for the current login and never written in plain text in the database.
+     *
+     * @param array           $githubInfo the data gitub has on this developer
+     * @param EntityInterface $developer  the developper
      *
      * @return int|null The developer Id
      */
-    public function saveFromGithub(array $githubInfo, string $accessToken, EntityInterface $developer): int|null
+    public function saveFromGithub(array $githubInfo, EntityInterface $developer): int|null
     {
         $developer->patch([
             'full_name' => $githubInfo['name'],
@@ -46,7 +48,6 @@ class DevelopersTable extends Table
             // the address when the developer made it public.
             'email' => $githubInfo['email'] ?? null,
             'github_id' => $githubInfo['id'],
-            'access_token' => $accessToken,
             'has_commit_access' => $githubInfo['has_commit_access'] ? 1 : 0,
         ]);
         if ($this->save($developer)) {

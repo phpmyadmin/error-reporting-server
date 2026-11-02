@@ -88,9 +88,8 @@ class DevelopersTableTest extends TestCase
             'has_commit_access' => 0,
         ];
         $developer = $this->Developers->newEmptyEntity();
-        $access_token = 'abc';
 
-        $this->Developers->saveFromGithub($githubInfo, $access_token, $developer);
+        $this->Developers->saveFromGithub($githubInfo, $developer);
 
         $savedDeveloper = $this->Developers->get($nextId);
         $this->assertNotEquals(null, $savedDeveloper);
@@ -98,6 +97,7 @@ class DevelopersTableTest extends TestCase
         $this->assertEquals('PMA BOT', $savedDeveloper->full_name);
         $this->assertEquals('pma-bot@phpmyadmin.net', $savedDeveloper->email);
         $this->assertEquals(false, $savedDeveloper->has_commit_access);
+        $this->assertNull($savedDeveloper->access_token, 'The access token must not be stored in plain text.');
 
         $updatedGithubInfo = [
             'login' => 'pma-bot',
@@ -109,7 +109,7 @@ class DevelopersTableTest extends TestCase
             'has_commit_access' => 1,// changed
         ];
 
-        $this->Developers->saveFromGithub($updatedGithubInfo, $access_token, $developer);
+        $this->Developers->saveFromGithub($updatedGithubInfo, $developer);
 
         $savedDeveloper = $this->Developers->get($nextId);
         $this->assertNotEquals(null, $savedDeveloper);
