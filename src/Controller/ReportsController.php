@@ -322,6 +322,9 @@ class ReportsController extends AppController
 
     public function change_state(string|null $reportId): Response
     {
+        // Only allow POST requests, so that the CSRF middleware applies.
+        $this->request->allowMethod(['post']);
+
         if (! $reportId) {
             throw new NotFoundException('Invalid Report');
         }
@@ -362,6 +365,9 @@ class ReportsController extends AppController
      */
     public function mass_action(): Response
     {
+        // Only allow POST requests, so that the CSRF middleware applies.
+        $this->request->allowMethod(['post']);
+
         $flash_class = 'alert alert-error';
         $state = $this->request->getData('state');
         $newState = null;

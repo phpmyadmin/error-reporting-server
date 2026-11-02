@@ -83,11 +83,15 @@ class GithubController extends AppController
 
         $reportArray = $report->toArray();
         if (empty($this->request->getParsedBody())) {
+            // The form is displayed by a GET request, the submission is a POST one.
             $this->set('error_name', $reportArray['error_name']);
             $this->set('error_message', $reportArray['error_message']);
 
             return null;
         }
+
+        // Only allow POST requests, so that the CSRF middleware applies.
+        $this->request->allowMethod(['post']);
 
         $this->disableAutoRender();
         $data = [
@@ -137,6 +141,9 @@ class GithubController extends AppController
      */
     public function link_issue($reportId): Response
     {
+        // Only allow POST requests, so that the CSRF middleware applies.
+        $this->request->allowMethod(['post']);
+
         if (empty($reportId)) {
             throw new NotFoundException('Invalid report Id.');
         }
@@ -150,7 +157,7 @@ class GithubController extends AppController
             throw new NotFoundException('The report does not exist.');
         }
 
-        $ticket_id = intval($this->request->getQuery('ticket_id'));
+        $ticket_id = intval($this->request->getData('ticket_id'));
         if (! $ticket_id) {
             throw new NotFoundException('Invalid Ticket ID!!');
         }
@@ -212,6 +219,9 @@ class GithubController extends AppController
      */
     public function unlink_issue($reportId): Response
     {
+        // Only allow POST requests, so that the CSRF middleware applies.
+        $this->request->allowMethod(['post']);
+
         if (empty($reportId)) {
             throw new NotFoundException('Invalid report Id.');
         }

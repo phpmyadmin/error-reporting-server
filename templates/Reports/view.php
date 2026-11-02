@@ -78,24 +78,26 @@ use Cake\Routing\Router;
                     );
                 ?>
                 <?=
-                    '<form action="'
-                        . Router::url([
+                    $this->Form->create(null, [
+                        'url' => [
                             '_name' => 'github:unlink_issue',
                             'id' => $report[0]['id'],
-                        ])
-                        . '" method="GET" class="form-horizontal" style="margin-bottom:5px;"'
-                        . ' onclick="return window.confirm(\'Are you sure you want to unlink this report?\');" >';
+                        ],
+                        'type' => 'post',
+                        'class' => 'form-horizontal',
+                        'style' => 'margin-bottom:5px;',
+                        'onclick' => 'return window.confirm(\'Are you sure you want to unlink this report?\');',
+                    ]);
                 ?>
-                <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
 
                 <?=
                     $this->Form->input('Unlink from issue', [
                         'type' => 'submit',
                         'label' => false,
                         'class' => 'btn btn-primary',
-                    ])
-                    . '</form>';
+                    ]);
                 ?>
+                <?= $this->Form->end(); ?>
             <?php elseif (! $read_only) : ?>
                 <table cellspacing="0" class="table table-bordered error-report"
                     style="width:300px; margin-bottom:5px;">
@@ -114,14 +116,16 @@ use Cake\Routing\Router;
                         </td>
                         <td style="min-width:130px;">
                             <?=
-                                '<form action="'
-                                    . Router::url([
+                                $this->Form->create(null, [
+                                    'url' => [
                                         '_name' => 'github:link_issue',
                                         'id' => $report[0]['id'],
-                                    ]) . '" method="GET" '
-                                    . 'class="form-horizontal" style="margin-bottom:5px;">';
+                                    ],
+                                    'type' => 'post',
+                                    'class' => 'form-horizontal',
+                                    'style' => 'margin-bottom:5px;',
+                                ]);
                             ?>
-                            <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
 
                             <?=
                                 $this->Form->input(
@@ -148,7 +152,7 @@ use Cake\Routing\Router;
                                     ],
                                 );
                             ?>
-                            </form>
+                            <?= $this->Form->end(); ?>
                         </td>
                     </tr>
                 </table>

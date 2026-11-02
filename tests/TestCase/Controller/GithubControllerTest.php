@@ -141,12 +141,12 @@ class GithubControllerTest extends TestCase
         $repoPath = 'phpmyadmin/phpmyadmin';
 
         // Case 1.1 Test with an invalid reportId
-        $this->get('github/link_issue/123?ticket_id=1');
+        $this->post('github/link_issue/123', ['ticket_id' => 1]);
         $this->assertResponseCode(404);
         $this->assertResponseContains('The report does not exist.');
 
         // Case 1.2 Test with an invalid ticketId
-        $this->get('github/link_issue/5?ticket_id=');
+        $this->post('github/link_issue/5', ['ticket_id' => '']);
         $this->assertResponseCode(404);
         $this->assertResponseContains('Invalid Ticket ID');
 
@@ -165,8 +165,9 @@ class GithubControllerTest extends TestCase
         );
 
         // Case 2. Test submission of form with unsuccessful github response
-        $this->get(
-            'github/link_issue/5?ticket_id=9999999',
+        $this->post(
+            'github/link_issue/5',
+            ['ticket_id' => 9999999],
         );
         $this->assertResponseCode(302);
 
@@ -190,8 +191,9 @@ class GithubControllerTest extends TestCase
             $this->newClientResponse(200, [], $issueResponse),
         );
         // Case 3. Test submission of form with successful Github response (with issue open)
-        $this->get(
-            'github/link_issue/5?ticket_id=1387',
+        $this->post(
+            'github/link_issue/5',
+            ['ticket_id' => 1387],
         );
         $this->assertResponseCode(302);
 
@@ -209,8 +211,9 @@ class GithubControllerTest extends TestCase
             $this->newClientResponse(200, [], $issueResponseWithClosed),
         );
         // Case 4. Test submission of form with successful Github response (with issue closed)
-        $this->get(
-            'github/link_issue/5?ticket_id=1387',
+        $this->post(
+            'github/link_issue/5',
+            ['ticket_id' => 1387],
         );
         $this->assertResponseCode(302);
 
@@ -228,12 +231,12 @@ class GithubControllerTest extends TestCase
         $repoPath = 'phpmyadmin/phpmyadmin';
 
         // Case 1.1 Test with an invalid reportId
-        $this->get('github/unlink_issue/123');
+        $this->post('github/unlink_issue/123');
         $this->assertResponseCode(404);
         $this->assertResponseContains('The report does not exist.');
 
         // Case 1.2 Test unlinked with an already unlinked issue
-        $this->get('github/unlink_issue/5');
+        $this->post('github/unlink_issue/5');
         $this->assertResponseCode(404);
         $this->assertResponseContains('Invalid Ticket ID');
 
@@ -250,7 +253,7 @@ class GithubControllerTest extends TestCase
             $this->newClientResponse(401, [], json_encode(['message' => 'Unauthorised access'])),
         );
         // Case 2. Test submission of form with unsuccessful and unexpected github response
-        $this->get(
+        $this->post(
             'github/unlink_issue/5',
         );
         $this->assertResponseCode(302);
@@ -270,7 +273,7 @@ class GithubControllerTest extends TestCase
             $this->newClientResponse(201, [], $commentResponse),
         );
         // Case 3. Test submission of form with successful Github response
-        $this->get(
+        $this->post(
             'github/unlink_issue/5',
         );
         $this->assertResponseCode(302);
