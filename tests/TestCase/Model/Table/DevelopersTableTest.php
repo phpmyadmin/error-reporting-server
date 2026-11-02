@@ -118,4 +118,23 @@ class DevelopersTableTest extends TestCase
         $this->assertEquals('pma-bot@phpmyadmin.net', $savedDeveloper->email);
         $this->assertEquals(true, $savedDeveloper->has_commit_access);
     }
+
+    /**
+     * The login does not ask for user:email anymore, so GitHub leaves the key
+     * out when the address of the developer is private.
+     */
+    public function testSaveFromGithubWithoutAnEmail(): void
+    {
+        $developer = $this->Developers->newEmptyEntity();
+
+        $id = $this->Developers->saveFromGithub([
+            'name' => 'Private Email',
+            'gravatar_id' => 'abc',
+            'id' => 4242,
+            'has_commit_access' => false,
+        ], $developer);
+
+        $this->assertNotNull($id);
+        $this->assertNull($this->Developers->get($id)->get('email'));
+    }
 }

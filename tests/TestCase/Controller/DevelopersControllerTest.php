@@ -26,11 +26,15 @@ use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 use function file_get_contents;
 use function json_encode;
+use function parse_str;
+use function parse_url;
 
 use const DS;
+use const PHP_URL_QUERY;
 
 /**
  * App\Controller\DevelopersController Test Case
@@ -59,18 +63,112 @@ class DevelopersControllerTest extends TestCase
     }
 
     /**
-     * Test login method
+     * Register the access token, user and permission answers of GitHub.
      */
-    public function testLogin(): void
+    protected function mockSuccessfulGithub(string $permission = 'write'): void
     {
-        // Empty session during initiation
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(200, [], json_encode(['access_token' => 'abc'])),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/user',
+            $this->newClientResponse(
+                200,
+                [],
+                (string) file_get_contents(TESTS . 'Fixture' . DS . 'user_response.json'),
+            ),
+        );
+        $this->mockClientGet(
+            'https://api.github.com/repos/phpmyadmin/phpmyadmin/collaborators/pma-bot/permission',
+            $this->newClientResponse(
+                200,
+                [],
+                json_encode(['permission' => $permission, 'role_name' => $permission]),
+            ),
+        );
+    }
+
+    /**
+     * The login stores a fresh state in the session and asks for the minimal scope.
+     */
+    public function testLoginStoresStateAndRequestsMinimalScope(): void
+    {
         $this->session([]);
 
         $this->get('developers/login');
+
         $this->assertResponseEmpty();
         $this->assertResponseCode(302);
-        $this->assertRedirectContains('https://github.com/login/oauth/authorize');
-        $this->assertRedirectContains('developers%2Fcallback');
+        $location = $this->_response->getHeaderLine('Location');
+        $this->assertStringContainsString('https://github.com/login/oauth/authorize', $location);
+        $this->assertStringContainsString('developers%2Fcallback', $location);
+
+        parse_str((string) parse_url($location, PHP_URL_QUERY), $query);
+
+        $this->assertSame('public_repo', $query['scope']);
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $query['state']);
+        $this->assertSessionHasKey('oauth_state');
+        $this->assertSame($query['state'], $_SESSION['oauth_state']);
+    }
+
+    /**
+     * A callback without a state must not exchange the authorization code.
+     */
+    public function testCallbackRejectsMissingState(): void
+    {
+        $tokenExchanges = 0;
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(200, [], json_encode(['access_token' => 'abc'])),
+            [
+                'match' => static function () use (&$tokenExchanges): bool {
+                    $tokenExchanges++;
+
+                    return true;
+                },
+            ],
+        );
+
+        $this->session(['last_page' => 'http://localhost/reports/index']);
+
+        $this->get('developers/callback?code=123123123&state=whatever');
+
+        $this->assertResponseCode(302);
+        $this->assertRedirect(['controller' => '', 'action' => 'index']);
+        $this->assertSame(0, $tokenExchanges, 'The authorization code must not be exchanged without a state.');
+        $this->assertSessionNotHasKey('Developer.id');
+        $this->assertFlashMessageContains('not able to verify');
+    }
+
+    /**
+     * A callback with a state that does not match the session one is rejected.
+     */
+    public function testCallbackRejectsMismatchedStateAndConsumesIt(): void
+    {
+        $tokenExchanges = 0;
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(200, [], json_encode(['access_token' => 'abc'])),
+            [
+                'match' => static function () use (&$tokenExchanges): bool {
+                    $tokenExchanges++;
+
+                    return true;
+                },
+            ],
+        );
+
+        $this->session(['oauth_state' => 'expected-state']);
+
+        $this->get('developers/callback?code=123123123&state=attacker-state');
+
+        $this->assertResponseCode(302);
+        $this->assertRedirect(['controller' => '', 'action' => 'index']);
+        $this->assertSame(0, $tokenExchanges, 'The authorization code must not be exchanged on a state mismatch.');
+        $this->assertSessionNotHasKey('Developer.id');
+        $this->assertSessionNotHasKey('oauth_state');
+        $this->assertFlashMessageContains('not able to verify');
     }
 
     /**
@@ -84,51 +182,37 @@ class DevelopersControllerTest extends TestCase
         $nonSuccessUserResponse = json_encode(['message' => 'Unauthorized access']);
         $userResponse = file_get_contents(TESTS . 'Fixture' . DS . 'user_response.json');
 
-        // Data for 1.1
-        $this->cleanupMockResponses();
-        $this->mockClientPost(
-            'https://github.com/login/oauth/access_token',
-            $this->newClientResponse(401, [], $emptyAccessTokenResponse),
-        );
         // Case 1.1 Test no access_token in Github response (with last_page not set in session)
-        // So, empty the session
-        $this->session([]);
-
         $this->cleanupMockResponses();
         $this->mockClientPost(
             'https://github.com/login/oauth/access_token',
             $this->newClientResponse(200, [], $emptyAccessTokenResponse),
         );
-        $this->get('developers/callback/?code=123123123');
+        $this->session(['oauth_state' => 'known-state', 'last_page' => '']);
+
+        $this->get('developers/callback?code=123123123&state=known-state');
         $this->assertResponseCode(302);
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
-        // Data for 1.2
-        $this->cleanupMockResponses();
-        $this->mockClientPost(
-            'https://github.com/login/oauth/access_token',
-            $this->newClientResponse(200, [], $accessTokenResponse),
-        );
-        $this->mockClientGet(
-            'https://api.github.com/user',
-            $this->newClientResponse(404, [], $nonSuccessUserResponse),
-        );
         // Case 1.2 Test no access_token in Github response (with last_page set in session)
+        $this->cleanupMockResponses();
+        $this->mockClientPost(
+            'https://github.com/login/oauth/access_token',
+            $this->newClientResponse(200, [], $emptyAccessTokenResponse),
+        );
         $this->session(
             [
-                'last_page' => [
-                    'controller' => 'notifications',
-                    'action' => 'index',
-                ],
+                'oauth_state' => 'known-state',
+                'last_page' => 'http://localhost/notifications',
             ],
         );
 
-        $this->get('developers/callback/?code=123123123');
+        $this->get('developers/callback?code=123123123&state=known-state');
         $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
-        // Data for 2.
+        // Case 2. Non successful response code from Github
         $this->cleanupMockResponses();
         $this->mockClientPost(
             'https://github.com/login/oauth/access_token',
@@ -138,21 +222,19 @@ class DevelopersControllerTest extends TestCase
             'https://api.github.com/user',
             $this->newClientResponse(404, [], $nonSuccessUserResponse),
         );
-        // Case 2. Non successful response code from Github
         $this->session(
             [
-                'last_page' => [
-                    'controller' => 'reports',
-                    'action' => 'index',
-                ],
+                'oauth_state' => 'known-state',
+                'last_page' => 'http://localhost/reports/index',
             ],
         );
-        $this->get('developers/callback/?code=123123123');
+
+        $this->get('developers/callback?code=123123123&state=known-state');
         $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
 
-        // Data for 3.
+        // Case 3. Successful response code (new user), check whether session variables are init
         $this->cleanupMockResponses();
         $this->mockClientPost(
             'https://github.com/login/oauth/access_token',
@@ -163,23 +245,24 @@ class DevelopersControllerTest extends TestCase
             $this->newClientResponse(200, [], $userResponse),
         );
         $this->mockClientGet(
-            'https://api.github.com/repos/phpmyadmin/phpmyadmin/collaborators/pma-bot',
-            $this->newClientResponse(200, [], json_encode([])),
+            'https://api.github.com/repos/phpmyadmin/phpmyadmin/collaborators/pma-bot/permission',
+            $this->newClientResponse(200, [], json_encode(['permission' => 'read', 'role_name' => 'read'])),
         );
+        $this->session(['oauth_state' => 'known-state', 'last_page' => '']);
 
-        // Case 3. Successful response code (new user), check whether session variables are init
-        $this->get('developers/callback/?code=123123123');
+        $this->get('developers/callback?code=123123123&state=known-state');
         $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertSession(3, 'Developer.id');
         $this->assertSession(true, 'read_only');
         $this->assertSession('abc', 'access_token');
+        $this->assertSessionNotHasKey('oauth_state');
 
         $developer = $this->Developers->get(3);
-        $this->assertEquals('abc', $developer->access_token);
+        $this->assertNull($developer->access_token);
         $this->assertEquals('pma-bot@phpmyadmin.net', $developer->email);
 
-        // Data for 4.
+        // Case 4. Successful response code (returning user), check whether session variables are init
         $this->cleanupMockResponses();
         $this->mockClientPost(
             'https://github.com/login/oauth/access_token',
@@ -190,14 +273,12 @@ class DevelopersControllerTest extends TestCase
             $this->newClientResponse(200, [], $userResponse),
         );
         $this->mockClientGet(
-            'https://api.github.com/repos/phpmyadmin/phpmyadmin/collaborators/pma-bot',
-            $this->newClientResponse(204, [], json_encode([])),
+            'https://api.github.com/repos/phpmyadmin/phpmyadmin/collaborators/pma-bot/permission',
+            $this->newClientResponse(200, [], json_encode(['permission' => 'write', 'role_name' => 'write'])),
         );
-        // Case 4. Successful response code (returning user)
-        // check whether session variables are init
-        $this->session(['last_page' => null]);
+        $this->session(['oauth_state' => 'known-state', 'last_page' => null]);
 
-        $this->get('developers/callback/?code=123123123');
+        $this->get('developers/callback?code=123123123&state=known-state');
         $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertSession(3, 'Developer.id');
@@ -206,6 +287,41 @@ class DevelopersControllerTest extends TestCase
 
         $developer = $this->Developers->get(3);
         $this->assertEquals(1, $developer->has_commit_access);
+        $this->assertNull($developer->access_token);
+    }
+
+    /**
+     * Only the pages of this application can be used as post-login target.
+     *
+     * @return array<string, array{string, bool}>
+     */
+    public static function lastPageProvider(): array
+    {
+        return [
+            'external absolute url' => ['https://evil.example/steal', false],
+            'protocol relative url' => ['//evil.example/steal', false],
+            'url without a host' => ['javascript:alert(1)', false],
+            'same host absolute url' => ['http://localhost/notifications', true],
+            'relative path' => ['/notifications', true],
+        ];
+    }
+
+    #[DataProvider('lastPageProvider')]
+    public function testCallbackOnlyRedirectsInsideTheApp(string $lastPage, bool $allowed): void
+    {
+        $this->mockSuccessfulGithub();
+        $this->session(['oauth_state' => 'known-state', 'last_page' => $lastPage]);
+
+        $this->get('developers/callback?code=123123123&state=known-state');
+
+        $this->assertResponseCode(302);
+        $location = $this->_response->getHeaderLine('Location');
+        if ($allowed) {
+            $this->assertStringContainsString($lastPage, $location);
+        } else {
+            $this->assertStringNotContainsString('evil.example', $location);
+            $this->assertRedirect(['controller' => 'reports', 'action' => 'index']);
+        }
     }
 
     /**

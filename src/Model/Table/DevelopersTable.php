@@ -42,7 +42,9 @@ class DevelopersTable extends Table
         $developer->patch([
             'full_name' => $githubInfo['name'],
             'gravatar_id' => $githubInfo['gravatar_id'],
-            'email' => $githubInfo['email'],
+            // The login no longer asks for user:email, so /user only returns
+            // the address when the developer made it public.
+            'email' => $githubInfo['email'] ?? null,
             'github_id' => $githubInfo['id'],
             'access_token' => $accessToken,
             'has_commit_access' => $githubInfo['has_commit_access'] ? 1 : 0,

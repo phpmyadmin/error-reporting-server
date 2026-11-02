@@ -23,6 +23,17 @@ use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;
 use Cake\Http\Response;
 
+use function bin2hex;
+use function hash_equals;
+use function is_array;
+use function is_string;
+use function parse_url;
+use function random_bytes;
+use function str_starts_with;
+use function strcasecmp;
+
+use const PHP_URL_HOST;
+
 /**
  * Developer controller handling developer login/logout/register.
  *
@@ -50,14 +61,41 @@ class DevelopersController extends AppController
 
     public function login(): Response
     {
-        $this->request->getSession()->destroy();
-        $url = $this->GithubApi->getRedirectUrl('user:email,public_repo,read:org,repo');
+        $session = $this->request->getSession();
+        $session->destroy();
+
+        $state = bin2hex(random_bytes(32));
+        $session->write('oauth_state', $state);
+
+        $url = $this->GithubApi->getRedirectUrl('public_repo', $state);
 
         return $this->redirect($url);
     }
 
     public function callback(): Response|null
     {
+        $session = $this->request->getSession();
+        $state = $this->request->getQuery('state');
+        $expectedState = $session->read('oauth_state');
+        // The state is single use, whether the check succeeds or not.
+        $session->delete('oauth_state');
+
+        if (
+            ! is_string($state)
+            || ! is_string($expectedState)
+            || $expectedState === ''
+            || ! hash_equals($expectedState, $state)
+        ) {
+            $flash_class = 'alert alert-error';
+            $this->Flash->set(
+                'We were not able to verify your login attempt.'
+                    . ' Please try again later',
+                ['params' => ['class' => $flash_class]],
+            );
+
+            return $this->redirect('/');
+        }
+
         $code = $this->request->getQuery('code');
         $accessToken = $this->GithubApi->getAccessToken($code);
         if (empty($code) || empty($accessToken)) {
@@ -97,14 +135,42 @@ class DevelopersController extends AppController
         );
 
         $last_page = $this->request->getSession()->read('last_page');
-        if (empty($last_page)) {
-            $last_page = [
-                'controller' => 'reports',
-                'action' => 'index',
-            ];
+        // Only redirect inside this application after the login.
+        if (is_array($last_page) || (is_string($last_page) && $this->isLocalUrl($last_page))) {
+            return $this->redirect($last_page);
         }
 
-        return $this->redirect($last_page);
+        return $this->redirect([
+            'controller' => 'reports',
+            'action' => 'index',
+        ]);
+    }
+
+    /**
+     * Whether a URL points inside this application.
+     *
+     * A relative path is accepted, as is an absolute URL whose host is the
+     * configured application host. Anything else, including protocol relative
+     * URLs, is rejected.
+     *
+     * @param string $url the URL to check
+     *
+     * @return bool true when the URL belongs to this application
+     */
+    protected function isLocalUrl(string $url): bool
+    {
+        if (str_starts_with($url, '/')) {
+            return ! str_starts_with($url, '//');
+        }
+
+        $host = parse_url($url, PHP_URL_HOST);
+        if (! is_string($host)) {
+            return false;
+        }
+
+        $baseHost = parse_url((string) Configure::read('App.fullBaseUrl'), PHP_URL_HOST);
+
+        return is_string($baseHost) && strcasecmp($host, $baseHost) === 0;
     }
 
     public function logout(): Response
@@ -127,9 +193,11 @@ class DevelopersController extends AppController
             $developer = $this->Developers->newEmptyEntity();
         }
 
-        $developerId = $this->Developers->saveFromGithub($userInfo, $accessToken, $developer);
-        $this->request->getSession()->write('Developer.id', $developerId);
-        $this->request->getSession()->write('access_token', $accessToken);
-        $this->request->getSession()->write('read_only', ! $userInfo['has_commit_access']);
+        $developerId = $this->Developers->saveFromGithub($userInfo, $developer);
+        $session = $this->request->getSession();
+        $session->renew();
+        $session->write('Developer.id', $developerId);
+        $session->write('access_token', $accessToken);
+        $session->write('read_only', ! $userInfo['has_commit_access']);
     }
 }
