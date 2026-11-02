@@ -217,13 +217,19 @@ class GithubApiComponent extends Component
      */
     public function canCommitTo(string $username, string $repoPath, string $access_token): bool
     {
-        [$permission, $status] = $this->apiRequest(
-            'repos/' . $repoPath . '/collaborators/' . $username . '/permission',
-            [],
-            ClientRequest::METHOD_GET,
-            true,
-            $access_token,
-        );
+        [$role, $status] = $this->getCollaboratorPermission($username, $repoPath, $access_token);
+
+        if ($status !== 200) {
+            // The token of a login only carries the scopes the user agreed to
+            // share, and the endpoint refuses a read-only account as well:
+            // ask a second time with the token of the server, which is not
+            // tied to what a user agreed to give.
+            $serverToken = (string) Configure::read('GithubAccessToken');
+            if ($serverToken !== '' && $serverToken !== $access_token) {
+                [$role, $status] = $this->getCollaboratorPermission($username, $repoPath, $serverToken);
+            }
+        }
+
         if ($status !== 200) {
             Log::error(
                 'Collaborator permission call for ' . $username . ' on ' . $repoPath
@@ -233,15 +239,41 @@ class GithubApiComponent extends Component
             return false;
         }
 
-        if (! is_array($permission)) {
+        if ($role === null) {
             Log::error('Collaborator permission call for ' . $username . ' on ' . $repoPath . ' returned no data');
 
             return false;
         }
 
+        return in_array($role, ['admin', 'maintain', 'write'], true);
+    }
+
+    /**
+     * Read the permission of a user on a repository.
+     *
+     * @param string $username     GitHub login of the user
+     * @param string $repoPath     The repo slug
+     * @param string $access_token Token used to ask the API
+     *
+     * @return array{string|null, int} The role of the user, and the status code
+     */
+    private function getCollaboratorPermission(string $username, string $repoPath, string $access_token): array
+    {
+        [$permission, $status] = $this->apiRequest(
+            'repos/' . $repoPath . '/collaborators/' . $username . '/permission',
+            [],
+            ClientRequest::METHOD_GET,
+            true,
+            $access_token,
+        );
+
+        if (! is_array($permission)) {
+            return [null, $status];
+        }
+
         $role = $permission['permission'] ?? $permission['role_name'] ?? null;
 
-        return is_string($role) && in_array($role, ['admin', 'maintain', 'write'], true);
+        return [is_string($role) ? $role : null, $status];
     }
 
     /**

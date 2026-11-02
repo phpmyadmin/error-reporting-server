@@ -18,12 +18,14 @@ namespace App\Test\TestCase\Controller\Component;
 
 use App\Controller\Component\GithubApiComponent;
 use Cake\Controller\ComponentRegistry;
+use Cake\Core\Configure;
 use Cake\Http\TestSuite\HttpClientTrait;
 use Cake\Log\Engine\ArrayLog;
 use Cake\Log\Log;
 use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+use function count;
 use function is_array;
 use function json_encode;
 
@@ -186,6 +188,57 @@ class GithubApiComponentTest extends TestCase
         );
 
         $this->assertFalse($this->GithubApi->canCommitTo('pma-bot', 'phpmyadmin/phpmyadmin', 'token'));
+    }
+
+    /**
+     * The token of a login only carries the scopes the user agreed to share:
+     * when the API refuses it, the permission is read with the server token so
+     * that a maintainer does not lose the write access.
+     */
+    public function testCanCommitToFallsBackToTheServerToken(): void
+    {
+        Configure::write('GithubAccessToken', 'server-token');
+
+        $component = new class (new ComponentRegistry()) extends GithubApiComponent {
+            /** @var array<int, string> */
+            public array $usedTokens = [];
+
+            public function apiRequest(
+                string $path,
+                array|string $data,
+                string $method,
+                bool $returnStatus = false,
+                string $access_token = '',
+            ): array {
+                $this->usedTokens[] = $access_token;
+
+                if (count($this->usedTokens) === 1) {
+                    return [['message' => 'Resource not accessible'], 403];
+                }
+
+                return [['permission' => 'write'], 200];
+            }
+        };
+
+        $this->assertTrue($component->canCommitTo('pma-bot', 'phpmyadmin/phpmyadmin', 'user-token'));
+        $this->assertSame(['user-token', 'server-token'], $component->usedTokens);
+
+        Configure::delete('GithubAccessToken');
+    }
+
+    /**
+     * Without a server token, a refused login token is the answer: no access.
+     */
+    public function testCanCommitToRefusesWithoutAnyUsableToken(): void
+    {
+        Configure::delete('GithubAccessToken');
+        $this->mockClientGet(
+            self::PERMISSION_URL,
+            $this->newClientResponse(403, [], json_encode(['message' => 'Resource not accessible'])),
+        );
+
+        $this->assertFalse($this->GithubApi->canCommitTo('pma-bot', 'phpmyadmin/phpmyadmin', 'token'));
+        $this->assertCount(1, $this->logCapture->read());
     }
 
     /**
