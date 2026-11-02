@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
+use Cake\Core\App;
+use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\ORM\TableRegistry;
@@ -15,6 +17,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 use function assert;
 use function in_array;
+use function is_string;
 
 class AuthenticationMiddleware implements MiddlewareInterface
 {
@@ -142,6 +145,13 @@ class AuthenticationMiddleware implements MiddlewareInterface
 
         // Check for the controller name
         if (! isset(self::READ_ONLY_ACCESS_CONTROL_LIST[$controllerName])) {
+            if (! $this->controllerExists($controllerName)) {
+                // There is nothing to grant access to: the developer must not
+                // be signed out for requesting a controller which does not
+                // exist, the request simply ends with a 403.
+                throw new ForbiddenException();
+            }
+
             return false;// The controller is not in the list
         }
 
@@ -156,5 +166,22 @@ class AuthenticationMiddleware implements MiddlewareInterface
         }
 
         return false;// phpcs:ignore SlevomatCodingStandard.ControlStructures.UselessIfConditionWithReturn.UselessIfCondition
+    }
+
+    /**
+     * Tells whether the controller name of the request matches a controller
+     * class of the application.
+     *
+     * @param mixed $controllerName the controller name of the request
+     *
+     * @return bool true when the controller exists
+     */
+    private function controllerExists(mixed $controllerName): bool
+    {
+        if (! is_string($controllerName) || $controllerName === '') {
+            return false;
+        }
+
+        return App::className($controllerName, 'Controller', 'Controller') !== null;
     }
 }
