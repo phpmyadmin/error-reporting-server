@@ -4,6 +4,7 @@ namespace App\Test\TestCase;
 
 use App\Report;
 use Cake\Utility\Security;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 use function file_get_contents;
@@ -284,5 +285,369 @@ class ReportTest extends TestCase
             'user' => $user,
             'environment' => 'production',
         ], $toJson);
+    }
+
+    public function testSetTimestamp(): void
+    {
+        $report = Report::fromString(
+            file_get_contents(__DIR__ . '/../Fixture/report_js.json'),
+        );
+
+        $report->setTimestamp('2024-02-29T12:34:56+00:00');
+
+        $this->assertSame('2024-02-29T12:34:56+00:00', $report->getTimestampUTC());
+        $this->assertSame(
+            '2024-02-29T12:34:56+00:00',
+            $report->toJson()['timestamp'],
+        );
+    }
+
+    public function testGetTimestampUTCWithoutTimestamp(): void
+    {
+        $report = new Report();
+
+        $this->assertMatchesRegularExpression(
+            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/',
+            $report->getTimestampUTC(),
+        );
+    }
+
+    public function testGetEventIdIsCached(): void
+    {
+        $report = new Report();
+
+        $eventId = $report->getEventId();
+
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $eventId);
+        $this->assertSame($eventId, $report->getEventId());
+        $this->assertNotSame($eventId, (new Report())->getEventId());
+    }
+
+    public function testPhpPayloadFromObject(): void
+    {
+        $contents = file_get_contents(__DIR__ . '/../Fixture/report_php.json');
+        $report = Report::fromObject(json_decode($contents));
+
+        $this->assertEquals(Report::fromString($contents), $report);
+
+        $this->assertSame('5.2.4', $report->pma_version);
+        $this->assertSame('CHROME', $report->browser_name);
+        $this->assertSame('27.0.1453.93', $report->browser_version);
+        $this->assertSame('Linux', $report->user_os);
+        $this->assertSame('php', $report->exception_type);
+        $this->assertCount(3, $report->errors);
+        $this->assertSame('Notice', $report->errors[0]->type);
+        $this->assertSame('./libraries/Config.class.php', $report->errors[0]->file);
+        $this->assertTrue($report->isMultiReports());
+        $this->assertSame('5.2.4', $report->getPmaVersion());
+        $this->assertSame('5', $report->getTags()->version_major);
+        $this->assertSame('5.2', $report->getTags()->version_series);
+        $this->assertEquals((object) ['name' => 'Linux'], $report->getContexts()->os);
+        $this->assertSame(
+            '079f075fb3f0d366576122b0aacab77b977d58834677f930d6b571f7ddc2f518',
+            $report->getUserId(),
+        );
+        $this->assertEquals((object) [
+            'ip_address' => '0.0.0.0',
+            'id' => '079f075fb3f0d366576122b0aacab77b977d58834677f930d6b571f7ddc2f518',
+        ], $report->getUser());
+        $this->assertFalse($report->hasUserFeedback());
+        $this->assertSame('', $report->getUserFeedback());
+        $this->assertEquals((object) ['message' => ''], $report->getUserMessage());
+    }
+
+    public function testNullUserAgentPayload(): void
+    {
+        $report = Report::fromString(
+            file_get_contents(__DIR__ . '/../Fixture/report_ua_null_js.json'),
+        );
+
+        $tags = $report->getTags();
+        $this->assertSame('5', $tags->version_major);
+        $this->assertSame('5.2', $tags->version_series);
+        $this->assertNull($tags->user_agent_string);
+        $this->assertTrue($tags->configuration_storage);
+        $this->assertSame('js', $tags->exception_type);
+        $this->assertEquals((object) [
+            'os' => (object) ['name' => 'Other'],
+            'browser' => (object) [
+                'name' => 'OTHER',
+                'version' => 0,
+            ],
+        ], $report->getContexts());
+        $this->assertSame(
+            'c7d0ea6886cc827a9ade6a5e4e6844d73e86c197f98bfa7970f8b10f460e6047',
+            $report->getUserId(),
+        );
+        $this->assertFalse($report->isMultiReports());
+
+        $reports = $report->getReports();
+
+        $this->assertCount(1, $reports);
+        $this->assertSame('javascript', $reports[0]['platform']);
+        $this->assertSame('development', $reports[0]['environment']);
+        $this->assertSame('index.php', $reports[0]['culprit']);
+        $this->assertArrayNotHasKey('transaction', $reports[0]);
+        $this->assertSame('', $reports[0]['message']);
+        $this->assertEquals((object) [
+            'type' => '',
+            'value' => '',
+            'stacktrace' => (object) ['frames' => []],
+        ], $reports[0]['exception']['values'][0]);
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $reports[0]['event_id']);
+    }
+
+    public function testGetRouteWithoutException(): void
+    {
+        $report = Report::fromObject((object) ['script_name' => 'index.php']);
+
+        $this->assertNull($report->getRoute());
+    }
+
+    public function testGetRouteWithoutExceptionUri(): void
+    {
+        $report = Report::fromObject((object) [
+            'exception' => (object) ['message' => 'boom'],
+        ]);
+
+        $this->assertNull($report->getRoute());
+    }
+
+    #[DataProvider('routeProvider')]
+    public function testGetRoute(string|null $uri, string|null $expected): void
+    {
+        $report = Report::fromObject((object) [
+            'exception' => (object) ['uri' => $uri],
+        ]);
+
+        $this->assertSame($expected, $report->getRoute());
+    }
+
+    /** @return array<string, array{string|null, string|null}> */
+    public static function routeProvider(): array
+    {
+        return [
+            'null uri' => [null, null],
+            'no query' => ['index.php', null],
+            'empty query' => ['index.php?', null],
+            'query without route' => ['index.php?db=test', null],
+            'malformed url' => ['http://', null],
+            'route' => ['index.php?route=/sql&db=test', '/sql'],
+            'encoded route' => ['index.php?route=%2Fserver%2Fdatabases', '/server/databases'],
+        ];
+    }
+
+    #[DataProvider('typeToLevelProvider')]
+    public function testTypeToLevel(string $type, string $expected): void
+    {
+        $report = new Report();
+
+        $this->assertSame($expected, $report->typeToLevel($type));
+    }
+
+    /** @return array<string, array{string, string}> */
+    public static function typeToLevelProvider(): array
+    {
+        return [
+            'Internal error' => ['Internal error', 'error'],
+            'Parsing Error' => ['Parsing Error', 'error'],
+            'Error' => ['Error', 'error'],
+            'Core Error' => ['Core Error', 'error'],
+            'User Error' => ['User Error', 'info'],
+            'User Warning' => ['User Warning', 'info'],
+            'User Notice' => ['User Notice', 'info'],
+            'Warning' => ['Warning', 'warning'],
+            'Runtime Notice' => ['Runtime Notice', 'warning'],
+            'Deprecation Notice' => ['Deprecation Notice', 'warning'],
+            'Notice' => ['Notice', 'warning'],
+            'Compile Warning' => ['Compile Warning', 'warning'],
+            'Catchable Fatal Error' => ['Catchable Fatal Error', 'fatal'],
+            'unknown type' => ['Something else', 'error'],
+        ];
+    }
+
+    public function testGetMultiDataToSendFromPhpPayload(): void
+    {
+        $report = Report::fromString(
+            file_get_contents(__DIR__ . '/../Fixture/report_php.json'),
+        );
+
+        $expected = [
+            [
+                'platform' => 'php',
+                'level' => 'warning',
+                'exception' => [
+                    'values' => [
+                        (object) [
+                            'type' => 'Notice',
+                            'value' => 'Undefined variable: haha',
+                            'stacktrace' => (object) [
+                                'frames' => [
+                                    [
+                                        'platform' => 'php',
+                                        'function' => 'getFontsizeForm',
+                                        'lineno' => 228,
+                                        'filename' => './libraries/Config.class.php',
+                                        'package' => 'PMA_Config',
+                                        'symbol_addr' => ':: ',
+                                        'vars' => (object) [],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'message' => 'Undefined variable: haha',
+                'culprit' => './libraries/Config.class.php',
+            ],
+            [
+                'platform' => 'php',
+                'level' => 'warning',
+                'exception' => [
+                    'values' => [
+                        (object) [
+                            'type' => 'Notice',
+                            'value' => 'Undefined variable: hihi',
+                            'stacktrace' => (object) [
+                                'frames' => [
+                                    [
+                                        'platform' => 'php',
+                                        'function' => 'showPHPDocu',
+                                        'lineno' => 322,
+                                        'filename' => './libraries/Util.class.php',
+                                        'package' => 'PMA_Util',
+                                        'symbol_addr' => ':: ',
+                                        'vars' => (object) ['book.mysqli.php'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'message' => 'Undefined variable: hihi',
+                'culprit' => './libraries/Util.class.php',
+            ],
+            [
+                'platform' => 'php',
+                'level' => 'warning',
+                'exception' => [
+                    'values' => [
+                        (object) [
+                            'type' => 'Notice',
+                            'value' => 'Undefined variable: hehe',
+                            'stacktrace' => (object) ['frames' => []],
+                        ],
+                    ],
+                ],
+                'message' => 'Undefined variable: hehe',
+                'culprit' => './index.php',
+            ],
+        ];
+
+        $this->assertEquals($expected, $report->getMultiDataToSend());
+    }
+
+    public function testGetMultiDataToSendWithPartialErrors(): void
+    {
+        $report = Report::fromObject((object) [
+            'exception_type' => 'php',
+            'pma_version' => '5.2.4',
+            'errors' => [
+                (object) [
+                    'type' => 'Catchable Fatal Error',
+                    'msg' => 'Cannot use &quot;foo&quot; as &#039;bar&#039;',
+                    'file' => './index.php',
+                    'stackTrace' => [
+                        (object) [],
+                    ],
+                ],
+                (object) [
+                    'type' => 'User Notice',
+                    'msg' => 'Something',
+                    'file' => './other.php',
+                    'stackTrace' => [],
+                ],
+            ],
+        ]);
+
+        $data = $report->getMultiDataToSend();
+
+        $this->assertCount(2, $data);
+
+        $this->assertSame('fatal', $data[0]['level']);
+        $this->assertSame('Cannot use "foo" as \'bar\'', $data[0]['message']);
+        $this->assertSame('Catchable Fatal Error', $data[0]['exception']['values'][0]->type);
+        $this->assertSame(
+            'Cannot use "foo" as \'bar\'',
+            $data[0]['exception']['values'][0]->value,
+        );
+        $this->assertSame(
+            [
+                'platform' => 'php',
+                'function' => '',
+                'lineno' => 0,
+                'filename' => './index.php',
+            ],
+            $data[0]['exception']['values'][0]->stacktrace->frames[0],
+        );
+
+        $this->assertSame('info', $data[1]['level']);
+        $this->assertSame([], $data[1]['exception']['values'][0]->stacktrace->frames);
+    }
+
+    public function testGetReportsForPhpPayload(): void
+    {
+        $report = Report::fromString(
+            file_get_contents(__DIR__ . '/../Fixture/report_php.json'),
+        );
+        $report->setTimestamp('2024-01-02T03:04:05+00:00');
+
+        $this->assertTrue($report->isMultiReports());
+
+        $multiData = $report->getMultiDataToSend();
+        $reports = $report->getReports();
+
+        $this->assertCount(3, $multiData);
+        $this->assertCount(3, $reports);
+
+        $eventId = $report->getEventId();
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $eventId);
+
+        foreach ($reports as $index => $singleReport) {
+            $this->assertSame($eventId, $singleReport['event_id']);
+            $this->assertSame('2024-01-02T03:04:05+00:00', $singleReport['timestamp']);
+            $this->assertSame('php', $singleReport['platform']);
+            $this->assertSame($multiData[$index]['level'], $singleReport['level']);
+            $this->assertSame($multiData[$index]['message'], $singleReport['message']);
+            $this->assertSame($multiData[$index]['culprit'], $singleReport['culprit']);
+            $this->assertEquals($multiData[$index]['exception'], $singleReport['exception']);
+            $this->assertEquals($report->getTags(), $singleReport['tags']);
+            $this->assertEquals($report->getContexts(), $singleReport['contexts']);
+            $this->assertEquals($report->getUser(), $singleReport['user']);
+            $this->assertSame('production', $singleReport['environment']);
+            $this->assertSame('5.2.4', $singleReport['release']);
+            $this->assertSame('5.2.4', $singleReport['dist']);
+            $this->assertEquals((object) [], $singleReport['extra']);
+            $this->assertArrayNotHasKey('transaction', $singleReport);
+        }
+
+        $this->assertSame('Undefined variable: haha', $reports[0]['message']);
+        $this->assertSame('Undefined variable: hihi', $reports[1]['message']);
+        $this->assertSame('Undefined variable: hehe', $reports[2]['message']);
+        $this->assertSame('./libraries/Config.class.php', $reports[0]['culprit']);
+        $this->assertSame('./libraries/Util.class.php', $reports[1]['culprit']);
+        $this->assertSame('./index.php', $reports[2]['culprit']);
+    }
+
+    public function testGetReportsWithoutErrors(): void
+    {
+        $report = Report::fromObject((object) [
+            'exception_type' => 'php',
+            'errors' => [],
+        ]);
+
+        $this->assertTrue($report->isMultiReports());
+        $this->assertSame([], $report->getMultiDataToSend());
+        $this->assertSame([], $report->getReports());
     }
 }
