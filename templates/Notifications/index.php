@@ -11,7 +11,7 @@ use Cake\Routing\Router;
             'action' => 'mass_action',
         ]);
         ?>">
-        <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
+        <input type="hidden" name="_csrfToken" value="<?= h($csrf_token) ?>" />
         <div style="margin-bottom:10px;">
             <input type="checkbox" id="notificationsForm_checkall"
                 class="checkall_box" title="Check All"

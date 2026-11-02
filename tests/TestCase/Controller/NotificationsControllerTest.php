@@ -65,6 +65,7 @@ class NotificationsControllerTest extends TestCase
         $this->session(['Developer.id' => 1, 'read_only' => false]);
 
         /* Test case 1 */
+        // Notification 3 belongs to developer 2, so it must survive.
         $this->post(
             '/notifications/mass_action',
             [
@@ -81,6 +82,7 @@ class NotificationsControllerTest extends TestCase
         $actual = $notifications->enableHydration(false)->toArray();
         $expected = [
             ['id' => 2],
+            ['id' => 3],
         ];
         $this->assertEquals($actual, $expected);
 
@@ -94,8 +96,49 @@ class NotificationsControllerTest extends TestCase
         $notifications = $this->Notifications->find('all', fields: ['Notifications.id']);
         $this->assertInstanceOf(Query::class, $notifications);
         $actual = $notifications->enableHydration(false)->toArray();
-        $expected = [];
+        $expected = [
+            ['id' => 3],
+        ];
         $this->assertEquals($actual, $expected);
+    }
+
+    /**
+     * Deleting a notification of another developer must not even be attempted.
+     */
+    public function testADeveloperCannotDeleteAnotherDevelopersNotification(): void
+    {
+        $this->session(['Developer.id' => 1, 'read_only' => false]);
+
+        $this->post(
+            '/notifications/mass_action',
+            ['notifs' => ['1', '3']],
+        );
+
+        $this->assertResponseCode(302);
+        $this->assertSame(0, $this->Notifications->find()->where(['id' => 1])->count());
+        $this->assertSame(1, $this->Notifications->find()->where(['id' => 3])->count());
+    }
+
+    /**
+     * A forged "notifs" value must not turn into an error page.
+     */
+    public function testMassActionWithANonArraySelectionDoesNothing(): void
+    {
+        $this->session(['Developer.id' => 1, 'read_only' => false]);
+
+        $this->post('/notifications/mass_action', ['notifs' => 'not-an-array']);
+
+        $this->assertResponseCode(302);
+        $this->assertSame(3, $this->Notifications->find()->count());
+    }
+
+    public function testMassActionOnlyAnswersPostRequests(): void
+    {
+        $this->session(['Developer.id' => 1, 'read_only' => false]);
+
+        $this->get('/notifications/mass_action');
+
+        $this->assertResponseCode(405);
     }
 
     public function testDataTables(): void

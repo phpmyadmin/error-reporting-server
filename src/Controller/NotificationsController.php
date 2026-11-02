@@ -26,9 +26,11 @@ use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 
+use function array_map;
 use function array_push;
 use function Cake\Core\h;
 use function intval;
+use function is_array;
 use function json_encode;
 
 /**
@@ -180,25 +182,34 @@ class NotificationsController extends AppController
      */
     public function mass_action(): Response
     {
+        $this->request->allowMethod(['post']);
+
+        $developerId = (int) $this->request->getSession()->read('Developer.id');
+
         $msg = 'Selected Notifications have been marked \'Read\'!';
         $flash_class = 'alert alert-success';
 
         if ($this->request->getData('mark_all')) {
             // Delete all notifications for this Developer
             $this->Notifications->deleteAll(
-                ['developer_id' => $this->request->getSession()->read('Developer.id')],
+                ['developer_id' => $developerId],
             );
 
             $msg = 'All your notifications have been marked \'Read\'';
         } else {
-            foreach ($this->request->getData('notifs') as $notif_id) {
-                if (! $this->Notifications->delete($this->Notifications->get(intval($notif_id)))) {
-                    $msg = '<b>ERROR</b>: There was some problem in deleting Notification(ID:'
-                        . $notif_id
-                        . ')!';
-                    $flash_class = 'alert alert-error';
-                    break;
-                }
+            $notifs = $this->request->getData('notifs');
+            $ids = [];
+            if (is_array($notifs)) {
+                $ids = array_map(intval(...), $notifs);
+            }
+
+            if ($ids !== []) {
+                // The developer id is part of the condition: a submitted id of
+                // another account must not be deleted.
+                $this->Notifications->deleteAll([
+                    'id IN' => $ids,
+                    'developer_id' => $developerId,
+                ]);
             }
         }
 
