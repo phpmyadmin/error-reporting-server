@@ -68,6 +68,9 @@ class DevelopersTableTest extends TestCase
             try {
                 $i++;
                 $savedDeveloper = $this->Developers->get($i);
+                // The developer that exists has to be the one of that id, the
+                // exception of get() is what tells that the id is free.
+                $this->assertSame($i, $savedDeveloper->get('id'));
             } catch (RecordNotFoundException) {
                 break;
             }
