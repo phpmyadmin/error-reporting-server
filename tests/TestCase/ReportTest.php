@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test;
+namespace App\Test\TestCase;
 
 use App\Report;
 use Cake\Utility\Security;
