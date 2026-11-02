@@ -3,11 +3,7 @@
     <form>
         <select class="pull-right" name="filter" onchange="this.parentElement.submit()">
             <?php foreach ($filter_times as $key => $value) : ?>
-                <?= '<option value="' . $key . '" '; ?>
-                <?php if ($selected_filter === $key) : ?>
-                    <?= 'selected' ?>
-                <?php endif; ?>
-                <?= '>' . $value['label'] . '</option>'; ?>
+                <option value="<?= h($key) ?>"<?= $selected_filter === $key ? ' selected' : '' ?>><?= h($value['label']) ?></option>
             <?php endforeach;
 
             ?>
