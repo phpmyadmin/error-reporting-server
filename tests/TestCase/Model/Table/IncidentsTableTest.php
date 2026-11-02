@@ -18,6 +18,7 @@ use function count;
 use function file_get_contents;
 use function json_decode;
 use function json_encode;
+use function mb_strlen;
 use function str_repeat;
 
 use const DS;
@@ -744,6 +745,109 @@ class IncidentsTableTest extends TestCase
 
         $this->assertSame([false], $result['incidents']);
         $this->assertSame([], $result['reports']);
+    }
+
+    public function testCreateIncidentFromAReportWithNonArrayErrors(): void
+    {
+        $bugReport = $this->jsBugReport();
+        $bugReport['exception_type'] = 'php';
+        $bugReport['errors'] = 'not a list';
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertSame([false], $result['incidents']);
+        $this->assertSame([], $result['reports']);
+    }
+
+    public function testCreateIncidentFromAReportWithNonArrayErrorsAndNoException(): void
+    {
+        $bugReport = $this->jsBugReport();
+        $bugReport['exception_type'] = 'php';
+        unset($bugReport['exception']);
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertSame([false], $result['incidents']);
+        $this->assertSame([], $result['reports']);
+    }
+
+    public function testCreateIncidentFromAJavaScriptReportWithNonArrayErrors(): void
+    {
+        $bugReport = $this->jsBugReport();
+        $bugReport['errors'] = 'not a list';
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertCount(1, $result['incidents']);
+        $this->assertCount(1, $result['reports']);
+    }
+
+    public function testCreateIncidentFromAReportWithANonArrayStack(): void
+    {
+        $bugReport = $this->jsBugReport();
+        $bugReport['exception']['stack'] = 'not a list';
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertCount(1, $result['incidents']);
+        $this->assertCount(1, $result['reports']);
+        $incident = $this->Incidents->get($result['incidents'][0]);
+        $this->assertSame('[]', $incident->stacktrace);
+    }
+
+    public function testCreateIncidentFromAReportWithWronglyTypedScalarFields(): void
+    {
+        $bugReport = $this->jsBugReport();
+        $bugReport['php_version'] = ['8.2.0'];
+        $bugReport['browser_name'] = ['Firefox'];
+        $bugReport['browser_version'] = ['100.0'];
+        $bugReport['user_os'] = ['Linux'];
+        $bugReport['locale'] = ['en'];
+        $bugReport['configuration_storage'] = ['enabled'];
+        $bugReport['server_software'] = ['Apache/2.4.1'];
+        $bugReport['script_name'] = ['index.php'];
+        $bugReport['steps'] = ['steps'];
+        $bugReport['exception']['name'] = ['ReferenceError'];
+        $bugReport['exception']['message'] = ['a is not defined'];
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertCount(1, $result['incidents']);
+        $this->assertCount(1, $result['reports']);
+    }
+
+    public function testCreateIncidentTruncatesLongStringFields(): void
+    {
+        $bugReport = $this->jsBugReport();
+        $bugReport['php_version'] = str_repeat('1', 40);
+        $bugReport['browser_name'] = str_repeat('B', 60);
+        $bugReport['user_os'] = str_repeat('O', 60);
+        $bugReport['locale'] = str_repeat('L', 60);
+        $bugReport['configuration_storage'] = str_repeat('C', 60);
+        $bugReport['script_name'] = str_repeat('S', 300);
+        $bugReport['exception']['name'] = str_repeat('E', 100);
+        $bugReport['exception']['message'] = str_repeat('M', 500);
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertCount(1, $result['incidents']);
+        $this->assertCount(1, $result['reports']);
+
+        $incident = $this->Incidents->get($result['incidents'][0]);
+        $this->assertSame(15, mb_strlen($incident->php_version));
+        $this->assertSame(40, mb_strlen($incident->browser));
+        $this->assertSame(30, mb_strlen($incident->user_os));
+        $this->assertSame(30, mb_strlen($incident->locale));
+        $this->assertSame(30, mb_strlen($incident->configuration_storage));
+        $this->assertSame(255, mb_strlen($incident->script_name));
+        $this->assertSame(30, mb_strlen($incident->error_name));
+        $this->assertSame(200, mb_strlen($incident->error_message));
+
+        $report = TableRegistry::getTableLocator()
+            ->get('Reports')
+            ->get($result['reports'][0]);
+        $this->assertSame(150, mb_strlen($report->error_message));
+        $this->assertSame(50, mb_strlen($report->error_name));
     }
 
     public function testCreateIncidentFromAReportWhoseNotificationsCannotBeAdded(): void

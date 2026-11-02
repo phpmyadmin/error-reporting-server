@@ -13,10 +13,12 @@ use Cake\ORM\TableRegistry;
 use Cake\TestSuite\EmailTrait;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 use function count;
 use function file_get_contents;
 use function json_decode;
+use function str_repeat;
 
 use const DS;
 
@@ -176,6 +178,73 @@ class IncidentsControllerTest extends TestCase
         $result = json_decode($this->_response->getBody(), true);
         $this->assertNotNull($result);
         $this->assertSame(false, $result['success']);
+    }
+
+    /**
+     * A JSON scalar is not a report: it must be refused, not reach the typed
+     * parameter of createIncidentFromBugReport().
+     *
+     * @param string $body A body that decodes to something else than an object
+     */
+    #[DataProvider('nonObjectBodyProvider')]
+    public function testCreateRejectsABodyThatIsNotAnObject(string $body): void
+    {
+        $reportsBefore = $this->Reports->find()->count();
+
+        $this->configRequest(['input' => $body]);
+        $this->post('/incidents/create');
+
+        $this->assertResponseCode(200);
+        $this->assertSame(
+            ['success' => false],
+            json_decode($this->_response->getBody(), true),
+        );
+        $this->assertSame($reportsBefore, $this->Reports->find()->count());
+    }
+
+    /** @return array<string, array{string}> */
+    public static function nonObjectBodyProvider(): array
+    {
+        return [
+            'integer' => ['1'],
+            'zero' => ['0'],
+            'string' => ['"x"'],
+            'true' => ['true'],
+            'empty array' => ['[]'],
+            'empty body' => [''],
+        ];
+    }
+
+    public function testCreateRejectsAnOversizedBody(): void
+    {
+        $reportsBefore = $this->Reports->find()->count();
+        $incidentsBefore = $this->Incidents->find()->count();
+
+        $this->configRequest(['input' => str_repeat('a', 1048577)]);
+        $this->post('/incidents/create');
+
+        $this->assertResponseCode(413);
+        $this->assertSame(
+            ['success' => false],
+            json_decode($this->_response->getBody(), true),
+        );
+        $this->assertSame($reportsBefore, $this->Reports->find()->count());
+        $this->assertSame($incidentsBefore, $this->Incidents->find()->count());
+        $this->assertNoMailSent();
+    }
+
+    public function testCreateAcceptsABodyAtTheLimit(): void
+    {
+        // A body of exactly the limit is still parsed, and rejected for its
+        // content, not for its size.
+        $this->configRequest(['input' => str_repeat('a', 1048576)]);
+        $this->post('/incidents/create');
+
+        $this->assertResponseCode(200);
+        $this->assertSame(
+            ['success' => false],
+            json_decode($this->_response->getBody(), true),
+        );
     }
 
     public function testCreateIncidentFromBugReportUANull(): void

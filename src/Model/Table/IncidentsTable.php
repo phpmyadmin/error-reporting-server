@@ -35,14 +35,19 @@ use function hash_init;
 use function hash_update;
 use function in_array;
 use function is_array;
+use function is_float;
+use function is_int;
+use function is_scalar;
 use function is_string;
 use function json_encode;
 use function mb_strimwidth;
 use function mb_strlen;
+use function mb_substr;
 use function preg_match;
 use function preg_replace;
 use function str_ends_with;
 use function str_starts_with;
+use function strlen;
 use function strtotime;
 use function substr;
 use function time;
@@ -212,13 +217,39 @@ class IncidentsTable extends Table
         $incident_ids = []; // array to hold ids of all the inserted incidents
         $new_report_ids = []; // array to hold ids of all newly created reports
 
+        // The errors of a PHP report are its content: a report which does not
+        // carry a list of errors has nothing to store.
+        if (
+            isset($bugReport['exception_type'])
+            && $bugReport['exception_type'] === 'php'
+            && (! isset($bugReport['errors']) || ! is_array($bugReport['errors']))
+        ) {
+            Log::info(
+                'Ignoring a PHP report whose errors field is not a list.',
+                'cron_jobs',
+            );
+
+            return [
+                'incidents' => [false],
+                'reports' => [],
+            ];
+        }
+
         // Avoid storing too many errors from single report
-        if (isset($bugReport['errors']) && count($bugReport['errors']) > 40) {
+        if (isset($bugReport['errors']) && is_array($bugReport['errors']) && count($bugReport['errors']) > 40) {
             $bugReport['errors'] = array_slice($bugReport['errors'], 0, 40);
         }
 
-        if (isset($bugReport['exception']['stack']) && count($bugReport['exception']['stack']) > 40) {
-            $bugReport['exception']['stack'] = array_slice($bugReport['exception']['stack'], 0, 40);
+        if (isset($bugReport['exception']) && ! is_array($bugReport['exception'])) {
+            $bugReport['exception'] = [];
+        }
+
+        if (isset($bugReport['exception']['stack'])) {
+            if (! is_array($bugReport['exception']['stack'])) {
+                $bugReport['exception']['stack'] = [];
+            } elseif (count($bugReport['exception']['stack']) > 40) {
+                $bugReport['exception']['stack'] = array_slice($bugReport['exception']['stack'], 0, 40);
+            }
         }
 
         // Also sanitizes the bug report
@@ -304,11 +335,22 @@ class IncidentsTable extends Table
     protected function getClosestReport(array $bugReport, int $index = 0): Entity|null
     {
         if (isset($bugReport['exception_type']) && $bugReport['exception_type'] === 'php') {
-            $location = $bugReport['errors'][$index]['file'];
-            $linenumber = $bugReport['errors'][$index]['lineNum'];
+            $error = $bugReport['errors'][$index] ?? [];
+            if (! is_array($error)) {
+                $error = [];
+            }
+
+            $location = $this->truncate($this->stringValue($error['file'] ?? ''), 65535);
+            $linenumber = (int) $this->stringValue($error['lineNum'] ?? '');
         } else {
+            $exception = $bugReport['exception'] ?? [];
+            $stack = is_array($exception) && is_array($exception['stack'] ?? null)
+                ? $exception['stack']
+                : [];
             [$location, $linenumber] =
-                    $this->getIdentifyingLocation($bugReport['exception']['stack'] ?? []);
+                    $this->getIdentifyingLocation($stack);
+            $location = $this->truncate($this->stringValue($location), 65535);
+            $linenumber = (int) $linenumber;
         }
 
         return TableRegistry::getTableLocator()->get('Reports')->findByLocationAndLinenumberAndPmaVersion(
@@ -330,21 +372,33 @@ class IncidentsTable extends Table
     protected function getReportDetails(array $bugReport, int $index = 0): array
     {
         if (isset($bugReport['exception_type']) && $bugReport['exception_type'] === 'php') {
-            $location = $bugReport['errors'][$index]['file'];
-            $linenumber = $bugReport['errors'][$index]['lineNum'];
+            $error = $bugReport['errors'][$index] ?? [];
+            if (! is_array($error)) {
+                $error = [];
+            }
+
+            $location = $this->truncate($this->stringValue($error['file'] ?? ''), 65535);
+            $linenumber = (int) $this->stringValue($error['lineNum'] ?? '');
             $reportDetails = [
-                'error_message' => $bugReport['errors'][$index]['msg'],
-                'error_name' => $bugReport['errors'][$index]['type'],
+                'error_message' => $this->truncate($this->stringValue($error['msg'] ?? ''), 150),
+                'error_name' => $this->truncate($this->stringValue($error['type'] ?? ''), 50),
             ];
             $exception_type = 1;
         } else {
             $exception = $bugReport['exception'] ?? [];
+            if (! is_array($exception)) {
+                $exception = [];
+            }
+
+            $stack = is_array($exception['stack'] ?? null) ? $exception['stack'] : [];
             [$location, $linenumber] =
-                $this->getIdentifyingLocation($exception['stack'] ?? []);
+                $this->getIdentifyingLocation($stack);
+            $location = $this->truncate($this->stringValue($location), 65535);
+            $linenumber = (int) $linenumber;
 
             $reportDetails = [
-                'error_message' => $exception['message'] ?? '',
-                'error_name' => $exception['name'] ?? '',
+                'error_message' => $this->truncate($this->stringValue($exception['message'] ?? ''), 150),
+                'error_name' => $this->truncate($this->stringValue($exception['name'] ?? ''), 50),
             ];
             $exception_type = 0;
         }
@@ -354,7 +408,7 @@ class IncidentsTable extends Table
             [
                 'status' => 'new',
                 'location' => $location,
-                'linenumber' => $linenumber ?? 0,
+                'linenumber' => $linenumber,
                 'pma_version' => self::getStrippedPmaVersion($bugReport['pma_version']),
                 'exception_type' => $exception_type,
             ],
@@ -376,59 +430,127 @@ class IncidentsTable extends Table
         //$bugReport = Sanitize::clean($bugReport, array('escape' => false));
         $schematizedReports = [];
         $schematizedCommonReport = [
-            'pma_version' => self::getStrippedPmaVersion($bugReport['pma_version']),
-            'php_version' => $this->getSimpleVersion($bugReport['php_version'] ?? '', 2),
-            'browser' => ($bugReport['browser_name'] ?? '') . ' '
-                    . $this->getSimpleVersion($bugReport['browser_version'] ?? '', 1),
-            'user_os' => $bugReport['user_os'] ?? '',
-            'locale' => $bugReport['locale'] ?? '',
-            'configuration_storage' => $bugReport['configuration_storage'] ?? '',
-            'server_software' => $this->getServer($bugReport['server_software'] ?? ''),
+            'pma_version' => $this->truncate(
+                self::getStrippedPmaVersion($this->stringValue($bugReport['pma_version'] ?? '')),
+                30,
+            ),
+            'php_version' => $this->truncate(
+                $this->getSimpleVersion($this->stringValue($bugReport['php_version'] ?? ''), 2),
+                15,
+            ),
+            'browser' => $this->truncate(
+                $this->stringValue($bugReport['browser_name'] ?? '') . ' '
+                    . $this->getSimpleVersion($this->stringValue($bugReport['browser_version'] ?? ''), 1),
+                40,
+            ),
+            'user_os' => $this->truncate($this->stringValue($bugReport['user_os'] ?? ''), 30),
+            'locale' => $this->truncate($this->stringValue($bugReport['locale'] ?? ''), 30),
+            'configuration_storage' => $this->truncate(
+                $this->stringValue($bugReport['configuration_storage'] ?? ''),
+                30,
+            ),
+            'server_software' => $this->truncate(
+                $this->getServer($this->stringValue($bugReport['server_software'] ?? '')),
+                100,
+            ),
             'full_report' => json_encode($bugReport),
         ];
 
         if (isset($bugReport['exception_type']) && $bugReport['exception_type'] === 'php') {
+            $errors = $bugReport['errors'] ?? [];
+            if (! is_array($errors)) {
+                $errors = [];
+            }
+
             // for each "errors"
-            foreach ($bugReport['errors'] as $error) {
+            foreach ($errors as $error) {
+                if (! is_array($error)) {
+                    $error = [];
+                }
+
                 $tmpReport = array_merge(
                     $schematizedCommonReport,
                     [
-                        'error_name' => $error['type'],
-                        'error_message' => $error['msg'],
-                        'script_name' => $error['file'],
-                        'stacktrace' => json_encode($error['stackTrace'] ?? []),
-                        'stackhash' => $error['stackhash'],
+                        'error_name' => $this->truncate($this->stringValue($error['type'] ?? ''), 30),
+                        'error_message' => $this->truncate($this->stringValue($error['msg'] ?? ''), 200),
+                        'script_name' => $this->truncate($this->stringValue($error['file'] ?? ''), 255),
+                        'stacktrace' => json_encode(
+                            is_array($error['stackTrace'] ?? null) ? $error['stackTrace'] : [],
+                        ),
+                        'stackhash' => $this->truncate($this->stringValue($error['stackhash'] ?? ''), 32),
                         'exception_type' => 1, // 'php'
                     ],
                 );
                 array_push($schematizedReports, $tmpReport);
             }
         } else {
-            $exception = $bugReport['exception'] ?? [
-                'name' => '',
-                'message' => '',
-                'stack' => [],
-            ];
+            $exception = $bugReport['exception'] ?? [];
+            if (! is_array($exception)) {
+                $exception = [];
+            }
+
+            $stack = is_array($exception['stack'] ?? null) ? $exception['stack'] : [];
             $tmpReport = array_merge(
                 $schematizedCommonReport,
                 [
-                    'error_name' => $exception['name'] ?? '',
-                    'error_message' => $exception['message'] ?? '',
-                    'script_name' => $bugReport['script_name'] ?? '',
-                    'stacktrace' => json_encode($exception['stack'] ?? []),
-                    'stackhash' => self::getStackHash($exception['stack'] ?? []),
+                    'error_name' => $this->truncate($this->stringValue($exception['name'] ?? ''), 30),
+                    'error_message' => $this->truncate($this->stringValue($exception['message'] ?? ''), 200),
+                    'script_name' => $this->truncate($this->stringValue($bugReport['script_name'] ?? ''), 255),
+                    'stacktrace' => json_encode($stack),
+                    'stackhash' => self::getStackHash($stack),
                     'exception_type' => 0, //'js'
                 ],
             );
 
             if (isset($bugReport['steps'])) {
-                $tmpReport['steps'] = $bugReport['steps'];
+                $tmpReport['steps'] = $this->stringValue($bugReport['steps']);
             }
 
             array_push($schematizedReports, $tmpReport);
         }
 
         return $schematizedReports;
+    }
+
+    /**
+     * Returns a string usable in a database column for an untrusted value.
+     *
+     * The fields of a bug report are decoded from a request body, they are not
+     * guaranteed to hold the type the schema expects.
+     *
+     * @param mixed $value the value read from the bug report
+     *
+     * @return string the value itself, its string representation or '' for a
+     *                value which cannot be stored as a string
+     */
+    private function stringValue(mixed $value): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+
+        return '';
+    }
+
+    /**
+     * Truncates a value to the length of the database column storing it.
+     *
+     * @param string $value  the value to store
+     * @param int    $length the length of the column, in characters
+     *
+     * @return string the value, cut to the column length if needed
+     */
+    private function truncate(string $value, int $length): string
+    {
+        if (mb_strlen($value) <= $length) {
+            return $value;
+        }
+
+        return mb_substr($value, 0, $length);
     }
 
     /**
@@ -454,6 +576,10 @@ class IncidentsTable extends Table
             0,
         ];
         foreach ($stacktrace as $level) {
+            if (! is_array($level)) {
+                continue;
+            }
+
             if (isset($level['filename'])) {
                 // ignore unrelated files that sometimes appear in the error report
                 if ($level['filename'] === 'tracekit/tracekit.js') {
@@ -466,7 +592,7 @@ class IncidentsTable extends Table
                     if ($fallback[0] === 'UNKNOWN') {
                         $fallback = [
                             $level['filename'],
-                            $level['line'],
+                            $level['line'] ?? 0,
                         ];
                     }
 
@@ -475,14 +601,14 @@ class IncidentsTable extends Table
 
                 return [
                     $level['filename'],
-                    $level['line'],
+                    $level['line'] ?? 0,
                 ];
             }
 
             if (isset($level['scriptname'])) {
                 return [
                     $level['scriptname'],
-                    $level['line'],
+                    $level['line'] ?? 0,
                 ];
             }
 
@@ -645,6 +771,10 @@ class IncidentsTable extends Table
     {
         $handle = hash_init('md5');
         foreach ($stacktrace as $level) {
+            if (! is_array($level)) {
+                continue;
+            }
+
             $elements = [
                 'filename',
                 'scriptname',
@@ -653,11 +783,11 @@ class IncidentsTable extends Table
                 'column',
             ];
             foreach ($elements as $element) {
-                if (! isset($level[$element])) {
+                if (! isset($level[$element]) || ! is_scalar($level[$element])) {
                     continue;
                 }
 
-                hash_update($handle, $level[$element]);
+                hash_update($handle, (string) $level[$element]);
             }
         }
 
@@ -674,8 +804,9 @@ class IncidentsTable extends Table
      */
     private function logLongIncidentSubmissions($si, array &$incident_ids): void// phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
     {
-        $stacktraceLength = mb_strlen($si['stacktrace']);
-        $fullReportLength = mb_strlen($si['full_report']);
+        // A TEXT column holds 65 535 bytes, not 65 535 characters.
+        $stacktraceLength = strlen($si['stacktrace']);
+        $fullReportLength = strlen($si['full_report']);
 
         if ($stacktraceLength <= 65535 && $fullReportLength <= 65535) {
             return;
@@ -687,8 +818,8 @@ class IncidentsTable extends Table
         Log::error(
             'Too long data submitted in the incident. The length of stacktrace: '
             . $stacktraceLength . ', the length of bug report: '
-            . $fullReportLength . '. The full incident reported was as follows: '
-            . json_encode($si),
+            . $fullReportLength . '. The beginning of the incident was: '
+            . substr((string) json_encode($si), 0, 1000),
         );
 
         // add a 'false' to the return array

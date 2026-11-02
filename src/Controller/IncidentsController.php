@@ -31,10 +31,13 @@ use Cake\ORM\TableRegistry;
 use function array_merge;
 use function count;
 use function in_array;
+use function is_array;
 use function json_decode;
 use function json_encode;
+use function strlen;
 
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 
 /**
@@ -42,6 +45,15 @@ use const JSON_UNESCAPED_SLASHES;
  */
 class IncidentsController extends AppController
 {
+    /**
+     * The largest report body accepted, in bytes.
+     *
+     * Reports are submitted without authentication and each new report sends
+     * a notification email, so the size of a single submission is bounded
+     * before it is decoded.
+     */
+    private const int MAX_REQUEST_BODY_SIZE = 1048576;
+
     protected NotificationsTable $Notifications;
     protected IncidentsTable $Incidents;
     protected ReportsTable $Reports;
@@ -74,9 +86,19 @@ class IncidentsController extends AppController
         $this->request->allowMethod(['post']);
 
         $requestBody = (string) $this->request->getBody();
+
+        // Refuse oversized submissions before decoding them
+        if (strlen($requestBody) > self::MAX_REQUEST_BODY_SIZE) {
+            $this->response = $this->response
+                ->withStatus(413)
+                ->withStringBody($this->rejectionBody());
+
+            return $this->response;
+        }
+
         $bugReport = json_decode($requestBody, true);
 
-        if ($bugReport === null || $bugReport === false || $requestBody === '') {
+        if (! is_array($bugReport) || $requestBody === '') {
             $response = ['success' => false];
 
             $this->response = $this->response
@@ -113,6 +135,19 @@ class IncidentsController extends AppController
         }
 
         return $this->response;
+    }
+
+    /**
+     * Builds the body of a refused report.
+     *
+     * @return string the JSON encoded failure answer
+     */
+    private function rejectionBody(): string
+    {
+        return json_encode(
+            ['success' => false],
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
+        );
     }
 
     public function json(string|null $id): Response|null
