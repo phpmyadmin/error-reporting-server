@@ -103,12 +103,6 @@ parameters:
 			path: src/Controller/DevelopersController.php
 
 		-
-			message: '#^Strict comparison using \=\=\= between 201 and 200 will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: src/Controller/EventsController.php
-
-		-
 			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$sourceforge_bug_id\.$#'
 			identifier: property.notFound
 			count: 1
