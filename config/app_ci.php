@@ -317,7 +317,7 @@ return [
             'path' => LOGS,
             'file' => 'debug',
             'url' => null,
-            'scopes' => false,
+            'scopes' => null,
             'levels' => [
                 'notice',
                 'info',
@@ -329,7 +329,7 @@ return [
             'path' => LOGS,
             'file' => 'error',
             'url' => null,
-            'scopes' => false,
+            'scopes' => null,
             'levels' => [
                 'warning',
                 'error',
