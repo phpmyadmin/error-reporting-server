@@ -8,6 +8,7 @@ use App\Test\Fixture\IncidentsFixture;
 use App\Test\Fixture\NotificationsFixture;
 use App\Test\Fixture\ReportsFixture;
 use Cake\Core\Configure;
+use Cake\Event\EventInterface;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -17,6 +18,7 @@ use function count;
 use function file_get_contents;
 use function json_decode;
 use function json_encode;
+use function str_repeat;
 
 use const DS;
 
@@ -700,5 +702,135 @@ class IncidentsTableTest extends TestCase
         $this->assertSame([false], $result['incidents']);
         $this->assertSame([], $result['reports']);
         $this->assertSame($incidentsBefore, $this->Incidents->find()->count());
+    }
+
+    public function testCreateIncidentFromANullBugReport(): void
+    {
+        $result = $this->Incidents->createIncidentFromBugReport(null);
+
+        $this->assertSame(['incidents' => [false], 'reports' => []], $result);
+    }
+
+    public function testCreateIncidentFromABugReportThatCannotBeSaved(): void
+    {
+        $this->Incidents->getEventManager()->on('Model.beforeSave', static function (EventInterface $event): void {
+            $event->setResult(false);
+        });
+
+        $result = $this->Incidents->createIncidentFromBugReport($this->jsBugReport());
+
+        $this->assertSame([false], $result['incidents']);
+        $this->assertCount(1, $result['reports']);
+    }
+
+    public function testCreateIncidentFromALongReportForAnExistingReport(): void
+    {
+        $bugReport = $this->jsBugReport();
+        $this->assertCount(1, $this->Incidents->createIncidentFromBugReport($bugReport)['incidents']);
+
+        $bugReport['steps'] = str_repeat('a', 70000);
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertSame([false], $result['incidents']);
+        $this->assertSame([], $result['reports']);
+    }
+
+    public function testCreateIncidentFromALongReportForANewReport(): void
+    {
+        $bugReport = $this->jsBugReport('new-long-report.js', 42);
+        $bugReport['steps'] = str_repeat('a', 70000);
+
+        $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+
+        $this->assertSame([false], $result['incidents']);
+        $this->assertSame([], $result['reports']);
+    }
+
+    public function testCreateIncidentFromAReportWhoseNotificationsCannotBeAdded(): void
+    {
+        TableRegistry::getTableLocator()
+            ->get('Notifications')
+            ->getEventManager()
+            ->on('Model.beforeSave', static function (EventInterface $event): void {
+                $event->setResult(false);
+            });
+
+        $result = $this->Incidents->createIncidentFromBugReport(
+            $this->jsBugReport('notification-failure.js', 10),
+        );
+
+        $this->assertCount(1, $result['incidents']);
+        $this->assertNotFalse($result['incidents'][0]);
+        $this->assertCount(1, $result['reports']);
+    }
+
+    public function testGetSchematizedIncidentsWithoutAnException(): void
+    {
+        $method = new ReflectionMethod($this->Incidents, 'getSchematizedIncidents');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->Incidents, ['pma_version' => '5.2.4']);
+
+        $this->assertCount(1, $result);
+        $this->assertSame('', $result[0]['error_name']);
+        $this->assertSame('', $result[0]['error_message']);
+        $this->assertSame('', $result[0]['script_name']);
+        $this->assertSame('[]', $result[0]['stacktrace']);
+        $this->assertSame('d41d8cd98f00b204e9800998ecf8427e', $result[0]['stackhash']);
+        $this->assertSame(0, $result[0]['exception_type']);
+    }
+
+    public function testGetSimpleVersionWhenItIsNotAVersion(): void
+    {
+        $method = new ReflectionMethod($this->Incidents, 'getSimpleVersion');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->Incidents, 'not a version', 2);
+
+        $this->assertSame('not a version', $result);
+    }
+
+    public function testIsSupportedPmaVersionIgnoresRulesThatAreNotStrings(): void
+    {
+        Configure::write('AcceptedReportsVersions', [123, null, '>=5.0']);
+
+        $this->assertTrue(IncidentsTable::isSupportedPmaVersion('5.2.4'));
+
+        Configure::write('AcceptedReportsVersions', [123, null]);
+
+        $this->assertFalse(IncidentsTable::isSupportedPmaVersion('5.2.4'));
+    }
+
+    /**
+     * Build a minimal JavaScript bug report.
+     *
+     * @param string $filename The file the error is reported in
+     * @param int    $line     The line the error is reported on
+     *
+     * @return array<string, mixed>
+     */
+    protected function jsBugReport(string $filename = 'error.js', int $line = 312): array
+    {
+        return [
+            'pma_version' => '5.2.4',
+            'php_version' => '8.2.0',
+            'browser_name' => 'Firefox',
+            'browser_version' => '100.0',
+            'user_os' => 'Linux',
+            'locale' => 'en',
+            'configuration_storage' => 'enabled',
+            'server_software' => 'Apache/2.4.1',
+            'script_name' => 'index.php',
+            'exception' => [
+                'name' => 'ReferenceError',
+                'message' => 'a is not defined',
+                'stack' => [
+                    [
+                        'filename' => $filename,
+                        'line' => $line,
+                    ],
+                ],
+            ],
+        ];
     }
 }
