@@ -31,6 +31,7 @@ use Cake\ORM\TableRegistry;
 use function array_key_exists;
 use function array_push;
 use function array_unshift;
+use function Cake\Core\h;
 use function count;
 use function json_encode;
 
@@ -213,6 +214,11 @@ class ReportsController extends AppController
         // add incident count for related reports
         $dispRows = [];
         foreach ($rows as $row) {
+            // DataTables writes every cell but the first with innerHTML.
+            $row[1] = h($row[1]);
+            $row[2] = h($row[2]);
+            $row[3] = h($row[3]);
+            $row[4] = h($row[4]);
             $row[5] = $this->Reports->status[$row[5]];
             $row[6] = (int) $row[6] ? 'php' : 'js';
             $input_elem = '<input type="checkbox" name="reports[]" value="'

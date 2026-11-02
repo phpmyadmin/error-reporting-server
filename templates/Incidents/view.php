@@ -41,10 +41,7 @@
     <tr>
         <td>Browser</td>
         <td>
-            <?=
-                $incident['full_report']['browser_name'] . ' '
-                    . $incident['full_report']['browser_version'];
-            ?>
+            <?= h($incident['browser'] ?? ''); ?>
         </td>
     </tr>
     <tr>

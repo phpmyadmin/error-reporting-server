@@ -32,11 +32,11 @@ use Cake\Routing\Router;
     </tr>
     <tr>
         <td>Error Name</td>
-        <td><?= $report['error_name']; ?></td>
+        <td><?= h($report['error_name']); ?></td>
     </tr>
     <tr>
         <td>Error Message</td>
-        <td><?= $report['error_message']; ?></td>
+        <td><?= h($report['error_message']); ?></td>
     </tr>
     <tr>
         <td>PMA Versions</td>
@@ -77,11 +77,11 @@ use Cake\Routing\Router;
     <?php if ($incidents[0]['exception_type']) : // php ?>
         <tr>
             <td>Location</td>
-            <td><?= $report['location']; ?></td>
+            <td><?= h($report['location']); ?></td>
         </tr>
         <tr>
             <td>Line Number</td>
-            <td><?= $report['linenumber']; ?></td>
+            <td><?= h($report['linenumber']); ?></td>
         </tr>
     <?php else : ?>
         <tr>
@@ -152,7 +152,7 @@ use Cake\Routing\Router;
     <tr>
         <td>Submission Date</td>
         <td>
-            <?= $report['created']; ?>
+            <?= h($report['created']); ?>
         </td>
     </tr>
 </table>
@@ -163,5 +163,5 @@ use Cake\Routing\Router;
     '_name' => 'reports:view',
     'id' => $report['id'],
 ], true) ?>">
-        #<?= $report['id'] ?></a>.
+        #<?= h($report['id']) ?></a>.
 </p>

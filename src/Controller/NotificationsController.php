@@ -27,6 +27,7 @@ use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 
 use function array_push;
+use function Cake\Core\h;
 use function intval;
 use function json_encode;
 
@@ -143,9 +144,10 @@ class NotificationsController extends AppController
                 . '">'
                 . $row->get('report_id')
                 . '</a>';
-            $tmp_row[2] = $row->get('error_name');
-            $tmp_row[3] = $row->get('error_message');
-            $tmp_row[4] = $row->get('pma_version');
+            // DataTables writes every cell but the first with innerHTML.
+            $tmp_row[2] = h($row->get('error_name'));
+            $tmp_row[3] = h($row->get('error_message'));
+            $tmp_row[4] = h($row->get('pma_version'));
             $tmp_row[5] = $row->get('exception_type') ? 'php' : 'js';
             $tmp_row[6] = $row->get('created_time');
             array_push($dispRows, $tmp_row);

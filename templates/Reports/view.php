@@ -4,8 +4,8 @@ use Cake\Routing\Router;
 
 ?>
 <div>
-    <h1 style="display: inline">Error Report #<?= $report[0]['id'] ?>
-            <small>[<?= $status[$report[0]['status']]; ?>]</small>
+    <h1 style="display: inline">Error Report #<?= h($report[0]['id']) ?>
+            <small>[<?= h($status[$report[0]['status']]); ?>]</small>
     </h1>
     <?php if (! $read_only) : ?>
         <a href="#" onclick="showStateForm(); return false">Change state</a>
@@ -15,9 +15,9 @@ use Cake\Routing\Router;
 
 <?php if (! $read_only) : ?>
     <form class="form-inline" id="state-form" style="display: none"
-            action="/<?= BASE_DIR ?>reports/change_state/<?= $report[0]['id']; ?>"
+            action="/<?= h(BASE_DIR) ?>reports/change_state/<?= h($report[0]['id']); ?>"
             method="post">
-        <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
+        <input type="hidden" name="_csrfToken" value="<?= h($csrf_token) ?>" />
         <span>Change state to:</span>
         <?=
             $this->Form->select(
@@ -34,9 +34,9 @@ use Cake\Routing\Router;
 <?php endif; ?>
 
 <?php if ($related_reports->isEmpty() && ! $read_only) : ?>
-    <form class="form-inline" action="/<?= BASE_DIR ?>reports/mark_related_to/<?=
-        $report[0]['id']; ?>" method="post">
-        <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
+    <form class="form-inline" action="/<?= h(BASE_DIR) ?>reports/mark_related_to/<?=
+        h($report[0]['id']); ?>" method="post">
+        <input type="hidden" name="_csrfToken" value="<?= h($csrf_token) ?>" />
         <span>Mark the same as:</span>
         <input type="number" min="1" name="related_to" />
         <input type="submit" value="Submit" class="btn btn-primary" />
@@ -45,9 +45,9 @@ use Cake\Routing\Router;
     <p>
         This report has been marked the same as the following reports:
         (<?= $this->Reports->createReportsLinks($related_reports); ?>).
-        <form class="form-inline" action="/<?= BASE_DIR ?>reports/unmark_related_to/<?= $report[0]['id']; ?>" method="post">
+        <form class="form-inline" action="/<?= h(BASE_DIR) ?>reports/unmark_related_to/<?= h($report[0]['id']); ?>" method="post">
                 <input type="submit" value="Remove from this group" class="btn btn-primary" />
-                <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
+                <input type="hidden" name="_csrfToken" value="<?= h($csrf_token) ?>" />
         </form>
     </p>
 <?php endif; ?>

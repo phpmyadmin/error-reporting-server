@@ -13,7 +13,7 @@ $reportsUrl = Router::url(
 <form class="form-inline" id="state-form"
         action=" <?= Router::url('/reports/mass_action/'); ?> "
         method="post">
-    <input type="hidden" name="_csrfToken" value="<?= $csrf_token ?>" />
+    <input type="hidden" name="_csrfToken" value="<?= h($csrf_token) ?>" />
     <table id="reports_table" data-ajax-url="<?= $reportsUrl ?>">
         <thead>
             <tr>
@@ -37,7 +37,7 @@ $reportsUrl = Router::url(
                     <select id="error_name_filter" style="width:100%">
                         <option></option>
                         <?php foreach ($distinct_error_names as $id => $name) : ?>
-                            <?= '<option value="' . $name . '">' . $name . '</option>'; ?>
+                            <option value="<?= h($name) ?>"><?= h($name) ?></option>
                         <?php endforeach;
 
                         ?>
@@ -48,7 +48,7 @@ $reportsUrl = Router::url(
                     <select id="location_filter" style="width:100%">
                         <option></option>
                         <?php foreach ($distinct_locations as $id => $location) : ?>
-                            <?= '<option value="' . $location . '">' . $location . '</option>'; ?>
+                            <option value="<?= h($location) ?>"><?= h($location) ?></option>
                         <?php endforeach;
 
                         ?>
@@ -58,7 +58,7 @@ $reportsUrl = Router::url(
                     <select id="pma_version_filter" style="width:100%">
                         <option></option>
                         <?php foreach ($distinct_versions as $id => $version) : ?>
-                            <?= '<option value="' . $version . '">' . $version . '</option>'; ?>
+                            <option value="<?= h($version) ?>"><?= h($version) ?></option>
                         <?php endforeach;
 
                         ?>
@@ -68,7 +68,7 @@ $reportsUrl = Router::url(
                     <select id="status_filter" style="width:100%">
                         <option></option>
                         <?php foreach ($distinct_statuses as $id => $status) : ?>
-                            <?= '<option value="' . $status . '">' . $statuses[$status] . '</option>'; ?>
+                            <option value="<?= h($status) ?>"><?= h($statuses[$status]) ?></option>
                         <?php endforeach;
 
                         ?>

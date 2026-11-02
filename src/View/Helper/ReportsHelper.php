@@ -5,6 +5,7 @@ namespace App\View\Helper;
 use Cake\Utility\Inflector;
 
 use function count;
+use function htmlspecialchars;
 use function implode;
 use function json_encode;
 
@@ -30,8 +31,8 @@ class ReportsHelper extends AppHelper
         //$entries = Sanitize::clean($entries);
         $values = [];
         foreach ($entries as $entry) {
-            $values[] = $entry[$key] . ' <span class="count">('
-                . $entry['count'] . ')</span>';
+            $values[] = htmlspecialchars((string) $entry[$key])
+                . ' <span class="count">(' . (int) $entry['count'] . ')</span>';
         }
 
         $fullString = implode(', ', $values);
