@@ -291,7 +291,7 @@ class Report extends stdClass
                 return 'warning';
 
             case 'Catchable Fatal Error':
-                return 'tatal';
+                return 'fatal';
 
             default:
                 return 'error';
