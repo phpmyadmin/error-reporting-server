@@ -25,15 +25,14 @@ use Cake\Http\ServerRequest;
 use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 
-use function count;
-use function explode;
 use function hash_equals;
 use function hash_hmac;
-use function hash_hmac_algos;
-use function in_array;
 use function json_decode;
 use function json_encode;
+use function str_starts_with;
+use function strlen;
 use function strpos;
+use function substr;
 
 /**
  * Events controller Github webhook events
@@ -60,17 +59,18 @@ class EventsController extends AppController
 
         // Validate request
         $statusCode = $this->validateRequest($this->request, $payload);
+
+        if ($statusCode === 200) {
+            // A ping event only checks the delivery, there is nothing to do.
+            return $this->respond($statusCode);
+        }
+
         if ($statusCode !== 201) {
             Log::error(
                 'Could not validate the request. Sending a '
                     . $statusCode . ' response.',
             );
 
-            return $this->respond($statusCode);
-        }
-
-        if ($statusCode === 200) {
-           // Send a success response to ping event
             return $this->respond($statusCode);
         }
 
@@ -150,24 +150,20 @@ class EventsController extends AppController
      */
     protected function validateRequest(ServerRequest $request, string $payload): int
     {
-        // Default $statusCode
-        $statusCode = 201;
+        $secret = (string) Configure::read('GithubWebhookSecret');
+        if ($secret === '') {
+            // With an empty key anyone can compute the expected HMAC.
+            Log::error(
+                'GithubWebhookSecret is empty: refusing every webhook event.',
+            );
+
+            return 401;
+        }
 
         $userAgent = $request->getHeaderLine('User-Agent');
         $eventType = $request->getHeaderLine('X-GitHub-Event');
 
-        $receivedHashHeader = $request->getHeaderLine('X-Hub-Signature');
-        $algo = '';
-        $receivedHash = '';
-        if ($receivedHashHeader !== '') {
-            $parts = explode('=', $receivedHashHeader);
-            if (count($parts) === 2) {
-                $algo = $parts[0];
-                $receivedHash = $parts[1];
-            }
-        }
-
-        if ($userAgent !== null && strpos($userAgent, 'GitHub-Hookshot') !== 0) {
+        if (strpos($userAgent, 'GitHub-Hookshot') !== 0) {
             // Check if the User-agent is Github
             // Otherwise, Send a '403: Forbidden'
 
@@ -179,10 +175,8 @@ class EventsController extends AppController
             return 403;
         }
 
-        if ($eventType !== null && $eventType === 'ping') {
-            // Check if the request is based on 'issues' event
-            // Otherwise, Send a '400: Bad Request'
-
+        if ($eventType === 'ping') {
+            // Ping events only check the delivery, there is nothing to do.
             Log::info(
                 'Ping event type received.',
             );
@@ -190,7 +184,7 @@ class EventsController extends AppController
             return 200;
         }
 
-        if ($eventType !== null && $eventType !== 'issues') {
+        if ($eventType !== 'issues') {
             // Check if the request is based on 'issues' event
             // Otherwise, Send a '400: Bad Request'
 
@@ -202,33 +196,41 @@ class EventsController extends AppController
             return 400;
         }
 
-        if (! in_array($algo, hash_hmac_algos(), true)) {
-            // Without a supported algorithm the expected hash would be empty or
-            // built from a hash the request does not use.
+        // GitHub signs the deliveries with sha256 in X-Hub-Signature-256.
+        // Older integrations still use sha1 in X-Hub-Signature. The client
+        // must not be able to pick any other algorithm.
+        $algo = 'sha256';
+        $signature = $request->getHeaderLine('X-Hub-Signature-256');
+        if ($signature === '') {
+            $algo = 'sha1';
+            $signature = $request->getHeaderLine('X-Hub-Signature');
+        }
+
+        $prefix = $algo . '=';
+        if (! str_starts_with($signature, $prefix)) {
             Log::error(
-                'Unsupported signature algorithm: ' . $algo
-                . '. Ignoring the event.',
+                'The signature of the webhook payload is missing or uses an '
+                . 'unsupported algorithm. Ignoring the event.',
             );
 
             return 401;
         }
 
+        $receivedHash = substr($signature, strlen($prefix));
         $expectedHash = $this->getHash($payload, $algo);
 
         if (! hash_equals($expectedHash, $receivedHash)) {
-            // Check if hash matches
-            // Otherwise, Send a '401: Unauthorized'
-
+            // Never log either hash: whoever reads the log could use the
+            // expected one to forge a valid signature.
             Log::error(
-                'received hash ' . $receivedHash . ' does not match '
-                . ' expected hash ' . $expectedHash
-                . '. Ignoring the event.',
+                'The signature of the webhook payload does not match. '
+                . 'Ignoring the event.',
             );
 
             return 401;
         }
 
-        return $statusCode;
+        return 201;
     }
 
     /**

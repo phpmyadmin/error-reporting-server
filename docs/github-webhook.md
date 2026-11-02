@@ -49,10 +49,12 @@ SourceForge name, it holds the GitHub issue number.
   `GitHub-Hookshot`, every other request is refused with `403`. A `ping` event
   answers `200` before any signature check, it only tells GitHub that the
   endpoint is reachable.
-- The signature of the payload is read from the `X-Hub-Signature` header, the
-  SHA-1 one, and it covers the body of the delivery. GitHub also sends it until
-  it is removed, together with the `X-Hub-Signature-256` header this service
-  does not read yet.
+- The signature of the payload is read from the `X-Hub-Signature-256` header and
+  must start with `sha256=`, and it covers the body of the delivery. The older
+  `X-Hub-Signature` header is still accepted, but only with a `sha1=` signature:
+  no other algorithm of the header is read, so a delivery cannot choose a weaker
+  one. The expected and the received hash are never logged.
+- An empty `GithubWebhookSecret` refuses every delivery, `ping` included.
 
 ## Answers
 

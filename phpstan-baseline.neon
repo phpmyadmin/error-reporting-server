@@ -103,12 +103,6 @@ parameters:
 			path: src/Controller/DevelopersController.php
 
 		-
-			message: '#^Strict comparison using \!\=\= between string and null will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 3
-			path: src/Controller/EventsController.php
-
-		-
 			message: '#^Strict comparison using \=\=\= between 201 and 200 will always evaluate to false\.$#'
 			identifier: identical.alwaysFalse
 			count: 1

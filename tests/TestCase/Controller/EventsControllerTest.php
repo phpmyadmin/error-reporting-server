@@ -11,6 +11,7 @@ use Cake\TestSuite\TestCase;
 
 use function hash_hmac;
 use function json_encode;
+use function str_repeat;
 
 class EventsControllerTest extends TestCase
 {
@@ -45,8 +46,8 @@ class EventsControllerTest extends TestCase
         return $replace + [
             'User-Agent' => 'GitHub-Hookshot-abcdef',
             'X-GitHub-Event' => 'issues',
-            'X-Hub-Signature' => 'sha1=' . hash_hmac(
-                'sha1',
+            'X-Hub-Signature-256' => 'sha256=' . hash_hmac(
+                'sha256',
                 $payload,
                 (string) Configure::read('GithubWebhookSecret'),
             ),
@@ -91,7 +92,7 @@ class EventsControllerTest extends TestCase
         // Invalid Hash in headers
         $this->deliverIssueEvent(
             ['action' => 'closed', 'issue' => ['number' => 4]],
-            ['X-Hub-Signature' => 'sha1=89db05030cf4c1fbcfb4d590deda30fa40a247ed'],
+            ['X-Hub-Signature-256' => 'sha256=' . str_repeat('0', 64)],
         );
         $this->assertResponseCode(401);
 
