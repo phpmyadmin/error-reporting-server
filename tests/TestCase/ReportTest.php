@@ -40,6 +40,10 @@ class ReportTest extends TestCase
         );
         $report = Report::fromString($contents);
 
+        // The fixture carries no date, so getTimestampUTC() would read the
+        // clock and could answer the next second between the two comparisons.
+        $report->setTimestamp('2024-02-29T12:34:56+00:00');
+
         $tags = $report->getTags();
 
         $this->assertEquals((object) [
@@ -103,6 +107,10 @@ class ReportTest extends TestCase
             __DIR__ . '/../Fixture/report_issue_16853_js.json',
         );
         $report = Report::fromString($contents);
+
+        // The fixture carries no date, so getTimestampUTC() would read the
+        // clock and could answer the next second between the two comparisons.
+        $report->setTimestamp('2024-02-29T12:34:56+00:00');
 
         $tags = $report->getTags();
         $contexts = $report->getContexts();
