@@ -29,6 +29,9 @@ use Cake\Routing\Router;
 use function array_merge;
 use function assert;
 use function http_build_query;
+use function in_array;
+use function is_array;
+use function is_string;
 use function json_encode;
 use function strtoupper;
 
@@ -170,13 +173,15 @@ class GithubApiComponent extends Component
 
     /**
      * generate the url to redirect the user to for authorization given the
-     * requested scope.
+     * requested scope and the OAuth state.
      *
-     * @param string $scope the api scope for the user to authorize
+     * @param string|null $scope the api scope for the user to authorize
+     * @param string|null $state the OAuth state used to protect the callback
+     *                           against login CSRF
      *
      * @return string the generated url to redirect the user to
      */
-    public function getRedirectUrl(string|null $scope = null): string
+    public function getRedirectUrl(string|null $scope = null, string|null $state = null): string
     {
         $url = 'https://github.com/login/oauth/authorize';
         $data = [
@@ -190,6 +195,9 @@ class GithubApiComponent extends Component
             ),
             'scope' => $scope,
         ];
+        if ($state !== null) {
+            $data['state'] = $state;
+        }
 
         return $url . '?' . http_build_query($data);
     }
@@ -197,26 +205,43 @@ class GithubApiComponent extends Component
     /**
      * Check if a user can commit to a rep.
      *
+     * Only the permissions that allow writing to the repository are accepted.
+     * The collaborators endpoint cannot be used for this: it answers 204 for
+     * every collaborator, read only and triage ones included.
+     *
      * @param string $username     the username to check
      * @param string $repoPath     the repo path of the repo to check for
      * @param string $access_token the github access token
      *
-     * @return bool true if the user is a collaborator and false if they are not
+     * @return bool true if the user can write to the repository and false if they cannot
      */
     public function canCommitTo(string $username, string $repoPath, string $access_token): bool
     {
-        [, $status] = $this->apiRequest(
-            'repos/' . $repoPath . '/collaborators/' . $username,
+        [$permission, $status] = $this->apiRequest(
+            'repos/' . $repoPath . '/collaborators/' . $username . '/permission',
             [],
             ClientRequest::METHOD_GET,
             true,
             $access_token,
         );
-        if ($status !== 204 && $status !== 404) {
-            Log::error('Collaborators call ended in a status code: ' . $status);
+        if ($status !== 200) {
+            Log::error(
+                'Collaborator permission call for ' . $username . ' on ' . $repoPath
+                . ' ended in a status code: ' . $status,
+            );
+
+            return false;
         }
 
-        return $status === 204;
+        if (! is_array($permission)) {
+            Log::error('Collaborator permission call for ' . $username . ' on ' . $repoPath . ' returned no data');
+
+            return false;
+        }
+
+        $role = $permission['permission'] ?? $permission['role_name'] ?? null;
+
+        return is_string($role) && in_array($role, ['admin', 'maintain', 'write'], true);
     }
 
     /**
