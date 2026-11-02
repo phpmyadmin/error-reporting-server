@@ -22,6 +22,8 @@ use App\Model\Table\IncidentsTable;
 use Cake\Cache\Cache;
 use Cake\ORM\TableRegistry;
 
+use function array_key_exists;
+use function is_string;
 use function json_decode;
 use function json_encode;
 
@@ -51,10 +53,7 @@ class StatsController extends AppController
     {
         $filter = $this->getTimeFilter();
         $relatedEntries = [];
-        $filter_string = $this->request->getQuery('filter');
-        if (! $filter_string) {
-            $filter_string = 'all_time';
-        }
+        $filter_string = $this->getFilterName();
 
         $entriesWithCount = [];
         //Cache::clear();
@@ -73,7 +72,12 @@ class StatsController extends AppController
         $this->set('related_entries', $relatedEntries);
         $this->set('columns', $this->Incidents->summarizableFields);
         $this->set('filter_times', $this->Incidents->filterTimes);
-        $this->set('selected_filter', $this->request->getQuery('filter'));
+        // No filter at all keeps no option selected, any other value selects
+        // the filter actually used (which is all_time for an unknown one).
+        $this->set(
+            'selected_filter',
+            $this->request->getQuery('filter') === null ? null : $filter_string,
+        );
 
         $query = [
             'group' => 'grouped_by',
@@ -107,17 +111,31 @@ class StatsController extends AppController
         $this->set('download_stats', json_decode($downloadStats, true));
     }
 
-    /** @return mixed I am not sure about the type */
-    protected function getTimeFilter()
+    /**
+     * Returns the name of the selected time filter.
+     *
+     * Any value which is not one of the known filters falls back to the all
+     * time filter, so that it can be used in a cache key.
+     *
+     * @return string the name of the filter
+     */
+    protected function getFilterName(): string
     {
-        if ($this->request->getQuery('filter')) {
-            $filter = $this->Incidents->filterTimes[$this->request->getQuery('filter')];
+        $filterName = $this->request->getQuery('filter');
+        if (! is_string($filterName) || ! array_key_exists($filterName, $this->Incidents->filterTimes)) {
+            return 'all_time';
         }
 
-        if (isset($filter)) {
-            return $filter;
-        }
+        return $filterName;
+    }
 
-        return $this->Incidents->filterTimes['all_time'];
+    /**
+     * Returns the selected time filter.
+     *
+     * @return array<mixed> the filter with its label, limit and group
+     */
+    protected function getTimeFilter(): array
+    {
+        return $this->Incidents->filterTimes[$this->getFilterName()];
     }
 }

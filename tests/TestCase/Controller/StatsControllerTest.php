@@ -32,6 +32,7 @@ use function array_keys;
 use function array_sum;
 use function count;
 use function json_encode;
+use function urlencode;
 
 /**
  * App\Controller\StatsController Test Case
@@ -154,6 +155,44 @@ class StatsControllerTest extends TestCase
         // The fixtures contain two distinct PHP versions
         $this->assertCount(2, $relatedEntries['php_version']);
         $this->assertSame(5, array_sum(array_column($relatedEntries['php_version'], 'count')));
+    }
+
+    /** @return array<string, array{0: string}> */
+    public static function unknownFilterProvider(): array
+    {
+        return [
+            'unknown name' => ['doesnotexist'],
+            'wrong case' => ['DAY'],
+            'trailing space' => ['all_time '],
+            'numeric' => ['0'],
+            'markup' => ['<script>alert(1)</script>'],
+        ];
+    }
+
+    #[DataProvider('unknownFilterProvider')]
+    public function testAnUnknownFilterFallsBackToAllTime(string $filter): void
+    {
+        $this->session(['Developer.id' => 1, 'read_only' => false]);
+
+        $this->get('/stats?filter=' . urlencode($filter));
+
+        $this->assertResponseCode(200);
+        $this->assertSame('all_time', $this->viewVariable('selected_filter'));
+        $this->assertNotFalse(Cache::read('browser_all_time'));
+        $this->assertNotFalse(Cache::read('downloadStats_all_time'));
+        $this->assertNull(Cache::read('browser_' . $filter));
+        $this->assertNull(Cache::read('downloadStats_' . $filter));
+    }
+
+    public function testAnArrayFilterFallsBackToAllTime(): void
+    {
+        $this->session(['Developer.id' => 1, 'read_only' => false]);
+
+        $this->get('/stats?filter%5B%5D=day');
+
+        $this->assertResponseCode(200);
+        $this->assertSame('all_time', $this->viewVariable('selected_filter'));
+        $this->assertNotFalse(Cache::read('browser_all_time'));
     }
 
     public function testStatsUsesTheCachedStatistics(): void
