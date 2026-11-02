@@ -193,12 +193,6 @@ parameters:
 			path: src/Controller/NotificationsController.php
 
 		-
-			message: '#^Method `render\(\)` must be used to prevent unreachable code\. Use `return \$this\-\>render\(\)` or assign it to a variable\.$#'
-			identifier: cake.controller.renderMustBeUsed
-			count: 1
-			path: src/Controller/PagesController.php
-
-		-
 			message: '#^Access to an undefined property App\\Controller\\ReportsController\:\:\$OrderSearch\.$#'
 			identifier: property.notFound
 			count: 2

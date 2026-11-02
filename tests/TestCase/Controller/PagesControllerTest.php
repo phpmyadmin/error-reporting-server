@@ -76,11 +76,18 @@ class PagesControllerTest extends TestCase
         }
     }
 
-    public function testAMissingPageFileIsAnError(): void
+    public function testAMissingPageFileIsNotFound(): void
     {
-        // BUG: a missing page template throws MissingTemplateException, which
-        // PagesController does not catch (it catches MissingViewException), so
-        // the page renders a 500 error instead of a 404.
+        // View::render() throws MissingTemplateException for a missing
+        // template, PagesController answers with a 404 when debug is off.
+        $this->get('/pages/does-not-exist');
+
+        $this->assertResponseCode(404);
+    }
+
+    public function testAMissingPageFileIsRethrownInDebugMode(): void
+    {
+        Configure::write('debug', true);
         $this->get('/pages/does-not-exist');
 
         $this->assertResponseCode(500);

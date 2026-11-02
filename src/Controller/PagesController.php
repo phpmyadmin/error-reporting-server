@@ -22,7 +22,9 @@ namespace App\Controller;
 
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
+use Cake\Http\Response;
 use Cake\Utility\Inflector;
+use Cake\View\Exception\MissingTemplateException;
 use Cake\View\Exception\MissingViewException;
 
 use function count;
@@ -46,9 +48,10 @@ class PagesController extends AppController
     /**
      * Displays a view.
      *
-     * @throws NotFoundException when the view file could not be found
-     *                           or MissingViewException in debug mode.
-     * @return mixed A Response of nothing
+     * @throws NotFoundException when the view file could not be found.
+     * @throws MissingTemplateException in debug mode.
+     * @throws MissingViewException in debug mode.
+     * @return Response|null The response of the page
      */
     public function display()
     {
@@ -79,8 +82,8 @@ class PagesController extends AppController
         ]);
 
         try {
-            $this->render(implode('/', $path));
-        } catch (MissingViewException $e) {
+            return $this->render(implode('/', $path));
+        } catch (MissingViewException | MissingTemplateException $e) {
             if (Configure::read('debug')) {
                 throw $e;
             }
