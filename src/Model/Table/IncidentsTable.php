@@ -235,22 +235,7 @@ class IncidentsTable extends Table
             ];
         }
 
-        // Avoid storing too many errors from single report
-        if (isset($bugReport['errors']) && is_array($bugReport['errors']) && count($bugReport['errors']) > 40) {
-            $bugReport['errors'] = array_slice($bugReport['errors'], 0, 40);
-        }
-
-        if (isset($bugReport['exception']) && ! is_array($bugReport['exception'])) {
-            $bugReport['exception'] = [];
-        }
-
-        if (isset($bugReport['exception']['stack'])) {
-            if (! is_array($bugReport['exception']['stack'])) {
-                $bugReport['exception']['stack'] = [];
-            } elseif (count($bugReport['exception']['stack']) > 40) {
-                $bugReport['exception']['stack'] = array_slice($bugReport['exception']['stack'], 0, 40);
-            }
-        }
+        $bugReport = self::capReport($bugReport);
 
         // Also sanitizes the bug report
         $schematizedIncidents = $this->getSchematizedIncidents($bugReport);
@@ -650,6 +635,50 @@ class IncidentsTable extends Table
         }
 
         return $versionString;
+    }
+
+    /**
+     * Largest number of entries of a report that are kept.
+     */
+    public const MAX_REPORT_ENTRIES = 40;
+
+    /**
+     * Keep the beginning of the list of errors and of the stack of a report.
+     *
+     * A payload carries one entry per error and one frame per call: without
+     * this cap a single request stores, renders and forwards thousands of
+     * them.
+     *
+     * @param array<string, mixed> $bugReport The report as it was received
+     *
+     * @return array<string, mixed> The report, capped
+     */
+    public static function capReport(array $bugReport): array
+    {
+        if (
+            isset($bugReport['errors']) && is_array($bugReport['errors'])
+            && count($bugReport['errors']) > self::MAX_REPORT_ENTRIES
+        ) {
+            $bugReport['errors'] = array_slice($bugReport['errors'], 0, self::MAX_REPORT_ENTRIES);
+        }
+
+        if (isset($bugReport['exception']) && ! is_array($bugReport['exception'])) {
+            $bugReport['exception'] = [];
+        }
+
+        if (isset($bugReport['exception']['stack'])) {
+            if (! is_array($bugReport['exception']['stack'])) {
+                $bugReport['exception']['stack'] = [];
+            } elseif (count($bugReport['exception']['stack']) > self::MAX_REPORT_ENTRIES) {
+                $bugReport['exception']['stack'] = array_slice(
+                    $bugReport['exception']['stack'],
+                    0,
+                    self::MAX_REPORT_ENTRIES,
+                );
+            }
+        }
+
+        return $bugReport;
     }
 
     /**

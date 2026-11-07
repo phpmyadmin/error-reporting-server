@@ -26,7 +26,9 @@ use App\Report;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
+use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
+use Throwable;
 
 use function array_merge;
 use function count;
@@ -110,14 +112,13 @@ class IncidentsController extends AppController
         }
 
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
+        $accepted = count($result['incidents']) > 0 && ! in_array(false, $result['incidents']);
 
-        $sentryConfig = Configure::read('Forwarding.Sentry');
-        if ($sentryConfig !== null) {
-            $report = Report::fromString($requestBody);
-            Sentry::process($report);
+        if ($accepted) {
+            $this->forwardToSentry(IncidentsTable::capReport($bugReport));
         }
 
-        if (count($result['incidents']) > 0 && ! in_array(false, $result['incidents'])) {
+        if ($accepted) {
             $response = ['success' => true];
         } else {
             $response = ['success' => false];
@@ -192,6 +193,31 @@ class IncidentsController extends AppController
             json_decode($incident['stacktrace'], true);
 
         $this->set('incident', $incident);
+    }
+
+    /**
+     * Forward an accepted report to Sentry, if it is configured.
+     *
+     * The report is forwarded only once it was stored and capped, and a Sentry
+     * outage must not break the ingestion or the notification emails, so the
+     * failure is logged instead of thrown.
+     *
+     * @param array<string, mixed> $bugReport The report, capped
+     */
+    private function forwardToSentry(array $bugReport): void
+    {
+        if (Configure::read('Forwarding.Sentry') === null) {
+            return;
+        }
+
+        try {
+            Sentry::process(Report::fromObject((object) $bugReport));
+        } catch (Throwable $e) {
+            Log::error(
+                'Could not forward the report to Sentry: ' . $e->getMessage(),
+                'cron_jobs',
+            );
+        }
     }
 
     private function sendNotificationMail(int $reportId): void

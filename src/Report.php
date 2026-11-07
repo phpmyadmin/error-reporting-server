@@ -330,12 +330,12 @@ class Report extends stdClass
         */
         foreach ($this->errors as $error) {
             $exception = new stdClass();
-            $exception->type = $this->decode($error->type ?? '');
+            $exception->type = $this->decode((string) ($error->type ?? ''));
             $exception->value = $this->decode($error->msg ?? '');
             $exception->stacktrace = new stdClass();
             $exception->stacktrace->frames = [];
 
-            foreach ($error->stackTrace as $stack) {
+            foreach ($error->stackTrace ?? [] as $stack) {
                 $trace = [
                     'platform' => 'php',
                     'function' => $stack->function ?? '',
@@ -359,12 +359,12 @@ class Report extends stdClass
 
             $reports[] = [
                 'platform' => 'php',
-                'level' => $this->typeToLevel($error->type),
+                'level' => $this->typeToLevel((string) ($error->type ?? '')),
                 'exception' => [
                     'values' => [$exception],
                 ],
                 'message' => $this->decode($error->msg ?? ''),
-                'culprit' => $error->file,
+                'culprit' => $error->file ?? '',
             ];
         }
 

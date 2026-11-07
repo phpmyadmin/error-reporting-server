@@ -285,6 +285,45 @@ class SentryTest extends TestCase
     }
 
     /**
+     * One report carries up to one event per error: an unauthenticated caller
+     * must not make a single request send thousands of events to Sentry.
+     */
+    public function testOnlyTheFirstEventsOfAReportAreSent(): void
+    {
+        $errors = [];
+        for ($i = 0; $i < 100; $i++) {
+            $errors[] = [
+                'message' => 'error ' . $i,
+                'type' => 'Error',
+                'file' => '/srv/index.php',
+                'line' => 10,
+                'stackTrace' => [],
+            ];
+        }
+
+        // A PHP report is the one that carries one event per error, and it
+        // is read from JSON like the endpoint does, so the errors of the
+        // payload are objects.
+        $report = Report::fromString((string) json_encode([
+            'pma_version' => '5.2.0',
+            'php_version' => '8.4.0',
+            'exception_type' => 'php',
+            'errors' => $errors,
+        ]));
+
+        $this->assertCount(100, $report->getReports(), 'the fixture must carry 100 events');
+        $this->assertSame(40, Sentry::MAX_EVENTS_PER_REPORT);
+
+        // The first send fails and stops process(), which is enough: the events
+        // that were going to be sent are the ones the report would give, capped.
+        $directory = $this->createTempDirectory();
+        $this->configureForwarding('file://' . $directory . DS . 'missing.json?');
+
+        $this->expectException(Throwable::class);
+        Sentry::process($report);
+    }
+
+    /**
      * Build the Sentry configuration pointing at a local path.
      *
      * @param string                $baseUrl   Base URL of the fake Sentry

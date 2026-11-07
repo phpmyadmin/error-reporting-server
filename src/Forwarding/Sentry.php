@@ -8,6 +8,7 @@ use Cake\Log\Log;
 use Composer\CaBundle\CaBundle;
 use Exception;
 
+use function array_slice;
 use function curl_errno;
 use function curl_exec;
 use function curl_getinfo;
@@ -26,16 +27,33 @@ use function time;
 use const CURLINFO_HTTP_CODE;
 use const CURLOPT_CAINFO;
 use const CURLOPT_CAPATH;
+use const CURLOPT_CONNECTTIMEOUT;
 use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_SSL_VERIFYPEER;
+use const CURLOPT_TIMEOUT;
 use const CURLOPT_URL;
 use const CURLOPT_USERPWD;
 
 class Sentry
 {
+    /**
+     * Largest number of events sent for a single report.
+     */
+    public const MAX_EVENTS_PER_REPORT = 40;
+
+    /**
+     * Seconds allowed to open the connection to the Sentry host.
+     */
+    public const CONNECT_TIMEOUT = 3;
+
+    /**
+     * Seconds allowed for the whole request to Sentry.
+     */
+    public const REQUEST_TIMEOUT = 5;
+
     public static function getSentryTimestamp(): int
     {
         date_default_timezone_set('UTC');
@@ -76,6 +94,10 @@ class Sentry
         curl_setopt($ch, CURLOPT_URL, $sentryConfig['base_url'] . '/api/' . $sentryConfig['project_id'] . '/store/');
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // The ingestion waits for this call: do not let it hang when the
+        // service does not answer.
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::CONNECT_TIMEOUT);
+        curl_setopt($ch, CURLOPT_TIMEOUT, self::REQUEST_TIMEOUT);
         curl_setopt($ch, CURLOPT_USERPWD, $sentryConfig['key'] . ':');
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-type: application/json',
@@ -152,6 +174,8 @@ class Sentry
 
         curl_setopt($ch, CURLOPT_USERPWD, $sentryConfig['key'] . ':');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::CONNECT_TIMEOUT);
+        curl_setopt($ch, CURLOPT_TIMEOUT, self::REQUEST_TIMEOUT);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
@@ -184,7 +208,8 @@ class Sentry
 
     public static function process(Report $report): void
     {
-        foreach ($report->getReports() as $reportData) {
+        $reports = array_slice($report->getReports(), 0, self::MAX_EVENTS_PER_REPORT);
+        foreach ($reports as $reportData) {
             $eventId = self::sendReport($reportData);
             if (! $report->hasUserFeedback()) {
                 continue;
