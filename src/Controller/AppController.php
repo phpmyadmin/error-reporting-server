@@ -28,6 +28,8 @@ use Cake\Event\EventInterface;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 
+use function max;
+
 /**
  * Application Controller.
  *
@@ -38,6 +40,16 @@ use Cake\Routing\Router;
  */
 class AppController extends Controller
 {
+    /**
+     * Largest number of rows a data table request may ask for.
+     */
+    public const MAX_DATA_TABLE_LENGTH = 100;
+
+    /**
+     * Number of rows a data table request gets when it asks for none.
+     */
+    public const DEFAULT_DATA_TABLE_LENGTH = 25;
+
     protected NotificationsTable $Notifications;
     protected DevelopersTable $Developers;
 
@@ -122,5 +134,24 @@ class AppController extends Controller
 
         $this->set('notif_count', $notificationCount);
         $this->set('csrf_token', $this->request->getAttribute('csrfToken'));
+    }
+
+    /**
+     * Read the paging of a data table request.
+     *
+     * The length and the start come straight from the query string: an
+     * unauthenticated caller can ask for the whole table, and the controller
+     * builds every row of the answer before sending it.
+     *
+     * @return array{0: int, 1: int} The number of rows, and the offset
+     */
+    protected function getDataTablePaging(): array
+    {
+        $limit = (int) $this->request->getQuery('iDisplayLength');
+        if ($limit <= 0 || $limit > self::MAX_DATA_TABLE_LENGTH) {
+            $limit = self::DEFAULT_DATA_TABLE_LENGTH;
+        }
+
+        return [$limit, max(0, (int) $this->request->getQuery('iDisplayStart'))];
     }
 }

@@ -110,8 +110,7 @@ class NotificationsController extends AppController
         ];
 
         $pagedParams = $params;
-        $pagedParams['limit'] = intval($this->request->getQuery('iDisplayLength'));
-        $pagedParams['offset'] = intval($this->request->getQuery('iDisplayStart'));
+        [$pagedParams['limit'], $pagedParams['offset']] = $this->getDataTablePaging();
 
         $rows = $this->Notifications->find(
             'all',

@@ -187,8 +187,7 @@ class ReportsController extends AppController
         ];
 
         $pagedParams = $params;
-        $pagedParams['limit'] = (int) $this->request->getQuery('iDisplayLength');
-        $pagedParams['offset'] = (int) $this->request->getQuery('iDisplayStart');
+        [$pagedParams['limit'], $pagedParams['offset']] = $this->getDataTablePaging();
 
         $rows = $this->findAllDataTable(
             $this->Reports->find(
