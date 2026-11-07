@@ -56,6 +56,31 @@ class ReportsControllerTest extends TestCase
         );
     }
 
+    /**
+     * Opening a report clears the notification the current developer has for
+     * it, and only that one.
+     */
+    public function testViewClearsTheNotificationOfTheCurrentDeveloper(): void
+    {
+        $notifications = TableRegistry::getTableLocator()->get('Notifications');
+        $this->assertSame(1, $notifications->find()
+            ->where(['developer_id' => 1, 'report_id' => 1])->count());
+
+        $this->get('/reports/view/1');
+
+        $this->assertResponseCode(200);
+        $this->assertSame(
+            0,
+            $notifications->find()->where(['developer_id' => 1, 'report_id' => 1])->count(),
+            'The notification of the current developer was not cleared.',
+        );
+        $this->assertSame(
+            1,
+            $notifications->find()->where(['id' => 3])->count(),
+            'The notification of another developer was cleared.',
+        );
+    }
+
     public function testView(): void
     {
         $this->get('/reports/view/1');

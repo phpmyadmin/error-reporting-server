@@ -23,6 +23,7 @@ use App\Model\Table\IncidentsTable;
 use App\Model\Table\NotificationsTable;
 use App\Model\Table\ReportsTable;
 use Cake\Core\Configure;
+use Cake\Datasource\EntityInterface;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\Log\Log;
@@ -134,13 +135,13 @@ class ReportsController extends AppController
         $current_developer = TableRegistry::getTableLocator()->get('Developers')->
                     findById($this->request->getSession()->read('Developer.id'))->all()->first();
 
-        if (! $current_developer || ! $current_developer['Developer']) {
+        if (! $current_developer instanceof EntityInterface) {
             return;
         }
 
         TableRegistry::getTableLocator()->get('Notifications')->deleteAll(
             [
-                'developer_id' => $current_developer['Developer']['id'],
+                'developer_id' => $current_developer->get('id'),
                 'report_id' => $reportId,
             ],
         );
