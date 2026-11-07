@@ -78,7 +78,10 @@ return [
      *   You should treat it as extremely sensitive data.
      */
     //  DO NOT COPY THIS VALUE IT IS A TESTING ONLY VALUE !!
-    'Security' => ['salt' => '%&23jQ29qzLA856BvbyjF$j$3h7U%gF!axSbczUX#hEC%upNcq%6jVrQd4ruR2e3'],
+    'Security' => [
+        'salt' => '%&23jQ29qzLA856BvbyjF$j$3h7U%gF!axSbczUX#hEC%upNcq%6jVrQd4ruR2e3',
+        'trustedProxies' => [],
+    ],
 
     /**
      * Apply timestamps with the last modified time to static assets (js, css, images).

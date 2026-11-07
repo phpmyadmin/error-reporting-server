@@ -211,7 +211,9 @@ class IncidentsController extends AppController
         }
 
         try {
-            Sentry::process(Report::fromObject((object) $bugReport));
+            $report = Report::fromObject((object) $bugReport);
+            $report->setClientIp($this->request->clientIp());
+            Sentry::process($report);
         } catch (Throwable $e) {
             Log::error(
                 'Could not forward the report to Sentry: ' . $e->getMessage(),

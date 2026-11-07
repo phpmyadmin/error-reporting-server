@@ -80,6 +80,16 @@ return [
      */
     'Security' => [
         'salt' => env('SECURITY_SALT'),
+        /*
+         * Addresses of the reverse proxies whose X-Forwarded-For header is
+         * believed, for the client IP that a report and a login record.
+         *
+         * Empty by default: the header is written by the caller, so believing
+         * it from anywhere lets anybody choose the address that is stored and
+         * shown to the developers. List the address of the proxy itself, not
+         * the network it serves, and nothing else.
+         */
+        'trustedProxies' => [],
     ],
 
     /*

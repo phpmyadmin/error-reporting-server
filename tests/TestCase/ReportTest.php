@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 use function file_get_contents;
 use function json_decode;
 
+use const DS;
+
 class ReportTest extends TestCase
 {
     public function setUp(): void
@@ -69,25 +71,41 @@ class ReportTest extends TestCase
             $report->getUserId(),
         );
 
+        // The headers of the caller are not an address: the report must not
+        // be able to choose its own identity.
         $oldForwardedValue = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
+        $oldClientIp = $_SERVER['HTTP_CLIENT_IP'] ?? null;
 
         $_SERVER['HTTP_X_FORWARDED_FOR'] = '1.1.1.1';
+        $_SERVER['HTTP_CLIENT_IP'] = '1.1.1.1';
 
-        $this->assertEquals(
-            (object) [
-                'ip_address' => '0.0.0.0',
-                'id' => '747901a7736cb599fefec3b52bb939a511fb7662a66ba30e6049b128f2114cec',
-            ],
-            $report->getUser(),
+        $this->assertSame(
+            '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
+            $report->getUserId(),
+            'a forwarded header must not change the identity of the report',
         );
-        $_SERVER['HTTP_X_FORWARDED_FOR'] = $oldForwardedValue;
-        $this->assertEquals(
-            (object) [
-                'ip_address' => '0.0.0.0',
-                'id' => '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
-            ],
-            $report->getUser(),
+
+        if ($oldForwardedValue === null) {
+            unset($_SERVER['HTTP_X_FORWARDED_FOR']);
+        } else {
+            $_SERVER['HTTP_X_FORWARDED_FOR'] = $oldForwardedValue;
+        }
+
+        if ($oldClientIp === null) {
+            unset($_SERVER['HTTP_CLIENT_IP']);
+        } else {
+            $_SERVER['HTTP_CLIENT_IP'] = $oldClientIp;
+        }
+
+        // The address of the request does.
+        $report->setClientIp('198.51.100.7');
+        $this->assertNotSame(
+            '99a62784e874c1a5b4625660a94c736bbb8ca46f53d321ab8ce700050e30cb97',
+            $report->getUserId(),
         );
+
+        $report->setClientIp('');
+
         Security::setSalt(
             'N8KB3iKch@xT4nP$WcPoF!9fwxtT7pNY5Hm4*Ld6G^Ux3tQ57iJzPYumu@jXVzue',
         );
@@ -657,5 +675,31 @@ class ReportTest extends TestCase
         $this->assertTrue($report->isMultiReports());
         $this->assertSame([], $report->getMultiDataToSend());
         $this->assertSame([], $report->getReports());
+    }
+
+    /**
+     * The identity of a report is salted with the address of the client. Read
+     * from the headers of the caller, the report would choose it.
+     */
+    public function testTheClientIpComesFromTheSetterNotTheHeaders(): void
+    {
+        $payload = file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
+
+        $_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.9';
+        $_SERVER['HTTP_CLIENT_IP'] = '203.0.113.9';
+        try {
+            $fromHeader = Report::fromString($payload)->getUserId();
+        } finally {
+            unset($_SERVER['HTTP_X_FORWARDED_FOR'], $_SERVER['HTTP_CLIENT_IP']);
+        }
+
+        $untouched = Report::fromString($payload)->getUserId();
+
+        $this->assertSame($untouched, $fromHeader, 'the headers of the caller must be ignored');
+
+        $withIp = Report::fromString($payload);
+        $withIp->setClientIp('198.51.100.7');
+
+        $this->assertNotSame($untouched, $withIp->getUserId(), 'the address of the request must count');
     }
 }

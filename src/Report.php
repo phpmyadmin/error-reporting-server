@@ -56,6 +56,12 @@ class Report extends stdClass
 
     private string|null $internal____userMessage = null;
 
+    /**
+     * Address of the client, as the request sees it behind the configured
+     * trusted proxies.
+     */
+    private string|null $internal____clientIp = null;
+
     public function hasUserFeedback(): bool
     {
         return $this->internal____userMessage !== null;
@@ -204,10 +210,23 @@ class Report extends stdClass
         return $userMessage;
     }
 
+    /**
+     * Set the address of the client the report was sent by.
+     *
+     * @param string $clientIp The address the request came from
+     */
+    public function setClientIp(string $clientIp): void
+    {
+        $this->internal____clientIp = $clientIp;
+    }
+
     public function getUserId(): string
     {
         // Do not use the Ip as real data, protect the user !
-        $userIp = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+        // The address comes from the request, through the trusted proxies of
+        // the configuration: read from the headers of the caller it would let
+        // the report choose its own identity.
+        $userIp = $this->internal____clientIp ?? $_SERVER['REMOTE_ADDR'] ?? '';
         $serverSoftware = $this->server_software ?? null;
         $userAgentString = $this->user_agent_string ?? null;
         $locale = $this->locale ?? null;

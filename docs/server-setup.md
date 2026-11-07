@@ -78,6 +78,24 @@ application fails with an internal error as soon as `debug` is off.
 
 The HTTPS redirection and the certificates are left to the web server.
 
+## Reverse proxy
+
+The address of a client is used to salt the identity of a report, and it is
+recorded with a login. It is read from the connection, and `X-Forwarded-For` is
+believed only for the proxies listed in the `Security.trustedProxies` key of
+``config/app.php``, which is empty by default:
+
+```php
+'Security' => [
+    'trustedProxies' => ['10.0.0.2'],   // the address of the proxy, not its network
+],
+```
+
+The header is written by whoever sends the request: left to a proxy that is not
+listed, it is ignored and the address of the proxy is recorded instead. Listed
+for a network the caller can reach, it lets the caller choose the address that
+is stored and shown to the developers.
+
 ## Rewrites
 
 The application is reached through `webroot/index.php`, every URL is handled by
