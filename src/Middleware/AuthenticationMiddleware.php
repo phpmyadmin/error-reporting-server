@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
+use App\Github\PermissionChecker;
 use Cake\Core\App;
+use Cake\Core\Configure;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
@@ -18,6 +20,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use function assert;
 use function in_array;
 use function is_string;
+use function time;
 
 class AuthenticationMiddleware implements MiddlewareInterface
 {
@@ -72,6 +75,8 @@ class AuthenticationMiddleware implements MiddlewareInterface
         }
 
         if ($currentDeveloper !== null) {
+            $this->refreshCommitAccess($request);
+
             $hasAccess = $this->hasAccessToAction($request);
             if ($hasAccess === false) {
                 $request->getSession()->destroy();
@@ -130,14 +135,52 @@ class AuthenticationMiddleware implements MiddlewareInterface
         return in_array($action, self::NO_ACCESS_CONTROL_LIST[$controllerName]);
     }
 
+    /**
+     * Ask GitHub again what the developer may do, at most once per interval.
+     *
+     * The access of the developer is decided at login from a single answer of
+     * GitHub: left alone, a login stays valid with write access long after the
+     * account lost its permission on the repository, and a read-only developer
+     * keeps being refused after they were granted it.
+     *
+     * A failure to ask GitHub keeps what the session already knew.
+     *
+     * @param ServerRequest $request The request
+     */
+    protected function refreshCommitAccess(ServerRequest $request): void
+    {
+        $session = $request->getSession();
+        $checkedAt = (int) $session->read('access_checked_at');
+        if ($checkedAt > 0 && time() - $checkedAt < PermissionChecker::RECHECK_INTERVAL) {
+            return;
+        }
+
+        $login = (string) $session->read('github_login');
+        $token = (string) $session->read('access_token');
+        $repoPath = (string) Configure::read('GithubRepoPath');
+
+        $hasCommitAccess = PermissionChecker::canCommitTo($login, $repoPath, $token);
+        if ($hasCommitAccess !== null) {
+            $session->write('has_commit_access', $hasCommitAccess);
+        }
+
+        $session->write('access_checked_at', time());
+    }
+
     protected function hasAccessToAction(ServerRequest $request): bool
     {
         $controllerName = $request->getParam('controller');
         $action = $request->getParam('action');
-        $read_only = $request->getSession()->read('read_only');
+        $session = $request->getSession();
+        $hasCommitAccess = $session->read('has_commit_access');
+        if ($hasCommitAccess === null) {
+            // Sessions opened before this key existed.
+            $readOnly = $session->read('read_only');
+            $hasCommitAccess = $readOnly === null ? false : ! $readOnly;
+        }
 
         // If developer has commit access on phpmyadmin/phpmyadmin
-        if ($read_only === false) {
+        if ($hasCommitAccess === true) {
             return true;
         }
 

@@ -46,4 +46,35 @@ class AuthenticationMiddlewareTest extends TestCase
             'You need to have commit access on phpmyadmin/phpmyadmin repository on Github.com to do this action (Stats:stats)',
         );
     }
+
+    /**
+     * The access is decided from the key the login writes now, and a session
+     * that still carries the old derived flag must not override it.
+     */
+    public function testTheCommitAccessOfTheSessionDecides(): void
+    {
+        $this->session([
+            'Developer.id' => 1,
+            'has_commit_access' => true,
+            'read_only' => true,
+        ]);
+
+        $this->get('/stats');
+
+        $this->assertResponseCode(200);
+    }
+
+    public function testARevokedCommitAccessIsRefused(): void
+    {
+        $this->session([
+            'Developer.id' => 1,
+            'has_commit_access' => false,
+            'read_only' => false,
+        ]);
+
+        $this->get('/stats');
+
+        $this->assertResponseCode(307);
+        $this->assertRedirect('/');
+    }
 }

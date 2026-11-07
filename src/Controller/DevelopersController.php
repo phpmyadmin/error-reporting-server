@@ -31,6 +31,7 @@ use function parse_url;
 use function random_bytes;
 use function str_starts_with;
 use function strcasecmp;
+use function time;
 
 use const PHP_URL_HOST;
 
@@ -201,6 +202,11 @@ class DevelopersController extends AppController
         $session->renew();
         $session->write('Developer.id', $developerId);
         $session->write('access_token', $accessToken);
+        // The login is what the API is asked about later: the permission is
+        // read again by the middleware, see AuthenticationMiddleware.
+        $session->write('github_login', (string) ($userInfo['login'] ?? ''));
+        $session->write('has_commit_access', (bool) $userInfo['has_commit_access']);
+        $session->write('access_checked_at', time());
         $session->write('read_only', ! $userInfo['has_commit_access']);
     }
 }
