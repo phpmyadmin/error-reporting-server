@@ -18,21 +18,25 @@
 
 namespace App\Test\TestCase\Controller;
 
+use App\Controller\GithubController;
 use App\Model\Table\ReportsTable;
 use App\Test\Fixture\DevelopersFixture;
 use App\Test\Fixture\IncidentsFixture;
 use App\Test\Fixture\NotificationsFixture;
 use App\Test\Fixture\ReportsFixture;
 use Cake\Core\Configure;
+use Cake\Http\ServerRequest;
 use Cake\Http\TestSuite\HttpClientTrait;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
+use ReflectionMethod;
 
 use function file_get_contents;
 use function json_decode;
 use function json_encode;
+use function substr_count;
 
 use const DS;
 
@@ -337,5 +341,41 @@ class GithubControllerTest extends TestCase
         $report = $this->Reports->get(4);
         $this->assertEquals('resolved', $report->status);
         $this->assertEquals(4, $report->sourceforge_bug_id);
+    }
+
+    /**
+     * A report is written by a client without an account: its values must not
+     * break out of the Markdown of the issue body.
+     */
+    public function testATableCellStaysInItsColumn(): void
+    {
+        $controller = new GithubController(new ServerRequest());
+        $cell = new ReflectionMethod($controller, 'tableCell');
+        $cell->setAccessible(true);
+
+        $this->assertSame(
+            'Error \\| injected',
+            $cell->invoke($controller, 'Error | injected'),
+            'a pipe must not add a column',
+        );
+        $this->assertSame(
+            'one line',
+            $cell->invoke($controller, "one\nline"),
+            'a line break must not end the row',
+        );
+        $this->assertStringNotContainsString('@someone', $cell->invoke($controller, 'hi @someone'));
+    }
+
+    public function testAFreeTextCannotCloseItsFence(): void
+    {
+        $controller = new GithubController(new ServerRequest());
+        $fenced = new ReflectionMethod($controller, 'fencedText');
+        $fenced->setAccessible(true);
+
+        $text = (string) $fenced->invoke($controller, "before\n```\n<img src=x>\nafter");
+
+        $this->assertSame(2, substr_count($text, '```'), 'only the fence of the block remains');
+        $this->assertStringNotContainsString('<img', $text);
+        $this->assertStringNotContainsString('@someone', (string) $fenced->invoke($controller, '@someone hi'));
     }
 }

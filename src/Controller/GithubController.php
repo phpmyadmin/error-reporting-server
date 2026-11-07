@@ -32,7 +32,9 @@ use function array_key_exists;
 use function explode;
 use function in_array;
 use function intval;
+use function preg_replace;
 use function print_r;
+use function str_replace;
 
 /**
  * Github controller handling github issue submission and creation.
@@ -306,20 +308,69 @@ class GithubController extends AppController
      * @param array $report   Report associative array
      * @return string the text
      */
+
+    /**
+     * Keep a value inside its cell of the Markdown table.
+     *
+     * A line break or a pipe of the value would end the row or add a column,
+     * and a mention would notify whoever the value names.
+     *
+     * @param string $value The value to write in a cell
+     *
+     * @return string The value, on one line
+     */
+    protected function tableCell(string $value): string
+    {
+        $value = (string) preg_replace('/\s+/', ' ', $value);
+        $value = str_replace('|', '\\|', $value);
+
+        return $this->neutralizeMentions($value);
+    }
+
+    /**
+     * Write a free text as a fenced block that it cannot close.
+     *
+     * @param string $value The text of the report
+     *
+     * @return string The text, fenced
+     */
+    protected function fencedText(string $value): string
+    {
+        // A fence of three backticks inside the value would end the block, and
+        // an HTML tag would be rendered by GitHub.
+        $value = str_replace(['```', '<'], ["`\u{200B}`\u{200B}`", '&lt;'], $value);
+
+        return "```\n" . $this->neutralizeMentions($value) . "\n```";
+    }
+
+    /**
+     * Stop a value from notifying a GitHub user.
+     *
+     * @param string $value The value
+     *
+     * @return string The value, without a mention
+     */
+    protected function neutralizeMentions(string $value): string
+    {
+        return (string) preg_replace('/@(?=\S)/u', "@\u{200B}", $value);
+    }
+
     protected function getReportDescriptionText(int $reportId, array $report): string
     {
         $incident_count = $this->getTotalIncidentCount($reportId);
 
-        // "formatted" text of the comment.
+        // "formatted" text of the comment. The values are written by a client
+        // without an account, so they are kept on one line, out of the cells
+        // of the table, and the free text is fenced.
         $formattedText
-            = array_key_exists('description', $report) ? $report['description'] . "\n\n"
+            = array_key_exists('description', $report) ? $this->fencedText((string) $report['description']) . "\n\n"
                 : '';
         $formattedText .= "\nParam | Value "
             . "\n -----------|--------------------"
-            . "\n Error Type | " . $report['error_name']
-            . "\n Error Message |" . $report['error_message']
-            . "\n Exception Type |" . $report['exception_type']
-            . "\n phpMyAdmin version |" . $report['pma_version']
+            . "\n Error Type | " . $this->tableCell((string) $report['error_name'])
+            . "\n Error Message |" . $this->tableCell((string) $report['error_message'])
+            . "\n Exception Type |" . $this->tableCell((string) $report['exception_type'])
+            . "\n phpMyAdmin version |" . $this->tableCell((string) $report['pma_version'])
             . "\n Incident count | " . $incident_count
             . "\n Link | [Report#"
                 . $reportId
