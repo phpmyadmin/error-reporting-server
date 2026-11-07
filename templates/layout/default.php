@@ -84,9 +84,11 @@ use Cake\Utility\Inflector;
                             </p>
                         </li>
                         <li>
-                            <a href="<?= $baseURL . 'developers/logout'; ?>">
-                                Logout
-                            </a>
+                            <?= $this->Form->postLink(
+                                'Logout',
+                                ['controller' => 'Developers', 'action' => 'logout'],
+                                ['class' => 'nav-link'],
+                            ) ?>
                         </li>
                     <?php else : ?>
                         <li>

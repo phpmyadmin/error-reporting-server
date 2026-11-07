@@ -330,11 +330,25 @@ class DevelopersControllerTest extends TestCase
     public function testLogout(): void
     {
         $this->session(['Developer.id' => 1, 'read_only' => false]);
+        $this->enableCsrfToken();
 
-        $this->get('developers/logout');
+        $this->post('developers/logout');
         $this->assertResponseEmpty();
         $this->assertResponseCode(302);
         $this->assertSession(null, 'Developer.id');
         $this->assertRedirect(['controller' => '', 'action' => 'index']);
+    }
+
+    /**
+     * A link on another site must not be able to sign the developer out.
+     */
+    public function testLogoutRefusesGet(): void
+    {
+        $this->session(['Developer.id' => 1, 'read_only' => false]);
+
+        $this->get('developers/logout');
+
+        $this->assertResponseCode(405);
+        $this->assertSession(1, 'Developer.id');
     }
 }

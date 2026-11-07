@@ -175,6 +175,9 @@ class DevelopersController extends AppController
 
     public function logout(): Response
     {
+        // A link on another site must not be able to sign the developer out.
+        $this->request->allowMethod(['post']);
+
         $this->request->getSession()->destroy();
 
         $flash_class = 'alert alert-success';
