@@ -6,6 +6,7 @@ use App\Report;
 use Cake\Core\Configure;
 use Cake\Log\Log;
 use Composer\CaBundle\CaBundle;
+use CurlHandle;
 use Exception;
 use Throwable;
 
@@ -20,11 +21,13 @@ use function curl_strerror;
 use function gmdate;
 use function is_array;
 use function is_dir;
+use function is_numeric;
 use function is_scalar;
 use function is_string;
 use function json_decode;
 use function json_encode;
 use function json_last_error_msg;
+use function max;
 use function mb_strcut;
 use function rtrim;
 use function strcasecmp;
@@ -64,6 +67,18 @@ class Sentry
      * Longest comment of a user that is forwarded, in bytes.
      */
     public const MAX_FEEDBACK_LENGTH = 4096;
+
+    /**
+     * Attempts in a row that may fail to connect before the run gives up.
+     */
+    public const MAX_CONSECUTIVE_FAILURES = 3;
+
+    /**
+     * The cURL handle of the run, and the attempts that failed in a row.
+     */
+    private static CurlHandle|false|null $handle = null;
+
+    private static int $consecutiveFailures = 0;
 
     /**
      * Whether forwarding is configured well enough to send anything.
@@ -203,8 +218,12 @@ class Sentry
      */
     protected static function post(string $data, array $headers, array $sentryConfig): array
     {
-        $ch = curl_init();
+        // One handle for the whole run: a fresh one costs a TCP and TLS
+        // handshake per event, and a backlog is thousands of them.
+        $ch = self::$handle ??= curl_init();
         if ($ch === false) {
+            self::$handle = null;
+
             throw new Exception('Could not init cURL');
         }
 
@@ -236,16 +255,32 @@ class Sentry
         $output = curl_exec($ch);
 
         $errNo = curl_errno($ch);
+        if ($errNo !== 0) {
+            self::$consecutiveFailures++;
+        }
 
         if ($errNo !== 0) {
             $errorMessage = curl_strerror($errNo);
 
             // The caller logs what it catches: logging here as well would write
             // the same failure twice.
-            throw new Exception(
+            $error = new Exception(
                 'Creating the report failed, cURL error (' . $errNo . '): ' . $errorMessage,
             );
+
+            // A tracker that cannot be reached is not asked again and again:
+            // every attempt costs its timeout, and the backlog never drains.
+            if (self::$consecutiveFailures >= self::MAX_CONSECUTIVE_FAILURES) {
+                throw new TrackerUnreachableException(
+                    'The tracker could not be reached ' . self::$consecutiveFailures
+                    . ' times in a row, giving up for this run: ' . $errorMessage,
+                );
+            }
+
+            throw $error;
         }
+
+        self::$consecutiveFailures = 0;
 
         if (! is_string($output)) {
             throw new Exception('Creating the report failed: ' . json_encode($output));
@@ -274,6 +309,13 @@ class Sentry
         if ($status === 0) {
             // Not an HTTP transfer at all: the checks of the caller decide.
             return;
+        }
+
+        if ($status === 429) {
+            throw new TrackerThrottledException(
+                'The tracker asked to wait, status 429: ' . substr($output, 0, 500),
+                self::retryAfterFrom($output),
+            );
         }
 
         // The tracker answered, and it answered with a refusal: the body holds
@@ -385,5 +427,29 @@ class Sentry
         self::sendUserReport($eventIds[0], $report->getUserFeedback(), $report->getUserId());
 
         return $eventIds;
+    }
+
+    /**
+     * The seconds a 429 answer asked to wait, when it says so.
+     *
+     * @param string $output The body of the answer
+     */
+    private static function retryAfterFrom(string $output): int
+    {
+        $decoded = json_decode($output, true);
+        if (is_array($decoded) && isset($decoded['retry_after']) && is_numeric($decoded['retry_after'])) {
+            return max(0, (int) $decoded['retry_after']);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Forget the handle and the failure count, between two runs.
+     */
+    public static function reset(): void
+    {
+        self::$handle = null;
+        self::$consecutiveFailures = 0;
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Test\TestCase\Forwarding;
 
 use App\Forwarding\Sentry;
+use App\Forwarding\TrackerThrottledException;
+use App\Forwarding\TrackerUnreachableException;
 use App\Model\Table\IncidentsTable;
 use App\Report;
 use Cake\Core\Configure;
@@ -239,6 +241,47 @@ class SentryTest extends TestCase
         }
 
         $this->assertSame([], $this->errorLogs());
+    }
+
+    /**
+     * A 429 is not a refusal of the payload: the run gives up and the next one
+     * asks later, once the delay the tracker asked for has passed.
+     */
+    public function testAThrottledAnswerCarriesTheDelay(): void
+    {
+        $this->expectException(TrackerThrottledException::class);
+
+        try {
+            Sentry::assertAccepted(429, '{"retry_after":120}');
+        } catch (TrackerThrottledException $e) {
+            $this->assertSame(120, $e->getRetryAfter());
+
+            throw $e;
+        }
+    }
+
+    public function testATrackerThatCannotBeReachedStopsTheRun(): void
+    {
+        Sentry::reset();
+        $this->configureForwarding('file://' . $this->createTempDirectory() . DS . 'missing.json?');
+
+        $refused = 0;
+        $unreachable = 0;
+        for ($i = 0; $i < Sentry::MAX_CONSECUTIVE_FAILURES; $i++) {
+            try {
+                Sentry::sendReport(['message' => 'x', 'event_id' => str_repeat('a', 32)]);
+            } catch (TrackerUnreachableException) {
+                $unreachable++;
+            } catch (Throwable) {
+                $refused++;
+            }
+        }
+
+        Sentry::reset();
+
+        // The attempt that reaches the limit is the one that gives up.
+        $this->assertSame(Sentry::MAX_CONSECUTIVE_FAILURES - 1, $refused);
+        $this->assertSame(1, $unreachable, 'then the run is told to give up');
     }
 
     public function testARedirectIsNotAStore(): void
