@@ -18,17 +18,13 @@
 
 namespace App\Controller;
 
-use App\Forwarding\Sentry;
 use App\Model\Table\IncidentsTable;
 use App\Model\Table\NotificationsTable;
 use App\Model\Table\ReportsTable;
-use App\Report;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
-use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
-use Throwable;
 
 use function array_merge;
 use function count;
@@ -36,7 +32,6 @@ use function in_array;
 use function is_array;
 use function json_decode;
 use function json_encode;
-use function json_last_error_msg;
 use function strlen;
 
 use const JSON_PRETTY_PRINT;
@@ -115,9 +110,10 @@ class IncidentsController extends AppController
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
         $accepted = count($result['incidents']) > 0 && ! in_array(false, $result['incidents']);
 
-        if ($accepted) {
-            $this->forwardToSentry(IncidentsTable::capReport($bugReport));
-        }
+        // The forwarding to the tracker is done by the forward_reports command
+        // on the reports that carry no forwarded_at: it used to run here, one
+        // request per event, and a slow tracker delayed this answer and the
+        // notification mail below.
 
         if ($accepted) {
             $response = ['success' => true];
@@ -194,65 +190,6 @@ class IncidentsController extends AppController
             json_decode($incident['stacktrace'], true);
 
         $this->set('incident', $incident);
-    }
-
-    /**
-     * Forward an accepted report to Sentry, if it is configured.
-     *
-     * The report is forwarded only once it was stored and capped, and a Sentry
-     * outage must not break the ingestion or the notification emails, so the
-     * failure is logged instead of thrown.
-     *
-     * @param array<string, mixed> $bugReport The report, capped
-     */
-    private function forwardToSentry(array $bugReport): void
-    {
-        if (Configure::read('Forwarding.Sentry') === null) {
-            return;
-        }
-
-        try {
-            $report = $this->buildReportForForwarding($bugReport);
-            if ($report === null) {
-                return;
-            }
-
-            $report->setClientIp($this->request->clientIp());
-            Sentry::process($report);
-        } catch (Throwable $e) {
-            Log::error(
-                'Could not forward the report to Sentry: ' . $e->getMessage(),
-                'cron_jobs',
-            );
-        }
-    }
-
-    /**
-     * Build the report that is forwarded, from the capped payload.
-     *
-     * fromString() reads the nested values as objects: fromObject() copies the
-     * top level as it is, so an errors list decoded to arrays gave empty
-     * messages, culprits and stack frames.
-     *
-     * @param array<string, mixed> $bugReport The report, capped
-     *
-     * @return Report|null The report, null when it cannot be encoded
-     */
-    protected function buildReportForForwarding(array $bugReport): Report|null
-    {
-        $payload = json_encode($bugReport);
-        if ($payload === false) {
-            // A number too large to encode, for instance: forwarding the empty
-            // string would send one event with no data at all.
-            Log::error(
-                'Could not encode the report to forward: ' . json_last_error_msg(),
-                'cron_jobs',
-            );
-
-            return null;
-        }
-
-        return Report::fromString($payload);
     }
 
     private function sendNotificationMail(int $reportId): void

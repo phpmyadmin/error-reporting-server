@@ -128,6 +128,53 @@ bin/cake stats
 The statistics cache expires in one day so we need to schedule this command to
 run everyday as cron job.
 
+### Forward the reports to the tracker
+
+When `Forwarding.Sentry` is set, the reports are sent to the tracker by a
+command rather than by the request that stored them, so that a slow tracker
+never delays the answer to the client nor the notification mail:
+
+```sh
+bin/cake forward_reports
+```
+
+It reads every report whose `forwarded_at` is empty and sets it on each one it
+is done with. A report the tracker refused keeps its empty `forwarded_at`, so the
+next run tries again — a backlog is visible as:
+
+```sql
+SELECT COUNT(*) FROM reports WHERE forwarded_at IS NULL;
+```
+
+Before the first run, decide what happens to the reports stored before the
+column existed: they all have an empty `forwarded_at`, so the first run forwards
+the whole archive unless you mark it as already handled.
+
+```sql
+UPDATE reports SET forwarded_at = created;   -- skip the archive
+```
+
+Run it every minute or five minutes as a cron job. A run that has nothing to do,
+or that finds another run already going, prints nothing.
+
+**Only one run at a time.** The command takes a `flock()` on `tmp/forward_reports.lock`
+and exits silently when it is held; the file holds the PID of the run that has it.
+`flock` is released if the process dies, so there is no stale lock to clear. This
+assumes one host: several hosts sharing the queue need a lock they share too (the
+Redis engine of `Cake\Lock`, or a MySQL `GET_LOCK`).
+
+**Output follows the console verbosity:**
+
+| Flags | What is printed |
+| ----- | --------------- |
+| none | nothing on success; a refused report prints one line on stderr |
+| `-v` | one line per report (`Report 12: 4628 bytes, 1 event(s)`) and a summary |
+| `--debug` | the event ids, one per line |
+| `-q` | nothing on stdout; stderr keeps the errors |
+
+`-vvv` is accepted by CakePHP but read as `-v`: the framework has no third level,
+which is why `--debug` exists.
+
 ### Cron Job Logging
 
 A separate log file, `logs/cron_jobs.log`, is maintained for all the cron jobs:

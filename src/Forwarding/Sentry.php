@@ -276,7 +276,10 @@ class Sentry
         ) {
             $answeredId = (string) $response['id'];
             if (strcasecmp($answeredId, $eventId) !== 0) {
-                Log::warning('The tracker stored the event as ' . $answeredId . ' instead of ' . $eventId);
+                // A diagnostic, not a warning: a tracker that rewrites the id
+                // is answering usefully, and a warning here would reach the
+                // stderr of every cron run.
+                Log::debug('The tracker stored the event as ' . $answeredId . ' instead of ' . $eventId);
             }
 
             return $answeredId;
@@ -323,25 +326,29 @@ class Sentry
         }
     }
 
-    public static function process(Report $report): void
+    /**
+     * Send the events of a report, then its feedback.
+     *
+     * @param Report $report The report
+     *
+     * @return array<int, string> The ids of the events that were stored
+     */
+    public static function process(Report $report): array
     {
         $reports = array_slice($report->getReports(), 0, self::MAX_EVENTS_PER_REPORT);
-        $userReportEventId = null;
+        $eventIds = [];
         foreach ($reports as $reportData) {
-            $eventId = self::sendReport($reportData);
-            if ($userReportEventId !== null) {
-                continue;
-            }
-
-            // The feedback belongs to the report, not to each of its
-            // events: attach it to the first one that was stored.
-            $userReportEventId = $eventId;
+            $eventIds[] = self::sendReport($reportData);
         }
 
-        if ($userReportEventId === null || ! $report->hasUserFeedback()) {
-            return;
+        if ($eventIds === [] || ! $report->hasUserFeedback()) {
+            return $eventIds;
         }
 
-        self::sendUserReport($userReportEventId, $report->getUserFeedback(), $report->getUserId());
+        // The feedback belongs to the report, not to each of its events:
+        // attach it to the first one that was stored.
+        self::sendUserReport($eventIds[0], $report->getUserFeedback(), $report->getUserId());
+
+        return $eventIds;
     }
 }
