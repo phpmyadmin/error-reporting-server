@@ -143,7 +143,7 @@ class AppController extends Controller
      * unauthenticated caller can ask for the whole table, and the controller
      * builds every row of the answer before sending it.
      *
-     * @return array{0: int, 1: int} The number of rows, and the offset
+     * @return array<int, int> The number of rows, and the offset
      */
     protected function getDataTablePaging(): array
     {

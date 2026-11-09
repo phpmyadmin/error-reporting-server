@@ -32,7 +32,7 @@ class AppControllerPagingTest extends TestCase
      *
      * @param array<string, string> $query The query string of the request
      *
-     * @return array{0: int, 1: int} The number of rows, and the offset
+     * @return array<int, int> The number of rows, and the offset
      */
     protected function paging(array $query): array
     {

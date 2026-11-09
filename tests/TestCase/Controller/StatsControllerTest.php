@@ -66,7 +66,7 @@ class StatsControllerTest extends TestCase
         Cache::clear();
     }
 
-    /** @return array<string, array{0: string|null, 1: string|null}> */
+    /** @return array<string, array<int, string|null>> */
     public static function filterProvider(): array
     {
         return [
@@ -157,7 +157,7 @@ class StatsControllerTest extends TestCase
         $this->assertSame(5, array_sum(array_column($relatedEntries['php_version'], 'count')));
     }
 
-    /** @return array<string, array{0: string}> */
+    /** @return array<string, array<int, string>> */
     public static function unknownFilterProvider(): array
     {
         return [

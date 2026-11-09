@@ -17,7 +17,7 @@ class TestTransport extends AbstractTransport
      * Send mail
      *
      * @param Message $message Email mesage.
-     * @psalm-return array{headers: string, message: string}
+     * @psalm-return array<string, mixed>
      */
     public function send(Message $message): array
     {
