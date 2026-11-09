@@ -44,9 +44,10 @@ class AuthenticationMiddleware implements MiddlewareInterface
 
     /**
      * Seconds the answer of GitHub about the access of a developer is kept
-     * before it is asked again.
+     * before it is asked again: half a day, which is a token budget rather than
+     * a security delay, since a refusal is answered straight away when asked.
      */
-    public const ACCESS_RECHECK_INTERVAL = 900;
+    public const ACCESS_RECHECK_INTERVAL = 43200;
 
     /**
      * Longest time an answer of GitHub is kept when it cannot be asked again.
@@ -55,7 +56,7 @@ class AuthenticationMiddleware implements MiddlewareInterface
      * says nothing for days: past it, the developer is read-only until it
      * answers, rather than keeping the access they had when it last did.
      */
-    public const ACCESS_MAX_STALE = 86400;
+    public const ACCESS_MAX_STALE = 172800;
 
     /**
      * The API the permission of a developer is read from.

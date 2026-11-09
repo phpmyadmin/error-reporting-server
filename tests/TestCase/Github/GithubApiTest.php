@@ -19,6 +19,7 @@ namespace App\Test\TestCase\Github;
 use App\Github\GithubApi;
 use Cake\Core\Configure;
 use Cake\Http\Client;
+use Cake\Http\Client\Exception\ClientException;
 use Cake\Http\Client\Response;
 use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -112,6 +113,24 @@ class GithubApiTest extends TestCase
             ['message' => 'API rate limit exceeded'],
             ['X-RateLimit-Remaining' => '0'],
         );
+
+        $this->assertNull((new GithubApi($client))->canCommitTo('pma-bot', 'phpmyadmin/phpmyadmin', 'token'));
+    }
+
+    /**
+     * The callers run on the request path: a DNS failure or a timeout must leave
+     * the question open, not throw a 500 out of the middleware.
+     */
+    public function testATransportErrorIsNotAnAnswer(): void
+    {
+        Configure::delete('GithubAccessToken');
+
+        $client = new class extends Client {
+            public function sendRequest(RequestInterface $request): ResponseInterface
+            {
+                throw new ClientException('Could not reach api.github.com');
+            }
+        };
 
         $this->assertNull((new GithubApi($client))->canCommitTo('pma-bot', 'phpmyadmin/phpmyadmin', 'token'));
     }

@@ -23,6 +23,7 @@ use function gettype;
 use function htmlspecialchars;
 use function implode;
 use function is_array;
+use function is_scalar;
 use function is_string;
 use function json_decode;
 use function strlen;
@@ -112,11 +113,19 @@ class IncidentsHelper extends AppHelper
 
             if ($exception_type === 'js') {
                 if (isset($level['context'])) {
-                    $ctx = is_string($level['context']) ? $level['context'] : implode("\n", $level['context']);
+                    // The field comes from an unauthenticated client: it is
+                    // any JSON type, and implode() throws on a scalar.
+                    $context = $level['context'];
+                    $ctx = is_string($context)
+                        ? $context
+                        : implode("\n", is_array($context) ? $context : [(string) $context]);
                     $html .= htmlspecialchars($ctx);
                 }
             } else {
-                $html .= htmlspecialchars($level['function']);
+                // Same for the function and the class: a client can send a
+                // number, a list or an object, and htmlspecialchars() throws on
+                // anything that is not a string.
+                $html .= htmlspecialchars(is_scalar($level['function']) ? (string) $level['function'] : '');
                 $html .= '(';
                 $argList = '';
                 if (isset($level['args']) && is_array($level['args']) && count($level['args']) > 0) {
@@ -174,7 +183,9 @@ class IncidentsHelper extends AppHelper
                 continue;
             }
 
-            $html .= $element . ': ' . htmlspecialchars($level[$element]) . '; ';
+            $value = $level[$element];
+            $html .= $element . ': '
+                . htmlspecialchars(is_scalar($value) ? (string) $value : '') . '; ';
         }
 
         $html .= '</span>';

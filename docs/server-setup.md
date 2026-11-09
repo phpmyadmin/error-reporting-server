@@ -82,26 +82,21 @@ The HTTPS redirection and the certificates are left to the web server.
 
 The address of a client salts the identity of a report, and it is recorded with
 a login. It is read from the connection, and `X-Forwarded-For` is believed only
-for the addresses listed in the `Security.trustedProxies` key of
+for the proxies listed in the `Security.trustedProxies` key of
 ``config/app.php``, which is empty by default:
 
 ```php
 'Security' => [
-    'trustedProxies' => ['203.0.113.9'],
+    'trustedProxies' => ['10.0.0.2'],   // the address of the proxy, not its network
 ],
 ```
 
-Two things are worth knowing before setting it:
-
-- The list is **empty by default and that is the safe value**. The header is
-  written by whoever sends the request: believed from anywhere, it lets the
-  caller choose the address that is stored and shown to the developers.
-- **CakePHP compares the header against this list, it does not check that the
-  connection comes from a proxy.** Read `ServerRequest::clientIp()` before
-  relying on it for anything but the salted identity: with a non-empty list, a
-  request that carries `X-Forwarded-For` has that value used even when the
-  connection did not come through the proxy. Behind a proxy that overwrites the
-  header, that is what you want; on a directly exposed server, leave it empty.
+The list holds the addresses of the **proxies**, not of the clients: the
+framework removes them from the `X-Forwarded-For` chain, and the address that
+is left is read as the client. Nothing is believed while the list is empty,
+which is the safe value — the header is written by whoever sends the request,
+so believing it from anywhere lets a caller choose the address that is stored
+and shown to the developers.
 
 ## Rewrites
 

@@ -103,6 +103,8 @@ class IncidentsControllerTest extends TestCase
             'created' => '2013-08-29T18:10:01+00:00',
             'modified' => '2013-08-29T18:10:01+00:00',
             'exception_type' => null,
+            // The forwarding marker of the occurrence.
+            'forwarded_at' => null,
         ];
 
         $this->assertEquals($expected, $incident);

@@ -643,6 +643,11 @@ class IncidentsTable extends Table
     public const MAX_REPORT_ENTRIES = 40;
 
     /**
+     * Longest version this application stores: the width of the column.
+     */
+    public const MAX_PMA_VERSION_LENGTH = 50;
+
+    /**
      * Keep the beginning of the list of errors and of the stack of a report.
      *
      * A payload carries one entry per error and one frame per call: without
@@ -699,6 +704,13 @@ class IncidentsTable extends Table
         // development builds of a released branch.
         $version = preg_replace('/[^0-9.].*$/', '', self::getStrippedPmaVersion($versionString));
         if ($version === null || preg_match('/^\d+(\.\d+)*$/', $version) !== 1) {
+            return false;
+        }
+
+        // "5.2.<200 digits>" is accepted by version_compare and does not fit
+        // in the column: refuse it here rather than let the save fail, or let
+        // a server that is not in strict mode truncate it.
+        if (strlen($version) > self::MAX_PMA_VERSION_LENGTH) {
             return false;
         }
 

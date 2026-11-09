@@ -17,7 +17,7 @@
 namespace App\Command;
 
 use App\Forwarding\Sentry;
-use App\Model\Table\ReportsTable;
+use App\Model\Table\IncidentsTable;
 use App\Report;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
@@ -41,6 +41,10 @@ use function fwrite;
 use function getmypid;
 use function is_array;
 use function is_string;
+use function json_decode;
+use function json_encode;
+use function max;
+use function min;
 use function rewind;
 use function strlen;
 
@@ -75,6 +79,12 @@ class ForwardReportsCommand extends Command
      * Only one run at a time, see acquireLock().
      */
     public const LOCK_FILE = 'forward_reports.lock';
+
+    /**
+     * Number of reports read at once: the driver buffers a result, so the
+     * backlog is drained a batch at a time rather than in one query.
+     */
+    public const BATCH_SIZE = 100;
 
     public static function defaultName(): string
     {
@@ -117,7 +127,7 @@ class ForwardReportsCommand extends Command
             return self::CODE_SUCCESS;
         }
 
-        if (! $this->isConfigComplete(Configure::read('Forwarding.Sentry'))) {
+        if (! Sentry::hasConfig()) {
             $error = 'The Sentry config needs a base_url, a project_id and a key';
             Log::error($error, 'cron_jobs');
             $io->error($error);
@@ -143,80 +153,144 @@ class ForwardReportsCommand extends Command
         }
 
         try {
-            return $this->forwardPendingReports((int) $args->getOption('limit'), $io);
+            return $this->forwardPendingIncidents((int) $args->getOption('limit'), $io);
         } finally {
             $this->releaseLock($lock);
         }
     }
 
     /**
-     * Forward every pending report, up to the limit when one is given.
+     * Forward the pending incidents, a batch at a time, up to the limit.
      *
-     * @param int       $limit Largest number of reports, 0 for all of them
+     * Read in batches: the query is buffered by the driver, so reading every
+     * pending incident at once would hold the whole backlog in memory, and a
+     * backlog is exactly what this command exists to drain.
+     *
+     * @param int       $limit Largest number of incidents, 0 for all of them
      * @param ConsoleIo $io    The console
      *
      * @return int The exit code: a report the tracker refused is logged and
      *             stays pending, which is not a failure of the run itself
      */
-    protected function forwardPendingReports(int $limit, ConsoleIo $io): int
+    protected function forwardPendingIncidents(int $limit, ConsoleIo $io): int
     {
-        $reports = $this->getReportsTable();
-
         $sent = 0;
         $failed = 0;
-        foreach ($this->findPendingReports($limit) as $report) {
-            $payload = $this->findPayload($report);
+        $attempted = 0;
+        $lastId = 0;
 
-            if ($payload === null) {
-                // A report without incident has nothing to forward, and never
-                // will: mark it so the query stops reading it.
-                $this->markForwarded($reports, $report, $io, 'has no incident');
-
-                continue;
+        while (true) {
+            $size = self::BATCH_SIZE;
+            if ($limit > 0) {
+                $size = min($size, $limit - $attempted);
+                if ($size <= 0) {
+                    break;
+                }
             }
 
-            if ($this->forward($payload, (int) $report->get('id'), $io)) {
-                $this->markForwarded($reports, $report, $io);
-                $sent++;
+            $batch = $this->findPendingIncidents($lastId, $size);
+            $read = 0;
+            foreach ($batch as $incident) {
+                $read++;
+                $attempted++;
+                $lastId = max($lastId, (int) $incident->get('id'));
 
-                continue;
+                // An incident that is not marked stays pending for the next
+                // run, and its id is already behind the cursor: it is not read
+                // twice by this run, which would otherwise never end.
+                $this->forwardIncident($incident, $io) ? $sent++ : $failed++;
             }
 
-            $failed++;
+            if ($read < $size) {
+                break;
+            }
         }
 
-        $io->verbose('Forwarded ' . $sent . ' report(s), ' . $failed . ' failed.');
+        $io->verbose('Forwarded ' . $sent . ' incident(s), ' . $failed . ' failed.');
 
         return self::CODE_SUCCESS;
     }
 
     /**
-     * Forward the payload of a report.
+     * Forward one incident, and mark it when the tracker took it.
      *
-     * @param string    $payload  The payload, as it was stored
-     * @param int       $reportId The report it belongs to
-     * @param ConsoleIo $io       The console
+     * @param EntityInterface $incident The incident
+     * @param ConsoleIo       $io       The console
+     *
+     * @return bool True when the incident is done with
+     */
+    protected function forwardIncident(EntityInterface $incident, ConsoleIo $io): bool
+    {
+        $incidents = $this->getIncidentsTable();
+        $incidentId = (int) $incident->get('id');
+
+        try {
+            $payload = $incident->get('full_report');
+            if (! is_string($payload) || $payload === '') {
+                // Nothing will ever be forwarded for this incident.
+                $this->markForwarded($incidents, $incident, $io, 'carries no report');
+
+                return true;
+            }
+
+            if (! $this->forward($payload, $incident, $io)) {
+                return false;
+            }
+
+            $this->markForwarded($incidents, $incident, $io);
+
+            return true;
+        } catch (Throwable $e) {
+            // One incident must not stop the drain: a deadlock, a lost
+            // connection, anything the forward itself does not catch.
+            Log::error(
+                'Could not forward the incident ' . $incidentId . ': ' . $e->getMessage(),
+                'cron_jobs',
+            );
+            $io->verbose('Incident ' . $incidentId . ' failed: ' . $e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * Forward the payload of one incident.
+     *
+     * The stored payload is the whole submission, which carries one entry per
+     * error: send the entry of this incident only, or every occurrence would
+     * replay every error of the report into the tracker.
+     *
+     * @param string          $payload  The payload, as it was stored
+     * @param EntityInterface $incident The incident it belongs to
+     * @param ConsoleIo       $io       The console
      *
      * @return bool True when the tracker took it
      */
-    protected function forward(string $payload, int $reportId, ConsoleIo $io): bool
+    protected function forward(string $payload, EntityInterface $incident, ConsoleIo $io): bool
     {
+        $incidentId = (int) $incident->get('id');
+
         try {
-            $eventIds = Sentry::process($this->buildReport($payload));
+            $eventIds = Sentry::process(
+                Report::fromString($this->payloadForIncident($payload, $incident)),
+            );
         } catch (Throwable $e) {
-            // The report stays unforwarded: the next run tries again, which is
-            // the point of the column.
+            // The incident stays unforwarded: the next run tries again, which
+            // is the point of the column.
             Log::error(
-                'Could not forward the report ' . $reportId . ': ' . $e->getMessage(),
+                'Could not forward the incident ' . $incidentId . ': ' . $e->getMessage(),
                 'cron_jobs',
             );
-            $io->error('Report ' . $reportId . ': ' . $e->getMessage());
+            // Logged, and shown with -v: an incident the tracker refuses stays
+            // pending, so printing it on stderr at every run would make cron
+            // mail about the same payload for ever.
+            $io->verbose('Incident ' . $incidentId . ' refused: ' . $e->getMessage());
 
             return false;
         }
 
         $io->verbose(
-            'Report ' . $reportId . ': ' . strlen($payload) . ' bytes, '
+            'Incident ' . $incidentId . ': ' . strlen($payload) . ' bytes, '
             . count($eventIds) . ' event(s)',
         );
         foreach ($eventIds as $eventId) {
@@ -227,112 +301,107 @@ class ForwardReportsCommand extends Command
     }
 
     /**
-     * Build the report that is forwarded, from the payload of an incident.
+     * Narrow the stored payload to the error of one incident.
      *
-     * fromString() is what reads the nested values as objects: built with
-     * fromObject() from the decoded arrays, every message, culprit and frame
-     * comes out empty.
+     * @param string          $payload  The payload of the submission
+     * @param EntityInterface $incident The incident to send
      *
-     * @param string $payload The payload, as it was stored
+     * @return string The payload that carries that error only
      */
-    protected function buildReport(string $payload): Report
+    protected function payloadForIncident(string $payload, EntityInterface $incident): string
     {
-        return Report::fromString($payload);
-    }
-
-    /**
-     * The reports that were not forwarded yet.
-     *
-     * @param int $limit Largest number of reports to read, 0 for all of them
-     *
-     * @return SelectQuery<EntityInterface> The reports, oldest first
-     */
-    protected function findPendingReports(int $limit): SelectQuery
-    {
-        $query = $this->getReportsTable()->find()
-            ->where(['Reports.forwarded_at IS' => null])
-            ->orderBy(['Reports.id' => 'ASC']);
-
-        if ($limit > 0) {
-            $query = $query->limit($limit);
+        $decoded = json_decode($payload, true);
+        if (! is_array($decoded) || ! isset($decoded['errors']) || ! is_array($decoded['errors'])) {
+            // A JavaScript report carries a single error: there is nothing to
+            // narrow, and the incident is that report.
+            return $payload;
         }
 
-        return $query;
+        $error = $this->findErrorOfIncident($decoded['errors'], $incident);
+        if ($error === null) {
+            return $payload;
+        }
+
+        $decoded['errors'] = [$error];
+
+        return (string) json_encode($decoded);
     }
 
     /**
-     * The payload of a report, read from its first incident.
+     * The entry of the payload that built this incident.
      *
-     * Every incident of a report stores the whole payload, so one of them is
-     * enough: reading them all would send the events of the report once per
-     * incident.
+     * @param array<int, mixed> $errors   The errors of the payload
+     * @param EntityInterface   $incident The incident
      *
-     * @param EntityInterface $report The report
-     *
-     * @return string|null The payload, null when the report has no incident
+     * @return array<string, mixed>|null The entry, null when it cannot be told
      */
-    protected function findPayload(EntityInterface $report): string|null
+    protected function findErrorOfIncident(array $errors, EntityInterface $incident): array|null
     {
-        $incident = TableRegistry::getTableLocator()->get('Incidents')->find()
-            ->where(['Incidents.report_id' => $report->get('id')])
+        $file = (string) $incident->get('script_name');
+        $line = (int) $incident->get('linenumber');
+
+        foreach ($errors as $error) {
+            if (! is_array($error)) {
+                continue;
+            }
+
+            if ((int) ($error['line'] ?? 0) === $line && (string) ($error['file'] ?? '') === $file) {
+                return $error;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The incidents that were not forwarded yet, after the ones already read.
+     *
+     * @param int $lastId The id of the last incident that was read
+     * @param int $size   Largest number of incidents to read
+     *
+     * @return SelectQuery<EntityInterface> The incidents, oldest first
+     */
+    protected function findPendingIncidents(int $lastId, int $size): SelectQuery
+    {
+        // The cursor is the id rather than an offset: an incident that stays
+        // pending does not shift the batch, and the index on forwarded_at
+        // serves the filter while InnoDB appends the primary key to it, so the
+        // order needs no filesort either.
+        return $this->getIncidentsTable()->find()
+            ->where(['Incidents.forwarded_at IS' => null, 'Incidents.id >' => $lastId])
             ->orderBy(['Incidents.id' => 'ASC'])
-            ->first();
-
-        if (! $incident instanceof EntityInterface) {
-            return null;
-        }
-
-        $payload = $incident->get('full_report');
-
-        return is_string($payload) && $payload !== '' ? $payload : null;
+            ->limit($size);
     }
 
     /**
-     * Remember that the report is done, whatever the outcome.
+     * Remember that this run is done with the incident.
      *
-     * @param ReportsTable    $reports The table
-     * @param EntityInterface $report  The report
-     * @param ConsoleIo       $io      The console
-     * @param string          $reason  Why it is done without being sent
+     * Only called once the tracker took it, or when there is nothing to send:
+     * an incident that was refused is left pending on purpose, for the next run.
+     *
+     * @param IncidentsTable  $incidents The table
+     * @param EntityInterface $incident  The incident
+     * @param ConsoleIo       $io        The console
+     * @param string          $reason    Why it is done without being sent
      */
     protected function markForwarded(
-        ReportsTable $reports,
-        EntityInterface $report,
+        IncidentsTable $incidents,
+        EntityInterface $incident,
         ConsoleIo $io,
         string $reason = '',
     ): void {
-        // One UPDATE by key: the report is already stored, and nothing else on
-        // the row changes.
-        $reports->updateAll(
+        // One UPDATE by key: the incident is already stored, and nothing else
+        // on the row changes.
+        $incidents->updateAll(
             ['forwarded_at' => date('Y-m-d H:i:s')],
-            ['id' => $report->get('id')],
+            ['id' => $incident->get('id')],
         );
 
         if ($reason === '') {
             return;
         }
 
-        $io->verbose('Report ' . $report->get('id') . ' skipped: it ' . $reason);
-    }
-
-    /**
-     * The configuration is complete enough to send anything.
-     *
-     * @param mixed $config The Forwarding.Sentry value
-     */
-    protected function isConfigComplete(mixed $config): bool
-    {
-        if (! is_array($config)) {
-            return false;
-        }
-
-        foreach (['base_url', 'project_id', 'key'] as $key) {
-            if (($config[$key] ?? '') === '') {
-                return false;
-            }
-        }
-
-        return true;
+        $io->verbose('Incident ' . $incident->get('id') . ' skipped: it ' . $reason);
     }
 
     /**
@@ -389,10 +458,10 @@ class ForwardReportsCommand extends Command
     /**
      * The reports table.
      */
-    protected function getReportsTable(): ReportsTable
+    protected function getIncidentsTable(): IncidentsTable
     {
         // The table locator resolves the class from the name, which the
         // analysis already knows.
-        return TableRegistry::getTableLocator()->get('Reports');
+        return TableRegistry::getTableLocator()->get('Incidents');
     }
 }

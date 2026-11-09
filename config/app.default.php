@@ -81,15 +81,16 @@ return [
     'Security' => [
         'salt' => env('SECURITY_SALT'),
         /*
-         * Addresses whose X-Forwarded-For header is believed, for the client
-         * IP that a report and a login record.
+         * Addresses of the reverse proxies whose X-Forwarded-For header is
+         * believed, for the client IP that a report and a login record.
+         *
+         * The framework removes these addresses from the chain and reads the
+         * one that is left as the client, so this is the address of each proxy
+         * and not of the clients.
          *
          * Empty by default, and that is the safe value: the header is written
          * by the caller, so believing it from anywhere lets anybody choose the
-         * address that is stored and shown to the developers. Set it only
-         * behind a reverse proxy, and read the note in docs/server-setup.md —
-         * the framework compares the header against this list, it does not
-         * check that the connection comes from a proxy.
+         * address that is stored and shown to the developers.
          */
         'trustedProxies' => [],
     ],

@@ -254,7 +254,7 @@ class SentryTest extends TestCase
         }
     }
 
-    public function testSendReportLogsAndThrowsOnACurlError(): void
+    public function testSendReportThrowsOnACurlError(): void
     {
         $baseDirectory = $this->createTempDirectory();
         $this->configureForwarding('file://' . $baseDirectory . DS . 'missing.json?');
@@ -268,7 +268,31 @@ class SentryTest extends TestCase
             $this->assertSame($expected, $exception->getMessage());
         }
 
-        $this->assertLogContains($expected);
+        // The caller logs what it catches: this class must not write the same
+        // failure again.
+        $this->assertLogDoesNotContain($expected);
+    }
+
+    /**
+     * A refusal is a refusal all the way up: the status check has to run inside
+     * the send, or a tracker that answers 400 is taken for a store and the
+     * report is marked forwarded with nothing sent.
+     */
+    public function testSendReportRefusesAnAnswerOfTheTracker(): void
+    {
+        $this->configureForwarding('file:///tmp/');
+
+        $refusing = new class extends Sentry {
+            protected static function post(string $data, array $headers, array $sentryConfig): array
+            {
+                return [400, '{"detail":"invalid"}'];
+            }
+        };
+
+        $this->expectException(Throwable::class);
+        $this->expectExceptionMessage('The tracker refused the envelope, status 400');
+
+        $refusing::sendReport(['message' => 'x', 'event_id' => str_repeat('a', 32)]);
     }
 
     public function testSendReportEncodesACompleteReportPayload(): void

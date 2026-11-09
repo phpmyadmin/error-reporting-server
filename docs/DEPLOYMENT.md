@@ -138,42 +138,65 @@ never delays the answer to the client nor the notification mail:
 bin/cake forward_reports
 ```
 
-It reads every report whose `forwarded_at` is empty and sets it on each one it
-is done with. A report the tracker refused keeps its empty `forwarded_at`, so the
-next run tries again — a backlog is visible as:
+It reads every incident whose `forwarded_at` is empty, a hundred at a time, and
+sets it on each one it is done with. An incident the tracker refused keeps its
+empty `forwarded_at`, so the next run tries again — a backlog, and the sign that
+the tracker is refusing what it is sent, are both visible as:
 
 ```sql
-SELECT COUNT(*) FROM reports WHERE forwarded_at IS NULL;
+SELECT COUNT(*) FROM incidents WHERE forwarded_at IS NULL;
 ```
 
-Before the first run, decide what happens to the reports stored before the
+Before the first run, decide what happens to the occurrences stored before the
 column existed: they all have an empty `forwarded_at`, so the first run forwards
 the whole archive unless you mark it as already handled.
 
 ```sql
-UPDATE reports SET forwarded_at = created;   -- skip the archive
+UPDATE incidents SET forwarded_at = created;   -- skip the archive
 ```
 
 Run it every minute or five minutes as a cron job. A run that has nothing to do,
 or that finds another run already going, prints nothing.
 
+**Nothing forwards without the cron.** The ingest endpoint no longer calls the
+tracker: it stores the report and answers, and the command above is the only thing
+that sends anything. Deploy the code without the crontab entry and reports keep
+arriving and keep being stored, silently, with nothing reaching the tracker. The
+backlog query is the check that the command runs at all.
+
+**Every occurrence is forwarded.** A repeat of the same error adds an incident to
+the existing report, and each incident is sent to the tracker: an issue keeps
+showing that it still happens, with the count of events behind it. The report page
+here keeps the full history either way.
+
 **Only one run at a time.** The command takes a `flock()` on `tmp/forward_reports.lock`
 and exits silently when it is held; the file holds the PID of the run that has it.
-`flock` is released if the process dies, so there is no stale lock to clear. This
-assumes one host: several hosts sharing the queue need a lock they share too (the
-Redis engine of `Cake\Lock`, or a MySQL `GET_LOCK`).
+`flock` is released if the process dies, so there is no stale lock to clear.
+
+The lock file lives in `tmp/`, which the user the cron runs as has to be able to
+write: if it cannot, every run fails at once instead of doing any work. The lock
+assumes one host too — `flock` over NFS is not reliable, and several hosts sharing
+the queue need a lock they share (the Redis engine of `Cake\Lock`, or a MySQL
+`GET_LOCK`).
 
 **Output follows the console verbosity:**
 
 | Flags | What is printed |
 | ----- | --------------- |
-| none | nothing on success; a refused report prints one line on stderr |
-| `-v` | one line per report (`Report 12: 4628 bytes, 1 event(s)`) and a summary |
-| `--debug` | the event ids, one per line |
-| `-q` | nothing on stdout; stderr keeps the errors |
+| none | nothing on stdout; the tracker's own transport error still goes to stderr |
+| `-v` | one line per incident (`Incident 12: 4628 bytes, 1 event(s)`), one per refusal, and a summary |
+| `--debug` | everything `-v` prints, plus the event ids |
+| `-q` | nothing on stdout; stderr keeps the failures |
 
 `-vvv` is accepted by CakePHP but read as `-v`: the framework has no third level,
 which is why `--debug` exists.
+
+**A refused incident produces no output of its own**: it is written to
+`logs/cron_jobs.log` and printed by `-v` on stdout, and the run still exits 0.
+Only a transport failure raised by the tracker itself reaches stderr, and that is
+what a cron would mail about — repeatedly, since the incident stays pending until
+it is forwarded. Watch the backlog query rather than the cron mail: a queue that
+grows is the reliable signal, whatever the tracker answers.
 
 ### Cron Job Logging
 

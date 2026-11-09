@@ -55,18 +55,6 @@ parameters:
 			path: src/Controller/Component/GithubApiComponent.php
 
 		-
-			message: '#^Method App\\Controller\\Component\\GithubApiComponent\:\:sendRequest\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Controller/Component/GithubApiComponent.php
-
-		-
-			message: '#^Method App\\Controller\\Component\\GithubApiComponent\:\:sendRequest\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Controller/Component/GithubApiComponent.php
-
-		-
 			message: '#^Parameter \#2 \$data of method App\\Controller\\Component\\GithubApiComponent\:\:apiRequest\(\) expects array\|string, string\|false given\.$#'
 			identifier: argument.type
 			count: 2

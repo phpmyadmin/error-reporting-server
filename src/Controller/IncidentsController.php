@@ -21,6 +21,7 @@ namespace App\Controller;
 use App\Model\Table\IncidentsTable;
 use App\Model\Table\NotificationsTable;
 use App\Model\Table\ReportsTable;
+use App\Report;
 use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
@@ -106,6 +107,12 @@ class IncidentsController extends AppController
 
             return $this->response;
         }
+
+        // The report is forwarded later, by a command that has no request: the
+        // salted hash of the address travels with the payload, or the identity
+        // the tracker groups the events by is the same for every user. The
+        // address itself is never stored.
+        $bugReport['client_ip_hash'] = Report::hashClientIp($this->request->clientIp());
 
         $result = $this->Incidents->createIncidentFromBugReport($bugReport);
         $accepted = count($result['incidents']) > 0 && ! in_array(false, $result['incidents']);

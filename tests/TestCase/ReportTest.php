@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use function array_unique;
 use function file_get_contents;
 use function json_decode;
+use function json_encode;
 
 use const DS;
 
@@ -711,5 +712,39 @@ class ReportTest extends TestCase
         $withIp->setClientIp('198.51.100.7');
 
         $this->assertNotSame($untouched, $withIp->getUserId(), 'the address of the request must count');
+    }
+
+    /**
+     * The forwarding runs in a command, with no request to read an address
+     * from: the ingest stores the salted hash with the payload, and the identity
+     * of the report is built from it.
+     */
+    public function testTheClientIpHashStoredByTheIngestFixesTheIdentity(): void
+    {
+        $payload = (string) file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
+
+        // Two clients that differ only by their address.
+        $report = Report::fromString($payload);
+        $report->setClientIp('198.51.100.7');
+        $fromAddress = $report->getUserId();
+
+        $withHash = json_decode($payload, true);
+        $withHash['client_ip_hash'] = Report::hashClientIp('198.51.100.7');
+        $this->assertSame($fromAddress, Report::fromString((string) json_encode($withHash))->getUserId());
+
+        $withOther = json_decode($payload, true);
+        $withOther['client_ip_hash'] = Report::hashClientIp('203.0.113.9');
+        $this->assertNotSame($fromAddress, Report::fromString((string) json_encode($withOther))->getUserId());
+    }
+
+    /**
+     * The address itself is never what is stored: only its salted hash.
+     */
+    public function testTheClientIpHashIsNotTheAddress(): void
+    {
+        $hash = Report::hashClientIp('198.51.100.7');
+
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $hash);
+        $this->assertStringNotContainsString('198.51.100.7', $hash);
     }
 }

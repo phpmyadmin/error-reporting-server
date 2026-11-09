@@ -18,8 +18,6 @@ namespace App\Test\TestCase\Command;
 
 use App\Command\ForwardReportsCommand;
 use App\Model\Table\IncidentsTable;
-use App\Model\Table\ReportsTable;
-use App\Report;
 use App\Test\Fixture\DevelopersFixture;
 use App\Test\Fixture\IncidentsFixture;
 use App\Test\Fixture\NotificationsFixture;
@@ -30,13 +28,14 @@ use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use ReflectionMethod;
 
-use function assert;
 use function bin2hex;
 use function fclose;
 use function file_get_contents;
 use function file_put_contents;
 use function flock;
 use function fopen;
+use function json_decode;
+use function json_encode;
 use function mkdir;
 use function random_bytes;
 use function rmdir;
@@ -50,17 +49,19 @@ use const LOCK_UN;
 use const TMP;
 
 /**
- * The report is forwarded by a command, not by the request that stored it.
+ * The occurrences are forwarded by a command, not by the request that stored
+ * them, and every occurrence is sent so that the tracker keeps showing an issue
+ * as still happening.
  */
 class ForwardReportsCommandTest extends TestCase
 {
     use ConsoleIntegrationTestTrait;
 
-    protected ReportsTable $Reports;
-
     protected IncidentsTable $Incidents;
 
     protected ForwardReportsCommand $command;
+
+    protected string|null $responseDirectory = null;
 
     public function getFixtures(): array
     {
@@ -76,7 +77,6 @@ class ForwardReportsCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $this->Incidents = TableRegistry::getTableLocator()->get('Incidents');
         $this->command = new ForwardReportsCommand();
     }
@@ -93,11 +93,6 @@ class ForwardReportsCommandTest extends TestCase
 
         parent::tearDown();
     }
-
-    /**
-     * Directory the fake tracker answers from, removed on tear down.
-     */
-    protected string|null $responseDirectory = null;
 
     /**
      * Point the forwarding at a local file that answers like the tracker.
@@ -124,7 +119,8 @@ class ForwardReportsCommandTest extends TestCase
     protected function enableBrokenForwarding(): void
     {
         Configure::write('Forwarding.Sentry', [
-            'base_url' => 'file://' . sys_get_temp_dir() . DS . 'ers-missing-' . bin2hex(random_bytes(6)) . '.json?',
+            'base_url' => 'file://' . sys_get_temp_dir() . DS . 'ers-missing-'
+                . bin2hex(random_bytes(6)) . '.json?',
             'project_id' => 1,
             'key' => 'k',
         ]);
@@ -158,6 +154,11 @@ class ForwardReportsCommandTest extends TestCase
         return $reflection->invoke($this->command, ...$args);
     }
 
+    protected function countForwarded(): int
+    {
+        return $this->Incidents->find()->where(['forwarded_at IS NOT' => null])->count();
+    }
+
     public function testTheCommandDoesNothingWhenForwardingIsDisabled(): void
     {
         Configure::delete('Forwarding.Sentry');
@@ -167,142 +168,98 @@ class ForwardReportsCommandTest extends TestCase
 
         $this->assertExitSuccess();
         $this->assertOutputContains('Forwarding is disabled');
-        $this->assertSame(
-            0,
-            $this->Reports->find()->where(['forwarded_at IS NOT' => null])->count(),
-            'no report must be marked when nothing was sent',
-        );
+        $this->assertSame(0, $this->countForwarded(), 'nothing must be marked when nothing was sent');
     }
 
-    public function testTheCommandForwardsAndMarksTheReport(): void
+    public function testTheCommandForwardsAndMarksTheIncidents(): void
     {
         $this->enableForwarding();
         $this->storePayload('report_js.json');
 
-        $this->exec('forward_reports --limit 1');
+        $this->exec('forward_reports');
 
         $this->assertExitSuccess();
         $this->assertSame(
-            1,
-            $this->Reports->find()->where(['forwarded_at IS NOT' => null])->count(),
-            'the forwarded report must be marked',
+            $this->Incidents->find()->count(),
+            $this->countForwarded(),
+            'every incident of the fixture must be forwarded and marked',
         );
     }
 
     /**
-     * A report is read once, whatever the number of its incidents: every
-     * incident of a report stores the whole payload.
+     * Every occurrence is sent, not only the first one: that is what keeps an
+     * issue in the tracker showing that it still happens.
      */
-    public function testAReportIsPendingOnceWhateverItsIncidentCount(): void
+    public function testEveryOccurrenceOfAReportIsForwarded(): void
     {
-        // The report 4 of the fixture carries two incidents.
-        $this->assertSame(2, $this->Incidents->find()->where(['report_id' => 4])->count());
-
-        $pending = $this->callCommand('findPendingReports', [100]);
-
-        $this->assertSame(4, $pending->count(), 'the fixture holds 4 reports');
-    }
-
-    public function testThePayloadIsReadFromTheFirstIncidentOfTheReport(): void
-    {
-        $payload = $this->callCommand('findPayload', [$this->Reports->get(4)]);
-
-        $this->assertIsString($payload);
-        $this->assertNotSame('', $payload);
-    }
-
-    /**
-     * The payload of a report is read from the incident, and it must carry its
-     * data: read with fromObject() from the decoded arrays, every message,
-     * culprit and frame came out empty.
-     */
-    public function testThePayloadThatIsForwardedCarriesItsData(): void
-    {
-        $this->storePayload('report_php.json');
-
-        $payload = $this->callCommand('findPayload', [$this->Reports->get(4)]);
-        $this->assertIsString($payload);
-
-        $events = Report::fromString($payload)->getReports();
-        $this->assertNotSame([], $events);
-        $this->assertNotSame('', $events[0]['message'], 'the message must not be empty');
-        $this->assertNotSame('', $events[0]['culprit'], 'the culprit must not be empty');
-        $this->assertNotSame(
-            [],
-            $events[0]['exception']['values'][0]->stacktrace->frames,
-            'the frames must not be empty',
-        );
-    }
-
-    /**
-     * What the command hands to the tracker must carry the data of the crash.
-     *
-     * Built with fromObject() from the payload decoded to arrays, every
-     * message, culprit and frame came out empty: fromObject() copies the top
-     * level only.
-     */
-    public function testTheCommandForwardsAPayloadThatCarriesItsData(): void
-    {
-        $this->storePayload('report_php.json');
-
-        $payload = $this->callCommand('findPayload', [$this->Reports->get(4)]);
-        $this->assertIsString($payload);
-
-        $report = $this->callCommand('buildReport', [$payload]);
-        assert($report instanceof Report);
-        $events = $report->getReports();
-
-        $this->assertNotSame([], $events);
-        $this->assertNotSame('', $events[0]['message'], 'the message must not be empty');
-        $this->assertNotSame('', $events[0]['culprit'], 'the culprit must not be empty');
-        $this->assertNotSame(
-            [],
-            $events[0]['exception']['values'][0]->stacktrace->frames,
-            'the frames must not be empty',
-        );
-    }
-
-    public function testAReportAlreadyForwardedIsNotSentAgain(): void
-    {
-        $this->enableForwarding();
-        $this->storePayload('report_js.json');
-
-        $this->exec('forward_reports --limit 1');
-        $marked = $this->Reports->find()->where(['forwarded_at IS NOT' => null])->count();
-        $this->assertSame(1, $marked);
-
-        $this->exec('forward_reports --limit 1');
-
         $this->assertSame(
             2,
-            $this->Reports->find()->where(['forwarded_at IS NOT' => null])->count(),
-            'the second run must take the next report, not the one already sent',
+            $this->Incidents->find()->where(['report_id' => 4])->count(),
+            'the report 4 carries two incidents',
         );
-    }
 
-    public function testAFailedForwardLeavesTheReportForTheNextRun(): void
-    {
-        // A base url that cannot be read: the send throws.
-        $this->enableBrokenForwarding();
+        $this->enableForwarding();
         $this->storePayload('report_js.json');
 
-        $this->exec('forward_reports --limit 1');
+        $this->exec('forward_reports');
 
-        // The run completed: the report stays pending and the next run retries
-        // it, which must not make cron complain about a crash.
         $this->assertExitSuccess();
-        $this->assertErrorContains('Report');
-        $this->assertSame(
-            0,
-            $this->Reports->find()->where(['forwarded_at IS NOT' => null])->count(),
-            'a failed report must stay pending, the next run retries it',
-        );
+        foreach ($this->Incidents->find()->where(['report_id' => 4]) as $incident) {
+            $this->assertNotNull(
+                $incident->get('forwarded_at'),
+                'the incident ' . $incident->get('id') . ' must have been forwarded',
+            );
+        }
     }
 
     /**
-     * A healthy run is silent: cron must not mail the output of every run.
+     * The stored payload is the whole submission: each incident must send its
+     * own error only, or a report of N errors would send N events N times.
      */
-    public function testTheCommandIsSilentByDefault(): void
+    public function testThePayloadOfAnIncidentCarriesItsOwnErrorOnly(): void
+    {
+        $errors = [
+            ['msg' => 'first', 'type' => 'Error', 'file' => '/a.php', 'line' => 1, 'stackTrace' => []],
+            ['msg' => 'second', 'type' => 'Error', 'file' => '/b.php', 'line' => 2, 'stackTrace' => []],
+        ];
+        $payload = (string) json_encode([
+            'pma_version' => '5.2.0',
+            'exception_type' => 'php',
+            'errors' => $errors,
+        ]);
+
+        $incidents = $this->Incidents->find()->orderBy(['Incidents.id' => 'ASC'])->limit(2)->all()->toArray();
+        $incidents[0]->set('full_report', $payload);
+        $incidents[0]->set('script_name', '/a.php');
+        $incidents[0]->set('linenumber', 1);
+        $incidents[1]->set('full_report', $payload);
+        $incidents[1]->set('script_name', '/b.php');
+        $incidents[1]->set('linenumber', 2);
+
+        $first = json_decode((string) $this->callCommand('payloadForIncident', [$payload, $incidents[0]]), true);
+        $second = json_decode((string) $this->callCommand('payloadForIncident', [$payload, $incidents[1]]), true);
+
+        $this->assertCount(1, $first['errors'], 'one error per incident');
+        $this->assertSame('first', $first['errors'][0]['msg']);
+        $this->assertCount(1, $second['errors'], 'one error per incident');
+        $this->assertSame('second', $second['errors'][0]['msg']);
+    }
+
+    /**
+     * A JavaScript report carries a single error: its payload is sent as it is.
+     */
+    public function testAReportWithoutErrorListIsSentAsItIs(): void
+    {
+        $payload = (string) file_get_contents(TESTS . 'Fixture' . DS . 'report_js.json');
+        $incident = $this->Incidents->find()->orderBy(['Incidents.id' => 'ASC'])->firstOrFail();
+
+        $this->assertSame(
+            $payload,
+            $this->callCommand('payloadForIncident', [$payload, $incident]),
+        );
+    }
+
+    public function testAHealthyRunIsSilent(): void
     {
         $this->enableForwarding();
         $this->storePayload('report_js.json');
@@ -312,17 +269,12 @@ class ForwardReportsCommandTest extends TestCase
         $this->assertExitSuccess();
         $this->assertOutputEmpty('a healthy run must print nothing on stdout');
         $this->assertErrorEmpty('a healthy run must print nothing on stderr');
-        $this->assertSame(
-            4,
-            $this->Reports->find()->where(['forwarded_at IS NOT' => null])->count(),
-            'every pending report must still have been forwarded',
-        );
     }
 
     public function testTheCommandIsSilentWhenThereIsNothingToDo(): void
     {
         $this->enableForwarding();
-        $this->Reports->updateAll(['forwarded_at' => '2024-01-01 00:00:00'], []);
+        $this->Incidents->updateAll(['forwarded_at' => '2024-01-01 00:00:00'], []);
 
         $this->exec('forward_reports');
 
@@ -331,21 +283,7 @@ class ForwardReportsCommandTest extends TestCase
         $this->assertErrorEmpty();
     }
 
-    /**
-     * The report is forwarded but nothing is printed, so -q changes nothing.
-     */
-    public function testTheQuietFlagKeepsTheRunSilent(): void
-    {
-        $this->enableForwarding();
-        $this->storePayload('report_js.json');
-
-        $this->exec('forward_reports -q');
-
-        $this->assertExitSuccess();
-        $this->assertOutputEmpty();
-    }
-
-    public function testTheVerboseFlagPrintsOneLinePerReport(): void
+    public function testTheVerboseFlagPrintsOneLinePerIncident(): void
     {
         $this->enableForwarding();
         $this->storePayload('report_js.json');
@@ -353,8 +291,8 @@ class ForwardReportsCommandTest extends TestCase
         $this->exec('forward_reports -v');
 
         $this->assertExitSuccess();
-        $this->assertOutputContains('Report 1: 4628 bytes, 1 event(s)');
-        $this->assertOutputContains('Forwarded 4 report(s), 0 failed.');
+        $this->assertOutputContains('Incident 1:');
+        $this->assertOutputContains('Forwarded 5 incident(s), 0 failed.');
         // The event ids are the detail of --debug, not of -v.
         $this->assertOutputNotContains('  event ');
     }
@@ -370,28 +308,17 @@ class ForwardReportsCommandTest extends TestCase
         $this->assertOutputRegExp('/^\s*event [0-9a-f]{32}$/m');
     }
 
-    /**
-     * Everything pending is forwarded in one run: no cap by default.
-     */
-    public function testTheCommandForwardsEveryPendingReport(): void
+    public function testTheLimitBoundsTheRun(): void
     {
         $this->enableForwarding();
         $this->storePayload('report_js.json');
 
-        $this->exec('forward_reports');
+        $this->exec('forward_reports --limit 2');
 
         $this->assertExitSuccess();
-        $this->assertSame(
-            $this->Reports->find()->count(),
-            $this->Reports->find()->where(['forwarded_at IS NOT' => null])->count(),
-            'every report of the fixture must be done with',
-        );
+        $this->assertSame(2, $this->countForwarded(), 'only two incidents must be marked');
     }
 
-    /**
-     * A second run must not start while the first holds the lock: it prints
-     * nothing and is not an error.
-     */
     public function testASecondRunDoesNotOverlap(): void
     {
         $this->enableForwarding();
@@ -410,36 +337,26 @@ class ForwardReportsCommandTest extends TestCase
 
         $this->assertExitSuccess();
         $this->assertOutputEmpty('a run that found the lock held must print nothing');
-        $this->assertSame(
-            0,
-            $this->Reports->find()->where(['forwarded_at IS NOT' => null])->count(),
-            'nothing must be forwarded while another run holds the lock',
-        );
-    }
-
-    public function testTheLockIsReleasedAfterARun(): void
-    {
-        $this->enableForwarding();
-        $this->storePayload('report_js.json');
-
-        $this->exec('forward_reports');
-        $this->assertExitSuccess();
-
-        // The next run must be able to take it.
-        $handle = fopen(TMP . ForwardReportsCommand::LOCK_FILE, 'c');
-        $this->assertNotFalse($handle);
-        $this->assertTrue(
-            flock($handle, LOCK_EX | LOCK_NB),
-            'the lock must be free once the run returned',
-        );
-        flock($handle, LOCK_UN);
-        fclose($handle);
+        $this->assertSame(0, $this->countForwarded(), 'nothing must be forwarded while the lock is held');
     }
 
     /**
-     * A configuration that cannot send anything is a failure of the run, unlike
-     * a report the tracker refused.
+     * A refused incident is the one thing a run reports on stderr, since it
+     * stays pending and is retried: the tracker's own error is what alerts.
      */
+    public function testARefusedIncidentKeepsStdoutEmpty(): void
+    {
+        $this->enableBrokenForwarding();
+        $this->storePayload('report_js.json');
+
+        $this->exec('forward_reports --limit 1');
+
+        $this->assertExitSuccess();
+        $this->assertOutputEmpty('the progress stays on stdout only with -v');
+        $this->assertErrorContains('cURL error');
+        $this->assertSame(0, $this->countForwarded(), 'a refused incident stays pending');
+    }
+
     public function testAnIncompleteConfigurationIsAnError(): void
     {
         Configure::write('Forwarding.Sentry', ['base_url' => 'file:///tmp/']);

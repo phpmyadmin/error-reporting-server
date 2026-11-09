@@ -66,6 +66,24 @@ class Sentry
     public const MAX_FEEDBACK_LENGTH = 4096;
 
     /**
+     * Whether forwarding is configured well enough to send anything.
+     *
+     * The single place the required keys are listed: a command that sends
+     * nothing because a key is missing has to say so, and saying it twice from
+     * two lists is how the two drift apart.
+     */
+    public static function hasConfig(): bool
+    {
+        try {
+            self::getConfig();
+        } catch (Throwable) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Read the forwarding configuration, or refuse to send without it.
      *
      * @return array<string, mixed> The configuration
@@ -161,8 +179,30 @@ class Sentry
      */
     protected static function postEnvelope(array $items, string $eventId, array $sentryConfig): array
     {
-        $data = self::buildEnvelope($items, $eventId);
+        [$status, $output] = static::post(
+            self::buildEnvelope($items, $eventId),
+            self::envelopeHeaders((string) $sentryConfig['key']),
+            $sentryConfig,
+        );
 
+        // Deleting this call is how a tracker that answers 400 gets taken for a
+        // store, and the report is marked forwarded with nothing sent.
+        self::assertAccepted($status, $output);
+
+        return [$status, $output];
+    }
+
+    /**
+     * Send the bytes of an envelope, and read the answer.
+     *
+     * @param string               $data         The bytes of the envelope
+     * @param array<int, string>   $headers      The headers to send
+     * @param array<string, mixed> $sentryConfig The forwarding configuration
+     *
+     * @return array{int, string} The status code and the body of the answer
+     */
+    protected static function post(string $data, array $headers, array $sentryConfig): array
+    {
         $ch = curl_init();
         if ($ch === false) {
             throw new Exception('Could not init cURL');
@@ -189,7 +229,7 @@ class Sentry
         // service does not answer.
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::CONNECT_TIMEOUT);
         curl_setopt($ch, CURLOPT_TIMEOUT, self::REQUEST_TIMEOUT);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, self::envelopeHeaders((string) $sentryConfig['key']));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
@@ -199,23 +239,19 @@ class Sentry
 
         if ($errNo !== 0) {
             $errorMessage = curl_strerror($errNo);
-            $error = 'Creating the report failed, cURL error (' . $errNo . '): ' . $errorMessage;
-            Log::error($error);
 
-            throw new Exception($error);
+            // The caller logs what it catches: logging here as well would write
+            // the same failure twice.
+            throw new Exception(
+                'Creating the report failed, cURL error (' . $errNo . '): ' . $errorMessage,
+            );
         }
 
         if (! is_string($output)) {
-            $error = 'Creating the report failed: ' . json_encode($output);
-            Log::error($error);
-
-            throw new Exception($error);
+            throw new Exception('Creating the report failed: ' . json_encode($output));
         }
 
-        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        self::assertAccepted($status, $output);
-
-        return [$status, $output];
+        return [(int) curl_getinfo($ch, CURLINFO_HTTP_CODE), (string) $output];
     }
 
     /**
@@ -242,10 +278,9 @@ class Sentry
 
         // The tracker answered, and it answered with a refusal: the body holds
         // the reason, but it is not worth a whole log line.
-        $error = 'The tracker refused the envelope, status ' . $status . ': ' . substr($output, 0, 500);
-        Log::error($error);
-
-        throw new Exception($error);
+        throw new Exception(
+            'The tracker refused the envelope, status ' . $status . ': ' . substr($output, 0, 500),
+        );
     }
 
     /**

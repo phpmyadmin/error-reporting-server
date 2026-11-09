@@ -28,6 +28,7 @@ use Cake\Core\Configure;
 use Cake\Http\ServerRequest;
 use Cake\Http\TestSuite\HttpClientTrait;
 use Cake\ORM\TableRegistry;
+use Cake\Routing\Router;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use phpmock\phpunit\PHPMock;
@@ -38,6 +39,7 @@ use function json_decode;
 use function json_encode;
 use function substr_count;
 
+use const CONFIG;
 use const DS;
 
 /**
@@ -341,6 +343,50 @@ class GithubControllerTest extends TestCase
         $report = $this->Reports->get(4);
         $this->assertEquals('resolved', $report->status);
         $this->assertEquals(4, $report->sourceforge_bug_id);
+    }
+
+    /**
+     * The issue body names its report with a named route: load them, since a
+     * unit test does not go through the application.
+     */
+    protected function loadAppRoutes(): void
+    {
+        $builder = Router::createRouteBuilder('/');
+        $routes = require CONFIG . 'routes.php';
+        $this->assertIsCallable($routes);
+        $routes($builder);
+    }
+
+    /**
+     * The body of the issue is what reaches GitHub: the escaping has to be
+     * applied where the body is built, not only in the helpers it calls.
+     *
+     * Reverting getReportDescriptionText() to the raw values re-opens the
+     * injection, so this asserts on its output.
+     */
+    public function testTheIssueBodyCarriesNoLiveMarkup(): void
+    {
+        $payload = '<img src=x onerror=alert(1)>';
+        $report = $this->Reports->get(1)->toArray();
+        $report['description'] = $payload . "\n```\n<b>x</b>";
+        $report['error_name'] = $payload . ' | injected';
+        $report['error_message'] = $payload;
+        $report['pma_version'] = '<https://evil.test>';
+
+        $this->loadAppRoutes();
+
+        $controller = new GithubController(new ServerRequest());
+        $method = new ReflectionMethod($controller, 'getReportDescriptionText');
+        $method->setAccessible(true);
+        $body = (string) $method->invoke($controller, 1, $report);
+
+        $this->assertStringNotContainsString($payload, $body, 'no raw tag reaches the issue');
+        $this->assertStringNotContainsString('<b>', $body);
+        $this->assertStringNotContainsString('<https://evil.test>', $body, 'no autolink either');
+        // The value is still there, escaped: the report is not silently emptied.
+        $this->assertStringContainsString('&lt;img src=x onerror=alert(1)&gt;', $body);
+        // And the pipe did not add a column to the table.
+        $this->assertStringNotContainsString('| &lt;img src=x onerror=alert(1)&gt; | injected', $body);
     }
 
     /**

@@ -42,8 +42,12 @@ class AppController extends Controller
 {
     /**
      * Largest number of rows a data table request may ask for.
+     *
+     * The largest the page offers, so that picking it in the selector does what
+     * it says: it is bounded to keep one request from building the whole table,
+     * not to second-guess the menu.
      */
-    public const MAX_DATA_TABLE_LENGTH = 100;
+    public const MAX_DATA_TABLE_LENGTH = 1000;
 
     /**
      * Number of rows a data table request gets when it asks for none.

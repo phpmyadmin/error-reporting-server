@@ -48,8 +48,9 @@ class AppControllerPagingTest extends TestCase
     {
         return [
             'the default of the page' => ['10', 10],
-            'the maximum' => ['100', 100],
-            'one above the maximum' => ['101', 25],
+            'a page size the menu offers' => ['500', 500],
+            'the maximum' => ['1000', 1000],
+            'one above the maximum' => ['1001', 25],
             'the whole table' => ['100000000', 25],
             'zero' => ['0', 25],
             'negative' => ['-1', 25],

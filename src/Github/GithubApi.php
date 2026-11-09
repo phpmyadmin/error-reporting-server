@@ -18,6 +18,7 @@ namespace App\Github;
 
 use Cake\Core\Configure;
 use Cake\Http\Client;
+use Cake\Http\Client\Exception\ClientException;
 use Cake\Http\Client\Request as ClientRequest;
 use Cake\Http\Client\Response as ClientResponse;
 use Cake\Log\Log;
@@ -41,11 +42,6 @@ class GithubApi
      * Roles of a repository that are allowed to act on the reports.
      */
     public const WRITE_ROLES = ['admin', 'maintain', 'write'];
-
-    /**
-     * Seconds allowed to open the connection to the API.
-     */
-    public const CONNECT_TIMEOUT = 3;
 
     /**
      * Seconds allowed for a whole request to the API.
@@ -152,7 +148,19 @@ class GithubApi
             headers: $headers,
             data: $data,
         );
-        $response = $this->getClient()->sendRequest($request);
+        try {
+            $response = $this->getClient()->sendRequest($request);
+        } catch (ClientException $e) {
+            // A DNS failure, a refused connection or a timeout: the callers
+            // run on the request path, where a 500 is worse than an unanswered
+            // question.
+            Log::error('[GitHub] ' . $url . ' could not be reached: ' . $e->getMessage());
+
+            // An empty answer with a status of 0: no code path reads the body
+            // without first checking the status.
+            return $returnCode ? [null, 0] : [];
+        }
+
         assert($response instanceof ClientResponse);
 
         $this->lastResponse = $response;

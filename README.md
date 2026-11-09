@@ -21,6 +21,9 @@ The account does not have to belong to the phpMyAdmin organization:
 A developer without that write access is read-only, the action is refused with a "You need to have commit access on phpmyadmin/phpmyadmin repository on Github.com to do this action" message.
 Without signing in, only the report submission endpoint, the pages and the GitHub webhook are reachable.
 
+The write access is read from GitHub at the login and asked again every half day, so a permission granted or removed on the repository is followed without signing out.
+When GitHub cannot be asked, the answer of the session is kept — but for a day and a half at most, after which the developer is read-only until GitHub answers again.
+
 ## Report submission
 
 Reports are posted to `/incidents/create` as a JSON body, without authentication, and each stored report sends a notification email.

@@ -119,4 +119,35 @@ class AuthenticationMiddlewareTest extends TestCase
         $this->assertResponseCode(200);
         $this->assertSession(true, 'has_commit_access');
     }
+
+    /**
+     * The access is asked again every half day: a token budget, since a refused
+     * token is answered straight away when it is asked.
+     */
+    public function testTheAccessIsAskedAgainEveryHalfDay(): void
+    {
+        $this->assertSame(12 * 3600, AuthenticationMiddleware::ACCESS_RECHECK_INTERVAL);
+        $this->assertGreaterThan(
+            AuthenticationMiddleware::ACCESS_RECHECK_INTERVAL,
+            AuthenticationMiddleware::ACCESS_MAX_STALE,
+            'the stale limit must be longer than the interval it bounds',
+        );
+    }
+
+    /**
+     * Within the interval nothing is asked: the session keeps its answer.
+     */
+    public function testTheAccessIsNotAskedAgainWithinTheInterval(): void
+    {
+        $this->session([
+            'Developer.id' => 1,
+            'has_commit_access' => true,
+            'has_commit_access_at' => time() - 3600,
+            'access_checked_at' => time() - 3600,// an hour ago, well inside
+        ]);
+
+        $this->get('/stats');
+
+        $this->assertResponseCode(200);
+    }
 }

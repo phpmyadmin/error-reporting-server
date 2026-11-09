@@ -59,8 +59,8 @@ class GithubApiComponent extends Component
     }
 
     /**
-     * perform an api request given a path, the data to send, the method and whether
-     * or not to return a status.
+     * perform an api request given a path, the data to send, the method and
+     * whether or not to return a status.
      *
      * @see GithubApi::sendRequest()
      *
@@ -84,32 +84,6 @@ class GithubApiComponent extends Component
         string $access_token = '',
     ): array {
         return $this->getApi()->apiRequest($path, $data, $method, $returnStatus, $access_token);
-    }
-
-    /**
-     * perform an http request using curl given a url, the post data to send, the
-     * request method and whether or not to return a status.
-     *
-     * @see GithubApi::sendRequest()
-     *
-     * @param string       $url         the url to preform the request to
-     * @param array|string $data        the post data to send in the request
-     * @param string       $method      the method type of the request
-     * @param bool         $returnCode  whether to return the status code with the
-     *                                  request
-     * @param string       $accessToken the github access token
-     * @phpstan-param ClientRequest::METHOD_* $method
-     *
-     * @return array the returned response decoded and optionally the status code
-     */
-    public function sendRequest(
-        string $url,
-        array|string $data,
-        string $method,
-        bool $returnCode = false,
-        string $accessToken = '',
-    ): array {
-        return $this->getApi()->sendRequest($url, $data, $method, $returnCode, $accessToken);
     }
 
     /**

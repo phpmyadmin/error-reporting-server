@@ -28,6 +28,9 @@ class RecordingSentry extends Sentry
     /** @var array<int, array<int, mixed>> */
     public static array $envelopes = [];
 
+    /** The answer the fake tracker gives, when a test sets one. */
+    public static array|null $answer = null;
+
     /**
      * @param array<int, array<int, mixed>> $items
      * @param array<string, mixed>          $sentryConfig

@@ -17,6 +17,7 @@ use function date;
 use function explode;
 use function html_entity_decode;
 use function htmlspecialchars_decode;
+use function is_scalar;
 use function json_decode;
 use function openssl_random_pseudo_bytes;
 use function ord;
@@ -41,6 +42,7 @@ use const PHP_URL_QUERY;
  * @property array<int, mixed>|null $errors
  * @property stdClass|null          $exception
  * @property string|null            $exception_type
+ * @property string|null            $client_ip_hash
  * @property string|null            $locale
  * @property string|null            $php_version
  * @property string|null            $pma_version
@@ -79,17 +81,45 @@ class Report extends stdClass
         return self::fromObject((object) $obj);
     }
 
+    /**
+     * Read a client value as a string, and nothing else.
+     *
+     * @param mixed $value The value of the payload
+     */
+    private static function asString(mixed $value): string|null
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return is_scalar($value) ? (string) $value : '';
+    }
+
     public static function fromObject(stdClass $input): Report
     {
         $obj = (object) $input;
         $keys = array_keys((array) $obj);
         $report = new Report();
         foreach ($keys as $propertyName) {
+            // The payload is written by a client: a string property typed by
+            // the class throws when it is given a list or an object, and one
+            // such report stayed unforwardable for ever.
             if ($propertyName === 'steps') {
-                $report->internal____userMessage = $obj->{$propertyName};
-            } else {
-                $report->{$propertyName} = $obj->{$propertyName};
+                $report->internal____userMessage = self::asString($obj->{$propertyName});
+
+                continue;
             }
+
+            if (
+                $propertyName === 'internal____date' || $propertyName === 'internal____eventId'
+                || $propertyName === 'internal____userMessage'
+            ) {
+                $report->{$propertyName} = self::asString($obj->{$propertyName});
+
+                continue;
+            }
+
+            $report->{$propertyName} = $obj->{$propertyName};
         }
 
         return $report;
@@ -231,12 +261,26 @@ class Report extends stdClass
         $this->internal____clientIp = $clientIp;
     }
 
+    /**
+     * The salted hash of an address, the only form of it that is stored.
+     *
+     * @param string $userIp The address of the client
+     */
+    public static function hashClientIp(string $userIp): string
+    {
+        // Make finding back the Ip near to impossible.
+        return Security::hash($userIp . crc32($userIp), 'sha256', true);
+    }
+
     public function getUserId(): string
     {
         // Do not use the Ip as real data, protect the user !
         // The address comes from the request, through the trusted proxies of
         // the configuration: read from the headers of the caller it would let
         // the report choose its own identity.
+        // The address is read from the request when there is one, and from the
+        // payload the ingest stored otherwise: the forwarding runs in a command
+        // that has no request.
         $userIp = $this->internal____clientIp ?? $_SERVER['REMOTE_ADDR'] ?? '';
         $serverSoftware = $this->server_software ?? null;
         $userAgentString = $this->user_agent_string ?? null;
@@ -244,11 +288,9 @@ class Report extends stdClass
         $configurationStorage = $this->configuration_storage ?? null;
         $phpVersion = $this->php_version ?? null;
 
-        $userIp = Security::hash(
-            $userIp . crc32($userIp),
-            'sha256',
-            true, // Enable app security salt
-        );// Make finding back the Ip near to impossible
+        // The ingest stores the hash with the payload, since the forwarding runs
+        // in a command that has no request to read an address from.
+        $userIp = $this->client_ip_hash ?? self::hashClientIp($userIp);
 
         // A user can be anonymously identified using the hash of the hashed IP + server software
         // + the UA + the locale + is configuration storage enabled + php version
