@@ -22,7 +22,6 @@ use App\Model\Table\IncidentsTable;
 use App\Model\Table\NotificationsTable;
 use App\Model\Table\ReportsTable;
 use App\Report;
-use Cake\Core\Configure;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\ORM\TableRegistry;
@@ -204,28 +203,33 @@ class IncidentsController extends AppController
         $this->Reports = TableRegistry::getTableLocator()->get('Reports');
         $report = $this->Reports->findById($reportId)->all()->first()->toArray();
 
+        // What the template prints: the report, its incidents, and the fields
+        // it summarises the submission by. The two incident lists and the list
+        // of related reports used to be built here too and are printed
+        // nowhere: 27 queries per mail for three values nobody read.
         $viewVars = [
             'report' => $report,
-            'project_name' => Configure::read('GithubRepoPath'),
             'incidents' => $this->Reports->getIncidents($reportId)->toArray(),
-            'incidents_with_description' => $this->Reports->getIncidentsWithDescription($reportId),
-            'incidents_with_stacktrace' => $this->Reports->getIncidentsWithDifferentStacktrace($reportId),
-            'related_reports' => $this->Reports->getRelatedReports($reportId)->all(),
-            'status' => $this->Reports->status,
         ];
         $viewVars = array_merge($viewVars, $this->getSimilarFields($reportId));
 
         $this->Mailer->sendReportMail($viewVars);
     }
 
+    /**
+     * The distinct values of the fields a submission is summarised by.
+     *
+     * @param int $id The report
+     *
+     * @return array<string, mixed> The values the mail template prints
+     */
     protected function getSimilarFields(int $id): array
     {
-        $viewVars = [
-            'columns' => TableRegistry::getTableLocator()->get('Incidents')->summarizableFields,
-        ];
+        $fields = TableRegistry::getTableLocator()->get('Incidents')->summarizableFields;
+        $viewVars = ['columns' => $fields];
         $relatedEntries = [];
 
-        foreach (TableRegistry::getTableLocator()->get('Incidents')->summarizableFields as $field) {
+        foreach ($fields as $field) {
             [$entriesWithCount, $totalEntries] =
                     $this->Reports->getRelatedByField($field, 25, true, $id);
             $relatedEntries[$field] = $entriesWithCount->toArray();

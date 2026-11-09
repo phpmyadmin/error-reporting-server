@@ -183,20 +183,27 @@ the queue need a lock they share (the Redis engine of `Cake\Lock`, or a MySQL
 
 | Flags | What is printed |
 | ----- | --------------- |
-| none | nothing on stdout; the tracker's own transport error still goes to stderr |
+| none | nothing on stdout |
 | `-v` | one line per incident (`Incident 12: 4628 bytes, 1 event(s)`), one per refusal, and a summary |
 | `--debug` | everything `-v` prints, plus the event ids |
-| `-q` | nothing on stdout; stderr keeps the failures |
+| `-q` | nothing on stdout |
 
 `-vvv` is accepted by CakePHP but read as `-v`: the framework has no third level,
 which is why `--debug` exists.
 
-**A refused incident produces no output of its own**: it is written to
-`logs/cron_jobs.log` and printed by `-v` on stdout, and the run still exits 0.
-Only a transport failure raised by the tracker itself reaches stderr, and that is
-what a cron would mail about — repeatedly, since the incident stays pending until
-it is forwarded. Watch the backlog query rather than the cron mail: a queue that
-grows is the reliable signal, whatever the tracker answers.
+**A refused incident is logged, not printed.** The failure goes to
+`logs/cron_jobs.log` through the `cron_jobs` scope, and to stderr through the
+console log engine the command sets up — so a cron may mail it, on every run,
+for as long as the incident stays pending. The run itself still exits 0: the
+incident is retried, which is the point of the queue.
+
+**A tracker that cannot be reached stops the run**: after three failed
+connections in a row the command gives up, logs it and exits 1, instead of
+spending its whole timeout budget on every event of the backlog. A `429` with a
+`Retry-After` stops it the same way, so the next run asks later.
+
+Watch the backlog query as well as the mail: a queue that keeps growing is the
+reliable signal, whatever the tracker answers.
 
 ### Cron Job Logging
 
