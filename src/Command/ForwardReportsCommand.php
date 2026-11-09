@@ -202,7 +202,7 @@ class ForwardReportsCommand extends Command
     protected function forward(string $payload, int $reportId, ConsoleIo $io): bool
     {
         try {
-            $eventIds = Sentry::process(Report::fromString($payload));
+            $eventIds = Sentry::process($this->buildReport($payload));
         } catch (Throwable $e) {
             // The report stays unforwarded: the next run tries again, which is
             // the point of the column.
@@ -224,6 +224,20 @@ class ForwardReportsCommand extends Command
         }
 
         return true;
+    }
+
+    /**
+     * Build the report that is forwarded, from the payload of an incident.
+     *
+     * fromString() is what reads the nested values as objects: built with
+     * fromObject() from the decoded arrays, every message, culprit and frame
+     * comes out empty.
+     *
+     * @param string $payload The payload, as it was stored
+     */
+    protected function buildReport(string $payload): Report
+    {
+        return Report::fromString($payload);
     }
 
     /**

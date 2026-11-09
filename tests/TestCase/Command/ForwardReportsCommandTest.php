@@ -30,6 +30,7 @@ use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use ReflectionMethod;
 
+use function assert;
 use function bin2hex;
 use function fclose;
 use function file_get_contents;
@@ -223,6 +224,34 @@ class ForwardReportsCommandTest extends TestCase
         $this->assertIsString($payload);
 
         $events = Report::fromString($payload)->getReports();
+        $this->assertNotSame([], $events);
+        $this->assertNotSame('', $events[0]['message'], 'the message must not be empty');
+        $this->assertNotSame('', $events[0]['culprit'], 'the culprit must not be empty');
+        $this->assertNotSame(
+            [],
+            $events[0]['exception']['values'][0]->stacktrace->frames,
+            'the frames must not be empty',
+        );
+    }
+
+    /**
+     * What the command hands to the tracker must carry the data of the crash.
+     *
+     * Built with fromObject() from the payload decoded to arrays, every
+     * message, culprit and frame came out empty: fromObject() copies the top
+     * level only.
+     */
+    public function testTheCommandForwardsAPayloadThatCarriesItsData(): void
+    {
+        $this->storePayload('report_php.json');
+
+        $payload = $this->callCommand('findPayload', [$this->Reports->get(4)]);
+        $this->assertIsString($payload);
+
+        $report = $this->callCommand('buildReport', [$payload]);
+        assert($report instanceof Report);
+        $events = $report->getReports();
+
         $this->assertNotSame([], $events);
         $this->assertNotSame('', $events[0]['message'], 'the message must not be empty');
         $this->assertNotSame('', $events[0]['culprit'], 'the culprit must not be empty');
