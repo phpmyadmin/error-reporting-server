@@ -72,26 +72,46 @@ class NotificationsTable extends Table
     }
 
     /**
-     * To Add Multiple Notifications for New report.
+     * The developers a notification is created for.
      *
-     * @param int $report_id id of the new Report
+     * Read once by the ingest, which creates a report per error: reading them
+     * again for every report was one scan and one query per developer, per
+     * report.
      *
-     * @return bool|object value. True on success. False on any type of failure.
+     * @return array<int, int> The ids of the developers
      */
-    public static function addNotifications(int $report_id)
+    public static function developerIds(): array
     {
-        $devs = TableRegistry::getTableLocator()->get('Developers')->find('all');
+        $ids = [];
+        foreach (TableRegistry::getTableLocator()->get('Developers')->find('all') as $developer) {
+            $ids[] = (int) $developer->get('id');
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Create a notification for every developer, for one report.
+     *
+     * @param int                  $report_id    The report
+     * @param array<int, int>|null $developerIds The developers, read when absent
+     *
+     * @return bool True on success, false on any type of failure
+     */
+    public static function addNotifications(int $report_id, array|null $developerIds = null): bool
+    {
+        $developerIds ??= self::developerIds();
         $notoficationTable = TableRegistry::getTableLocator()->get('Notifications');
         $res = true;
-        foreach ($devs as $dev) {
+        foreach ($developerIds as $developerId) {
             $notification = $notoficationTable->newEmptyEntity();
             $notification->patch([
-                'developer_id' => $dev->get('id'),
+                'developer_id' => $developerId,
                 'report_id' => $report_id,
                 'created' => date('Y-m-d H:i:s', time()),
                 'modified' => date('Y-m-d H:i:s', time()),
             ]);
-            $res = $notoficationTable->save($notification);
+            $res = (bool) $notoficationTable->save($notification);
         }
 
         return $res;

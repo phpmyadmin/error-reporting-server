@@ -139,12 +139,6 @@ parameters:
 			path: src/Controller/IncidentsController.php
 
 		-
-			message: '#^Method App\\Controller\\IncidentsController\:\:getSimilarFields\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Controller/IncidentsController.php
-
-		-
 			message: '#^Parameter \#1 \$string of method Cake\\Http\\Response\:\:withStringBody\(\) expects string\|null, string\|false given\.$#'
 			identifier: argument.type
 			count: 3
@@ -231,7 +225,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 4
+			count: 3
 			path: src/Model/Table/IncidentsTable.php
 
 		-

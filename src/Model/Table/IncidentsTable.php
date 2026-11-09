@@ -240,6 +240,7 @@ class IncidentsTable extends Table
         // Also sanitizes the bug report
         $schematizedIncidents = $this->getSchematizedIncidents($bugReport);
         $incidentsTable = TableRegistry::getTableLocator()->get('Incidents');
+        $developerIds = null;
         $reportsTable = TableRegistry::getTableLocator()->get('Reports');
         foreach ($schematizedIncidents as $index => $si) {
             if (isset($si['error_message'])) {
@@ -283,13 +284,17 @@ class IncidentsTable extends Table
             if ($isSaved) {
                 array_push($incident_ids, $si->id);
                 if (! $closestReport) {
-                    // add notifications entry
-                    $tmpIncident = $incidentsTable->findById($si->id)->all()->first();
-                    if (! TableRegistry::getTableLocator()->get('Notifications')->addNotifications((int) $tmpIncident['report_id'])) {
+                    // The report id is the one the incident was just built
+                    // with: reading the row back only to get it was one query
+                    // per error, and the developers were read again for every
+                    // report instead of once per submission.
+                    $developerIds ??= NotificationsTable::developerIds();
+                    $savedReportId = (int) $si->get('report_id');
+                    if (! NotificationsTable::addNotifications($savedReportId, $developerIds)) {
                         Log::write(
                             'error',
                             'ERRORED: Notification::addNotifications() failed on Report#'
-                                . $tmpIncident['report_id'],
+                                . $savedReportId,
                             'alert',
                         );
                     }
@@ -325,7 +330,7 @@ class IncidentsTable extends Table
                 $error = [];
             }
 
-            $location = $this->truncate($this->stringValue($error['file'] ?? ''), 65535);
+            $location = self::truncate($this->stringValue($error['file'] ?? ''), 65535);
             $linenumber = (int) $this->stringValue($error['lineNum'] ?? '');
         } else {
             $exception = $bugReport['exception'] ?? [];
@@ -334,7 +339,7 @@ class IncidentsTable extends Table
                 : [];
             [$location, $linenumber] =
                     $this->getIdentifyingLocation($stack);
-            $location = $this->truncate($this->stringValue($location), 65535);
+            $location = self::truncate($this->stringValue($location), 65535);
             $linenumber = (int) $linenumber;
         }
 
@@ -362,11 +367,11 @@ class IncidentsTable extends Table
                 $error = [];
             }
 
-            $location = $this->truncate($this->stringValue($error['file'] ?? ''), 65535);
+            $location = self::truncate($this->stringValue($error['file'] ?? ''), 65535);
             $linenumber = (int) $this->stringValue($error['lineNum'] ?? '');
             $reportDetails = [
-                'error_message' => $this->truncate($this->stringValue($error['msg'] ?? ''), 150),
-                'error_name' => $this->truncate($this->stringValue($error['type'] ?? ''), 50),
+                'error_message' => self::truncate($this->stringValue($error['msg'] ?? ''), 150),
+                'error_name' => self::truncate($this->stringValue($error['type'] ?? ''), 50),
             ];
             $exception_type = 1;
         } else {
@@ -378,12 +383,12 @@ class IncidentsTable extends Table
             $stack = is_array($exception['stack'] ?? null) ? $exception['stack'] : [];
             [$location, $linenumber] =
                 $this->getIdentifyingLocation($stack);
-            $location = $this->truncate($this->stringValue($location), 65535);
+            $location = self::truncate($this->stringValue($location), 65535);
             $linenumber = (int) $linenumber;
 
             $reportDetails = [
-                'error_message' => $this->truncate($this->stringValue($exception['message'] ?? ''), 150),
-                'error_name' => $this->truncate($this->stringValue($exception['name'] ?? ''), 50),
+                'error_message' => self::truncate($this->stringValue($exception['message'] ?? ''), 150),
+                'error_name' => self::truncate($this->stringValue($exception['name'] ?? ''), 50),
             ];
             $exception_type = 0;
         }
@@ -415,26 +420,26 @@ class IncidentsTable extends Table
         //$bugReport = Sanitize::clean($bugReport, array('escape' => false));
         $schematizedReports = [];
         $schematizedCommonReport = [
-            'pma_version' => $this->truncate(
+            'pma_version' => self::truncate(
                 self::getStrippedPmaVersion($this->stringValue($bugReport['pma_version'] ?? '')),
                 30,
             ),
-            'php_version' => $this->truncate(
+            'php_version' => self::truncate(
                 $this->getSimpleVersion($this->stringValue($bugReport['php_version'] ?? ''), 2),
                 15,
             ),
-            'browser' => $this->truncate(
+            'browser' => self::truncate(
                 $this->stringValue($bugReport['browser_name'] ?? '') . ' '
                     . $this->getSimpleVersion($this->stringValue($bugReport['browser_version'] ?? ''), 1),
                 40,
             ),
-            'user_os' => $this->truncate($this->stringValue($bugReport['user_os'] ?? ''), 30),
-            'locale' => $this->truncate($this->stringValue($bugReport['locale'] ?? ''), 30),
-            'configuration_storage' => $this->truncate(
+            'user_os' => self::truncate($this->stringValue($bugReport['user_os'] ?? ''), 30),
+            'locale' => self::truncate($this->stringValue($bugReport['locale'] ?? ''), 30),
+            'configuration_storage' => self::truncate(
                 $this->stringValue($bugReport['configuration_storage'] ?? ''),
                 30,
             ),
-            'server_software' => $this->truncate(
+            'server_software' => self::truncate(
                 $this->getServer($this->stringValue($bugReport['server_software'] ?? '')),
                 100,
             ),
@@ -456,13 +461,13 @@ class IncidentsTable extends Table
                 $tmpReport = array_merge(
                     $schematizedCommonReport,
                     [
-                        'error_name' => $this->truncate($this->stringValue($error['type'] ?? ''), 30),
-                        'error_message' => $this->truncate($this->stringValue($error['msg'] ?? ''), 200),
-                        'script_name' => $this->truncate($this->stringValue($error['file'] ?? ''), 255),
+                        'error_name' => self::truncate($this->stringValue($error['type'] ?? ''), 30),
+                        'error_message' => self::truncate($this->stringValue($error['msg'] ?? ''), 200),
+                        'script_name' => self::truncate($this->stringValue($error['file'] ?? ''), 255),
                         'stacktrace' => json_encode(
                             is_array($error['stackTrace'] ?? null) ? $error['stackTrace'] : [],
                         ),
-                        'stackhash' => $this->truncate($this->stringValue($error['stackhash'] ?? ''), 32),
+                        'stackhash' => self::truncate($this->stringValue($error['stackhash'] ?? ''), 32),
                         'exception_type' => 1, // 'php'
                     ],
                 );
@@ -478,9 +483,9 @@ class IncidentsTable extends Table
             $tmpReport = array_merge(
                 $schematizedCommonReport,
                 [
-                    'error_name' => $this->truncate($this->stringValue($exception['name'] ?? ''), 30),
-                    'error_message' => $this->truncate($this->stringValue($exception['message'] ?? ''), 200),
-                    'script_name' => $this->truncate($this->stringValue($bugReport['script_name'] ?? ''), 255),
+                    'error_name' => self::truncate($this->stringValue($exception['name'] ?? ''), 30),
+                    'error_message' => self::truncate($this->stringValue($exception['message'] ?? ''), 200),
+                    'script_name' => self::truncate($this->stringValue($bugReport['script_name'] ?? ''), 255),
                     'stacktrace' => json_encode($stack),
                     'stackhash' => self::getStackHash($stack),
                     'exception_type' => 0, //'js'
@@ -529,7 +534,7 @@ class IncidentsTable extends Table
      *
      * @return string the value, cut to the column length if needed
      */
-    private function truncate(string $value, int $length): string
+    public static function truncate(string $value, int $length): string
     {
         if (mb_strlen($value) <= $length) {
             return $value;
