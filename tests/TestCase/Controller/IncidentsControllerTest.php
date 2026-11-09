@@ -2,18 +2,22 @@
 
 namespace App\Test\TestCase\Controller;
 
+use App\Controller\IncidentsController;
 use App\Model\Table\IncidentsTable;
 use App\Model\Table\ReportsTable;
+use App\Report;
 use App\Test\Fixture\DevelopersFixture;
 use App\Test\Fixture\IncidentsFixture;
 use App\Test\Fixture\NotificationsFixture;
 use App\Test\Fixture\ReportsFixture;
 use Cake\Core\Configure;
+use Cake\Http\ServerRequest;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\EmailTrait;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use ReflectionMethod;
 
 use function count;
 use function file_get_contents;
@@ -21,6 +25,7 @@ use function json_decode;
 use function str_repeat;
 
 use const DS;
+use const INF;
 
 class IncidentsControllerTest extends TestCase
 {
@@ -297,5 +302,49 @@ class IncidentsControllerTest extends TestCase
         $this->assertEquals('5.2.4', $report['pma_version']);
 
         $this->assertNoMailSent();
+    }
+
+    /**
+     * The report that is forwarded must carry the data of the crash.
+     *
+     * Built with fromObject() from a payload decoded to arrays, every message,
+     * culprit and frame came out empty: fromObject() copies the top level only.
+     */
+    public function testTheReportThatIsForwardedCarriesItsData(): void
+    {
+        $decoded = (array) json_decode(
+            (string) file_get_contents(TESTS . 'Fixture' . DS . 'report_php.json'),
+            true,
+        );
+
+        $controller = new IncidentsController(new ServerRequest());
+        $method = new ReflectionMethod($controller, 'buildReportForForwarding');
+        $method->setAccessible(true);
+        $report = $method->invoke($controller, IncidentsTable::capReport($decoded));
+
+        $this->assertInstanceOf(Report::class, $report);
+        $events = $report->getReports();
+        $this->assertNotSame([], $events);
+        $this->assertNotSame('', $events[0]['message'], 'the message must not be empty');
+        $this->assertNotSame('', $events[0]['culprit'], 'the culprit must not be empty');
+        $this->assertNotSame(
+            [],
+            $events[0]['exception']['values'][0]->stacktrace->frames,
+            'the frames must not be empty',
+        );
+    }
+
+    /**
+     * A payload that cannot be encoded is not forwarded at all, rather than
+     * forwarded as one empty event.
+     */
+    public function testAReportThatCannotBeEncodedIsNotForwarded(): void
+    {
+        $controller = new IncidentsController(new ServerRequest());
+        $method = new ReflectionMethod($controller, 'buildReportForForwarding');
+        $method->setAccessible(true);
+
+        // INF cannot be encoded by json_encode(), and a client can send it.
+        $this->assertNull($method->invoke($controller, ['value' => INF]));
     }
 }

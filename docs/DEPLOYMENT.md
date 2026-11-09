@@ -39,6 +39,9 @@ In order to deploy the app in this repo you need to follow these steps:
 - Copy the `oauth_example.php` to `oauth.php` and follow the instructions below
   to set the appropriate variables in the file.
 - Copy the `forwarding_example.php` to `forwarding.php` and fill the values.
+  It forwards the accepted reports to a sentry compatible tracker, one event per
+  error, using the sentry envelope protocol. Leave `Forwarding.Sentry` null to
+  disable the forwarding: the reports are stored and notified as usual.
 - Run the migrations that have been created so far to setup the database
  	- For existing systems: update and run migrations
     	`bin/cake migrations mark_migrated 20150607191654`
