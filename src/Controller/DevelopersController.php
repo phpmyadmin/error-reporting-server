@@ -206,6 +206,7 @@ class DevelopersController extends AppController
         // read again by the middleware, see AuthenticationMiddleware.
         $session->write('github_login', (string) ($userInfo['login'] ?? ''));
         $session->write('has_commit_access', (bool) $userInfo['has_commit_access']);
+        $session->write('has_commit_access_at', time());
         $session->write('access_checked_at', time());
         $session->write('read_only', ! $userInfo['has_commit_access']);
     }

@@ -49,6 +49,15 @@ class AuthenticationMiddleware implements MiddlewareInterface
     public const ACCESS_RECHECK_INTERVAL = 900;
 
     /**
+     * Longest time an answer of GitHub is kept when it cannot be asked again.
+     *
+     * A refusal is now an answer, so this only bounds the case of an API that
+     * says nothing for days: past it, the developer is read-only until it
+     * answers, rather than keeping the access they had when it last did.
+     */
+    public const ACCESS_MAX_STALE = 86400;
+
+    /**
      * The API the permission of a developer is read from.
      */
     private GithubApi|null $api = null;
@@ -191,9 +200,21 @@ class AuthenticationMiddleware implements MiddlewareInterface
         $hasCommitAccess = $this->getApi()->canCommitTo($login, $repoPath, $token);
         if ($hasCommitAccess !== null) {
             $session->write('has_commit_access', $hasCommitAccess);
+            $session->write('has_commit_access_at', time());
+            $session->write('access_checked_at', time());
+
+            return;
         }
 
-        $session->write('access_checked_at', time());
+        // The API could not be asked: keep what the session knew, but not
+        // forever, since that is the access it had when it last answered.
+        $answeredAt = (int) $session->read('has_commit_access_at');
+        if ($answeredAt > 0 && time() - $answeredAt > self::ACCESS_MAX_STALE) {
+            $session->write('has_commit_access', false);
+        }
+
+        // Retry sooner than a completed answer would, the API may be back.
+        $session->write('access_checked_at', time() - self::ACCESS_RECHECK_INTERVAL + 60);
     }
 
     protected function hasAccessToAction(ServerRequest $request): bool

@@ -55,6 +55,9 @@ class GithubApi
     /** Built on first use, then reused for every request of this instance. */
     private Client|null $client = null;
 
+    /** The answer of the last request, for the details of a refusal. */
+    private ClientResponse|null $lastResponse = null;
+
     /** @param Client|null $client Client to use, one is built when absent */
     public function __construct(Client|null $client = null)
     {
@@ -152,6 +155,7 @@ class GithubApi
         $response = $this->getClient()->sendRequest($request);
         assert($response instanceof ClientResponse);
 
+        $this->lastResponse = $response;
         $status = $response->getStatusCode();
 
         Log::debug('Response-code: ' . $status . ' for: ' . $url);
@@ -256,14 +260,17 @@ class GithubApi
 
         [$role, $status] = $this->getCollaboratorPermission($username, $repoPath, $access_token);
 
+        // A refusal of the token is not a refusal of the developer: the token
+        // of a login only carries the scopes the user agreed to share, and the
+        // endpoint refuses a read-only account as well. Ask a second time with
+        // the token of the server, which is not tied to what a user gave.
+        $refused = false;
         if ($status !== 200) {
-            // The token of a login only carries the scopes the user agreed to
-            // share, and the endpoint refuses a read-only account as well:
-            // ask a second time with the token of the server, which is not
-            // tied to what a user agreed to give.
+            $refused = $status === 401 || ($status === 403 && ! $this->isRateLimited());
             $serverToken = (string) Configure::read('GithubAccessToken');
             if ($serverToken !== '' && $serverToken !== $access_token) {
                 [$role, $status] = $this->getCollaboratorPermission($username, $repoPath, $serverToken);
+                $refused = $status === 401 || ($status === 403 && ! $this->isRateLimited());
             }
         }
 
@@ -276,9 +283,32 @@ class GithubApi
             . ' ended in a status code: ' . $status,
         );
 
-        // A 404, or a 200 without a role, is an answer: no access. Anything
-        // else is a failure to ask.
-        return $status === 404 || $status === 200 ? false : null;
+        if ($status === 200) {
+            // A 200 without a role: the answer is there, and it grants nothing.
+            return false;
+        }
+
+        if ($status === 404) {
+            // Not a collaborator of the repository.
+            return false;
+        }
+
+        // The API refused every token it was given: the developer has no
+        // access. Only an answer that says nothing, a transport error, a
+        // server error or a rate limit, leaves the question open.
+        return $refused ? false : null;
+    }
+
+    /**
+     * Whether the last answer of the API was a rate limit rather than a
+     * refusal.
+     */
+    protected function isRateLimited(): bool
+    {
+        $response = $this->lastResponse;
+
+        return $response !== null
+            && $response->getHeaderLine('X-RateLimit-Remaining') === '0';
     }
 
     /**

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Middleware;
 
+use App\Middleware\AuthenticationMiddleware;
 use App\Test\Fixture\DevelopersFixture;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+
+use function time;
 
 class AuthenticationMiddlewareTest extends TestCase
 {
@@ -76,5 +79,44 @@ class AuthenticationMiddlewareTest extends TestCase
 
         $this->assertResponseCode(307);
         $this->assertRedirect('/');
+    }
+
+    /**
+     * An answer that cannot be read must not keep the access forever: past the
+     * stale limit the developer is read-only until GitHub answers again.
+     */
+    public function testAnAccessThatCannotBeCheckedExpires(): void
+    {
+        $this->session([
+            'Developer.id' => 1,
+            'has_commit_access' => true,
+            'has_commit_access_at' => time() - AuthenticationMiddleware::ACCESS_MAX_STALE - 60,
+            'access_checked_at' => 1,// long overdue, so the check runs
+        ]);
+
+        $this->get('/stats');
+
+        // The denial destroys the session, so the code is the observable: it is
+        // a 307 only because the flag was turned to false before the decision.
+        $this->assertResponseCode(307);
+    }
+
+    /**
+     * Before the stale limit, what the session knew is kept: the API may simply
+     * be down, which is not a revocation.
+     */
+    public function testAnAccessThatCannotBeCheckedIsKeptForAWhile(): void
+    {
+        $this->session([
+            'Developer.id' => 1,
+            'has_commit_access' => true,
+            'has_commit_access_at' => time(),
+            'access_checked_at' => 1,
+        ]);
+
+        $this->get('/stats');
+
+        $this->assertResponseCode(200);
+        $this->assertSession(true, 'has_commit_access');
     }
 }

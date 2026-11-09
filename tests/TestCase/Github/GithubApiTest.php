@@ -17,6 +17,7 @@
 namespace App\Test\TestCase\Github;
 
 use App\Github\GithubApi;
+use Cake\Core\Configure;
 use Cake\Http\Client;
 use Cake\Http\Client\Response;
 use Cake\TestSuite\TestCase;
@@ -37,12 +38,20 @@ class GithubApiTest extends TestCase
      * @param int                       $status The status code to answer
      * @param array<string, mixed>|null $json   The body, as JSON
      */
-    protected function clientAnswering(int $status, array|null $json): Client
+
+    /**
+     * @param int                       $status  The status code to answer
+     * @param array<string, mixed>|null $json    The body, as JSON
+     * @param array<string, string>     $headers Extra headers to answer
+     */
+    protected function clientAnswering(int $status, array|null $json, array $headers = []): Client
     {
-        $response = new Response(
-            ['HTTP/1.1 ' . $status . ' Answer', 'Content-Type: application/json'],
-            (string) json_encode($json),
-        );
+        $lines = ['HTTP/1.1 ' . $status . ' Answer', 'Content-Type: application/json'];
+        foreach ($headers as $name => $value) {
+            $lines[] = $name . ': ' . $value;
+        }
+
+        $response = new Response($lines, (string) json_encode($json));
 
         return new class ($response) extends Client {
             public function __construct(private Response $canned)
@@ -70,13 +79,17 @@ class GithubApiTest extends TestCase
             'a role that is not a string' => [200, ['permission' => 1], false],
             'not a collaborator' => [404, null, false],
             'the API is down' => [500, null, null],
-            'a forbidden answer' => [403, null, null],
+            // A token GitHub refuses is a refusal of the token, not a promise of
+            // access: both tokens refused means the developer has none.
+            'a forbidden token' => [403, null, false],
+            'an unauthorised token' => [401, null, false],
         ];
     }
 
     #[DataProvider('roleProvider')]
     public function testTheRoleDecidesTheAccess(int $status, array|null $json, bool|null $expected): void
     {
+        Configure::delete('GithubAccessToken');
         $result = (new GithubApi($this->clientAnswering($status, $json)))->canCommitTo(
             'pma-bot',
             'phpmyadmin/phpmyadmin',
@@ -84,6 +97,23 @@ class GithubApiTest extends TestCase
         );
 
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * A rate limit is not a refusal: it is an answer that says nothing about the
+     * developer, so the caller keeps what it knew.
+     */
+    public function testARateLimitIsNotARefusal(): void
+    {
+        Configure::delete('GithubAccessToken');
+
+        $client = $this->clientAnswering(
+            403,
+            ['message' => 'API rate limit exceeded'],
+            ['X-RateLimit-Remaining' => '0'],
+        );
+
+        $this->assertNull((new GithubApi($client))->canCommitTo('pma-bot', 'phpmyadmin/phpmyadmin', 'token'));
     }
 
     public function testNoTokenIsNotAnAnswer(): void
