@@ -16,18 +16,20 @@
 
 namespace App\Test\TestCase\Github;
 
-use App\Github\PermissionChecker;
+use App\Github\GithubApi;
 use Cake\Http\Client;
 use Cake\Http\Client\Response;
 use Cake\TestSuite\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 use function json_encode;
 
 /**
  * The role of a developer is read from one answer of the GitHub API.
  */
-class PermissionCheckerTest extends TestCase
+class GithubApiTest extends TestCase
 {
     /**
      * Build a client that answers a canned response, without a connection.
@@ -47,7 +49,7 @@ class PermissionCheckerTest extends TestCase
             {
             }
 
-            public function get(string $url, array|string $data = [], array $options = []): Response
+            public function sendRequest(RequestInterface $request): ResponseInterface
             {
                 return $this->canned;
             }
@@ -75,11 +77,10 @@ class PermissionCheckerTest extends TestCase
     #[DataProvider('roleProvider')]
     public function testTheRoleDecidesTheAccess(int $status, array|null $json, bool|null $expected): void
     {
-        $result = PermissionChecker::canCommitTo(
+        $result = (new GithubApi($this->clientAnswering($status, $json)))->canCommitTo(
             'pma-bot',
             'phpmyadmin/phpmyadmin',
             'token',
-            $this->clientAnswering($status, $json),
         );
 
         $this->assertSame($expected, $result);
@@ -87,7 +88,7 @@ class PermissionCheckerTest extends TestCase
 
     public function testNoTokenIsNotAnAnswer(): void
     {
-        $this->assertNull(PermissionChecker::canCommitTo('pma-bot', 'phpmyadmin/phpmyadmin', ''));
-        $this->assertNull(PermissionChecker::canCommitTo('', 'phpmyadmin/phpmyadmin', 'token'));
+        $this->assertNull((new GithubApi())->canCommitTo('pma-bot', 'phpmyadmin/phpmyadmin', ''));
+        $this->assertNull((new GithubApi())->canCommitTo('', 'phpmyadmin/phpmyadmin', 'token'));
     }
 }

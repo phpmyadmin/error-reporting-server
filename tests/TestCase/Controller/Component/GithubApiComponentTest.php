@@ -17,6 +17,7 @@
 namespace App\Test\TestCase\Controller\Component;
 
 use App\Controller\Component\GithubApiComponent;
+use App\Github\GithubApi;
 use Cake\Controller\ComponentRegistry;
 use Cake\Core\Configure;
 use Cake\Http\TestSuite\HttpClientTrait;
@@ -199,7 +200,7 @@ class GithubApiComponentTest extends TestCase
     {
         Configure::write('GithubAccessToken', 'server-token');
 
-        $component = new class (new ComponentRegistry()) extends GithubApiComponent {
+        $api = new class extends GithubApi {
             /** @var array<int, string> */
             public array $usedTokens = [];
 
@@ -208,9 +209,9 @@ class GithubApiComponentTest extends TestCase
                 array|string $data,
                 string $method,
                 bool $returnStatus = false,
-                string $access_token = '',
+                string $accessToken = '',
             ): array {
-                $this->usedTokens[] = $access_token;
+                $this->usedTokens[] = $accessToken;
 
                 if (count($this->usedTokens) === 1) {
                     return [['message' => 'Resource not accessible'], 403];
@@ -220,8 +221,11 @@ class GithubApiComponentTest extends TestCase
             }
         };
 
+        $component = new GithubApiComponent(new ComponentRegistry());
+        $component->setApi($api);
+
         $this->assertTrue($component->canCommitTo('pma-bot', 'phpmyadmin/phpmyadmin', 'user-token'));
-        $this->assertSame(['user-token', 'server-token'], $component->usedTokens);
+        $this->assertSame(['user-token', 'server-token'], $api->usedTokens);
 
         Configure::delete('GithubAccessToken');
     }

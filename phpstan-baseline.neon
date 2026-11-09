@@ -67,12 +67,6 @@ parameters:
 			path: src/Controller/Component/GithubApiComponent.php
 
 		-
-			message: '#^Parameter \#1 \$data of function http_build_query expects array\|object, array\|string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Component/GithubApiComponent.php
-
-		-
 			message: '#^Parameter \#2 \$data of method App\\Controller\\Component\\GithubApiComponent\:\:apiRequest\(\) expects array\|string, string\|false given\.$#'
 			identifier: argument.type
 			count: 2

@@ -18,33 +18,51 @@
 
 namespace App\Controller\Component;
 
+use App\Github\GithubApi;
 use Cake\Controller\Component;
 use Cake\Core\Configure;
-use Cake\Http\Client;
 use Cake\Http\Client\Request as ClientRequest;
-use Cake\Http\Client\Response as ClientResponse;
-use Cake\Log\Log;
 use Cake\Routing\Router;
 
-use function array_merge;
-use function assert;
 use function http_build_query;
-use function in_array;
-use function is_array;
-use function is_string;
 use function json_encode;
-use function strtoupper;
 
 /**
  * Github api component handling comunication with github.
+ *
+ * The API itself lives in App\Github\GithubApi, which the middleware also
+ * uses: this component only gives it to a controller.
  */
 class GithubApiComponent extends Component
 {
     /**
+     * The shared API, built when it is first used.
+     */
+    private GithubApi|null $api = null;
+
+    /**
+     * The API of the component.
+     */
+    public function getApi(): GithubApi
+    {
+        return $this->api ??= new GithubApi();
+    }
+
+    /**
+     * Replace the API, for a test.
+     *
+     * @param GithubApi $api The API to use
+     */
+    public function setApi(GithubApi $api): void
+    {
+        $this->api = $api;
+    }
+
+    /**
      * perform an api request given a path, the data to send, the method and whether
      * or not to return a status.
      *
-     * @see GithubApiComponent::sendRequest()
+     * @see GithubApi::sendRequest()
      *
      * @param string       $path         the api path to preform the request to
      * @param array|string $data         the data to send in the request. This works with both GET
@@ -56,7 +74,7 @@ class GithubApiComponent extends Component
      * @phpstan-param ClientRequest::METHOD_* $method
      *
      * @return array the returned response decoded and optionally the status code,
-     *               see GithubApiComponent::sendRequest()
+     *               eg: array($decodedResponse, $statusCode) or just $decodedResponse
      */
     public function apiRequest(
         string $path,
@@ -65,63 +83,24 @@ class GithubApiComponent extends Component
         bool $returnStatus = false,
         string $access_token = '',
     ): array {
-        $path = 'https://api.github.com/' . $path;
-        if (strtoupper($method) === ClientRequest::METHOD_GET) {
-            $path .= '?' . http_build_query($data);
-            $data = [];
-        }
-
-        return $this->sendRequest($path, $data, $method, $returnStatus, $access_token);
-    }
-
-    /**
-     * retrieve an access token using a code that has been authorized by a user.
-     *
-     * @param string $code the code returned by github to the callback url
-     *
-     * @return string|null the access token
-     */
-    public function getAccessToken(string|null $code): string|null
-    {
-        $url = 'https://github.com/login/oauth/access_token';
-        $data = array_merge(
-            Configure::read('GithubConfig', []),
-            ['code' => $code],
-        );
-        $decodedResponse = $this->sendRequest($url, http_build_query($data), ClientRequest::METHOD_POST);
-
-        return $decodedResponse['access_token'] ?? null;
-    }
-
-    /**
-     * retrieve the github info stored on a user by his access token.
-     *
-     * @param string $accessToken the access token belonging to the user being
-     *                            requested
-     *
-     * @return array the github info returned by github as an associative array
-     */
-    public function getUserInfo(string $accessToken): array
-    {
-        return $this->apiRequest('user', [], ClientRequest::METHOD_GET, true, $accessToken);
+        return $this->getApi()->apiRequest($path, $data, $method, $returnStatus, $access_token);
     }
 
     /**
      * perform an http request using curl given a url, the post data to send, the
      * request method and whether or not to return a status.
      *
+     * @see GithubApi::sendRequest()
+     *
      * @param string       $url         the url to preform the request to
-     * @param array|string $data        the post data to send in the request. This only works with POST requests. GET requests need the data appended in the url.
-     *                           with POST requests. GET requests need the data appended
-     *                           in the url.
+     * @param array|string $data        the post data to send in the request
      * @param string       $method      the method type of the request
      * @param bool         $returnCode  whether to return the status code with the
      *                                  request
      * @param string       $accessToken the github access token
      * @phpstan-param ClientRequest::METHOD_* $method
      *
-     * @return array the returned response decoded and optionally the status code,
-     *               eg: array($decodedResponse, $statusCode) or just $decodedResponse
+     * @return array the returned response decoded and optionally the status code
      */
     public function sendRequest(
         string $url,
@@ -130,45 +109,31 @@ class GithubApiComponent extends Component
         bool $returnCode = false,
         string $accessToken = '',
     ): array {
-        Log::debug('Request-url: ' . $url);
+        return $this->getApi()->sendRequest($url, $data, $method, $returnCode, $accessToken);
+    }
 
-        $headers = [
-            'Accept' => 'application/json',
-            'User-Agent' => 'phpMyAdmin - Error Reporting Server',
-        ];
-        if ($accessToken !== '') {
-            $headers['Authorization'] = 'token ' . $accessToken;
-        }
+    /**
+     * Exchange the code of the callback for an access token.
+     *
+     * @param string $code The code github sends back
+     *
+     * @return string|null the access token, null when it was refused
+     */
+    public function getAccessToken(string $code): string|null
+    {
+        return $this->getApi()->getAccessToken($code);
+    }
 
-        $request = new ClientRequest(
-            url: $url,
-            method: $method,
-            headers: $headers,
-            data: $data,
-        );
-        $http = new Client([
-            'redirect' => 5,// Max redirects to follow
-        ]);
-        $response = $http->sendRequest($request);
-
-        $status = $response->getStatusCode();
-        assert($response instanceof ClientResponse);
-
-        Log::debug('Response-code: ' . $status . ' for: ' . $url);
-
-        $decodedResponse = $response->getJson();
-        if ($status === 401) {
-            Log::error('[GitHub] error ' . $status . ' on ' . $url . ' and data ' . json_encode($decodedResponse) . ' maybe the token is expired ?');
-        }
-
-        if ($returnCode) {
-            return [
-                $decodedResponse,
-                $status,
-            ];
-        }
-
-        return $decodedResponse;
+    /**
+     * Read the account of the token.
+     *
+     * @param string $accessToken the github access token
+     *
+     * @return array the github info returned by github as an associative array
+     */
+    public function getUserInfo(string $accessToken): array
+    {
+        return $this->getApi()->getUserInfo($accessToken);
     }
 
     /**
@@ -217,63 +182,9 @@ class GithubApiComponent extends Component
      */
     public function canCommitTo(string $username, string $repoPath, string $access_token): bool
     {
-        [$role, $status] = $this->getCollaboratorPermission($username, $repoPath, $access_token);
-
-        if ($status !== 200) {
-            // The token of a login only carries the scopes the user agreed to
-            // share, and the endpoint refuses a read-only account as well:
-            // ask a second time with the token of the server, which is not
-            // tied to what a user agreed to give.
-            $serverToken = (string) Configure::read('GithubAccessToken');
-            if ($serverToken !== '' && $serverToken !== $access_token) {
-                [$role, $status] = $this->getCollaboratorPermission($username, $repoPath, $serverToken);
-            }
-        }
-
-        if ($status !== 200) {
-            Log::error(
-                'Collaborator permission call for ' . $username . ' on ' . $repoPath
-                . ' ended in a status code: ' . $status,
-            );
-
-            return false;
-        }
-
-        if ($role === null) {
-            Log::error('Collaborator permission call for ' . $username . ' on ' . $repoPath . ' returned no data');
-
-            return false;
-        }
-
-        return in_array($role, ['admin', 'maintain', 'write'], true);
-    }
-
-    /**
-     * Read the permission of a user on a repository.
-     *
-     * @param string $username     GitHub login of the user
-     * @param string $repoPath     The repo slug
-     * @param string $access_token Token used to ask the API
-     *
-     * @return array{string|null, int} The role of the user, and the status code
-     */
-    private function getCollaboratorPermission(string $username, string $repoPath, string $access_token): array
-    {
-        [$permission, $status] = $this->apiRequest(
-            'repos/' . $repoPath . '/collaborators/' . $username . '/permission',
-            [],
-            ClientRequest::METHOD_GET,
-            true,
-            $access_token,
-        );
-
-        if (! is_array($permission)) {
-            return [null, $status];
-        }
-
-        $role = $permission['permission'] ?? $permission['role_name'] ?? null;
-
-        return [is_string($role) ? $role : null, $status];
+        // A controller cannot keep an older answer: an unanswered check is a
+        // refusal.
+        return $this->getApi()->canCommitTo($username, $repoPath, $access_token) ?? false;
     }
 
     /**

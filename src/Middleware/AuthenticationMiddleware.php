@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
-use App\Github\PermissionChecker;
+use App\Github\GithubApi;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Http\Exception\ForbiddenException;
@@ -41,6 +41,35 @@ class AuthenticationMiddleware implements MiddlewareInterface
         ],
         'Incidents' => ['view'],
     ];
+
+    /**
+     * Seconds the answer of GitHub about the access of a developer is kept
+     * before it is asked again.
+     */
+    public const ACCESS_RECHECK_INTERVAL = 900;
+
+    /**
+     * The API the permission of a developer is read from.
+     */
+    private GithubApi|null $api = null;
+
+    /**
+     * Replace the API, for a test.
+     *
+     * @param GithubApi $api The API to use
+     */
+    public function setApi(GithubApi $api): void
+    {
+        $this->api = $api;
+    }
+
+    /**
+     * The API of the middleware, built when it is first used.
+     */
+    protected function getApi(): GithubApi
+    {
+        return $this->api ??= new GithubApi();
+    }
 
     /**
      * Process the request
@@ -151,7 +180,7 @@ class AuthenticationMiddleware implements MiddlewareInterface
     {
         $session = $request->getSession();
         $checkedAt = (int) $session->read('access_checked_at');
-        if ($checkedAt > 0 && time() - $checkedAt < PermissionChecker::RECHECK_INTERVAL) {
+        if ($checkedAt > 0 && time() - $checkedAt < self::ACCESS_RECHECK_INTERVAL) {
             return;
         }
 
@@ -159,7 +188,7 @@ class AuthenticationMiddleware implements MiddlewareInterface
         $token = (string) $session->read('access_token');
         $repoPath = (string) Configure::read('GithubRepoPath');
 
-        $hasCommitAccess = PermissionChecker::canCommitTo($login, $repoPath, $token);
+        $hasCommitAccess = $this->getApi()->canCommitTo($login, $repoPath, $token);
         if ($hasCommitAccess !== null) {
             $session->write('has_commit_access', $hasCommitAccess);
         }
