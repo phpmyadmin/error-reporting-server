@@ -93,7 +93,16 @@ class IncidentsHelper extends AppHelper
                     json_decode($incident['stacktrace'], true);
         }
 
-        foreach ($incident['stacktrace'] as $level) {
+        // The stack comes from an unauthenticated client: a list whose
+        // entries are not frames is not a stack, and reading a field of a
+        // string raises a TypeError that takes the whole page down.
+        $frames = is_array($incident['stacktrace']) ? $incident['stacktrace'] : [];
+
+        foreach ($frames as $level) {
+            if (! is_array($level)) {
+                continue;
+            }
+
             $exception_type = ($incident['exception_type'] ? 'php' : 'js');
             $html .= $this->getStackLevelInfo($level, $exception_type);
             $html .= "<pre class='brush: "

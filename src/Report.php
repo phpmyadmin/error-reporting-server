@@ -18,11 +18,14 @@ use function explode;
 use function html_entity_decode;
 use function htmlspecialchars_decode;
 use function is_scalar;
+use function is_string;
 use function json_decode;
 use function openssl_random_pseudo_bytes;
 use function ord;
 use function parse_str;
 use function parse_url;
+use function property_exists;
+use function str_starts_with;
 use function strpos;
 
 use const ENT_HTML5;
@@ -110,12 +113,18 @@ class Report extends stdClass
                 continue;
             }
 
-            if (
-                $propertyName === 'internal____date' || $propertyName === 'internal____eventId'
-                || $propertyName === 'internal____userMessage'
-            ) {
+            // Every property this class types itself, and nothing else: an
+            // unknown internal key would either throw on assignment or become
+            // a dynamic property nobody reads.
+            if (property_exists($report, $propertyName)) {
                 $report->{$propertyName} = self::asString($obj->{$propertyName});
 
+                continue;
+            }
+
+            if (str_starts_with($propertyName, 'internal____')) {
+                // Not a property of this class: the payload does not get to
+                // create one, and the forwarding must not fail over it.
                 continue;
             }
 
@@ -175,7 +184,9 @@ class Report extends stdClass
         $version = explode('.', $release, 3);
         $tags = new stdClass();
         $tags->version_major = $version[0];
-        $tags->version_series = $version[0] . '.' . $version[1];
+        // A version without a minor part, or no version at all, is what a
+        // client can send: read the second part only when there is one.
+        $tags->version_series = $version[0] . (isset($version[1]) ? '.' . $version[1] : '');
         //$tags->pma_version = $this->{'pma_version'} ?? null;
         //$tags->browser_name = $this->{'browser_name'} ?? null;
         //$tags->browser_version = $this->{'browser_version'} ?? null;
@@ -203,8 +214,20 @@ class Report extends stdClass
         return $contexts;
     }
 
-    public function decode(string $text): string
+    /**
+     * Decode the entities of a value of the payload.
+     *
+     * The payload is written by a client: the value is any JSON type, and a
+     * list or an object reached this method as one.
+     *
+     * @param mixed $text The value of the payload
+     */
+    public function decode(mixed $text): string
     {
+        if (! is_string($text)) {
+            return '';
+        }
+
         return htmlspecialchars_decode(html_entity_decode($text, ENT_QUOTES | ENT_HTML5));
     }
 
