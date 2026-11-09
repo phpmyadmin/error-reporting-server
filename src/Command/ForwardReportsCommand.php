@@ -17,6 +17,8 @@
 namespace App\Command;
 
 use App\Forwarding\Sentry;
+use App\Forwarding\TrackerThrottledException;
+use App\Forwarding\TrackerUnreachableException;
 use App\Model\Table\IncidentsTable;
 use App\Report;
 use Cake\Command\Command;
@@ -152,9 +154,12 @@ class ForwardReportsCommand extends Command
             return self::CODE_ERROR;
         }
 
+        Sentry::reset();
+
         try {
             return $this->forwardPendingIncidents((int) $args->getOption('limit'), $io);
         } finally {
+            Sentry::reset();
             $this->releaseLock($lock);
         }
     }
@@ -198,7 +203,16 @@ class ForwardReportsCommand extends Command
                 // An incident that is not marked stays pending for the next
                 // run, and its id is already behind the cursor: it is not read
                 // twice by this run, which would otherwise never end.
-                $this->forwardIncident($incident, $io) ? $sent++ : $failed++;
+                try {
+                    $this->forwardIncident($incident, $io) ? $sent++ : $failed++;
+                } catch (TrackerUnreachableException | TrackerThrottledException $e) {
+                    // Nothing more will reach the tracker in this run.
+                    Log::error('Stopping the run: ' . $e->getMessage(), 'cron_jobs');
+                    $io->error($e->getMessage());
+                    $io->verbose('Forwarded ' . $sent . ' incident(s) before stopping.');
+
+                    return self::CODE_ERROR;
+                }
             }
 
             if ($read < $size) {
@@ -225,21 +239,40 @@ class ForwardReportsCommand extends Command
         $incidentId = (int) $incident->get('id');
 
         try {
-            $payload = $incident->get('full_report');
-            if (! is_string($payload) || $payload === '') {
+            $stored = $incident->get('full_report');
+            if (! is_string($stored) || $stored === '') {
                 // Nothing will ever be forwarded for this incident.
                 $this->markForwarded($incidents, $incident, $io, 'carries no report');
 
                 return true;
             }
 
-            if (! $this->forward($payload, $incident, $io)) {
+            // The payload of this occurrence only: sending the whole submission
+            // once per occurrence is how the same error reaches the tracker
+            // again and again under new ids.
+            $payload = $this->payloadForIncident($stored, $incident);
+            if ($payload === null) {
+                Log::error(
+                    'The incident ' . $incidentId . ' has no error in the payload it was built from',
+                    'cron_jobs',
+                );
+                $io->verbose('Incident ' . $incidentId . ' skipped: no matching error in its payload');
+                $this->markForwarded($incidents, $incident, $io, 'has no error in its payload');
+
+                return true;
+            }
+
+            if (! $this->forward($payload, $incidentId, $io)) {
                 return false;
             }
 
             $this->markForwarded($incidents, $incident, $io);
 
             return true;
+        } catch (TrackerUnreachableException | TrackerThrottledException $e) {
+            // These two do not concern one incident: asking again in this run
+            // costs the timeout of every event and drains nothing.
+            throw $e;
         } catch (Throwable $e) {
             // One incident must not stop the drain: a deadlock, a lost
             // connection, anything the forward itself does not catch.
@@ -254,26 +287,22 @@ class ForwardReportsCommand extends Command
     }
 
     /**
-     * Forward the payload of one incident.
+     * Forward one incident, from the error it was built from.
      *
      * The stored payload is the whole submission, which carries one entry per
      * error: send the entry of this incident only, or every occurrence would
      * replay every error of the report into the tracker.
      *
-     * @param string          $payload  The payload, as it was stored
-     * @param EntityInterface $incident The incident it belongs to
-     * @param ConsoleIo       $io       The console
+     * @param string    $payload    The payload to send
+     * @param int       $incidentId The incident it belongs to
+     * @param ConsoleIo $io         The console
      *
      * @return bool True when the tracker took it
      */
-    protected function forward(string $payload, EntityInterface $incident, ConsoleIo $io): bool
+    protected function forward(string $payload, int $incidentId, ConsoleIo $io): bool
     {
-        $incidentId = (int) $incident->get('id');
-
         try {
-            $eventIds = Sentry::process(
-                Report::fromString($this->payloadForIncident($payload, $incident)),
-            );
+            $eventIds = Sentry::process(Report::fromString($payload));
         } catch (Throwable $e) {
             // The incident stays unforwarded: the next run tries again, which
             // is the point of the column.
@@ -281,9 +310,10 @@ class ForwardReportsCommand extends Command
                 'Could not forward the incident ' . $incidentId . ': ' . $e->getMessage(),
                 'cron_jobs',
             );
-            // Logged, and shown with -v: an incident the tracker refuses stays
-            // pending, so printing it on stderr at every run would make cron
-            // mail about the same payload for ever.
+            // An incident the tracker refuses stays pending and is retried on
+            // every run, so this is logged once per attempt, to the cron_jobs
+            // log: that is the trail, and a cron may mail it while the
+            // incident is stuck. The console echo of it is what -v adds.
             $io->verbose('Incident ' . $incidentId . ' refused: ' . $e->getMessage());
 
             return false;
@@ -303,12 +333,18 @@ class ForwardReportsCommand extends Command
     /**
      * Narrow the stored payload to the error of one incident.
      *
+     * The stored payload is the whole submission, and it carries one entry per
+     * error. Sending it whole for every incident of a report would send every
+     * error once per occurrence, with a fresh id each time: the tracker cannot
+     * tell those apart and counts them again.
+     *
      * @param string          $payload  The payload of the submission
      * @param EntityInterface $incident The incident to send
      *
-     * @return string The payload that carries that error only
+     * @return string|null The payload that carries that error only, null when
+     *                     the error it was built from cannot be found
      */
-    protected function payloadForIncident(string $payload, EntityInterface $incident): string
+    protected function payloadForIncident(string $payload, EntityInterface $incident): string|null
     {
         $decoded = json_decode($payload, true);
         if (! is_array($decoded) || ! isset($decoded['errors']) || ! is_array($decoded['errors'])) {
@@ -319,7 +355,7 @@ class ForwardReportsCommand extends Command
 
         $error = $this->findErrorOfIncident($decoded['errors'], $incident);
         if ($error === null) {
-            return $payload;
+            return null;
         }
 
         $decoded['errors'] = [$error];
@@ -330,24 +366,40 @@ class ForwardReportsCommand extends Command
     /**
      * The entry of the payload that built this incident.
      *
+     * The three fields compared here are the three the ingest copies from the
+     * error into the incident, cut to the width of their column, so the
+     * comparison is exact. Two errors that differ in none of them are the same
+     * error as far as anything can tell, and sending either is the same.
+     *
      * @param array<int, mixed> $errors   The errors of the payload
      * @param EntityInterface   $incident The incident
      *
-     * @return array<string, mixed>|null The entry, null when it cannot be told
+     * @return array<string, mixed>|null The entry, null when there is none
      */
     protected function findErrorOfIncident(array $errors, EntityInterface $incident): array|null
     {
         $file = (string) $incident->get('script_name');
-        $line = (int) $incident->get('linenumber');
+        $name = (string) $incident->get('error_name');
+        $message = (string) $incident->get('error_message');
 
         foreach ($errors as $error) {
             if (! is_array($error)) {
                 continue;
             }
 
-            if ((int) ($error['line'] ?? 0) === $line && (string) ($error['file'] ?? '') === $file) {
-                return $error;
+            if (IncidentsTable::truncate((string) ($error['file'] ?? ''), 255) !== $file) {
+                continue;
             }
+
+            if (IncidentsTable::truncate((string) ($error['type'] ?? ''), 30) !== $name) {
+                continue;
+            }
+
+            if (IncidentsTable::truncate((string) ($error['msg'] ?? ''), 200) !== $message) {
+                continue;
+            }
+
+            return $error;
         }
 
         return null;

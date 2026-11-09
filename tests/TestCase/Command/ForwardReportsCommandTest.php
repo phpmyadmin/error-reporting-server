@@ -218,9 +218,11 @@ class ForwardReportsCommandTest extends TestCase
      */
     public function testThePayloadOfAnIncidentCarriesItsOwnErrorOnly(): void
     {
+        // The shape the ingest stores: one incident per error, carrying that
+        // error's file, type and message, cut to the width of their column.
         $errors = [
-            ['msg' => 'first', 'type' => 'Error', 'file' => '/a.php', 'line' => 1, 'stackTrace' => []],
-            ['msg' => 'second', 'type' => 'Error', 'file' => '/b.php', 'line' => 2, 'stackTrace' => []],
+            ['msg' => 'first', 'type' => 'Warning', 'file' => '/a.php', 'lineNum' => 10, 'stackTrace' => []],
+            ['msg' => 'second', 'type' => 'Notice', 'file' => '/a.php', 'lineNum' => 20, 'stackTrace' => []],
         ];
         $payload = (string) json_encode([
             'pma_version' => '5.2.0',
@@ -229,20 +231,38 @@ class ForwardReportsCommandTest extends TestCase
         ]);
 
         $incidents = $this->Incidents->find()->orderBy(['Incidents.id' => 'ASC'])->limit(2)->all()->toArray();
-        $incidents[0]->set('full_report', $payload);
-        $incidents[0]->set('script_name', '/a.php');
-        $incidents[0]->set('linenumber', 1);
-        $incidents[1]->set('full_report', $payload);
-        $incidents[1]->set('script_name', '/b.php');
-        $incidents[1]->set('linenumber', 2);
+        $incidents[0]->patch(['full_report' => $payload, 'script_name' => '/a.php', 'error_name' => 'Warning', 'error_message' => 'first']);
+        $incidents[1]->patch(['full_report' => $payload, 'script_name' => '/a.php', 'error_name' => 'Notice', 'error_message' => 'second']);
 
         $first = json_decode((string) $this->callCommand('payloadForIncident', [$payload, $incidents[0]]), true);
         $second = json_decode((string) $this->callCommand('payloadForIncident', [$payload, $incidents[1]]), true);
 
+        // Two errors of the same file: each incident sends its own, or the
+        // first would be sent twice and the second never.
         $this->assertCount(1, $first['errors'], 'one error per incident');
         $this->assertSame('first', $first['errors'][0]['msg']);
         $this->assertCount(1, $second['errors'], 'one error per incident');
         $this->assertSame('second', $second['errors'][0]['msg']);
+    }
+
+    /**
+     * An incident whose error cannot be found in the payload it names sends
+     * nothing, rather than the whole submission again.
+     */
+    public function testAnIncidentWithNoMatchingErrorSendsNothing(): void
+    {
+        $payload = (string) json_encode([
+            'pma_version' => '5.2.0',
+            'exception_type' => 'php',
+            'errors' => [['msg' => 'only', 'type' => 'Error', 'file' => '/a.php', 'lineNum' => 1]],
+        ]);
+        $incident = $this->Incidents->find()->orderBy(['Incidents.id' => 'ASC'])->firstOrFail();
+        $incident->patch(['full_report' => $payload, 'script_name' => '/elsewhere.php', 'error_name' => 'Error', 'error_message' => 'only']);
+
+        $this->assertNull(
+            $this->callCommand('payloadForIncident', [$payload, $incident]),
+            'the whole submission must not be replayed for one occurrence',
+        );
     }
 
     /**
