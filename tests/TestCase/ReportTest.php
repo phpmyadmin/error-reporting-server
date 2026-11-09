@@ -7,6 +7,7 @@ use Cake\Utility\Security;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+use function array_unique;
 use function file_get_contents;
 use function json_decode;
 
@@ -192,7 +193,7 @@ class ReportTest extends TestCase
                 ],
                 'message' => 'can\'t access property "transaction", db is null',
                 'culprit' => 'index.php',
-                'event_id' => $report->getEventId(),
+                'event_id' => $reports[0]['event_id'],
             ],
         ], $reports);
         $this->assertEquals([
@@ -296,7 +297,7 @@ class ReportTest extends TestCase
                 ],
                 'message' => 'a is not defined',
                 'culprit' => 'tbl_relation.php',
-                'event_id' => $report->getEventId(),
+                'event_id' => $reports[0]['event_id'],
             ],
         ], $reports);
         $this->assertEquals([
@@ -338,15 +339,21 @@ class ReportTest extends TestCase
         );
     }
 
-    public function testGetEventIdIsCached(): void
+    public function testNewEventIdIsAVersion4Uuid(): void
     {
         $report = new Report();
 
-        $eventId = $report->getEventId();
+        $eventId = $report->newEventId();
 
-        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $eventId);
-        $this->assertSame($eventId, $report->getEventId());
-        $this->assertNotSame($eventId, (new Report())->getEventId());
+        // The 32 hex characters every Sentry SDK sends, with the version 4 and
+        // the variant of RFC 4122 that a receiver checks: the tracker answers
+        // the page of an issue whose user report it cannot read with an error,
+        // and the id it cannot read is this one.
+        $this->assertMatchesRegularExpression(
+            '/^[0-9a-f]{8}[0-9a-f]{4}4[0-9a-f]{3}[89ab][0-9a-f]{15}$/',
+            $eventId,
+        );
+        $this->assertNotSame($eventId, $report->newEventId());
     }
 
     public function testPhpPayloadFromObject(): void
@@ -636,11 +643,12 @@ class ReportTest extends TestCase
         $this->assertCount(3, $multiData);
         $this->assertCount(3, $reports);
 
-        $eventId = $report->getEventId();
-        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $eventId);
-
+        $eventIds = [];
         foreach ($reports as $index => $singleReport) {
-            $this->assertSame($eventId, $singleReport['event_id']);
+            // Each event of a report needs its own id: a tracker keys its events
+            // by it, and the same id twice made it keep the last one only.
+            $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $singleReport['event_id']);
+            $eventIds[] = $singleReport['event_id'];
             $this->assertSame('2024-01-02T03:04:05+00:00', $singleReport['timestamp']);
             $this->assertSame('php', $singleReport['platform']);
             $this->assertSame($multiData[$index]['level'], $singleReport['level']);
@@ -656,6 +664,8 @@ class ReportTest extends TestCase
             $this->assertEquals((object) [], $singleReport['extra']);
             $this->assertArrayNotHasKey('transaction', $singleReport);
         }
+
+        $this->assertCount(3, array_unique($eventIds), 'every event of a report needs its own id');
 
         $this->assertSame('Undefined variable: haha', $reports[0]['message']);
         $this->assertSame('Undefined variable: hihi', $reports[1]['message']);

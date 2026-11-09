@@ -11,6 +11,7 @@ use function array_filter;
 use function array_keys;
 use function array_merge;
 use function bin2hex;
+use function chr;
 use function crc32;
 use function date;
 use function explode;
@@ -18,6 +19,7 @@ use function html_entity_decode;
 use function htmlspecialchars_decode;
 use function json_decode;
 use function openssl_random_pseudo_bytes;
+use function ord;
 use function parse_str;
 use function parse_url;
 use function strpos;
@@ -51,8 +53,6 @@ use const PHP_URL_QUERY;
 class Report extends stdClass
 {
     private string|null $internal____date = null;
-
-    private string|null $internal____eventId = null;
 
     private string|null $internal____userMessage = null;
 
@@ -100,15 +100,26 @@ class Report extends stdClass
         $this->internal____date = $timestamp;
     }
 
-    public function getEventId(): string
+    /**
+     * A new identity for one event.
+     *
+     * A report is sent as one event per error, and the tracker keys its events
+     * by this id: the same id twice makes the second event overwrite the first.
+     * The shape matters as much: a receiver validates an event id as a UUID,
+     * and one of another shape is stored, then refused when a page reads it
+     * back — the user report that points at it takes its issue page down.
+     */
+    public function newEventId(): string
     {
-        $eventId = $this->internal____eventId;
-        if ($eventId === null) {
-            $eventId = bin2hex((string) openssl_random_pseudo_bytes(16));
-            $this->internal____eventId = $eventId;
-        }
+        $bytes = (string) openssl_random_pseudo_bytes(16);
 
-        return $eventId;
+        // Version 4 and the variant of RFC 4122, which is what the Sentry SDKs
+        // send: of the 32 hex characters, the 13th says the version and the
+        // 17th the variant, so these two bits of the random bytes are fixed.
+        $bytes[6] = chr(ord($bytes[6]) & 0x0f | 0x40);
+        $bytes[8] = chr(ord($bytes[8]) & 0x3f | 0x80);
+
+        return bin2hex($bytes);
     }
 
     public function getTimestampUTC(): string
@@ -426,7 +437,7 @@ class Report extends stdClass
             $reports = [];
             foreach ($this->getMultiDataToSend() as $data) {
                 $reports[] = array_merge($this->toJson(), $data, [
-                    'event_id' => $this->getEventId(),
+                    'event_id' => $this->newEventId(),
                 ]);
             }
 
@@ -438,7 +449,7 @@ class Report extends stdClass
                 $this->toJson(),
                 $this->getExceptionJs(),
                 [
-                    'event_id' => $this->getEventId(),
+                    'event_id' => $this->newEventId(),
                 ],
             ),
         ];
