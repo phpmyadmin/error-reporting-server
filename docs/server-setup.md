@@ -80,21 +80,28 @@ The HTTPS redirection and the certificates are left to the web server.
 
 ## Reverse proxy
 
-The address of a client is used to salt the identity of a report, and it is
-recorded with a login. It is read from the connection, and `X-Forwarded-For` is
-believed only for the proxies listed in the `Security.trustedProxies` key of
+The address of a client salts the identity of a report, and it is recorded with
+a login. It is read from the connection, and `X-Forwarded-For` is believed only
+for the addresses listed in the `Security.trustedProxies` key of
 ``config/app.php``, which is empty by default:
 
 ```php
 'Security' => [
-    'trustedProxies' => ['10.0.0.2'],   // the address of the proxy, not its network
+    'trustedProxies' => ['203.0.113.9'],
 ],
 ```
 
-The header is written by whoever sends the request: left to a proxy that is not
-listed, it is ignored and the address of the proxy is recorded instead. Listed
-for a network the caller can reach, it lets the caller choose the address that
-is stored and shown to the developers.
+Two things are worth knowing before setting it:
+
+- The list is **empty by default and that is the safe value**. The header is
+  written by whoever sends the request: believed from anywhere, it lets the
+  caller choose the address that is stored and shown to the developers.
+- **CakePHP compares the header against this list, it does not check that the
+  connection comes from a proxy.** Read `ServerRequest::clientIp()` before
+  relying on it for anything but the salted identity: with a non-empty list, a
+  request that carries `X-Forwarded-For` has that value used even when the
+  connection did not come through the proxy. Behind a proxy that overwrites the
+  header, that is what you want; on a directly exposed server, leave it empty.
 
 ## Rewrites
 

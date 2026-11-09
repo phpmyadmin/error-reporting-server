@@ -21,6 +21,7 @@ namespace App;
 use App\Middleware\AuthenticationMiddleware;
 use App\Middleware\CsrfProtectionMiddleware;
 use App\Middleware\HostHeaderMiddleware;
+use App\Middleware\TrustedProxiesMiddleware;
 use Cake\Core\Configure;
 use Cake\Core\ContainerInterface;
 use Cake\Datasource\FactoryLocator;
@@ -92,6 +93,7 @@ class Application extends BaseApplication
             ->add(new CsrfProtectionMiddleware(['httponly' => true, 'field' => '_csrfToken', 'samesite' => 'Strict']))
 
             // Check for access controls
+            ->add(new TrustedProxiesMiddleware())
             ->add(new AuthenticationMiddleware());
 
         return $middlewareQueue;
