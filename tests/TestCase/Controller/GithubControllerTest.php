@@ -366,6 +366,26 @@ class GithubControllerTest extends TestCase
         $this->assertStringNotContainsString('@someone', $cell->invoke($controller, 'hi @someone'));
     }
 
+    /**
+     * GitHub renders raw HTML in a comment, in a cell or in a fenced block:
+     * a tag has to be escaped, and an autolink has to be broken.
+     */
+    public function testAMarkupValueIsNotRendered(): void
+    {
+        $controller = new GithubController(new ServerRequest());
+        $cell = new ReflectionMethod($controller, 'tableCell');
+        $cell->setAccessible(true);
+        $fenced = new ReflectionMethod($controller, 'fencedText');
+        $fenced->setAccessible(true);
+
+        foreach (['<img src=x onerror=alert(1)>', '<https://evil.test>', '<b>bold</b>'] as $value) {
+            foreach ([$cell, $fenced] as $method) {
+                $out = (string) $method->invoke($controller, $value);
+                $this->assertStringNotContainsString('<', $out, 'no tag and no autolink survives');
+            }
+        }
+    }
+
     public function testAFreeTextCannotCloseItsFence(): void
     {
         $controller = new GithubController(new ServerRequest());

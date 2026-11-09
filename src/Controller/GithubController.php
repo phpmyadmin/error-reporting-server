@@ -324,7 +324,26 @@ class GithubController extends AppController
         $value = (string) preg_replace('/\s+/', ' ', $value);
         $value = str_replace('|', '\\|', $value);
 
+        // Free text is neutralised by the cell it sits in, and the fence is
+        // what keeps an HTML tag from being rendered: do it here too.
+        $value = $this->neutralizeMarkup($value);
+
         return $this->neutralizeMentions($value);
+    }
+
+    /**
+     * Stop a value from being rendered as HTML.
+     *
+     * The value goes to GitHub, which renders raw HTML in a comment and in a
+     * table cell alike: escaping the tag is what keeps it text.
+     *
+     * @param string $value The value
+     *
+     * @return string The value, with its angle brackets escaped
+     */
+    protected function neutralizeMarkup(string $value): string
+    {
+        return str_replace(['<', '>'], ['&lt;', '&gt;'], $value);
     }
 
     /**
@@ -338,7 +357,8 @@ class GithubController extends AppController
     {
         // A fence of three backticks inside the value would end the block, and
         // an HTML tag would be rendered by GitHub.
-        $value = str_replace(['```', '<'], ["`\u{200B}`\u{200B}`", '&lt;'], $value);
+        $value = str_replace('```', "`\u{200B}`\u{200B}`", $value);
+        $value = $this->neutralizeMarkup($value);
 
         return "```\n" . $this->neutralizeMentions($value) . "\n```";
     }
