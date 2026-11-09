@@ -40,9 +40,11 @@ use function is_int;
 use function is_scalar;
 use function is_string;
 use function json_encode;
+use function max;
 use function mb_strimwidth;
 use function mb_strlen;
 use function mb_substr;
+use function min;
 use function preg_match;
 use function preg_replace;
 use function str_ends_with;
@@ -202,9 +204,13 @@ class IncidentsTable extends Table
         // Old versions are not maintained anymore, their reports are noise.
         $pmaVersion = $bugReport['pma_version'] ?? '';
         if (! self::isSupportedPmaVersion(is_string($pmaVersion) ? $pmaVersion : '')) {
+            // The value is written by a client: a newline in it would forge a
+            // line of the log, and a long one would fill the disk before the
+            // body cap below is applied.
             Log::info(
                 'Ignoring a report of the unsupported phpMyAdmin version "'
-                . (is_string($pmaVersion) ? $pmaVersion : '') . '".',
+                . substr((string) preg_replace('/[^\x20-\x7E]/', '?', is_string($pmaVersion) ? $pmaVersion : ''), 0, 40)
+                . '".',
                 'cron_jobs',
             );
 
@@ -311,6 +317,20 @@ class IncidentsTable extends Table
     }
 
     /**
+     * Read a line number the way an int(11) column can hold it.
+     *
+     * The value is written by a client: a line of ten digits does not fit, and
+     * a strict server refuses the whole insert over it. Both the lookup and the
+     * stored value go through here, so they keep agreeing.
+     *
+     * @param mixed $value The value of the payload
+     */
+    protected function lineNumber(mixed $value): int
+    {
+        return max(0, min((int) $this->stringValue($value), self::MAX_LINE_NUMBER));
+    }
+
+    /**
      * retrieves the closest report to a given bug report.
      *
      * it checks for another report with the same line number, filename and
@@ -331,7 +351,7 @@ class IncidentsTable extends Table
             }
 
             $location = self::truncate($this->stringValue($error['file'] ?? ''), 65535);
-            $linenumber = (int) $this->stringValue($error['lineNum'] ?? '');
+            $linenumber = $this->lineNumber($error['lineNum'] ?? '');
         } else {
             $exception = $bugReport['exception'] ?? [];
             $stack = is_array($exception) && is_array($exception['stack'] ?? null)
@@ -340,7 +360,7 @@ class IncidentsTable extends Table
             [$location, $linenumber] =
                     $this->getIdentifyingLocation($stack);
             $location = self::truncate($this->stringValue($location), 65535);
-            $linenumber = (int) $linenumber;
+            $linenumber = $this->lineNumber($linenumber);
         }
 
         return TableRegistry::getTableLocator()->get('Reports')->findByLocationAndLinenumberAndPmaVersion(
@@ -368,7 +388,7 @@ class IncidentsTable extends Table
             }
 
             $location = self::truncate($this->stringValue($error['file'] ?? ''), 65535);
-            $linenumber = (int) $this->stringValue($error['lineNum'] ?? '');
+            $linenumber = $this->lineNumber($error['lineNum'] ?? '');
             $reportDetails = [
                 'error_message' => self::truncate($this->stringValue($error['msg'] ?? ''), 150),
                 'error_name' => self::truncate($this->stringValue($error['type'] ?? ''), 50),
@@ -384,7 +404,7 @@ class IncidentsTable extends Table
             [$location, $linenumber] =
                 $this->getIdentifyingLocation($stack);
             $location = self::truncate($this->stringValue($location), 65535);
-            $linenumber = (int) $linenumber;
+            $linenumber = $this->lineNumber($linenumber);
 
             $reportDetails = [
                 'error_message' => self::truncate($this->stringValue($exception['message'] ?? ''), 150),
@@ -653,6 +673,11 @@ class IncidentsTable extends Table
     public const MAX_PMA_VERSION_LENGTH = 50;
 
     /**
+     * Largest line number an int(11) column holds.
+     */
+    public const MAX_LINE_NUMBER = 2147483647;
+
+    /**
      * Keep the beginning of the list of errors and of the stack of a report.
      *
      * A payload carries one entry per error and one frame per call: without
@@ -712,10 +737,11 @@ class IncidentsTable extends Table
             return false;
         }
 
-        // "5.2.<200 digits>" is accepted by version_compare and does not fit
-        // in the column: refuse it here rather than let the save fail, or let
-        // a server that is not in strict mode truncate it.
-        if (strlen($version) > self::MAX_PMA_VERSION_LENGTH) {
+        // The value that is stored, not its numeric prefix: "5.2.1-" followed by
+        // anything passes the version rules with a short prefix and does not fit
+        // in the column. Refuse it here rather than let the save fail, or let a
+        // server that is not in strict mode truncate it.
+        if (strlen(self::getStrippedPmaVersion($versionString)) > self::MAX_PMA_VERSION_LENGTH) {
             return false;
         }
 
