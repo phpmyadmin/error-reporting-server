@@ -59,6 +59,11 @@ class AuthenticationMiddleware implements MiddlewareInterface
     public const ACCESS_MAX_STALE = 172800;
 
     /**
+     * Seconds before an answer that could not be asked is tried again.
+     */
+    public const ACCESS_RETRY_DELAY = 900;
+
+    /**
      * The API the permission of a developer is read from.
      */
     private GithubApi|null $api = null;
@@ -214,8 +219,13 @@ class AuthenticationMiddleware implements MiddlewareInterface
             $session->write('has_commit_access', false);
         }
 
-        // Retry sooner than a completed answer would, the API may be back.
-        $session->write('access_checked_at', time() - self::ACCESS_RECHECK_INTERVAL + 60);
+        // Retry sooner than a completed answer would, since the API may be
+        // back — but not every minute: each attempt costs two calls, one of
+        // them on the token the server shares with the issue creation.
+        $session->write(
+            'access_checked_at',
+            time() - self::ACCESS_RECHECK_INTERVAL + self::ACCESS_RETRY_DELAY,
+        );
     }
 
     protected function hasAccessToAction(ServerRequest $request): bool

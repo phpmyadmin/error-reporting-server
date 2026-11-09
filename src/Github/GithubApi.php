@@ -272,13 +272,21 @@ class GithubApi
         // of a login only carries the scopes the user agreed to share, and the
         // endpoint refuses a read-only account as well. Ask a second time with
         // the token of the server, which is not tied to what a user gave.
+        if ($this->isRateLimited()) {
+            // Asking again with the token of the server would spend the same
+            // budget the issue creation needs, and answer the same thing.
+            Log::error('GitHub asked the permission too often, rate limit reached');
+
+            return null;
+        }
+
         $refused = false;
         if ($status !== 200) {
-            $refused = $status === 401 || ($status === 403 && ! $this->isRateLimited());
+            $refused = $status === 401 || $status === 403;
             $serverToken = (string) Configure::read('GithubAccessToken');
             if ($serverToken !== '' && $serverToken !== $access_token) {
                 [$role, $status] = $this->getCollaboratorPermission($username, $repoPath, $serverToken);
-                $refused = $status === 401 || ($status === 403 && ! $this->isRateLimited());
+                $refused = $status === 401 || $status === 403;
             }
         }
 
