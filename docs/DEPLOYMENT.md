@@ -48,6 +48,16 @@ In order to deploy the app in this repo you need to follow these steps:
     	`bin/cake migrations migrate`
 	- For new system: just run migration
 	 `bin/cake migrations migrate`
+- Clear the schema the application keeps in cache, or it keeps the one from
+  before the migration: `bin/cake cache clear _cake_model_`
+- If the reports were stored before `forwarded_at` existed, they all look like
+  they are waiting to be forwarded. Mark them as done **before** the cron of the
+  next step runs, or the first run sends the whole history again, with new event
+  ids and today's date: `UPDATE incidents SET forwarded_at = created;`
+- Install the cron that forwards the reports, `bin/cake forward_reports`, every
+  minute or five minutes (see [Forward the reports to the tracker](#forward-the-reports-to-the-tracker)).
+  **Nothing reaches the tracker without it**: the ingest endpoint stores the
+  report and answers, it does not forward anything itself.
 
 ## Requirements
 
