@@ -322,7 +322,15 @@ class GithubController extends AppController
     protected function tableCell(string $value): string
     {
         $value = (string) preg_replace('/\s+/', ' ', $value);
+
+        // A backslash of the value escapes the escape: "\" then "|" would leave
+        // cmark-gfm an escaped backslash and a live cell separator.
+        $value = str_replace('\\', '\\\\', $value);
         $value = str_replace('|', '\\|', $value);
+
+        // A link or an image in the cell is live: it is clicked by whoever reads
+        // the issue, and an image url is fetched by their browser.
+        $value = str_replace(['[', ']'], ['\[', '\]'], $value);
 
         // Free text is neutralised by the cell it sits in, and the fence is
         // what keeps an HTML tag from being rendered: do it here too.
@@ -372,6 +380,10 @@ class GithubController extends AppController
      */
     protected function neutralizeMentions(string $value): string
     {
+        // An entity-encoded at sign is rendered as one by GitHub, and would
+        // notify whoever it names just as the plain character does.
+        $value = (string) preg_replace('/&#0*64;|&#x0*40;/i', '&#64;&#8203;', $value);
+
         return (string) preg_replace('/@(?=\S)/u', "@\u{200B}", $value);
     }
 

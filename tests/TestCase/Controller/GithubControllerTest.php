@@ -37,6 +37,7 @@ use ReflectionMethod;
 use function file_get_contents;
 use function json_decode;
 use function json_encode;
+use function str_repeat;
 use function substr_count;
 
 use const CONFIG;
@@ -355,6 +356,37 @@ class GithubControllerTest extends TestCase
         $routes = require CONFIG . 'routes.php';
         $this->assertIsCallable($routes);
         $routes($builder);
+    }
+
+    /**
+     * A cell is not only text: a link is clickable, an image is fetched by
+     * whoever reads the issue, and an entity-encoded at sign still notifies.
+     */
+    public function testATableCellNeutralisesLinksAndEntities(): void
+    {
+        $controller = new GithubController(new ServerRequest());
+        $cell = new ReflectionMethod($controller, 'tableCell');
+        $cell->setAccessible(true);
+
+        // A backslash must not escape the escape of the cell separator: the
+        // pipe keeps an odd number of backslashes in front of it.
+        $expected = 'a' . str_repeat('\\', 3) . '|b';
+        $this->assertSame($expected, $cell->invoke($controller, 'a\\|b'));
+
+        // A link and an image are not live: every bracket is escaped, so none
+        // of them can open a link.
+        foreach (['[x](https://evil.test)', '![p](https://evil.test/p.png)'] as $value) {
+            $out = (string) $cell->invoke($controller, $value);
+            $this->assertDoesNotMatchRegularExpression(
+                '/(?<!\\\\)[\[\]]/',
+                $out,
+                'no unescaped bracket survives',
+            );
+        }
+
+        // An encoded at sign does not notify either.
+        $out = (string) $cell->invoke($controller, '&#64;someone hi');
+        $this->assertStringNotContainsString('&#64;someone', $out);
     }
 
     /**

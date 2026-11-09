@@ -83,6 +83,18 @@ class IncidentsController extends AppController
         // Only allow POST requests
         $this->request->allowMethod(['post']);
 
+        // Refuse an oversized submission from what the client announced, before
+        // the body is read: reading it first buffers the whole thing in memory,
+        // which is what an oversized body is trying to do.
+        $announced = (int) $this->request->getHeaderLine('Content-Length');
+        if ($announced > self::MAX_REQUEST_BODY_SIZE) {
+            $this->response = $this->response
+                ->withStatus(413)
+                ->withStringBody($this->rejectionBody());
+
+            return $this->response;
+        }
+
         $requestBody = (string) $this->request->getBody();
 
         // Refuse oversized submissions before decoding them
